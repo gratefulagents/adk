@@ -1,0 +1,14 @@
+[
+  {"name":"disabled","enabled":false,"all_servers":true,"all_tools":true,"resources":true},
+  {"name":"no_server_selection","enabled":true,"all_tools":true},
+  {"name":"no_tool_selection","enabled":true,"all_servers":true},
+  {"name":"absent_server","enabled":true,"servers":["absent"],"all_tools":true},
+  {"name":"selected_raw","enabled":true,"servers":["chosen"],"tools":["a b"]},
+  {"name":"selected_final","enabled":true,"servers":["chosen"],"tools":["mcp__chosen__a_b_2"]},
+  {"name":"selected_unknown_tool","enabled":true,"servers":["chosen"],"tools":["absent"]},
+  {"name":"resources_only","enabled":true,"servers":["chosen"],"resources":true},
+  {"name":"all_tools_selected_server","enabled":true,"servers":["chosen"],"all_tools":true},
+  {"name":"all_servers_raw","enabled":true,"all_servers":true,"tools":["a b"]},
+  {"name":"all_tools_and_resources","enabled":true,"all_servers":true,"all_tools":true,"resources":true},
+  {"name":"trimmed_selection","enabled":true,"servers":[" chosen "],"tools":[" a b "]}
+]

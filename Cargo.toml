@@ -12,7 +12,8 @@ publish = false
 
 [workspace.dependencies]
 serde = { version = "1", features = ["derive"] }
-serde_json = { version = "1", features = ["arbitrary_precision"] }
+# Preserve raw JSON numbers and exact typed f64 round trips in SDK event/cost records.
+serde_json = { version = "1", features = ["arbitrary_precision", "float_roundtrip"] }
 schemars = "1"
 thiserror = "2"
 tokio = { version = "1", features = ["rt", "macros", "sync", "time"] }

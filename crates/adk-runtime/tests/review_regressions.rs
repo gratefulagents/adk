@@ -23,6 +23,9 @@ fn text(value: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: Some(true),
@@ -46,6 +49,7 @@ fn policy() -> RunPolicy {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: policy(),
     }
@@ -130,7 +134,7 @@ async fn final_nonempty_message_not_commentary_is_validated_in_both_modes() {
             vec![Ok(ModelEvent::Complete { response: result })],
         ));
         let mut agent = AgentConfig::new("review", ModelBinding::streaming("fake", fake));
-        agent.output_schema = Some(json!({"type":"object", "required":["ok"], "properties":{"ok":{"const":true}}, "additionalProperties":false}).try_into().unwrap());
+        agent.output_schema = Some(adk_core::JsonDocument::new((json!({"type":"object", "required":["ok"], "properties":{"ok":{"const":true}}, "additionalProperties":false})).to_string()).unwrap());
         let runner = Runner::new(agent, RunnerConfig::default()).unwrap();
         let outcome = if streamed {
             runner
@@ -256,6 +260,7 @@ async fn conversation_can_adopt_failed_resume_and_continue_without_repeated_effe
         vec![
             Ok(response(vec![RunItem::ToolCall {
                 call: ToolCall {
+                    raw_arguments: None,
                     id: "approved-call".into(),
                     name: "count".into(),
                     arguments: json!({}),

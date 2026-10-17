@@ -4,6 +4,67 @@ Baseline: Go SDK `1dc92b73900fac74dc357a938e4b5eee6392b418`, especially
 `internal/agent/run_config.go`, `internal/agent/runner.go`, and
 `pkg/agentsdk/chatloop.go`. Native `adk-core` types remain unchanged.
 
+## Analysis snapshot records
+
+`dto::ResponseSnapshot` preserves Go response-record field formats independently
+of whether a record can be converted into an executable native response. Ordered
+slice fields decode JSON null elements as Go zero values (empty strings or empty
+records), not as omitted elements. Raw JSON retains missing-versus-null, numeric
+spelling and duplicate-key order; `snapshots::to_go_json` applies Go escaping.
+
+`dto::SnapshotType` is an open string label. Known labels keep named variants;
+empty/missing/null labels use `Unspecified`, and other strings use `Other(String)`.
+Unknown numeric native item tags still project to the literal `"unknown"` label.
+This permits faithful analysis-record transport, not execution of unfamiliar
+history. Native Go-checkpoint migration and platform transcript persistence reject
+unspecified, unknown and future labels before constructing executable state.
+`SnapshotType` is now cloneable rather than copyable, and its JSON Schema is an
+open string. This does not claim all snapshot-decoder edge cases or provider
+response conversion are equivalent.
+
+## Explicit budget guidance
+
+With `compat`, `adk::codec::userinput::{build_run_budget_context,
+build_subagent_budget_context}` return the pinned SDK's complete guidance text.
+They accept signed 64-bit turn counts; positive counts pass through, and zero or
+negative values select the SDK defaults of 100 top-level or 50 child turns.
+The public Go aliases map to ordinary Rust functions, not mutable global callbacks.
+
+These are text helpers, not limit setters or enforcement mechanisms. Their text
+does not guarantee that a host delivers turn-budget warnings. The legacy
+top-level helper is never automatically injected, matching its deprecated source
+status. The native automatic child runner's prompt assembly and default ceiling
+are separate contracts; exposing this helper does not establish their parity.
+Seven pinned-Go inputs per helper include both signed endpoints and compare every
+byte of the returned text. Source attribution remains GPL-3.0-only as recorded in
+the fixture provenance and repository licensing notices.
+
+## Signed usage arithmetic
+
+`adk::codec::dto::Usage` (facade `compat` feature) retains all five signed SDK
+counters. `add(&other)` merges them in place without changing `other`;
+`total_tokens()` sums input and output only, not cache counters. Both use explicit
+wrapping arithmetic, including in debug builds, matching the pinned SDK on
+64-bit targets. `requests` models a 64-bit Go `int`; this is not a 32-bit Go
+compatibility claim. Native `adk::core::Usage` remains unsigned and unchanged.
+
+`fixtures/usage/generate.go` executes the pinned public SDK alias to produce 64
+operand pairs, including negative values, cache-only counters and signed extrema.
+The typed-record fixture check reproduces the output before ledger verification.
+
+## Settings composition
+
+With the facade's `compat` feature, `adk::codec::snapshots::ModelSettings::merge`
+returns owned settings using the pinned SDK's value-precedence rules. Present
+`temperature`, `top_p` and `parallel_tool_calls` override even with zero/false;
+`max_tokens` and `thinking_budget` override only when positive. Nonempty strings
+(including whitespace) and nonempty stop lists override. Null/absent optionals,
+empty strings/lists and nonpositive integer overrides preserve the base values.
+Neither input is mutated; returned strings and lists do not alias either input.
+This helper does not validate provider-specific ranges or change builder policy.
+The `settings_routing` offline example feeds merged settings into a real builder
+request and then verifies mode/role precedence.
+
 ## Configuration integration
 
 `adk_codec::config::RunConfigSentinels` is a **bounded scalar projection**, not

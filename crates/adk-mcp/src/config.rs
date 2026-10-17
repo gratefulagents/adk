@@ -24,6 +24,50 @@ impl Config {
     pub fn server(&self, name: &str) -> Option<&ServerConfig> {
         self.mcp_servers.get(name)
     }
+    fn validate(&self) -> Result<(), Error> {
+        for (name, server) in self.servers() {
+            if name.trim().is_empty() {
+                return Err(Error::Config("empty server name".into()));
+            }
+            server.validate()?;
+        }
+        Ok(())
+    }
+}
+
+/// Explicit validated input; no ambient configuration discovery is performed.
+#[derive(Clone)]
+pub struct ConnectionConfig(ConnectionSource);
+
+#[derive(Clone)]
+enum ConnectionSource {
+    Inline(Config),
+    Snapshot(ConfigSnapshot),
+}
+
+impl ConnectionConfig {
+    pub fn inline(config: Config) -> Result<Self, Error> {
+        config.validate()?;
+        Ok(Self(ConnectionSource::Inline(config)))
+    }
+
+    pub fn snapshot(snapshot: ConfigSnapshot) -> Self {
+        Self(ConnectionSource::Snapshot(snapshot))
+    }
+
+    pub fn config(&self) -> &Config {
+        match &self.0 {
+            ConnectionSource::Inline(config) => config,
+            ConnectionSource::Snapshot(snapshot) => snapshot.config(),
+        }
+    }
+
+    pub fn verify_unchanged(&self) -> Result<(), Error> {
+        match &self.0 {
+            ConnectionSource::Inline(_) => Ok(()),
+            ConnectionSource::Snapshot(snapshot) => snapshot.verify_unchanged(),
+        }
+    }
 }
 
 #[derive(Clone, Default, Deserialize, Serialize)]
@@ -197,12 +241,7 @@ impl ConfigSnapshot {
                 .map_err(|_| Error::Config("invalid config JSON".into()))?,
             None => Config::default(),
         };
-        for (name, server) in config.servers() {
-            if name.trim().is_empty() {
-                return Err(Error::Config("empty server name".into()));
-            }
-            server.validate()?;
-        }
+        config.validate()?;
         let sha256 = bytes.as_ref().map(|b| Sha256::digest(b).into());
         Ok(Self {
             path,

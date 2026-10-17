@@ -20,6 +20,9 @@ fn answer(text: &str) -> ModelResponse {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: None,
@@ -30,6 +33,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 fn call(name: &str, arguments: Value) -> ModelResponse {
     response(vec![RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: None,
             id: format!("call-{name}"),
             name: name.into(),
             arguments,
@@ -45,6 +49,7 @@ fn context() -> Context {
 }
 fn request() -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![message(Role::User, "delegate")],
         policy: RunPolicy::default(),
     }
@@ -172,6 +177,82 @@ fn parent(model: Arc<FakeModel>, session: Arc<SubagentSession>) -> Runner {
 }
 
 #[tokio::test]
+async fn final_summary_waits_for_child_join_before_disabling_tools() {
+    struct GatedChild(Arc<tokio::sync::Notify>);
+    impl Model for GatedChild {
+        fn provider(&self) -> &str {
+            "test"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                self.0.notified().await;
+                Ok(answer("child evidence"))
+            })
+        }
+    }
+    struct ReleasingParent(Arc<FakeModel>, Arc<tokio::sync::Notify>);
+    impl Model for ReleasingParent {
+        fn provider(&self) -> &str {
+            "test"
+        }
+        fn complete<'a>(
+            &'a self,
+            context: &'a Context,
+            request: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            self.1.notify_one();
+            self.0.complete(context, request)
+        }
+    }
+    let gate = Arc::new(tokio::sync::Notify::new());
+    let (owner, session) = session(Arc::new(GatedChild(gate.clone()))).await;
+    owner
+        .handle()
+        .submit(Submission::new("worker", "inspect"))
+        .await
+        .unwrap();
+    let model = FakeModel::new(
+        vec![answer("premature"), answer("synthesized")],
+        Duration::ZERO,
+    );
+    let mut agent = AgentConfig::new(
+        "parent",
+        ModelBinding::complete("fake", Arc::new(ReleasingParent(model.clone(), gate))),
+    );
+    agent.tools = build_subagent_task_tools(session.clone(), "worker");
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            subagents: Some(session),
+            force_final_summary_turn: true,
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut req = request();
+    req.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+    let result = runner
+        .run(context(), req, Arc::new(TestHost))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("synthesized")));
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert!(!requests[0].tools.is_empty());
+        assert!(!requests[0].instructions.contains("<final_turn>"));
+        assert!(requests[1].tools.is_empty());
+        assert!(requests[1].instructions.contains("<final_turn>"));
+        assert!(history_text(&requests[1].input).contains("child evidence"));
+    }
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
 async fn background_final_answer_waits_and_delivers_exactly_once() {
     let child = FakeModel::new(vec![answer("child evidence")], Duration::from_millis(50));
     let (owner, session) = session(child.clone()).await;
@@ -291,6 +372,7 @@ async fn sync_timeout_keeps_child_alive_across_runs_and_status_can_reread() {
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "status".into(),
                 name: "subagent_status".into(),
                 arguments: json!({"detail":"results"}),
@@ -308,11 +390,26 @@ async fn sync_timeout_keeps_child_alive_across_runs_and_status_can_reread() {
 
 #[tokio::test(start_paused = true)]
 async fn tool_policy_timeout_preserves_managed_pending_results() {
+    struct GatedChild(Arc<tokio::sync::Notify>);
+    impl Model for GatedChild {
+        fn provider(&self) -> &str {
+            "test"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                self.0.notified().await;
+                Ok(answer("late policy evidence"))
+            })
+        }
+    }
     for name in ["subagent", "subagent_wait", "specialist"] {
-        let child = FakeModel::new(
-            vec![answer("late policy evidence")],
-            Duration::from_millis(50),
-        );
+        // Core deadlines use wall time, which can advance while Tokio time is paused.
+        let release = Arc::new(tokio::sync::Notify::new());
+        let child = Arc::new(GatedChild(release.clone()));
         let (owner, session) = session(child).await;
         let arguments = if name == "subagent_wait" {
             owner
@@ -384,6 +481,7 @@ async fn tool_policy_timeout_preserves_managed_pending_results() {
                 .status
                 .is_terminal()
         );
+        release.notify_one();
         owner
             .handle()
             .wait(&[task_id.to_owned()], WaitMode::All, None)
@@ -403,6 +501,48 @@ async fn tool_policy_timeout_preserves_managed_pending_results() {
 
 #[tokio::test(start_paused = true)]
 async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
+    struct Leaf(Option<Arc<tokio::sync::Notify>>);
+    impl Model for Leaf {
+        fn provider(&self) -> &str {
+            "fake"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async move {
+                if let Some(release) = &self.0 {
+                    release.notified().await;
+                } else {
+                    tokio::time::sleep(Duration::from_millis(50)).await;
+                }
+                Ok(answer("late nested evidence"))
+            })
+        }
+    }
+    struct ReleasingWorker {
+        model: Arc<FakeModel>,
+        release: Option<Arc<tokio::sync::Notify>>,
+        call_id: String,
+    }
+    impl Model for ReleasingWorker {
+        fn provider(&self) -> &str {
+            "fake"
+        }
+        fn complete<'a>(
+            &'a self,
+            context: &'a Context,
+            request: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            if let Some(release) = &self.release
+                && request.input.iter().any(|item| matches!(item, RunItem::ToolResult { call_id, .. } if call_id == &self.call_id))
+            {
+                release.notify_one();
+            }
+            self.model.complete(context, request)
+        }
+    }
     for max_concurrency in [1, 2] {
         for name in ["subagent", "subagent_wait", "specialist"] {
             let (foreign_owner, foreign_session) =
@@ -420,8 +560,19 @@ async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
                 answer("nested synthesis"),
             ]);
             let model = FakeModel::new(responses, Duration::ZERO);
-            let mut agent =
-                AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+            // Paused Tokio time cannot order a leaf delay against core wall-clock deadlines.
+            let release = (max_concurrency == 2).then(|| Arc::new(tokio::sync::Notify::new()));
+            let mut agent = AgentConfig::new(
+                "worker",
+                ModelBinding::complete(
+                    "fake",
+                    Arc::new(ReleasingWorker {
+                        model: model.clone(),
+                        release: release.clone(),
+                        call_id: format!("call-{name}"),
+                    }),
+                ),
+            );
             agent.tools = build_subagent_task_tools(foreign_session.clone(), "leaf");
             agent.tools.push(Arc::new(AgentAsTool::new(
                 "specialist",
@@ -437,13 +588,7 @@ async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
                 },
             )
             .unwrap();
-            let leaf = runner(
-                "leaf",
-                FakeModel::new(
-                    vec![answer("late nested evidence")],
-                    Duration::from_millis(50),
-                ),
-            );
+            let leaf = runner("leaf", Arc::new(Leaf(release)));
             let owner = Scheduler::new(
                 context(),
                 SchedulerConfig {
@@ -536,6 +681,214 @@ async fn nested_tool_policy_timeout_resumes_without_cancelling_children() {
 }
 
 #[tokio::test]
+async fn agent_as_tool_completed_output_matches_pinned_sdk() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/run-instructions/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["agent_tool_cases"].as_array().unwrap() {
+        let child = FakeModel::new(
+            vec![answer(case["answer"].as_str().unwrap())],
+            Duration::ZERO,
+        );
+        let mut child_agent =
+            AgentConfig::new("worker", ModelBinding::complete("fake", child.clone()));
+        if case["structured"].as_bool().unwrap() {
+            child_agent.output_schema =
+                Some(adk_core::JsonDocument::new((json!(true)).to_string()).unwrap());
+        }
+        let child_runner = Runner::new(child_agent, RunnerConfig::default()).unwrap();
+        let mut executor = RunnerChildExecutor::new(
+            [("worker".into(), child_runner)].into_iter().collect(),
+            Arc::new(TestHost),
+        );
+        let calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let extractor = case["extractor"].as_str().unwrap().to_owned();
+        if extractor != "none" {
+            let calls = calls.clone();
+            executor = executor.with_output_extractor(
+                "worker",
+                Arc::new(move |run| {
+                    calls.fetch_add(1, std::sync::atomic::Ordering::SeqCst);
+                    assert_eq!(run.status, RunStatus::Completed);
+                    assert_eq!(run.last_agent.as_deref(), Some("worker"));
+                    assert!(!run.history.is_empty());
+                    match extractor.as_str() {
+                        "empty" => String::new(),
+                        "json" => {
+                            format!("json:{}", serde_json::to_string(&run.final_output).unwrap())
+                        }
+                        _ => format!("extracted:{}", run.final_text()),
+                    }
+                }),
+            );
+        }
+        let baseline = SecurityBaseline::default();
+        let owner = Scheduler::new(
+            context(),
+            SchedulerConfig {
+                security: baseline.clone(),
+                agents: [("worker".into(), baseline)].into_iter().collect(),
+                ..Default::default()
+            },
+            Arc::new(executor),
+            None,
+        )
+        .unwrap();
+        let session = Arc::new(SubagentSession::new(owner.handle()));
+        let model = FakeModel::new(
+            vec![call("specialist", json!({"message":"work"}))],
+            Duration::ZERO,
+        );
+        let mut agent = AgentConfig::new("parent", ModelBinding::complete("fake", model));
+        agent.tools = vec![Arc::new(AgentAsTool::new(
+            "specialist",
+            "specialist task",
+            "worker",
+            session.clone(),
+        ))];
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                subagents: Some(session),
+                output: adk_runtime::output::OutputPolicy {
+                    untrusted: false,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let mut req = request();
+        req.policy.tool_use = ToolUseBehavior::StopAfterTool;
+        let result = runner
+            .run(context(), req, Arc::new(TestHost))
+            .await
+            .unwrap();
+        let output = result
+            .result
+            .history
+            .iter()
+            .find_map(|item| match item {
+                RunItem::ToolResult { output, .. } => Some(output),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(
+            output.content,
+            vec![Content::Text {
+                text: case["content"].as_str().unwrap().into(),
+            }],
+            "{case}"
+        );
+        assert_eq!(
+            output.is_error,
+            case["is_error"].as_bool().unwrap(),
+            "{case}"
+        );
+        assert_eq!(
+            child.requests.lock().unwrap().len() as u64,
+            case["requests"].as_u64().unwrap()
+        );
+        assert_eq!(
+            calls.load(std::sync::atomic::Ordering::SeqCst) as u64,
+            case["extractor_calls"].as_u64().unwrap()
+        );
+        assert_eq!(owner.handle().list().len(), 1);
+        assert_eq!(owner.handle().list()[0].status, TaskStatus::Completed);
+        assert_eq!(
+            owner.handle().list()[0].result,
+            case["content"].as_str().unwrap()
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn child_output_extractors_skip_failures_and_contain_panics() {
+    struct DeniedModel;
+    impl Model for DeniedModel {
+        fn provider(&self) -> &str {
+            "denied"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async { Err(Error::new(ErrorCategory::PermissionDenied, "denied child")) })
+        }
+    }
+    let child = FakeModel::new(vec![answer("first"), answer("second")], Duration::ZERO);
+    let calls = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+    let observed = calls.clone();
+    let executor = RunnerChildExecutor::new(
+        [
+            ("worker".into(), runner("worker", child)),
+            ("denied".into(), runner("denied", Arc::new(DeniedModel))),
+        ]
+        .into_iter()
+        .collect(),
+        Arc::new(TestHost),
+    )
+    .with_output_extractor(
+        "denied",
+        Arc::new(|_| panic!("failed child reached extractor")),
+    )
+    .with_output_extractor(
+        "worker",
+        Arc::new(move |run| {
+            if observed.fetch_add(1, std::sync::atomic::Ordering::SeqCst) == 0 {
+                panic!("extractor failure");
+            }
+            format!("extracted:{}", run.final_text())
+        }),
+    );
+    let baseline = SecurityBaseline::default();
+    let owner = Scheduler::new(
+        context(),
+        SchedulerConfig {
+            max_concurrency: 1,
+            security: baseline.clone(),
+            agents: [
+                ("worker".into(), baseline.clone()),
+                ("denied".into(), baseline),
+            ]
+            .into_iter()
+            .collect(),
+            ..Default::default()
+        },
+        Arc::new(executor),
+        None,
+    )
+    .unwrap();
+    let handle = owner.handle();
+    for (agent, status, expected) in [
+        ("denied", TaskStatus::Failed, "denied child"),
+        ("worker", TaskStatus::Failed, "child executor panicked"),
+        ("worker", TaskStatus::Completed, "extracted:second"),
+    ] {
+        let id = handle.submit(Submission::new(agent, "work")).await.unwrap();
+        let tasks = tokio::time::timeout(
+            Duration::from_secs(2),
+            handle.wait(&[id], WaitMode::All, None),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+        assert_eq!(tasks[0].status, status);
+        let text = if status == TaskStatus::Completed {
+            &tasks[0].result
+        } else {
+            tasks[0].error.as_ref().unwrap()
+        };
+        assert!(text.contains(expected), "{text}");
+    }
+    assert_eq!(calls.load(std::sync::atomic::Ordering::SeqCst), 2);
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
 async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired() {
     let child = FakeModel::new(vec![answer("first"), answer("second")], Duration::ZERO);
     let (owner, session) = session(child.clone()).await;
@@ -577,6 +930,12 @@ async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired
     );
     let mut req = request();
     req.input.push(message(Role::User, "parent context marker"));
+    req.input_provenance = vec![
+        ItemProvenance::Unknown,
+        ItemProvenance::Agent {
+            name: "original-parent".into(),
+        },
+    ];
     parent(model, session)
         .run(context(), req, Arc::new(TestHost))
         .await
@@ -585,6 +944,16 @@ async fn agent_as_tool_shares_child_engine_and_explicit_parent_context_is_paired
         let requests = child.requests.lock().unwrap();
         assert!(!history_text(&requests[0].input).contains("delegate"));
         assert!(history_text(&requests[1].input).contains("parent context marker"));
+        assert_eq!(
+            requests[1].input_provenance,
+            vec![
+                ItemProvenance::Unknown,
+                ItemProvenance::Agent {
+                    name: "original-parent".into()
+                },
+                ItemProvenance::Unattributed
+            ]
+        );
         assert!(
             !requests[1]
                 .input
@@ -661,6 +1030,139 @@ impl SchedulerStore for SchedulerCheckpoints {
             self.0.lock().unwrap().push(checkpoint.clone());
             Ok(())
         })
+    }
+}
+
+struct LateChildInput(Mutex<usize>);
+impl ImmediateInputFinalizer for LateChildInput {
+    fn durable_key(&self) -> Option<&str> {
+        Some("late-child-input-v1")
+    }
+    fn finalize<'a>(&'a self, _: &'a Context) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>> {
+        Box::pin(async move {
+            let mut calls = self.0.lock().unwrap();
+            *calls += 1;
+            Ok(if *calls == 1 {
+                ImmediateInputBatch {
+                    items: vec![message(Role::User, "late child input")],
+                    provenance: vec![ItemProvenance::Unattributed],
+                }
+            } else {
+                ImmediateInputBatch::default()
+            })
+        })
+    }
+}
+
+struct LateInputChildModel {
+    started: tokio::sync::Notify,
+    release: tokio::sync::Notify,
+    requests: Mutex<Vec<ModelRequest>>,
+}
+impl Model for LateInputChildModel {
+    fn provider(&self) -> &str {
+        "fake"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            let turn = {
+                let mut requests = self.requests.lock().unwrap();
+                requests.push(request);
+                requests.len()
+            };
+            if turn == 2 {
+                self.started.notify_one();
+                self.release.notified().await;
+            }
+            Ok(answer(if turn == 1 { "candidate" } else { "done" }))
+        })
+    }
+}
+
+#[tokio::test]
+async fn late_immediate_input_reopens_child_steering() {
+    for durable in [false, true] {
+        let model = Arc::new(LateInputChildModel {
+            started: tokio::sync::Notify::new(),
+            release: tokio::sync::Notify::new(),
+            requests: Mutex::new(vec![]),
+        });
+        let finalizer = Arc::new(LateChildInput(Mutex::new(0)));
+        let child = Runner::new(
+            AgentConfig::new("worker", ModelBinding::complete("fake", model.clone())),
+            RunnerConfig {
+                immediate_input_finalizer: Some(finalizer.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let store =
+            durable.then(|| Arc::new(SchedulerCheckpoints::default()) as Arc<dyn SchedulerStore>);
+        let (owner, session) = session_with_runner(child, store).await;
+        let id = session
+            .scheduler
+            .submit(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        tokio::time::timeout(Duration::from_secs(2), model.started.notified())
+            .await
+            .unwrap();
+        assert_eq!(
+            session
+                .scheduler
+                .status(&id, Detail::Summary)
+                .unwrap()
+                .status,
+            TaskStatus::Running
+        );
+        session
+            .scheduler
+            .steer(&id, "after-late-input", "parent steering after late input")
+            .await
+            .unwrap();
+        model.release.notify_one();
+        tokio::time::timeout(
+            Duration::from_secs(2),
+            session
+                .scheduler
+                .wait(std::slice::from_ref(&id), WaitMode::All, None),
+        )
+        .await
+        .unwrap()
+        .unwrap();
+        let record = session.scheduler.snapshot().records.remove(0);
+        assert_eq!(
+            record.task.status,
+            TaskStatus::Completed,
+            "{:?}",
+            record.task.error
+        );
+        assert!(!record.accepting_messages);
+        assert_eq!(record.acknowledged_messages.len(), 1);
+        assert_eq!(*finalizer.0.lock().unwrap(), 2);
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 3);
+            assert!(history_text(&requests[1].input).contains("late child input"));
+            assert_eq!(
+                history_text(&requests[2].input)
+                    .matches("parent steering after late input")
+                    .count(),
+                1
+            );
+        }
+        assert!(
+            session
+                .scheduler
+                .steer(&id, "too-late", "closed")
+                .await
+                .is_err()
+        );
+        owner.shutdown().await.unwrap();
     }
 }
 
@@ -1048,6 +1550,194 @@ impl Tool for CountTool {
         })
     }
 }
+#[tokio::test]
+async fn child_engine_reserves_final_turn_without_changing_registered_runner() {
+    for (turns, hallucinate) in [(1, false), (1, true), (2, false)] {
+        let mut responses = Vec::new();
+        if turns == 2 || hallucinate {
+            responses.push(call("count", json!({})));
+        }
+        if !hallucinate {
+            responses.push(answer("done"));
+        }
+        let model = FakeModel::new(responses, Duration::ZERO);
+        let count = Arc::new(std::sync::atomic::AtomicUsize::new(0));
+        let mut agent = AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+        agent.tools.push(Arc::new(CountTool {
+            definition: ToolDefinition {
+                name: "count".into(),
+                description: "count".into(),
+                input_schema: schemars::schema_for!(Value),
+                read_only: false,
+                requires_approval: false,
+            },
+            count: count.clone(),
+        }));
+        let child = Runner::new(agent, RunnerConfig::default()).unwrap();
+        let (owner, session) = session_with_runner(child.clone(), None).await;
+        let mut submission = Submission::new("worker", "start");
+        submission.policy.max_turns = std::num::NonZeroU32::new(turns).unwrap();
+        submission.policy.tools.access = AccessMode::FullAccess;
+        let task = session.scheduler.run(submission).await.unwrap();
+        assert_eq!(
+            task.status,
+            if hallucinate {
+                TaskStatus::Failed
+            } else {
+                TaskStatus::Completed
+            }
+        );
+        assert_eq!(
+            count.load(std::sync::atomic::Ordering::SeqCst),
+            usize::from(turns == 2)
+        );
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), turns as usize);
+            let last = requests.last().unwrap();
+            assert!(last.tools.is_empty());
+            assert!(last.instructions.contains("<final_turn>"));
+            if turns == 2 {
+                assert_eq!(requests[0].tools.len(), 1);
+                assert!(!requests[0].instructions.contains("<final_turn>"));
+            }
+        }
+        owner.shutdown().await.unwrap();
+        model.responses.lock().unwrap().push_back(answer("direct"));
+        let mut direct = request();
+        direct.policy.max_turns = std::num::NonZeroU32::new(1).unwrap();
+        direct.policy.tools.access = AccessMode::FullAccess;
+        child
+            .run(context(), direct, Arc::new(TestHost))
+            .await
+            .unwrap();
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.last().unwrap().tools.len(), 1);
+        assert!(
+            !requests
+                .last()
+                .unwrap()
+                .instructions
+                .contains("<final_turn>")
+        );
+    }
+}
+
+#[tokio::test]
+async fn child_context_guidance_wraps_static_and_dynamic_instructions_without_mutation() {
+    struct Dynamic;
+    impl InstructionProvider for Dynamic {
+        fn durable_key(&self) -> Option<&str> {
+            Some("dynamic-child-test")
+        }
+        fn instructions<'a>(
+            &'a self,
+            context: InstructionContext<'a>,
+        ) -> BoxFuture<'a, Result<String, Error>> {
+            Box::pin(async move {
+                assert!(context.agent.instructions.starts_with("static"));
+                Ok("dynamic".into())
+            })
+        }
+    }
+    for dynamic in [false, true] {
+        for durable in [false, true] {
+            for work_dir in ["", "/tmp/child workspace"] {
+                for access in [AccessMode::ReadOnly, AccessMode::FullAccess] {
+                    let model = FakeModel::new(
+                        vec![
+                            answer("one"),
+                            answer("two"),
+                            answer("capped"),
+                            answer("direct"),
+                        ],
+                        Duration::ZERO,
+                    );
+                    let mut agent =
+                        AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+                    agent.instructions = "static".into();
+                    if dynamic {
+                        agent.instruction_provider = Some(Arc::new(Dynamic));
+                    }
+                    agent.tool_access_ceiling = Some(access);
+                    let child = Runner::new(
+                        agent,
+                        RunnerConfig {
+                            work_dir: work_dir.into(),
+                            ..Default::default()
+                        },
+                    )
+                    .unwrap();
+                    let store = durable.then(|| {
+                        Arc::new(SchedulerCheckpoints::default()) as Arc<dyn SchedulerStore>
+                    });
+                    let (owner, session) = session_with_runner(child.clone(), store).await;
+                    for (turns, effective_turns) in [(3, 3), (7, 7), (1000, 100)] {
+                        let mut submission = Submission::new("worker", "inspect");
+                        submission.policy.tools.access = AccessMode::FullAccess;
+                        submission.policy.max_turns = std::num::NonZeroU32::new(turns).unwrap();
+                        let task = session.scheduler.run(submission).await.unwrap();
+                        assert_eq!(task.status, TaskStatus::Completed);
+                        let requests = model.requests.lock().unwrap();
+                        assert_eq!(
+                            requests.last().unwrap().instructions,
+                            format!(
+                                "{}{}\n\n{}",
+                                if dynamic { "dynamic" } else { "static" },
+                                if work_dir.is_empty() {
+                                    String::new()
+                                } else {
+                                    format!("\n\n{}", workspace_context(work_dir, access))
+                                },
+                                adk_codec::userinput::build_subagent_budget_context(i64::from(
+                                    effective_turns
+                                ))
+                            )
+                        );
+                    }
+                    owner.shutdown().await.unwrap();
+                    child
+                        .run(context(), request(), Arc::new(TestHost))
+                        .await
+                        .unwrap();
+                    assert_eq!(
+                        model.requests.lock().unwrap().last().unwrap().instructions,
+                        if dynamic { "dynamic" } else { "static" }
+                    );
+                }
+            }
+        }
+    }
+}
+
+#[tokio::test]
+async fn child_context_does_not_leak_into_handoff_targets() {
+    let model = FakeModel::new(
+        vec![call("transfer_to_target", json!({})), answer("done")],
+        Duration::ZERO,
+    );
+    let mut target = AgentConfig::new("target", ModelBinding::complete("fake", model.clone()));
+    target.instructions = "target instructions".into();
+    let mut initial = AgentConfig::new("worker", ModelBinding::complete("fake", model.clone()));
+    initial.handoffs.push(Handoff::new(Arc::new(target)));
+    let child = Runner::new(initial, RunnerConfig::default()).unwrap();
+    let (owner, session) = session_with_runner(child, None).await;
+    let task = session
+        .scheduler
+        .run(Submission::new("worker", "inspect"))
+        .await
+        .unwrap();
+    assert_eq!(task.status, TaskStatus::Completed);
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 2);
+        assert!(requests[0].instructions.contains("<sub_agent_budget>"));
+        assert!(requests[0].instructions.contains("<environment>"));
+        assert_eq!(requests[1].instructions, "target instructions");
+    }
+    owner.shutdown().await.unwrap();
+}
+
 struct CrashAfterTool {
     saved: Mutex<Option<SchedulerCheckpoint>>,
     reached: tokio::sync::Notify,
@@ -1152,39 +1842,70 @@ async fn native_child_resume_preserves_tool_cursor_and_narrows_policy() {
     assert_eq!(count.load(std::sync::atomic::Ordering::SeqCst), 1);
     assert_eq!(model.requests.lock().unwrap().len(), 2);
     assert!(model.requests.lock().unwrap()[1].tools.is_empty());
+    assert!(
+        model.requests.lock().unwrap()[0]
+            .instructions
+            .contains("Tool access: full")
+    );
+    assert!(
+        model.requests.lock().unwrap()[1]
+            .instructions
+            .contains("Tool access: read-only")
+    );
     owner.shutdown().await.unwrap();
 }
 
-struct FractionalCost;
+struct FractionalCost(Mutex<VecDeque<Option<f64>>>);
 impl CostEstimator for FractionalCost {
     fn cost(&self, _: &str, _: &Usage) -> f64 {
-        0.0000004
+        panic!("child prices must retain certainty")
+    }
+    fn estimate_cost(&self, _: &str, _: &Usage) -> Option<f64> {
+        self.0
+            .lock()
+            .unwrap()
+            .pop_front()
+            .expect("duplicate estimate")
     }
 }
 #[tokio::test]
 async fn cost_is_reported_cumulatively_not_rounded_per_response() {
-    let model = FakeModel::new(
-        vec![call("mutate", json!({})), answer("done")],
-        Duration::ZERO,
-    );
-    let child = Runner::new(
-        AgentConfig::new("worker", ModelBinding::complete("fake", model)),
-        RunnerConfig {
-            cost_estimator: Some(Arc::new(FractionalCost)),
-            ..Default::default()
-        },
-    )
-    .unwrap();
-    let (owner, session) = session_with_runner(child, None).await;
-    let task = session
-        .scheduler
-        .run(Submission::new("worker", "start"))
-        .await
+    for estimates in [
+        [Some(0.0000004), Some(0.0000004)],
+        [Some(0.0), Some(0.0)],
+        [Some(0.0000004), None],
+        [None, Some(0.0000004)],
+        [None, None],
+    ] {
+        let costs = Arc::new(FractionalCost(Mutex::new(estimates.into())));
+        let model = FakeModel::new(
+            vec![call("mutate", json!({})), answer("done")],
+            Duration::ZERO,
+        );
+        let child = Runner::new(
+            AgentConfig::new("worker", ModelBinding::complete("fake", model)),
+            RunnerConfig {
+                cost_estimator: Some(costs.clone()),
+                ..Default::default()
+            },
+        )
         .unwrap();
-    assert_eq!(task.status, TaskStatus::Completed);
-    assert_eq!(task.usage.cost_micros, 1);
-    assert_eq!(session.scheduler.snapshot().usage.cost_micros, 1);
-    owner.shutdown().await.unwrap();
+        let (owner, session) = session_with_runner(child, None).await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        assert_eq!(task.status, TaskStatus::Completed);
+        let expected = estimates.into_iter().flatten().sum::<f64>();
+        let micros = (expected * 1_000_000.0).ceil() as u64;
+        assert_eq!(task.usage.cost_micros, micros);
+        assert_eq!(task.cost_usd, expected);
+        assert_eq!(task.cost_known, estimates.iter().all(Option::is_some));
+        assert_eq!(session.scheduler.snapshot().usage.cost_micros, micros);
+        assert!(costs.0.lock().unwrap().is_empty());
+        owner.shutdown().await.unwrap();
+    }
 }
 
 #[tokio::test]
@@ -1436,6 +2157,272 @@ async fn steering_does_not_interrupt_started_tool() {
     assert_eq!(input.matches("safe boundary directive").count(), 1);
     owner.shutdown().await.unwrap();
 }
+struct FindingsThenFailure(Mutex<Option<Vec<RunItem>>>);
+impl Model for FindingsThenFailure {
+    fn provider(&self) -> &str {
+        "fake"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            if let Some(mut items) = self.0.lock().unwrap().take() {
+                items.extend(call("echo", json!({"text":"echo completed"})).items);
+                Ok(response(items))
+            } else {
+                assert!(request.input.iter().any(|item| matches!(
+                    item,
+                    RunItem::ToolResult { call_id, output }
+                        if call_id == "call-echo" && !output.is_error
+                            && output.content.iter().any(|content| matches!(
+                                content, Content::Text { text } if text.contains("echo completed")
+                            ))
+                )));
+                Err(Error::new(ErrorCategory::Provider, "provider failed"))
+            }
+        })
+    }
+}
+struct EchoTool(ToolDefinition);
+impl Tool for EchoTool {
+    fn definition(&self) -> &ToolDefinition {
+        &self.0
+    }
+    fn execute<'a>(
+        &'a self,
+        _: &'a ToolContext,
+        call: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            Ok(ToolOutput {
+                content: vec![Content::Text {
+                    text: call.arguments["text"].as_str().unwrap().into(),
+                }],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+fn findings_then_failure(items: Vec<RunItem>) -> Runner {
+    let mut agent = AgentConfig::new(
+        "worker",
+        ModelBinding::complete(
+            "fake",
+            Arc::new(FindingsThenFailure(Mutex::new(Some(items)))),
+        ),
+    );
+    agent.tools.push(Arc::new(EchoTool(ToolDefinition {
+        name: "echo".into(),
+        description: "echo".into(),
+        input_schema: schemars::schema_for!(Value),
+        read_only: true,
+        requires_approval: false,
+    })));
+    Runner::new(agent, RunnerConfig::default()).unwrap()
+}
+
+#[tokio::test]
+async fn failed_child_without_partial_findings_keeps_bare_error() {
+    let (owner, session) =
+        session(Arc::new(RetryOnce(std::sync::atomic::AtomicUsize::new(0)))).await;
+    let task = session
+        .scheduler
+        .run(Submission::new("worker", "input is not progress"))
+        .await
+        .unwrap();
+    assert_eq!(task.status, TaskStatus::Failed);
+    assert!(task.result.is_empty());
+    assert_eq!(
+        task.error.as_deref(),
+        Some("agent \"worker\" failed: model call failed on turn 0: retry me")
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn failed_child_error_selects_last_nonblank_non_system_message() {
+    for (items, expected) in [
+        (vec![], None),
+        (
+            vec![
+                message(Role::Assistant, " \n\t"),
+                message(Role::Assistant, "  [SYSTEM] budget reminder"),
+            ],
+            None,
+        ),
+        (
+            vec![
+                message(Role::Assistant, "first finding"),
+                message(Role::Assistant, "  latest finding \n"),
+                message(Role::Assistant, "\n [SYSTEM] budget reminder"),
+                message(Role::Assistant, " \t"),
+            ],
+            Some("latest finding"),
+        ),
+        (
+            vec![
+                message(Role::Assistant, "older finding"),
+                RunItem::PhasedMessage {
+                    message: Message {
+                        role: Role::Assistant,
+                        content: vec![Content::Text {
+                            text: "  phased finding [SYSTEM] is not a prefix \n".into(),
+                        }],
+                    },
+                    phase: "commentary".into(),
+                },
+                message(Role::Assistant, "[SYSTEM] final reminder"),
+            ],
+            Some("phased finding [SYSTEM] is not a prefix"),
+        ),
+    ] {
+        let (owner, session) = session_with_runner(findings_then_failure(items), None).await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "input is not progress"))
+            .await
+            .unwrap();
+        assert_eq!(task.status, TaskStatus::Failed);
+        assert_eq!(task.usage.tool_calls, 1);
+        let mut error =
+            "agent \"worker\" failed: model call failed on turn 1: provider failed".to_owned();
+        if let Some(expected) = expected {
+            error.push_str("\nPartial progress before the run ended:\n");
+            error.push_str(expected);
+        }
+        assert_eq!(task.error.as_deref(), Some(error.as_str()));
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn failed_child_error_truncates_unicode_progress_with_exact_counted_elision() {
+    for length in [1600, 1601, 5000] {
+        let finding = format!("{}{}", "界".repeat(1100), "🦀".repeat(length - 1100));
+        let expected = if length == 1600 {
+            finding.clone()
+        } else {
+            let tail = if length == 1601 {
+                format!("{}{}", "界".repeat(20), "🦀".repeat(501))
+            } else {
+                "🦀".repeat(521)
+            };
+            format!(
+                "{}\n…[elided {} chars]…\n{tail}",
+                "界".repeat(1042),
+                length - 1563
+            )
+        };
+        let (owner, session) = session_with_runner(
+            findings_then_failure(vec![RunItem::PhasedMessage {
+                message: Message {
+                    role: Role::Assistant,
+                    content: vec![Content::Text {
+                        text: format!(" \n{finding}\t "),
+                    }],
+                },
+                phase: "commentary".into(),
+            }]),
+            None,
+        )
+        .await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        assert_eq!(task.status, TaskStatus::Failed);
+        assert_eq!(
+            task.error.unwrap(),
+            format!(
+                "agent \"worker\" failed: model call failed on turn 1: provider failed\nPartial progress before the run ended:\n{expected}"
+            )
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn failed_child_findings_reach_named_and_managed_sync_parent_requests_and_summary() {
+    for tool_name in ["specialist", "subagent"] {
+        let (owner, session) = session_with_runner(
+            findings_then_failure(vec![message(Role::Assistant, "found the root cause")]),
+            None,
+        )
+        .await;
+        let model = FakeModel::new(
+            vec![
+                call(tool_name, json!({"message":"inspect", "mode":"sync"})),
+                call("subagent_status", json!({"detail":"summary"})),
+                answer("findings recovered"),
+            ],
+            Duration::ZERO,
+        );
+        let mut agent = AgentConfig::new("parent", ModelBinding::complete("fake", model.clone()));
+        agent.tools = build_subagent_task_tools(session.clone(), "worker");
+        agent.tools.push(Arc::new(AgentAsTool::new(
+            "specialist",
+            "specialist task",
+            "worker",
+            session.clone(),
+        )));
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                subagents: Some(session),
+                output: adk_runtime::output::OutputPolicy {
+                    untrusted: false,
+                    ..Default::default()
+                },
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        runner
+            .run(context(), request(), Arc::new(TestHost))
+            .await
+            .unwrap();
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 3);
+            let error = "agent \"worker\" failed: model call failed on turn 1: provider failed\nPartial progress before the run ended:\nfound the root cause";
+            for (index, name) in [(1, tool_name), (2, "subagent_status")] {
+                let output = requests[index]
+                    .input
+                    .iter()
+                    .find_map(|item| match item {
+                        RunItem::ToolResult { call_id, output }
+                            if call_id == &format!("call-{name}") =>
+                        {
+                            Some(output)
+                        }
+                        _ => None,
+                    })
+                    .unwrap();
+                assert_eq!(output.is_error, index == 1, "{tool_name}: {output:?}");
+                let Content::Text { text } = &output.content[0] else {
+                    panic!("expected text output")
+                };
+                let value: Value = serde_json::from_str(text).unwrap();
+                let task = if index == 1 {
+                    &value
+                } else {
+                    &value["tasks"][0]
+                };
+                assert_eq!(task["status"], "failed");
+                assert_eq!(task["error"], error);
+                if index == 2 {
+                    assert!(task.get("result").is_none());
+                }
+            }
+        }
+        owner.shutdown().await.unwrap();
+    }
+}
+
 struct ProgressThenFailure(std::sync::atomic::AtomicUsize);
 impl Model for ProgressThenFailure {
     fn provider(&self) -> &str {
@@ -1596,5 +2583,315 @@ async fn final_join_includes_active_descendants_of_an_already_delivered_child() 
         handle.status("b", Detail::Summary).unwrap().status,
         TaskStatus::Completed
     );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn successful_child_projects_frozen_prices_but_errors_and_budgets_keep_actual_charges() {
+    struct Overloaded;
+    impl Model for Overloaded {
+        fn provider(&self) -> &str {
+            "fake"
+        }
+        fn complete<'a>(
+            &'a self,
+            _: &'a Context,
+            _: ModelRequest,
+        ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+            Box::pin(async { Err(Error::new(ErrorCategory::Provider, "overloaded")) })
+        }
+        fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+            Some(ModelRetryAdvice {
+                should_retry: true,
+                retry_after: Duration::ZERO,
+                reason: "overloaded".into(),
+            })
+        }
+    }
+    struct DisplayCost {
+        prices: Mutex<VecDeque<f64>>,
+        display: f64,
+        known: bool,
+        calls: Mutex<Vec<(String, Usage)>>,
+    }
+    impl CostEstimator for DisplayCost {
+        fn cost(&self, model: &str, _: &Usage) -> f64 {
+            assert_eq!(model, "active");
+            self.prices
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("response re-estimated")
+        }
+        fn estimate_display_cost(&self, model: &str, usage: &Usage) -> ResponseCostSummary {
+            self.calls
+                .lock()
+                .unwrap()
+                .push((model.into(), usage.clone()));
+            ResponseCostSummary {
+                cost_usd: self.display,
+                cost_known: self.known,
+            }
+        }
+    }
+    struct CompactionPrice {
+        amount: f64,
+        known: bool,
+    }
+    impl Compactor for CompactionPrice {
+        fn compact<'a>(
+            &'a self,
+            _: &'a Context,
+            request: CompactionRequest,
+        ) -> BoxFuture<'a, Result<CompactedHistory, Error>> {
+            assert_eq!(request.model, "active");
+            Box::pin(async move {
+                Ok(CompactedHistory {
+                    history: vec![message(Role::User, "summary")],
+                    history_provenance: vec![],
+                    context_tokens: 1,
+                    usage: Usage {
+                        requests: 1,
+                        input_tokens: 20,
+                        ..Default::default()
+                    },
+                    cost: self.amount,
+                    cost_known: self.known,
+                })
+            })
+        }
+    }
+    for (failed, compaction_known, display, display_known, response_price, compaction_price) in [
+        (false, true, 1.0, true, 0.375, 0.25),
+        (false, false, 1.0, true, 0.375, 0.25),
+        (true, true, 1.0, true, 0.375, 0.25),
+        (true, false, 1.0, true, 0.375, 0.25),
+        (false, true, 0.25, false, 0.375, 0.25),
+        (false, true, -1.0, true, 0.375, 0.25),
+        (false, true, f64::NAN, true, 0.375, 0.25),
+        (false, true, f64::INFINITY, true, 0.375, 0.25),
+        (false, true, 1.0, true, 0.0000004, 1e12),
+    ] {
+        let costs = Arc::new(DisplayCost {
+            prices: Mutex::new(
+                if failed {
+                    vec![response_price; 2]
+                } else {
+                    vec![response_price, response_price, 0.0]
+                }
+                .into(),
+            ),
+            display,
+            known: display_known,
+            calls: Mutex::new(vec![]),
+        });
+        let mut more = answer("more");
+        more.end_turn = Some(false);
+        more.usage = Usage {
+            requests: 1,
+            input_tokens: 10,
+            context_tokens: Some(12),
+            ..Default::default()
+        };
+        let mut done = answer("done");
+        done.usage = Usage {
+            requests: 1,
+            input_tokens: 10,
+            ..Default::default()
+        };
+        let active = FakeModel::new(vec![more.clone(), more, done], Duration::ZERO);
+        let mut agent = AgentConfig::new(
+            "worker",
+            ModelBinding::complete("original", Arc::new(Overloaded)),
+        );
+        agent
+            .fallbacks
+            .push(ModelBinding::complete("active", active));
+        let child = Runner::new(
+            agent,
+            RunnerConfig {
+                cost_estimator: Some(costs.clone()),
+                limits: Limits {
+                    max_cost: failed.then_some(1.1),
+                    ..Default::default()
+                },
+                compaction: Some(CompactionConfig {
+                    trigger_tokens: 10,
+                    target_tokens: 5,
+                    compactor: Arc::new(CompactionPrice {
+                        amount: compaction_price,
+                        known: compaction_known,
+                    }),
+                }),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let (owner, session) = session_with_runner(child, None).await;
+        let task = session
+            .scheduler
+            .run(Submission::new("worker", "start"))
+            .await
+            .unwrap();
+        assert_eq!(
+            task.status,
+            if failed {
+                TaskStatus::Failed
+            } else {
+                TaskStatus::Completed
+            },
+            "{:?}",
+            task.error
+        );
+        let actual = ((response_price + compaction_price) + response_price) + compaction_price;
+        assert_eq!(task.usage.cost_micros, (actual * 1_000_000.0).ceil() as u64);
+        assert_eq!(
+            session.scheduler.snapshot().usage.cost_micros,
+            task.usage.cost_micros
+        );
+        assert_eq!(task.usage.tokens, if failed { 60 } else { 70 });
+        if failed {
+            assert_eq!((task.cost_usd, task.cost_known), (actual, compaction_known));
+            assert!(costs.calls.lock().unwrap().is_empty());
+        } else {
+            let valid = display.is_finite() && display >= 0.0;
+            assert_eq!(
+                task.cost_usd,
+                response_price * 2.0 + if valid { display } else { 0.0 }
+            );
+            assert_eq!(task.cost_known, valid && display_known);
+            assert_eq!(
+                *costs.calls.lock().unwrap(),
+                vec![(
+                    "original".into(),
+                    Usage {
+                        requests: 2,
+                        input_tokens: 40,
+                        ..Default::default()
+                    }
+                )]
+            );
+        }
+        assert!(costs.prices.lock().unwrap().is_empty());
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test(start_paused = true)]
+async fn cancellation_observation_does_not_publish_results_or_finish_parent_join() {
+    struct CancelBarrier {
+        blocked: std::sync::atomic::AtomicBool,
+        release: tokio::sync::Semaphore,
+    }
+    impl SchedulerStore for CancelBarrier {
+        fn persist<'a>(
+            &'a self,
+            _: &'a Context,
+            checkpoint: &'a SchedulerCheckpoint,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                if checkpoint
+                    .records
+                    .iter()
+                    .any(|r| r.task.status == TaskStatus::Cancelled)
+                    && !self.blocked.swap(true, std::sync::atomic::Ordering::SeqCst)
+                {
+                    self.release.acquire().await.unwrap().forget();
+                }
+                Ok(())
+            })
+        }
+    }
+    let store = Arc::new(CancelBarrier {
+        blocked: std::sync::atomic::AtomicBool::new(false),
+        release: tokio::sync::Semaphore::new(0),
+    });
+    let child = FakeModel::new(vec![answer("must not finish")], Duration::from_secs(3600));
+    let (owner, session) =
+        session_with_runner(runner("worker", child.clone()), Some(store.clone())).await;
+    let id = session
+        .scheduler
+        .submit(Submission::new("worker", "work"))
+        .await
+        .unwrap();
+    while child.requests.lock().unwrap().is_empty() {
+        tokio::task::yield_now().await;
+    }
+    let committed = serde_json::to_value(session.scheduler.snapshot()).unwrap();
+    let cancel = session.scheduler.cancel(&id);
+    tokio::pin!(cancel);
+    assert!(futures_util::poll!(&mut cancel).is_pending());
+    assert!(store.blocked.load(std::sync::atomic::Ordering::SeqCst));
+    let tools = build_subagent_task_tools(session.clone(), "worker");
+    let tool_context = ToolContext {
+        operation: context(),
+        work_dir: ".".into(),
+        policy: ToolPolicy::default(),
+        idempotency_key: None,
+    };
+    for (name, arguments) in [
+        ("subagent_status", json!({"detail":"summary"})),
+        ("subagent_status", json!({"detail":"graph"})),
+        ("subagent_status", json!({"detail":"results"})),
+        ("subagent_wait", json!({"task_ids":[id], "timeout_ms":1})),
+    ] {
+        let tool = tools.iter().find(|t| t.definition().name == name).unwrap();
+        let result = tool
+            .execute(
+                &tool_context,
+                ToolCall {
+                    raw_arguments: None,
+                    id: "observe".into(),
+                    name: name.into(),
+                    arguments: arguments.clone(),
+                },
+            )
+            .await
+            .unwrap();
+        assert!(!result.is_error);
+        let Content::Text { text } = &result.content[0] else {
+            panic!("expected text")
+        };
+        let value: Value = serde_json::from_str(text).unwrap();
+        match arguments["detail"].as_str() {
+            Some("summary") => assert_eq!(value["tasks"][0]["status"], "cancelled"),
+            Some("graph") => assert_eq!(value["nodes"][0]["status"], "cancelled"),
+            Some("results") => {
+                assert_eq!(value["results"], json!([]));
+                assert_eq!(value["still_active"], json!([id]));
+            }
+            _ => {
+                assert_eq!(value["wait_complete"], false);
+                assert_eq!(value["timed_out"], true);
+                assert_eq!(value["still_active"][0]["status"], "running");
+                assert!(value.get("finished").is_none());
+            }
+        }
+    }
+    let model = FakeModel::new(vec![answer("premature"), answer("joined")], Duration::ZERO);
+    let runner = parent(model.clone(), session.clone());
+    let run = runner.run(context(), request(), Arc::new(TestHost));
+    tokio::pin!(run);
+    assert!(
+        tokio::time::timeout(Duration::from_secs(1), &mut run)
+            .await
+            .is_err()
+    );
+    assert_eq!(model.requests.lock().unwrap().len(), 1);
+    assert!(!history_text(&model.requests.lock().unwrap()[0].input).contains("Sub-agent result"));
+    assert_eq!(
+        serde_json::to_value(session.scheduler.snapshot()).unwrap(),
+        committed
+    );
+    assert!(futures_util::poll!(&mut cancel).is_pending());
+    store.release.add_permits(1);
+    cancel.await.unwrap();
+    let result = run.await.unwrap();
+    assert_eq!(result.result.final_output, Some(json!("joined")));
+    {
+        let requests = model.requests.lock().unwrap();
+        assert!(history_text(&requests[1].input).contains("cancellation requested"));
+    }
+    assert!(session.scheduler.snapshot().records[0].result_delivered);
     owner.shutdown().await.unwrap();
 }

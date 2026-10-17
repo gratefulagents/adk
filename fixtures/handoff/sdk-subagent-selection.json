@@ -1,0 +1,101 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "selection": {
+        "task": false,
+        "status": false,
+        "control": false
+      },
+      "tools": [],
+      "scheduler": false
+    },
+    {
+      "selection": {
+        "task": true,
+        "status": false,
+        "control": false
+      },
+      "tools": [
+        "subagent",
+        "subagent_wait"
+      ],
+      "scheduler": true
+    },
+    {
+      "selection": {
+        "task": false,
+        "status": true,
+        "control": false
+      },
+      "tools": [
+        "subagent_status"
+      ],
+      "scheduler": true
+    },
+    {
+      "selection": {
+        "task": true,
+        "status": true,
+        "control": false
+      },
+      "tools": [
+        "subagent",
+        "subagent_status",
+        "subagent_wait"
+      ],
+      "scheduler": true
+    },
+    {
+      "selection": {
+        "task": false,
+        "status": false,
+        "control": true
+      },
+      "tools": [
+        "subagent_control"
+      ],
+      "scheduler": true
+    },
+    {
+      "selection": {
+        "task": true,
+        "status": false,
+        "control": true
+      },
+      "tools": [
+        "subagent",
+        "subagent_wait",
+        "subagent_control"
+      ],
+      "scheduler": true
+    },
+    {
+      "selection": {
+        "task": false,
+        "status": true,
+        "control": true
+      },
+      "tools": [
+        "subagent_status",
+        "subagent_control"
+      ],
+      "scheduler": true
+    },
+    {
+      "selection": {
+        "task": true,
+        "status": true,
+        "control": true
+      },
+      "tools": [
+        "subagent",
+        "subagent_status",
+        "subagent_wait",
+        "subagent_control"
+      ],
+      "scheduler": true
+    }
+  ]
+}

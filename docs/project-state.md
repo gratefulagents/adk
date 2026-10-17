@@ -261,3 +261,19 @@ store errors and plain-text priming. It normalizes generated task/memory/comment
 IDs and timestamps. Tests check `is_error` and compare business errors/priming
 text exactly; language-specific JSON decoding errors retain the `Invalid input:`
 classification instead of requiring identical Go/serde diagnostic wording.
+
+### Persisted record representation
+
+The public persisted `Event`, `Task`, `TaskComment`, `Memory`, and `SessionSummary`
+records retain RFC3339 fixed offsets with `chrono::DateTime<FixedOffset>`. Convert
+new UTC timestamps with `.fixed_offset()` when constructing records directly.
+Serialization preserves nonzero offsets, trims fractional trailing zeroes, and
+uses `Z` for zero offset, matching the pinned Go record codec. SQLite's separate
+integer-nanosecond event timestamp stores an instant, not an original offset.
+
+`Task.metadata` and `Memory.metadata` are `Option<serde_json::Value>`: `None` omits
+the field; `Some(Value::Null)` emits explicit JSON null. Input-option APIs remain
+unchanged: default null on create/upsert means omission. Persisted task priority
+is `i64`; normal creation/update inputs still enforce the existing priority range.
+The independent typed-record fixture covers 47 cases across these five records;
+this does not establish all backend or input-option semantics.

@@ -67,6 +67,7 @@ async fn invoke(tool: &Arc<dyn Tool>, ctx: &ToolContext, args: Value) -> ToolOut
     tool.execute(
         ctx,
         ToolCall {
+            raw_arguments: None,
             id: "b".into(),
             name: "Browser".into(),
             arguments: args,
@@ -422,7 +423,7 @@ async fn cancelled_browser_releases_runner_and_private_staging() {
     let mut ctx = context(root.path().into());
     ctx.operation.cancellation = token.clone();
     let operation = tokio::spawn(async move {
-        tool.execute(&ctx,ToolCall{id:"cancel".into(),name:"Browser".into(),arguments:json!({"url":"http://example.com","action":"screenshot","output_path":"unpublished.png"})}).await
+        tool.execute(&ctx,ToolCall{raw_arguments: None,id:"cancel".into(),name:"Browser".into(),arguments:json!({"url":"http://example.com","action":"screenshot","output_path":"unpublished.png"})}).await
     });
     tokio::time::timeout(Duration::from_secs(1), runner.started.notified())
         .await
@@ -575,6 +576,7 @@ fn native_browser_config(runner: Arc<dyn browser::Runner>) -> browser::Config {
 }
 fn native_browser_call() -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "native-cleanup".into(),
         name: "Browser".into(),
         arguments: json!({"action":"navigate","url":"https://example.com"}),

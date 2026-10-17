@@ -79,9 +79,37 @@ pub struct ModelRetryAdvice {
     pub reason: String,
 }
 
+#[derive(Debug, Clone, PartialEq, Eq)]
+pub struct ModelInfo {
+    pub provider: String,
+    pub model: String,
+    pub input_tokens_include_cache: Option<bool>,
+}
+
+/// Per-call transport progress, including bytes that produce no model event.
+/// Called inline; implementations must be thread-safe and return quickly.
+pub type ModelActivitySink = Arc<dyn Fn() + Send + Sync>;
+
+/// Incremental reasoning in transport order. Called inline; return quickly.
+/// A retried call can repeat chunks; the final response remains authoritative.
+/// Borrowed observers cannot escape the call-scoped lifetime.
+///
+/// ```compile_fail
+/// use adk_core::ModelReasoningSink;
+/// fn retain(sink: ModelReasoningSink<'_>) -> ModelReasoningSink<'static> { sink }
+/// ```
+pub type ModelReasoningSink<'a> = Arc<dyn Fn(&str) + Send + Sync + 'a>;
+
 /// Provider-neutral completion boundary. Streaming is a separate capability;
 /// implementations must not simulate it by silently buffering a complete call.
 pub trait Model: Send + Sync {
+    fn info(&self, model: &str) -> ModelInfo {
+        ModelInfo {
+            provider: self.provider().into(),
+            model: model.into(),
+            input_tokens_include_cache: None,
+        }
+    }
     fn retry_advice(&self, _error: &Error) -> Option<ModelRetryAdvice> {
         None
     }
@@ -91,6 +119,27 @@ pub trait Model: Send + Sync {
         context: &'a Context,
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>>;
+
+    fn complete_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        _activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete(context, request)
+    }
+
+    /// Observe transport activity and incremental reasoning during completion.
+    /// Models without live reasoning retain their activity-aware completion path.
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+        _reasoning: Option<ModelReasoningSink<'a>>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, activity)
+    }
 }
 
 /// Opt-in genuine streaming capability; no unsupported default implementation.
@@ -100,6 +149,15 @@ pub trait StreamingModel: Model {
         context: &'a Context,
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>>;
+
+    fn stream_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        _activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        self.stream(context, request)
+    }
 }
 
 /// Pull-based stream with backpressure, independent of any executor/Stream crate.

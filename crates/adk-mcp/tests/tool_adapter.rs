@@ -66,6 +66,7 @@ async fn native_tools_preserve_results_validate_arguments_and_expose_resources()
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "one".into(),
                 name: dynamic.definition().name.clone(),
                 arguments: json!({}),
@@ -84,6 +85,7 @@ async fn native_tools_preserve_results_validate_arguments_and_expose_resources()
         .execute(
             &context,
             ToolCall {
+                raw_arguments: None,
                 id: "two".into(),
                 name: dynamic.definition().name.clone(),
                 arguments: json!([]),
@@ -104,6 +106,7 @@ async fn native_tools_preserve_results_validate_arguments_and_expose_resources()
             .execute(
                 &context,
                 ToolCall {
+                    raw_arguments: None,
                     id: "r".into(),
                     name: tool.definition().name.clone(),
                     arguments: args,

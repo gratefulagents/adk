@@ -1,10 +1,15 @@
-use crate::{Capability, json_text, workspace::Workspace};
+use crate::{
+    Capability,
+    fs_input::{self, Kind},
+    json_text,
+    workspace::Workspace,
+};
 use adk_core::{
     BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
 };
 use rustix::fs::{AtFlags, FileType, RenameFlags, renameat_with, statat, unlinkat};
 use serde::Deserialize;
-use serde_json::{Value, json};
+use serde_json::json;
 use std::{fs::File, io, path::Path, sync::Arc};
 
 pub(crate) fn builtin(capability: &Capability) -> Option<Arc<dyn Tool>> {
@@ -134,15 +139,20 @@ fn mutate(workspace: &Workspace, source: &str, destination: Option<&str>) -> io:
 }
 
 impl Lifecycle {
-    fn execute_inner(&self, context: &ToolContext, mut arguments: Value) -> Result<String, String> {
-        if arguments.is_null() {
-            arguments = json!({});
-        }
-        if let Some(fields) = arguments.as_object_mut() {
-            fields.retain(|_, value| !value.is_null());
-        }
-        let input: Input =
-            serde_json::from_value(arguments).map_err(|e| format!("Invalid input: {e}"))?;
+    fn execute_inner(&self, context: &ToolContext, call: &ToolCall) -> Result<String, String> {
+        let (structure, fields): (_, &[_]) = if self.definition.name == "Move" {
+            (
+                "moveInput",
+                &[
+                    ("source_path", Kind::String),
+                    ("destination_path", Kind::String),
+                ],
+            )
+        } else {
+            ("deleteInput", &[("path", Kind::String)])
+        };
+        let arguments = fs_input::decode(call, structure, fields)?;
+        let input: Input = serde_json::from_value(arguments).expect("validated lifecycle fields");
         if self.definition.name == "Move" {
             let source =
                 clean(&input.source_path).map_err(|e| format!("Invalid source_path: {e}"))?;
@@ -180,7 +190,7 @@ impl Tool for Lifecycle {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             context.operation.check_active()?;
-            let (text, is_error) = match self.execute_inner(context, call.arguments) {
+            let (text, is_error) = match self.execute_inner(context, &call) {
                 Ok(text) => (text, false),
                 Err(text) => (text, true),
             };

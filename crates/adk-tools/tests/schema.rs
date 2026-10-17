@@ -185,6 +185,50 @@ fn parameter_schemas_match_actual_sdk_bundle_definitions() {
     }
 }
 
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[test]
+fn constructed_filesystem_tools_match_sdk_metadata_and_timeout_defaults() {
+    use adk_tools::{Config, Features, Registry};
+    let names = ["ApplyPatch", "Write", "Edit", "Move", "Delete"];
+    for sample in fixture().samples {
+        let registry = Registry::build(
+            &Config {
+                access: access(&sample),
+                features: Features::Strict(names.iter().map(|name| (*name).into()).collect()),
+                ..Default::default()
+            },
+            [],
+        )
+        .unwrap();
+        let expected: Vec<_> = sample
+            .definitions
+            .iter()
+            .filter(|definition| names.contains(&definition.name.as_str()))
+            .collect();
+        assert_eq!(
+            registry.names().collect::<BTreeSet<_>>(),
+            expected
+                .iter()
+                .map(|definition| definition.name.as_str())
+                .collect::<BTreeSet<_>>()
+        );
+        for expected in expected {
+            let tool = registry.get(&expected.name).unwrap();
+            let actual = tool.definition();
+            assert_eq!(actual.name, expected.name);
+            assert_eq!(actual.description, expected.description);
+            assert_eq!(actual.read_only, expected.read_only);
+            assert_eq!(actual.requires_approval, expected.requires_approval);
+            assert_eq!(
+                serde_json::to_value(&actual.input_schema).unwrap(),
+                expected.parameters
+            );
+            assert_eq!(expected.timeout_seconds, 0);
+            assert!(tool.timeout().is_none());
+        }
+    }
+}
+
 #[test]
 fn catalog_read_only_metadata_matches_actual_sdk_bundle_definitions() {
     for sample in fixture().samples {

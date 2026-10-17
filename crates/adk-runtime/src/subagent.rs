@@ -128,6 +128,7 @@ impl SecurityBaseline {
                     ApprovalPolicy::RequiredByTool
                 },
                 timeout: min_limit(a.timeout, b.timeout),
+                max_child_turns: min_limit(a.max_child_turns, b.max_child_turns),
             },
             input_guardrails: self
                 .input_guardrails
@@ -159,6 +160,7 @@ impl SecurityBaseline {
                 .is_subset(&a.allowed_mutating_tools)
             && (a.approval != ApprovalPolicy::All || b.approval == ApprovalPolicy::All)
             && narrower_limit(a.timeout, b.timeout)
+            && narrower_limit(a.max_child_turns, b.max_child_turns)
             && self.input_guardrails.is_subset(&current.input_guardrails)
             && self.output_guardrails.is_subset(&current.output_guardrails)
             && (!self.untrusted_tool_outputs || current.untrusted_tool_outputs)
@@ -230,7 +232,7 @@ impl BudgetLimits {
     }
 }
 
-#[derive(Debug, Clone)]
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
 pub struct SchedulerConfig {
     pub max_concurrency: usize,
     pub max_tasks: usize,
@@ -256,6 +258,22 @@ impl Default for SchedulerConfig {
     }
 }
 
+/// Host-owned immutable reconstruction binding. Persist the recipe for this ID before
+/// activation; the ID identifies the complete executor assembly, not just its config.
+#[derive(Clone)]
+pub struct SchedulerGeneration {
+    pub id: String,
+    pub config: SchedulerConfig,
+    pub executor: Arc<dyn ChildExecutor>,
+}
+
+#[derive(Debug, Clone, PartialEq, Eq, Serialize, Deserialize)]
+pub struct GenerationDescriptor {
+    pub id: String,
+    pub config: SchedulerConfig,
+    pub pool_id: String,
+}
+
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct Submission {
     /// Empty IDs are generated. DAG-local references use explicitly supplied IDs.
@@ -267,6 +285,8 @@ pub struct Submission {
     pub include_dependency_results: bool,
     /// Explicitly copied history. None means a fresh conversation, never ambient history.
     pub parent_history: Option<Vec<RunItem>>,
+    #[serde(default)]
+    pub parent_history_provenance: Vec<adk_core::ItemProvenance>,
     pub security: Option<SecurityBaseline>,
     pub policy: RunPolicy,
 }
@@ -280,6 +300,7 @@ impl Submission {
             dependency_policy: DependencyPolicy::AllSuccess,
             include_dependency_results: true,
             parent_history: None,
+            parent_history_provenance: Vec::new(),
             security: None,
             policy: RunPolicy::default(),
         }
@@ -370,6 +391,10 @@ pub struct TaskSnapshot {
     pub result: String,
     pub error: Option<String>,
     pub usage: BudgetUsage,
+    #[serde(default)]
+    pub cost_usd: f64,
+    #[serde(default)]
+    pub cost_known: bool,
     pub activity: Option<Activity>,
     pub messages_received: usize,
     #[serde(default)]
@@ -415,6 +440,10 @@ pub struct ChildOutcome {
     pub error: Option<String>,
     /// Cumulative totals, including consumption already charged through ChildControl.
     pub usage: BudgetUsage,
+    #[serde(default)]
+    pub cost_usd: f64,
+    #[serde(default)]
+    pub cost_known: bool,
 }
 impl ChildOutcome {
     pub fn completed(result: impl Into<String>) -> Self {
@@ -423,6 +452,8 @@ impl ChildOutcome {
             result: result.into(),
             error: None,
             usage: BudgetUsage::default(),
+            cost_usd: 0.0,
+            cost_known: false,
         }
     }
     pub fn failed(error: impl Into<String>) -> Self {
@@ -431,6 +462,8 @@ impl ChildOutcome {
             result: String::new(),
             error: Some(error.into()),
             usage: BudgetUsage::default(),
+            cost_usd: 0.0,
+            cost_known: false,
         }
     }
     fn cancelled() -> Self {
@@ -441,8 +474,19 @@ impl ChildOutcome {
     }
 }
 
+/// An ancestor from the scheduler's validated task graph, not a replayable execution.
+#[derive(Debug, Clone)]
+pub struct ChildAncestor {
+    pub task_id: String,
+    pub parent_task_id: Option<String>,
+    pub agent_name: String,
+}
+
 pub struct ChildInvocation {
     pub task_id: String,
+    pub parent_task_id: Option<String>,
+    /// Root-to-immediate-parent order, including ancestors not yet resumed.
+    pub ancestors: Vec<ChildAncestor>,
     pub agent_name: String,
     pub context: Context,
     pub request: RunRequest,
@@ -476,6 +520,8 @@ pub enum DispatchState {
 
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct CheckpointRecord {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub generation_id: Option<String>,
     pub task: TaskSnapshot,
     pub submission: Submission,
     pub security_baseline: SecurityBaseline,
@@ -491,6 +537,10 @@ pub struct CheckpointRecord {
 }
 #[derive(Debug, Clone, Serialize, Deserialize)]
 pub struct SchedulerCheckpoint {
+    #[serde(default, skip_serializing_if = "Option::is_none")]
+    pub active_generation_id: Option<String>,
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub generations: Vec<GenerationDescriptor>,
     pub version: u32,
     pub run_id: String,
     pub revision: u64,
@@ -517,16 +567,24 @@ pub trait SchedulerStore: Send + Sync {
 struct Inner {
     context: Context,
     config: SchedulerConfig,
-    executor: Arc<dyn ChildExecutor>,
+    wiring: Mutex<Arc<SchedulerWiring>>,
+    assignments: Mutex<BTreeMap<String, Arc<SchedulerWiring>>>,
+    bindings: Mutex<BTreeMap<String, SchedulerGeneration>>,
     store: Option<Arc<dyn SchedulerStore>>,
     state: Mutex<SchedulerCheckpoint>,
     transaction: AsyncMutex<()>,
     cancellations: Mutex<BTreeMap<String, CancellationToken>>,
+    cancellation_intents: Mutex<BTreeSet<String>>,
     changed: watch::Sender<u64>,
     wake: Notify,
-    slots: Arc<Semaphore>,
     closed: AtomicBool,
     poisoned: AtomicBool,
+}
+struct SchedulerWiring {
+    generation_id: Option<String>,
+    config: SchedulerConfig,
+    executor: Arc<dyn ChildExecutor>,
+    slots: Arc<Semaphore>,
 }
 #[derive(Clone)]
 pub struct SchedulerHandle {
@@ -537,6 +595,27 @@ pub struct SchedulerHandle {
 pub struct Scheduler {
     handle: SchedulerHandle,
     actor: JoinSet<Result<(), Error>>,
+}
+
+fn validate_generation(
+    binding: &SchedulerGeneration,
+    session: &SchedulerConfig,
+) -> Result<(), Error> {
+    let config = &binding.config;
+    if binding.id.trim().is_empty()
+        || config.max_concurrency == 0
+        || config.max_concurrency > Semaphore::MAX_PERMITS
+        || config.max_tasks == 0
+        || config.max_tasks != session.max_tasks
+        || config.max_depth != session.max_depth
+        || config.parent_depth != session.parent_depth
+        || config.budget != session.budget
+    {
+        return Err(invalid(
+            "invalid generation ID or changed session graph/accounting limits",
+        ));
+    }
+    Ok(())
 }
 
 fn invalid(message: impl Into<String>) -> Error {
@@ -587,8 +666,23 @@ impl Scheduler {
         executor: Arc<dyn ChildExecutor>,
         store: Option<Arc<dyn SchedulerStore>>,
     ) -> Result<Self, Error> {
+        let mut owner = Self::new_unstarted(context, config, executor, store)?;
+        owner.actor.spawn(drive(owner.handle.clone()));
+        Ok(owner)
+    }
+
+    fn new_unstarted(
+        context: Context,
+        config: SchedulerConfig,
+        executor: Arc<dyn ChildExecutor>,
+        store: Option<Arc<dyn SchedulerStore>>,
+    ) -> Result<Self, Error> {
         context.check_active()?;
-        if context.run_id.is_empty() || config.max_concurrency == 0 || config.max_tasks == 0 {
+        if context.run_id.is_empty()
+            || config.max_concurrency == 0
+            || config.max_concurrency > Semaphore::MAX_PERMITS
+            || config.max_tasks == 0
+        {
             return Err(invalid(
                 "nonempty run ID and positive scheduler limits required",
             ));
@@ -596,6 +690,8 @@ impl Scheduler {
         let (changed, _) = watch::channel(0);
         let state = SchedulerCheckpoint {
             version: 1,
+            active_generation_id: None,
+            generations: vec![],
             run_id: context.run_id.clone(),
             revision: 0,
             next_id: 0,
@@ -607,27 +703,199 @@ impl Scheduler {
         let handle = SchedulerHandle {
             inner: Arc::new(Inner {
                 context,
-                config,
-                executor,
+                config: config.clone(),
+                wiring: Mutex::new(Arc::new(SchedulerWiring {
+                    generation_id: None,
+                    config,
+                    executor,
+                    slots,
+                })),
+                assignments: Mutex::new(BTreeMap::new()),
+                bindings: Mutex::new(BTreeMap::new()),
                 store,
                 state: Mutex::new(state),
                 transaction: AsyncMutex::new(()),
                 cancellations: Mutex::new(BTreeMap::new()),
+                cancellation_intents: Mutex::new(BTreeSet::new()),
                 changed,
                 wake: Notify::new(),
-                slots,
                 closed: AtomicBool::new(false),
                 poisoned: AtomicBool::new(false),
             }),
             parent_task: None,
             parent_slot: None,
         };
-        let mut actor = JoinSet::new();
-        actor.spawn(drive(handle.clone()));
-        Ok(Self { handle, actor })
+        Ok(Self {
+            handle,
+            actor: JoinSet::new(),
+        })
     }
+    pub fn new_with_generations(
+        context: Context,
+        current: SchedulerGeneration,
+        historical: Vec<SchedulerGeneration>,
+        store: Option<Arc<dyn SchedulerStore>>,
+    ) -> Result<Self, Error> {
+        let mut bindings = BTreeMap::new();
+        for binding in historical
+            .into_iter()
+            .chain(std::iter::once(current.clone()))
+        {
+            validate_generation(&binding, &current.config)?;
+            if bindings.insert(binding.id.clone(), binding).is_some() {
+                return Err(invalid("duplicate scheduler generation ID"));
+            }
+        }
+        let mut owner = Self::new_unstarted(
+            context,
+            current.config.clone(),
+            current.executor.clone(),
+            store,
+        )?;
+        let inner = &owner.handle.inner;
+        let wiring = Arc::new(SchedulerWiring {
+            generation_id: Some(current.id.clone()),
+            config: current.config.clone(),
+            executor: current.executor,
+            slots: inner.wiring.lock().unwrap().slots.clone(),
+        });
+        *inner.wiring.lock().unwrap() = wiring;
+        *inner.bindings.lock().unwrap() = bindings;
+        let mut state = inner.state.lock().unwrap();
+        state.version = 2;
+        state.active_generation_id = Some(current.id.clone());
+        state.generations.push(GenerationDescriptor {
+            id: current.id.clone(),
+            config: current.config,
+            pool_id: current.id,
+        });
+        drop(state);
+        owner.actor.spawn(drive(owner.handle.clone()));
+        Ok(owner)
+    }
+
+    /// Activate a fresh immutable ID, fencing its descriptor before publishing wiring.
+    /// Cancellation or an ambiguous store failure poisons this owner.
+    pub async fn reconfigure_generation(&mut self, next: SchedulerGeneration) -> Result<(), Error> {
+        let inner = &self.handle.inner;
+        let transaction = inner.transaction.lock().await;
+        self.handle.active()?;
+        let mut checkpoint = self.handle.snapshot();
+        if checkpoint.version != 2 {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "unnamed scheduler cannot adopt named generations",
+            ));
+        }
+        validate_generation(&next, &inner.config)?;
+        if inner.bindings.lock().unwrap().contains_key(&next.id) {
+            return Err(invalid("scheduler generation ID already bound"));
+        }
+        let current = inner.wiring.lock().unwrap().clone();
+        let same_pool = current.config.max_concurrency == next.config.max_concurrency;
+        let pool_id = if same_pool {
+            checkpoint
+                .generations
+                .iter()
+                .find(|g| Some(&g.id) == checkpoint.active_generation_id.as_ref())
+                .unwrap()
+                .pool_id
+                .clone()
+        } else {
+            next.id.clone()
+        };
+        let wiring = Arc::new(SchedulerWiring {
+            generation_id: Some(next.id.clone()),
+            config: next.config.clone(),
+            executor: next.executor.clone(),
+            slots: if same_pool {
+                current.slots.clone()
+            } else {
+                Arc::new(Semaphore::new(next.config.max_concurrency))
+            },
+        });
+        checkpoint.active_generation_id = Some(next.id.clone());
+        checkpoint.generations.push(GenerationDescriptor {
+            id: next.id.clone(),
+            config: next.config.clone(),
+            pool_id,
+        });
+        checkpoint.revision = checkpoint
+            .revision
+            .checked_add(1)
+            .ok_or_else(|| invalid("checkpoint revision overflow"))?;
+        let mut guard = PersistGuard {
+            handle: self.handle.clone(),
+            committed: false,
+        };
+        if let Some(store) = &inner.store {
+            store.persist(&inner.context, &checkpoint).await?;
+        }
+        inner.bindings.lock().unwrap().insert(next.id.clone(), next);
+        *inner.state.lock().unwrap() = checkpoint;
+        *inner.wiring.lock().unwrap() = wiring;
+        guard.committed = true;
+        drop(transaction);
+        drop(current);
+        self.handle.signal();
+        Ok(())
+    }
+
     pub fn handle(&self) -> SchedulerHandle {
         self.handle.clone()
+    }
+    /// Replace wiring for future submissions; accepted tasks retain their generation.
+    /// Structural graph limits and the session-wide accounting budget cannot change.
+    /// The owner supplies a complete resolved security configuration, not a patch.
+    /// Durable owners with tracked records require a fresh owner and explicit recovery;
+    /// executor generations are not serializable in the scheduler checkpoint format.
+    pub async fn reconfigure(
+        &mut self,
+        config: SchedulerConfig,
+        executor: Arc<dyn ChildExecutor>,
+    ) -> Result<(), Error> {
+        let inner = &self.handle.inner;
+        let transaction = inner.transaction.lock().await;
+        self.handle.active()?;
+        if config.max_concurrency == 0
+            || config.max_concurrency > Semaphore::MAX_PERMITS
+            || config.max_tasks != inner.config.max_tasks
+            || config.max_depth != inner.config.max_depth
+            || config.parent_depth != inner.config.parent_depth
+            || config.budget != inner.config.budget
+        {
+            return Err(invalid(
+                "invalid concurrency or changed session graph/accounting limits",
+            ));
+        }
+        if self.handle.snapshot().version == 2
+            || (inner.store.is_some() && !self.handle.snapshot().records.is_empty())
+        {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "durable scheduler refresh requires reconstructible executor generations; recover with a fresh owner",
+            ));
+        }
+        let mut current = inner.wiring.lock().unwrap();
+        let slots = if config.max_concurrency == current.config.max_concurrency {
+            current.slots.clone()
+        } else {
+            Arc::new(Semaphore::new(config.max_concurrency))
+        };
+        let previous = std::mem::replace(
+            &mut *current,
+            Arc::new(SchedulerWiring {
+                generation_id: None,
+                config,
+                executor,
+                slots,
+            }),
+        );
+        // Host-owned executor destructors may reenter the scheduler.
+        drop(current);
+        drop(transaction);
+        drop(previous);
+        Ok(())
     }
     pub async fn shutdown(mut self) -> Result<(), Error> {
         self.handle.close();
@@ -645,6 +913,34 @@ impl Drop for Scheduler {
 }
 
 impl SchedulerHandle {
+    pub fn agent_names(&self) -> impl Iterator<Item = String> {
+        self.inner
+            .wiring
+            .lock()
+            .unwrap()
+            .config
+            .agents
+            .keys()
+            .cloned()
+            .collect::<Vec<_>>()
+            .into_iter()
+    }
+
+    /// Concurrency ceiling for future submissions. Accepted tasks retain their slots.
+    pub fn max_concurrency(&self) -> usize {
+        self.inner.wiring.lock().unwrap().config.max_concurrency
+    }
+
+    fn task_wiring(&self, id: &str) -> Arc<SchedulerWiring> {
+        self.inner
+            .assignments
+            .lock()
+            .unwrap()
+            .get(id)
+            .expect("accepted task has wiring")
+            .clone()
+    }
+
     fn close(&self) {
         self.inner.closed.store(true, Ordering::SeqCst);
         for token in self.inner.cancellations.lock().unwrap().values() {
@@ -753,14 +1049,17 @@ impl SchedulerHandle {
         self.signal();
         Ok(value)
     }
-    fn security(&self, request: &Submission) -> Result<SecurityBaseline, Error> {
-        let agent = self
-            .inner
+    fn security(
+        &self,
+        request: &Submission,
+        wiring: &SchedulerWiring,
+    ) -> Result<SecurityBaseline, Error> {
+        let agent = wiring
             .config
             .agents
             .get(&request.agent_name)
             .ok_or_else(|| denied("unknown or disallowed child agent"))?;
-        let mut security = self.inner.config.security.narrow(agent);
+        let mut security = wiring.config.security.narrow(agent);
         if let Some(parent) = &self.parent_task {
             let state = self.snapshot();
             let record = state
@@ -807,6 +1106,7 @@ impl SchedulerHandle {
             return Err(denied("child depth limit exceeded"));
         }
         self.transact(|state| {
+            let wiring = self.inner.wiring.lock().unwrap().clone();
             if requests.len()
                 > self
                     .inner
@@ -821,6 +1121,10 @@ impl SchedulerHandle {
             }
             let mut ids = Vec::new();
             for mut submission in requests {
+                submission.parent_history_provenance = adk_core::normalize_provenance(
+                    submission.parent_history.as_ref().map_or(0, Vec::len),
+                    &submission.parent_history_provenance,
+                )?;
                 if submission.message.trim().is_empty() {
                     return Err(invalid("empty child message"));
                 }
@@ -839,13 +1143,13 @@ impl SchedulerHandle {
                 if state.records.iter().any(|r| r.task.id == submission.id) {
                     return Err(invalid("duplicate child task ID"));
                 }
-                let security = self.security(&submission)?;
+                let security = self.security(&submission, &wiring)?;
                 if self.parent_task.is_some() {
                     submission.security = Some(security.clone());
                 }
                 submission.policy.tools = security.tools.clone();
                 submission.policy.max_turns =
-                    submission.policy.max_turns.min(self.inner.config.max_turns);
+                    submission.policy.max_turns.min(wiring.config.max_turns);
                 let task = TaskSnapshot {
                     id: submission.id.clone(),
                     agent_name: submission.agent_name.clone(),
@@ -860,6 +1164,8 @@ impl SchedulerHandle {
                     result: String::new(),
                     error: None,
                     usage: BudgetUsage::default(),
+                    cost_usd: 0.0,
+                    cost_known: false,
                     activity: Some(Activity::default()),
                     messages_received: 0,
                     started_at: Some(Utc::now()),
@@ -868,6 +1174,7 @@ impl SchedulerHandle {
                 };
                 ids.push(task.id.clone());
                 state.records.push(CheckpointRecord {
+                    generation_id: wiring.generation_id.clone(),
                     task,
                     submission,
                     security_baseline: security,
@@ -892,6 +1199,13 @@ impl SchedulerHandle {
                     }
                 }
             }
+            for id in &ids {
+                self.inner
+                    .assignments
+                    .lock()
+                    .unwrap()
+                    .insert(id.clone(), wiring.clone());
+            }
             Ok(ids)
         })
         .await
@@ -902,6 +1216,26 @@ impl SchedulerHandle {
         Ok(results.remove(0))
     }
     pub fn status(&self, id: &str, detail: Detail) -> Result<TaskSnapshot, Error> {
+        let mut task = self.committed_status(id, detail)?;
+        self.observe_cancellation(&mut task);
+        Ok(task)
+    }
+    fn observe_cancellation(&self, task: &mut TaskSnapshot) {
+        if !task.status.is_terminal()
+            && self
+                .inner
+                .cancellation_intents
+                .lock()
+                .unwrap()
+                .contains(&task.id)
+        {
+            task.status = TaskStatus::Cancelled;
+            task.error = Some("cancellation requested".into());
+            task.waiting_on.clear();
+        }
+    }
+    // Waits, joins and result delivery must not treat live intent as a durable result.
+    pub(crate) fn committed_status(&self, id: &str, detail: Detail) -> Result<TaskSnapshot, Error> {
         self.check_visible(id)?;
         let mut task = self
             .snapshot()
@@ -922,6 +1256,13 @@ impl SchedulerHandle {
         Ok(task)
     }
     pub fn list(&self) -> Vec<TaskSnapshot> {
+        let mut tasks = self.committed_list();
+        for task in &mut tasks {
+            self.observe_cancellation(task);
+        }
+        tasks
+    }
+    pub(crate) fn committed_list(&self) -> Vec<TaskSnapshot> {
         let state = self.snapshot();
         state
             .records
@@ -952,7 +1293,7 @@ impl SchedulerHandle {
             loop {
                 let tasks = ids
                     .iter()
-                    .map(|id| self.status(id, Detail::Full))
+                    .map(|id| self.committed_status(id, Detail::Full))
                     .collect::<Result<Vec<_>, _>>()?;
                 let done = match mode {
                     WaitMode::Any => {
@@ -1001,7 +1342,7 @@ impl SchedulerHandle {
     /// Atomically marks only the returned terminal results delivered.
     pub async fn collect(&self) -> Result<Vec<TaskSnapshot>, Error> {
         let ids = self
-            .list()
+            .committed_list()
             .into_iter()
             .map(|task| task.id)
             .collect::<Vec<_>>();
@@ -1071,12 +1412,17 @@ impl SchedulerHandle {
         .await
     }
     pub async fn cancel(&self, id: &str) -> Result<(), Error> {
-        let status = self.status(id, Detail::Summary)?.status;
+        let status = self.committed_status(id, Detail::Summary)?.status;
         if status.is_terminal() {
             return Ok(());
         }
         // Intent is synchronous so cancellation beats a blocked resume/dispatch write.
         self.token(id).cancel();
+        self.inner
+            .cancellation_intents
+            .lock()
+            .unwrap()
+            .insert(id.into());
         self.transact(|state| {
             let record = record_mut(state, id)?;
             if !record.task.status.is_terminal() {
@@ -1105,7 +1451,7 @@ impl SchedulerHandle {
             if token.is_cancelled() {
                 return Err(Error::new(ErrorCategory::Cancelled, "child cancelled"));
             }
-            let current = self.security(&record.submission)?;
+            let current = self.security(&record.submission, &self.task_wiring(&record.task.id))?;
             if !record.security_baseline.allows_resume_under(&current) {
                 return Err(denied("child security baseline weakened"));
             }
@@ -1157,7 +1503,7 @@ impl SchedulerHandle {
                     "child has ambiguous effects; explicit reconciliation required",
                 ));
             }
-            let current = self.security(&record.submission)?;
+            let current = self.security(&record.submission, &self.task_wiring(&record.task.id))?;
             if !record.security_baseline.allows_resume_under(&current) {
                 return Err(denied("child security baseline weakened"));
             }
@@ -1175,6 +1521,9 @@ impl SchedulerHandle {
         if !outcome.status.is_terminal() {
             return Err(invalid("reconciliation requires a terminal outcome"));
         }
+        if !outcome.cost_usd.is_finite() || outcome.cost_usd < 0.0 {
+            return Err(invalid("invalid child cost estimate"));
+        }
         self.transact(|state| {
             if record_mut(state, id)?.task.status != TaskStatus::Reconciling {
                 return Err(invalid("child is not reconciling"));
@@ -1184,6 +1533,8 @@ impl SchedulerHandle {
             let delta = record.task.usage.remaining_delta(&outcome.usage);
             record.task.usage.add(&delta)?;
             record.task.status = outcome.status;
+            record.task.cost_usd = outcome.cost_usd;
+            record.task.cost_known = outcome.cost_known;
             record.task.freeze_duration();
             record.task.result = outcome.result;
             record.task.error = outcome.error;
@@ -1197,6 +1548,14 @@ impl SchedulerHandle {
 fn validate_graph(records: &[CheckpointRecord]) -> Result<(), Error> {
     let mut remaining = BTreeMap::new();
     for record in records {
+        adk_core::normalize_provenance(
+            record
+                .submission
+                .parent_history
+                .as_ref()
+                .map_or(0, Vec::len),
+            &record.submission.parent_history_provenance,
+        )?;
         let id = &record.task.id;
         if id.is_empty()
             || remaining
@@ -1249,6 +1608,8 @@ fn apply_outcome(
     let record = record_mut(state, id)?;
     let delta = record.task.usage.remaining_delta(&outcome.usage);
     record.task.usage.add(&delta)?;
+    record.task.cost_usd = outcome.cost_usd;
+    record.task.cost_known = outcome.cost_known;
     if !record.task.status.is_terminal() {
         record.task.status = if outcome.status == TaskStatus::Completed
             && (!record.queued_messages.is_empty() || !record.in_flight_messages.is_empty())
@@ -1277,6 +1638,7 @@ fn apply_outcome(
 
 struct ExecutionSlot {
     permit: Mutex<Option<OwnedSemaphorePermit>>,
+    semaphore: Arc<Semaphore>,
 }
 struct ReleaseSlot {
     slot: Arc<ExecutionSlot>,
@@ -1320,7 +1682,7 @@ impl SuspendedSlot {
             biased;
             _ = token.cancelled() => return Err(Error::new(ErrorCategory::Cancelled, "child cancelled during suspended wait")),
             _ = self.handle.inner.context.cancellation.cancelled() => return Err(Error::new(ErrorCategory::Cancelled, "parent cancelled during suspended wait")),
-            permit = self.handle.inner.slots.clone().acquire_owned() => permit.map_err(|_| unavailable("scheduler execution slots closed"))?,
+            permit = self.slot.semaphore.clone().acquire_owned() => permit.map_err(|_| unavailable("scheduler execution slots closed"))?,
         };
         *self.slot.permit.lock().unwrap() = Some(permit);
         self.resumed = true;
@@ -1349,7 +1711,7 @@ impl ChildControl {
     }
     pub fn usage(&self) -> BudgetUsage {
         self.handle
-            .status(&self.id, Detail::Summary)
+            .committed_status(&self.id, Detail::Summary)
             .expect("owned child record")
             .usage
     }
@@ -1432,7 +1794,12 @@ impl ChildControl {
                 return Ok(());
             }
             self.handle.active()?;
-            if self.handle.status(&self.id, Detail::Summary)?.status != TaskStatus::Running {
+            if self
+                .handle
+                .committed_status(&self.id, Detail::Summary)?
+                .status
+                != TaskStatus::Running
+            {
                 return Err(invalid("child is not running"));
             }
             tokio::select! {
@@ -1458,6 +1825,22 @@ impl ChildControl {
                     record.accepting_messages = false;
                 }
                 Ok(record.in_flight_messages.clone())
+            })
+            .await
+    }
+
+    pub(crate) async fn reopen_message_admission(&self) -> Result<(), Error> {
+        self.handle
+            .transact(|state| {
+                let record = record_mut(state, &self.id)?;
+                if record.task.status != TaskStatus::Running {
+                    return Err(invalid("child is not running"));
+                }
+                if self.handle.token(&self.id).is_cancelled() {
+                    return Err(Error::new(ErrorCategory::Cancelled, "child cancelled"));
+                }
+                record.accepting_messages = true;
+                Ok(())
             })
             .await
     }
@@ -1638,6 +2021,9 @@ async fn execute_once(
         })
         .collect();
     let mut input = record.submission.parent_history.clone().unwrap_or_default();
+    let mut input_provenance =
+        adk_core::normalize_provenance(input.len(), &record.submission.parent_history_provenance)
+            .expect("validated submission provenance");
     if record.submission.include_dependency_results && !dependencies.is_empty() {
         let context =
             serde_json::to_string(&dependencies).expect("serializable dependency results");
@@ -1646,16 +2032,36 @@ async fn execute_once(
         )));
     }
     input.push(user_message(record.submission.message.clone()));
+    input_provenance.resize(input.len(), adk_core::ItemProvenance::Unattributed);
     let context = Context {
         run_id: format!("{}/{}", handle.inner.context.run_id, id),
         cancellation: Arc::new(token.clone()),
         deadline: handle.inner.context.deadline,
     };
+    let mut ancestors = Vec::new();
+    let mut parent_id = record.parent_id.as_ref();
+    while let Some(id) = parent_id {
+        let parent = state
+            .records
+            .iter()
+            .find(|ancestor| &ancestor.task.id == id)
+            .expect("validated child scope parent");
+        ancestors.push(ChildAncestor {
+            task_id: parent.task.id.clone(),
+            parent_task_id: parent.parent_id.clone(),
+            agent_name: parent.task.agent_name.clone(),
+        });
+        parent_id = parent.parent_id.as_ref();
+    }
+    ancestors.reverse();
     let invocation = ChildInvocation {
         task_id: id.clone(),
+        parent_task_id: record.parent_id.clone(),
+        ancestors,
         agent_name: record.task.agent_name,
         context,
         request: RunRequest {
+            input_provenance,
             input,
             policy: RunPolicy {
                 tools: record.security_baseline.tools.clone(),
@@ -1674,7 +2080,11 @@ async fn execute_once(
         active_tools: Arc::new(AsyncMutex::new(Vec::new())),
     };
     let work = std::panic::AssertUnwindSafe(async {
-        handle.inner.executor.execute(invocation, control).await
+        handle
+            .task_wiring(&id)
+            .executor
+            .execute(invocation, control)
+            .await
     })
     .catch_unwind();
     let deadline = async {
@@ -1690,7 +2100,16 @@ async fn execute_once(
         _ = handle.inner.context.cancellation.cancelled() => ChildOutcome::cancelled(),
         _ = deadline => ChildOutcome::failed("child deadline exceeded"),
         result = work => match result {
-            Ok(Ok(outcome)) if outcome.status.is_terminal() => outcome,
+            Ok(Ok(outcome)) if outcome.status.is_terminal() => {
+                if !outcome.cost_usd.is_finite() || outcome.cost_usd < 0.0 {
+                    ChildOutcome {
+                        usage: outcome.usage,
+                        ..ChildOutcome::failed("invalid child cost estimate")
+                    }
+                } else {
+                    outcome
+                }
+            },
             Ok(Ok(_)) => ChildOutcome::failed("executor returned nonterminal outcome"),
             Ok(Err(error)) => ChildOutcome::failed(error.to_string()),
             Err(_) => ChildOutcome::failed("child executor panicked"),
@@ -1700,7 +2119,7 @@ async fn execute_once(
 }
 
 impl SchedulerHandle {
-    async fn schedule_one(&self) -> Result<Option<CheckpointRecord>, Error> {
+    async fn schedule_one(&self) -> Result<Option<(CheckpointRecord, Arc<ExecutionSlot>)>, Error> {
         self.transact(|state| {
             let mut selected = None;
             let exhausted = state.budget.exhausted(&state.usage);
@@ -1754,9 +2173,16 @@ impl SchedulerHandle {
                     record.task.status = TaskStatus::Waiting;
                     continue;
                 }
+                let wiring = self.task_wiring(&id);
+                let Ok(permit) = wiring.slots.clone().try_acquire_owned() else {
+                    continue;
+                };
                 record.task.status = TaskStatus::Running;
                 record.dispatch = DispatchState::Started;
-                selected = Some(record.clone());
+                selected = Some((record.clone(), Arc::new(ExecutionSlot {
+                    permit: Mutex::new(Some(permit)),
+                    semaphore: wiring.slots.clone(),
+                })));
                 break;
             }
             Ok(selected)
@@ -1777,22 +2203,19 @@ async fn drive(handle: SchedulerHandle) -> Result<(), Error> {
             break;
         }
         loop {
-            let Ok(permit) = handle.inner.slots.clone().try_acquire_owned() else {
-                break;
-            };
             let snapshot = handle.snapshot();
             if !snapshot.records.iter().any(|r| {
                 matches!(r.task.status, TaskStatus::Pending | TaskStatus::Waiting)
-                    && (snapshot.budget.exhausted(&snapshot.usage) || self_ready(&snapshot, r))
+                    && (snapshot.budget.exhausted(&snapshot.usage)
+                        || handle.token(&r.task.id).is_cancelled()
+                        || (self_ready(&snapshot, r)
+                            && handle.task_wiring(&r.task.id).slots.available_permits() > 0))
             }) {
                 break;
             }
             match handle.schedule_one().await {
-                Ok(Some(record)) => {
+                Ok(Some((record, slot))) => {
                     let token = handle.token(&record.task.id);
-                    let slot = Arc::new(ExecutionSlot {
-                        permit: Mutex::new(Some(permit)),
-                    });
                     children.spawn(execute_once(handle.clone(), record, token, slot));
                 }
                 Ok(None) => break,
@@ -1885,7 +2308,7 @@ impl ChildCheckpointOwner for SchedulerHandle {
             }
             let mut checkpoint: SchedulerCheckpoint =
                 serde_json::from_value(checkpoint).map_err(|e| invalid(e.to_string()))?;
-            if checkpoint.version != 1 {
+            if !matches!(checkpoint.version, 1 | 2) {
                 return Err(Error::new(
                     ErrorCategory::Unsupported,
                     "unknown child checkpoint version",
@@ -1898,6 +2321,95 @@ impl ChildCheckpointOwner for SchedulerHandle {
             self.active()?;
             if !self.snapshot().records.is_empty() {
                 return Err(invalid("restore requires an empty scheduler"));
+            }
+            let wiring = self.inner.wiring.lock().unwrap().clone();
+            let mut restored = BTreeMap::new();
+            if checkpoint.version == 1 {
+                if wiring.generation_id.is_some()
+                    || checkpoint.active_generation_id.is_some()
+                    || !checkpoint.generations.is_empty()
+                    || checkpoint.records.iter().any(|r| r.generation_id.is_some())
+                {
+                    return Err(invalid(
+                        "legacy checkpoint cannot be relabeled with generations",
+                    ));
+                }
+            } else {
+                if checkpoint.active_generation_id.is_none()
+                    || checkpoint.generations.last().map(|g| &g.id)
+                        != checkpoint.active_generation_id.as_ref()
+                    || checkpoint.active_generation_id != wiring.generation_id
+                {
+                    return Err(invalid("active scheduler generation mismatch"));
+                }
+                if self.snapshot().revision != 0 {
+                    return Err(invalid("named restore requires a fresh scheduler"));
+                }
+                for (index, descriptor) in checkpoint.generations.iter().enumerate() {
+                    let expected_pool = if index > 0
+                        && checkpoint.generations[index - 1].config.max_concurrency
+                            == descriptor.config.max_concurrency
+                    {
+                        &checkpoint.generations[index - 1].pool_id
+                    } else {
+                        &descriptor.id
+                    };
+                    if &descriptor.pool_id != expected_pool {
+                        return Err(invalid("inconsistent scheduler pool identity"));
+                    }
+                }
+                let bindings = self.inner.bindings.lock().unwrap();
+                let mut pools: BTreeMap<String, (usize, Arc<Semaphore>)> = BTreeMap::new();
+                for descriptor in &checkpoint.generations {
+                    let binding = bindings
+                        .get(&descriptor.id)
+                        .ok_or_else(|| invalid("missing scheduler generation binding"))?;
+                    if binding.config != descriptor.config || descriptor.pool_id.trim().is_empty() {
+                        return Err(invalid("scheduler generation configuration mismatch"));
+                    }
+                    let (capacity, slots) =
+                        pools.entry(descriptor.pool_id.clone()).or_insert_with(|| {
+                            (
+                                descriptor.config.max_concurrency,
+                                Arc::new(Semaphore::new(descriptor.config.max_concurrency)),
+                            )
+                        });
+                    if *capacity != descriptor.config.max_concurrency {
+                        return Err(invalid("inconsistent scheduler pool capacity"));
+                    }
+                    if restored
+                        .insert(
+                            descriptor.id.clone(),
+                            Arc::new(SchedulerWiring {
+                                generation_id: Some(descriptor.id.clone()),
+                                config: binding.config.clone(),
+                                executor: binding.executor.clone(),
+                                slots: slots.clone(),
+                            }),
+                        )
+                        .is_some()
+                    {
+                        return Err(invalid("duplicate generation descriptor"));
+                    }
+                }
+                if !restored.contains_key(checkpoint.active_generation_id.as_ref().unwrap())
+                    || checkpoint.records.iter().any(|r| {
+                        r.generation_id
+                            .as_ref()
+                            .is_none_or(|id| !restored.contains_key(id))
+                    })
+                {
+                    return Err(invalid("missing checkpoint generation descriptor"));
+                }
+                for descriptor in &checkpoint.generations {
+                    if !checkpoint
+                        .generations
+                        .iter()
+                        .any(|g| g.id == descriptor.pool_id && g.pool_id == descriptor.pool_id)
+                    {
+                        return Err(invalid("missing scheduler pool origin"));
+                    }
+                }
             }
             if checkpoint.records.len() > self.inner.config.max_tasks
                 || !checkpoint
@@ -1931,13 +2443,20 @@ impl ChildCheckpointOwner for SchedulerHandle {
             }
             let mut total = BudgetUsage::default();
             for record in &mut checkpoint.records {
+                let wiring = record
+                    .generation_id
+                    .as_ref()
+                    .map_or(&wiring, |id| &restored[id]);
+                if !record.task.cost_usd.is_finite() || record.task.cost_usd < 0.0 {
+                    return Err(invalid("invalid child cost estimate"));
+                }
                 if record.submission.id != record.task.id
                     || record.submission.agent_name != record.task.agent_name
                     || record.submission.message != record.task.message
                     || record.submission.depends_on != record.task.depends_on
                     || record.depth == 0
                     || record.depth > self.inner.config.max_depth
-                    || record.submission.policy.max_turns > self.inner.config.max_turns
+                    || record.submission.policy.max_turns > wiring.config.max_turns
                     || record.submission.policy.tools != record.security_baseline.tools
                     || (record.result_delivered && !record.task.status.is_terminal())
                 {
@@ -1965,7 +2484,7 @@ impl ChildCheckpointOwner for SchedulerHandle {
                         return Err(invalid("invalid durable child continuation"));
                     }
                 }
-                let current = self.security(&record.submission)?;
+                let current = self.security(&record.submission, wiring)?;
                 if !record.security_baseline.allows_resume_under(&current) {
                     return Err(denied("child security baseline weakened"));
                 }
@@ -2005,6 +2524,18 @@ impl ChildCheckpointOwner for SchedulerHandle {
                 return Err(invalid("shared child usage disagrees with records"));
             }
             checkpoint.budget = self.inner.config.budget.clone();
+            for record in &checkpoint.records {
+                self.inner.assignments.lock().unwrap().insert(
+                    record.task.id.clone(),
+                    record
+                        .generation_id
+                        .as_ref()
+                        .map_or_else(|| wiring.clone(), |id| restored[id].clone()),
+                );
+            }
+            if let Some(id) = &checkpoint.active_generation_id {
+                *self.inner.wiring.lock().unwrap() = restored[id].clone();
+            }
             *self.inner.state.lock().unwrap() = checkpoint;
             self.signal();
             Ok(())

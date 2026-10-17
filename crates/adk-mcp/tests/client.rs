@@ -97,6 +97,213 @@ async fn client(replies: Vec<Result<Value, Error>>) -> (Client, Log) {
 }
 
 #[tokio::test]
+async fn manager_discovery_failure_rolls_back_every_acquired_client() {
+    let mut clients = vec![];
+    let mut logs = vec![];
+    for (name, replies) in [
+        ("a", vec![handshake(), Ok(json!({"tools":[]}))]),
+        ("b", vec![handshake(), Err(Error::Transport)]),
+        ("c", vec![]),
+    ] {
+        let (transport, log) = transport(replies);
+        let mut policy = policy();
+        let grant = policy.servers.remove("server").unwrap();
+        policy.servers.insert(name.into(), grant);
+        clients.push(Client::new(transport, name, config(), policy).unwrap());
+        logs.push(log);
+    }
+    assert!(ClientManager::new(clients).await.is_err());
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if logs.iter().all(|log| {
+                log.lock()
+                    .unwrap()
+                    .iter()
+                    .any(|(method, _)| method == "close")
+            }) {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    for log in logs {
+        assert_eq!(
+            log.lock()
+                .unwrap()
+                .iter()
+                .filter(|(method, _)| method == "close")
+                .count(),
+            1
+        );
+    }
+}
+
+#[tokio::test]
+async fn cancelled_manager_discovery_retains_cleanup() {
+    let log = Log::default();
+    let peer = Box::new(Mock {
+        replies: vec![handshake()].into(),
+        log: log.clone(),
+        hang: true,
+    });
+    let client = Client::new(peer, "server", config(), policy()).unwrap();
+    let building = tokio::spawn(ClientManager::new(vec![client]));
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if log
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|(method, _)| method == "tools/list")
+            {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    building.abort();
+    assert!(building.await.is_err());
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if log
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|(method, _)| method == "close")
+            {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(
+        log.lock()
+            .unwrap()
+            .iter()
+            .filter(|(method, _)| method == "close")
+            .count(),
+        1
+    );
+}
+
+#[tokio::test]
+async fn unpolled_manager_construction_still_owns_client_cleanup() {
+    let (client, log) = client(vec![]).await;
+    drop(ClientManager::new(vec![client]));
+    tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if log
+                .lock()
+                .unwrap()
+                .iter()
+                .any(|(method, _)| method == "close")
+            {
+                break;
+            }
+            tokio::task::yield_now().await;
+        }
+    })
+    .await
+    .unwrap();
+    assert_eq!(
+        log.lock()
+            .unwrap()
+            .iter()
+            .filter(|(method, _)| method == "close")
+            .count(),
+        1
+    );
+    assert!(
+        !log.lock()
+            .unwrap()
+            .iter()
+            .any(|(method, _)| method == "tools/list")
+    );
+}
+
+#[tokio::test]
+async fn selected_catalog_filters_raw_and_final_names_and_cannot_widen() {
+    for allowed in ["a b", "mcp__server__a_b_2"] {
+        let (client, log) = client(vec![
+            Ok(json!({"tools":[tool("a?b", true), tool("a b", true)]})),
+            Ok(json!({"content":[]})),
+        ])
+        .await;
+        let manager = ClientManager::new(vec![client])
+            .await
+            .unwrap()
+            .select_tools(false, &BTreeSet::from([allowed.into()]), false);
+        assert_eq!(manager.definitions().len(), 1);
+        assert_eq!(manager.definitions()[0].name, "mcp__server__a_b_2");
+        assert_eq!(manager.catalog()[0].tool_name, "a b");
+        assert!(!manager.has_resources());
+        let before = log.lock().unwrap().len();
+        assert!(matches!(
+            manager.call("mcp__server__a_b", json!({})).await,
+            Err(Error::Policy(_))
+        ));
+        assert!(matches!(
+            manager.list_resources(None).await,
+            Err(Error::Policy(_))
+        ));
+        assert!(matches!(
+            manager.read_resource("server", "file:///x").await,
+            Err(Error::Policy(_))
+        ));
+        assert_eq!(log.lock().unwrap().len(), before);
+        manager.call("mcp__server__a_b_2", json!({})).await.unwrap();
+        assert_eq!(
+            log.lock().unwrap().last().unwrap().1,
+            json!({"name":"a b","arguments":{}})
+        );
+        let manager = manager.select_tools(true, &BTreeSet::new(), true);
+        assert_eq!(manager.definitions().len(), 1);
+        assert!(!manager.has_resources());
+        assert!(matches!(
+            manager.list_resources(None).await,
+            Err(Error::Policy(_))
+        ));
+    }
+}
+
+#[tokio::test]
+async fn resources_only_selection_keeps_resource_dispatch_and_denies_tools() {
+    let (client, log) = client(vec![
+        Ok(json!({"tools":[tool("read", true)]})),
+        Ok(json!({"resources":[]})),
+    ])
+    .await;
+    let manager = ClientManager::new(vec![client])
+        .await
+        .unwrap()
+        .select_tools(false, &BTreeSet::new(), true);
+    assert!(manager.definitions().is_empty());
+    assert!(manager.catalog().is_empty());
+    assert!(manager.has_resources());
+    let before = log.lock().unwrap().len();
+    assert!(matches!(
+        manager.call("mcp__server__read", json!({})).await,
+        Err(Error::Policy(_))
+    ));
+    assert!(matches!(
+        manager.list_resources(Some("other")).await,
+        Err(Error::Policy(_))
+    ));
+    assert!(matches!(
+        manager.read_resource("other", "file:///x").await,
+        Err(Error::Policy(_))
+    ));
+    assert_eq!(log.lock().unwrap().len(), before);
+    assert_eq!(manager.list_resources(None).await.unwrap(), json!([]));
+}
+
+#[tokio::test]
 async fn initializes_once_negotiates_and_gates_capabilities() {
     let (mut client, log) = client(vec![]).await;
     assert!(
@@ -980,7 +1187,20 @@ async fn collision_suffixes_follow_discovery_order_and_route_exact_originals() {
                 .map(|(name, _, _)| *name)
                 .collect::<Vec<_>>()
         );
-        for (qualified, server_index, original) in expected {
+        let catalog = manager.catalog();
+        assert_eq!(catalog.len(), expected.len());
+        assert_eq!(
+            manager
+                .connected_servers()
+                .keys()
+                .map(String::as_str)
+                .collect::<Vec<_>>(),
+            vec!["a b", "a?b"]
+        );
+        for (entry, (qualified, server_index, original)) in catalog.iter().zip(expected) {
+            assert_eq!(entry.definition.name, qualified);
+            assert_eq!(entry.server_name, ["a b", "a?b"][server_index]);
+            assert_eq!(entry.tool_name, original);
             manager
                 .call(qualified, json!({"route":qualified}))
                 .await

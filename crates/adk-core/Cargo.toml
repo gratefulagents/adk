@@ -9,6 +9,6 @@ description = "Runtime-neutral native contracts for ADK agents, models, tools, a
 
 [dependencies]
 serde.workspace = true
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
 schemars.workspace = true
 thiserror.workspace = true

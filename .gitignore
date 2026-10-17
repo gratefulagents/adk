@@ -4,6 +4,7 @@
 __pycache__/
 *.pyc
 /target/
+/fixtures/standalone-consumer/target/
 /candidate.json
 /scripts/replay/.work/
 /scripts/replay/.home/

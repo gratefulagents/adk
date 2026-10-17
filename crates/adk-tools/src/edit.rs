@@ -1,5 +1,6 @@
 use crate::{
     Capability, edit_diff,
+    fs_input::{self, Kind},
     workspace::Workspace,
     write::{atomic_write, clean, resolve_existing},
 };
@@ -8,7 +9,6 @@ use adk_core::{
 };
 use rustix::fs::{Mode, OFlags, open};
 use serde::Deserialize;
-use serde_json::{Value, json};
 use std::{
     fs::File,
     io::{Read, Write},
@@ -38,15 +38,18 @@ struct Input {
     replace_all: bool,
 }
 impl Edit {
-    fn edit(&self, context: &ToolContext, mut arguments: Value) -> Result<String, String> {
-        if arguments.is_null() {
-            arguments = json!({});
-        }
-        if let Some(fields) = arguments.as_object_mut() {
-            fields.retain(|_, value| !value.is_null());
-        }
-        let input: Input =
-            serde_json::from_value(arguments).map_err(|e| format!("Invalid input: {e}"))?;
+    fn edit(&self, context: &ToolContext, call: &ToolCall) -> Result<String, String> {
+        let arguments = fs_input::decode(
+            call,
+            "fileEditInput",
+            &[
+                ("file_path", Kind::String),
+                ("old_string", Kind::String),
+                ("new_string", Kind::String),
+                ("replace_all", Kind::Bool),
+            ],
+        )?;
+        let input: Input = serde_json::from_value(arguments).expect("validated edit fields");
         if input.file_path.is_empty() {
             return Err("file_path is required".into());
         }
@@ -205,7 +208,7 @@ impl Tool for Edit {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             context.operation.check_active()?;
-            let (text, is_error) = match self.edit(context, call.arguments) {
+            let (text, is_error) = match self.edit(context, &call) {
                 Ok(text) => (text, false),
                 Err(text) => (text, true),
             };

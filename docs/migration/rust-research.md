@@ -92,3 +92,28 @@ Exact-version crates.io API responses were inspected in addition to the sources 
 | adk-core 2.2.0 | https://github.com/zavora-ai/adk-rust | Apache-2.0 | `040e96a250780592a2d9fb2e1813bcfa035d191494c383675b785ad36d889388` | 1.95 |
 
 Checksums are registry-reported archive identities, not a claim of locally compiled source. All three declare edition 2024. Query: `https://crates.io/api/v1/crates/<crate>/<version>`. Full dependency license compatibility remains unverified.
+
+## Content-event logger composition
+
+Adopt explicit `Write + Send` ownership, `Arc` for shared logger lifetime and an
+explicit `flush`, rather than reproducing Go's mutable global logger. Child
+streams snapshot the selected logger; replacing a parent's selection does not
+retarget existing children. These are native ownership choices, not claims that
+any surveyed framework implements the SDK's log format.
+
+Reject Rust `Debug` and JSON string rendering for SDK log bodies: their escaping
+is not Go `%q` (for example `\u{85}` / `\u0000` versus `\u0085` / `\x00`).
+Byte-limited Go previews can split UTF-8 and require escaped raw bytes rather than
+Unicode replacement characters. Use independently generated printable ranges
+from Go 1.26.8 / Unicode 15.0.0, and compare a complete log containing every
+Unicode scalar against the source logger. This avoids compiler Unicode-version
+drift without introducing a runtime Go dependency.
+
+Sources: pinned SDK [`logger.go`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/logger.go)
+(GPL-3.0-only), Go 1.26.8 [`quote.go`](https://github.com/golang/go/blob/go1.26.8/src/strconv/quote.go),
+[`isprint.go`](https://github.com/golang/go/blob/go1.26.8/src/strconv/isprint.go)
+and [`LICENSE`](https://github.com/golang/go/blob/go1.26.8/LICENSE) (BSD-3-Clause).
+The fixture records their local source hashes and exact toolchain identity; the
+license copy and generated-table attribution are retained. This verifies message
+bodies only, not Go's arbitrary global log flags, timestamp decoration or its
+full printf API.

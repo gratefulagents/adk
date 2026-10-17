@@ -1,0 +1,402 @@
+{
+  "cases": [
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "continue",
+      "output": "done",
+      "requests": 2,
+      "streamed": false,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "continue",
+      "output": "done",
+      "requests": 2,
+      "streamed": true,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "stop_all",
+      "output": null,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "stop_all",
+      "output": null,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "named",
+      "output": null,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "named",
+      "output": null,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "case_miss",
+      "output": "done",
+      "requests": 2,
+      "streamed": false,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "case_miss",
+      "output": "done",
+      "requests": 2,
+      "streamed": true,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "space_miss",
+      "output": "done",
+      "requests": 2,
+      "streamed": false,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "space_miss",
+      "output": "done",
+      "requests": 2,
+      "streamed": true,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "read-output"
+      ],
+      "name": "first",
+      "output": "read-output",
+      "requests": 1,
+      "streamed": false,
+      "text": "read-output"
+    },
+    {
+      "error": false,
+      "guards": [
+        "read-output"
+      ],
+      "name": "first",
+      "output": "read-output",
+      "requests": 1,
+      "streamed": true,
+      "text": "read-output"
+    },
+    {
+      "error": false,
+      "guards": [
+        "read-output"
+      ],
+      "name": "second_named",
+      "output": "read-output",
+      "requests": 1,
+      "streamed": false,
+      "text": "read-output"
+    },
+    {
+      "error": false,
+      "guards": [
+        "read-output"
+      ],
+      "name": "second_named",
+      "output": "read-output",
+      "requests": 1,
+      "streamed": true,
+      "text": "read-output"
+    },
+    {
+      "error": false,
+      "guards": [
+        {
+          "done": true
+        }
+      ],
+      "name": "object",
+      "output": {
+        "done": true
+      },
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        {
+          "done": true
+        }
+      ],
+      "name": "object",
+      "output": {
+        "done": true
+      },
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        "quoted"
+      ],
+      "name": "string",
+      "output": "quoted",
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        "quoted"
+      ],
+      "name": "string",
+      "output": "quoted",
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "null",
+      "output": null,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "null",
+      "output": null,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        false
+      ],
+      "name": "false",
+      "output": false,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        false
+      ],
+      "name": "false",
+      "output": false,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "disabled",
+      "output": null,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "disabled",
+      "output": null,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        "read-output"
+      ],
+      "name": "schema",
+      "output": "read-output",
+      "requests": 1,
+      "streamed": false,
+      "text": "read-output"
+    },
+    {
+      "error": false,
+      "guards": [
+        "read-output"
+      ],
+      "name": "schema",
+      "output": "read-output",
+      "requests": 1,
+      "streamed": true,
+      "text": "read-output"
+    },
+    {
+      "error": true,
+      "guards": [
+        null
+      ],
+      "name": "guardrail",
+      "output": null,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": true,
+      "guards": [
+        null
+      ],
+      "name": "guardrail",
+      "output": null,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "pause",
+      "output": null,
+      "requests": 1,
+      "streamed": false,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [
+        null
+      ],
+      "name": "pause",
+      "output": null,
+      "requests": 1,
+      "streamed": true,
+      "text": ""
+    },
+    {
+      "error": false,
+      "guards": [],
+      "name": "handoff",
+      "output": "done",
+      "requests": 2,
+      "streamed": false,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [],
+      "name": "handoff",
+      "output": "done",
+      "requests": 2,
+      "streamed": true,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "steering",
+      "output": "done",
+      "requests": 2,
+      "streamed": false,
+      "text": "done"
+    },
+    {
+      "error": false,
+      "guards": [
+        "done"
+      ],
+      "name": "steering",
+      "output": "done",
+      "requests": 2,
+      "streamed": true,
+      "text": "done"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/tool-stopping-reference/reference_test.go": "9f2bd1f89b40b783a94a9aafa8eb094c3c2d2b95edbf2e29c7601a534c6e337d",
+      "scripts/tool-stopping-reference/run.py": "f46c19de6a33017e32c83ae877d471c8b9ac91e662aa308bec8336f7322132fb"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/agent.go": "4249ea49210c173858beda562079e6c198b482c2043b1fbc4df795b10dcb6d07",
+      "internal/agent/run_config.go": "8bf6e20a356b493908bb9789b4b82b1430646558d1936cf8fa41439922d4163e",
+      "internal/agent/run_result.go": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/runner_test.go": "93f9b527d0c0b7bbbdfa0360c5a27697db2d42bf331753d2c05e120541d17ec3",
+      "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894"
+    }
+  }
+}

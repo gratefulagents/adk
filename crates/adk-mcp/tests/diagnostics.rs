@@ -192,6 +192,66 @@ async fn startup_failure_keeps_boom_traceback_host_only_and_error_typed() {
 }
 
 #[tokio::test]
+#[cfg(unix)]
+async fn cancelled_connection_initialization_kills_and_reaps_owned_process() {
+    let temp = tempfile::tempdir().unwrap();
+    let path = temp.path().to_owned();
+    let connecting = tokio::spawn(async move {
+        let config = adk_mcp::config::ConnectionConfig::inline(serde_json::from_value(json!({
+            "mcpServers":{"crashy":{"command":"/usr/bin/python3","args":["-u","-c",
+                "import sys,os,time; sys.stdin.readline(); open('pid', 'w').write(str(os.getpid())+'\\n'); time.sleep(30)"
+            ]}}
+        })).unwrap()).unwrap();
+        let policy = HostPolicy {
+            tenant_id: "tenant".into(),
+            servers: BTreeMap::from([(
+                "crashy".into(),
+                ServerPolicy {
+                    enabled: true,
+                    ..Default::default()
+                },
+            )]),
+            ..Default::default()
+        };
+        connection::connect_config(
+            &config,
+            "crashy",
+            policy,
+            None,
+            &BTreeMap::new(),
+            &path,
+            Limits::default(),
+        )
+        .await
+    });
+    let pid = tokio::time::timeout(Duration::from_secs(2), async {
+        loop {
+            if let Ok(text) = std::fs::read_to_string(temp.path().join("pid")) {
+                if let Some(text) = text.strip_suffix('\n') {
+                    break rustix::process::Pid::from_raw(text.parse().unwrap()).unwrap();
+                }
+            }
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+    })
+    .await
+    .unwrap();
+    connecting.abort();
+    assert!(connecting.await.is_err());
+    tokio::time::timeout(Duration::from_secs(2), async {
+        while rustix::process::test_kill_process(pid).is_ok() {
+            tokio::time::sleep(Duration::from_millis(5)).await;
+        }
+    })
+    .await
+    .unwrap();
+    assert!(matches!(
+        rustix::process::waitpid(Some(pid), rustix::process::WaitOptions::NOHANG),
+        Err(rustix::io::Errno::CHILD)
+    ));
+}
+
+#[tokio::test]
 async fn cancellation_during_stderr_grace_kills_and_reaps_child() {
     let mut transport = python(
         "import sys,os,json,time; r=json.loads(sys.stdin.readline()); print(json.dumps({'jsonrpc':'2.0','id':r['id'],'result':os.getpid()})); sys.stdin.readline(); os.close(1); time.sleep(30)",

@@ -184,6 +184,7 @@ func main() {
             before_item: index,
             marker: ApprovalMarker::from_call(
                 &ToolCall {
+                    raw_arguments: None,
                     id: id.into(),
                     name: "Edit".into(),
                     arguments: if index == 0 {
@@ -194,7 +195,8 @@ func main() {
                 },
                 ApprovalPhase::Denied,
                 None,
-            ),
+            )
+            .unwrap(),
         })
         .collect();
     let wire = encode_history(&native, &[None, None], &markers).unwrap();

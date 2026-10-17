@@ -1,0 +1,36 @@
+{
+  "baseline_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "claims": {
+    "SDK-0B2DC29E8C9CA68D": {
+      "artifact_paths": {
+        "LICENSE": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+        "docs/migration/licenses/sdk-LICENSE": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27"
+      },
+      "artifact_revision": "b1a1a981ead06d9c69eae4aaa713bb373a6fe2c3",
+      "category": "files",
+      "evidence_kind": "artifact_review",
+      "ledger_record_id": "files:LICENSE",
+      "rationale": "Retain the complete pinned SDK LICENSE byte-for-byte in both distribution copies, with independently approved source/provenance review. This artifact-only claim implies no Rust behavior, sibling/group closure, legal-compliance, release approval, or relicensing conclusion.",
+      "review_approval_reference": "docs/verification/issue-11-license-review.json#/approvals/sdk-license-retention-v1",
+      "rust_module": "sdk::distribution",
+      "source": "LICENSE",
+      "source_sha256": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27"
+    },
+    "SDK-B9810B40B3C11D74": {
+      "artifact_paths": {
+        "LICENSE": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27",
+        "docs/migration/licenses/sdk-LICENSE": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27"
+      },
+      "artifact_revision": "b1a1a981ead06d9c69eae4aaa713bb373a6fe2c3",
+      "category": "artifacts",
+      "evidence_kind": "artifact_review",
+      "ledger_record_id": "artifacts:LICENSE",
+      "rationale": "Retain the complete pinned SDK LICENSE byte-for-byte in both distribution copies, with independently approved source/provenance review. This artifact-only claim implies no Rust behavior, sibling/group closure, legal-compliance, release approval, or relicensing conclusion.",
+      "review_approval_reference": "docs/verification/issue-11-license-review.json#/approvals/sdk-license-retention-v1",
+      "rust_module": "sdk::distribution",
+      "source": "LICENSE",
+      "source_sha256": "e3df40627909b6fb9d91898c54b8c56dd677b0b2919a2e584ff3dbe7ebeced27"
+    }
+  },
+  "schema_version": 1
+}

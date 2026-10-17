@@ -35,6 +35,7 @@ async fn call(root: &Path, name: &str, arguments: Value) -> ToolOutput {
                 idempotency_key: None,
             },
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: name.into(),
                 arguments,

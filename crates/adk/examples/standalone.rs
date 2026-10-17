@@ -3,6 +3,7 @@ use adk::core::{Content, Message, Role, RunItem, RunPolicy, RunRequest};
 
 fn main() {
     let request = RunRequest {
+        input_provenance: Vec::new(),
         input: vec![RunItem::Message {
             message: Message {
                 role: Role::User,

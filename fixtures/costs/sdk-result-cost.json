@@ -1,0 +1,691 @@
+{
+  "cases": [
+    {
+      "cost_known": true,
+      "cost_usd": 1,
+      "fallback_cost": 99,
+      "fallback_kind": "known",
+      "fallback_usages": [],
+      "name": "response_sum",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.25,
+          "usage": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "requests": 0
+          }
+        },
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "requests": 0
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 2
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 0.25,
+      "fallback_cost": 99,
+      "fallback_kind": "known",
+      "fallback_usages": [],
+      "name": "unknown_response",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.25,
+          "usage": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "requests": 0
+          }
+        },
+        {
+          "cost_known": false,
+          "cost_usd": 0,
+          "usage": {
+            "input_tokens": 0,
+            "output_tokens": 0,
+            "requests": 0
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0.75,
+      "fallback_cost": 0.75,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 6,
+          "cache_read_tokens": 8,
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "requests": 3
+        }
+      ],
+      "name": "empty_known",
+      "responses": null,
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 0.25,
+      "fallback_cost": 0.25,
+      "fallback_kind": "unknown",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 6,
+          "cache_read_tokens": 8,
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "requests": 3
+        }
+      ],
+      "name": "empty_unknown_nonzero",
+      "responses": null,
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 0,
+      "fallback_cost": 0,
+      "fallback_kind": "nil",
+      "fallback_usages": [],
+      "name": "empty_no_model",
+      "responses": null,
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0,
+      "fallback_cost": 0,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0
+        }
+      ],
+      "name": "empty_zero_known",
+      "responses": null,
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 0,
+      "fallback_cost": 0,
+      "fallback_kind": "unknown",
+      "fallback_usages": [
+        {
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0
+        }
+      ],
+      "name": "empty_zero_unknown",
+      "responses": null,
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 1.75,
+      "fallback_cost": 1,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 3,
+          "cache_read_tokens": 6,
+          "input_tokens": 3,
+          "output_tokens": 1,
+          "requests": 2
+        }
+      ],
+      "name": "residual_known",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 1,
+      "fallback_cost": 0.25,
+      "fallback_kind": "unknown",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 3,
+          "cache_read_tokens": 6,
+          "input_tokens": 3,
+          "output_tokens": 1,
+          "requests": 2
+        }
+      ],
+      "name": "residual_unknown_nonzero",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 0.75,
+      "fallback_cost": 0,
+      "fallback_kind": "nil",
+      "fallback_usages": [],
+      "name": "residual_no_model",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0.75,
+      "fallback_cost": 99,
+      "fallback_kind": "known",
+      "fallback_usages": [],
+      "name": "requests_only",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 3,
+        "cache_read_tokens": 2,
+        "input_tokens": 7,
+        "output_tokens": 4,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 1,
+      "fallback_cost": 0.25,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "cache_read_tokens": 1,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0
+        }
+      ],
+      "name": "cache_read_only",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 3,
+        "cache_read_tokens": 3,
+        "input_tokens": 7,
+        "output_tokens": 4,
+        "requests": 1
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 1,
+      "fallback_cost": 0.25,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 1,
+          "input_tokens": 0,
+          "output_tokens": 0,
+          "requests": 0
+        }
+      ],
+      "name": "cache_create_only",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 4,
+        "cache_read_tokens": 2,
+        "input_tokens": 7,
+        "output_tokens": 4,
+        "requests": 1
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 1,
+      "fallback_cost": 0.25,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "input_tokens": 0,
+          "output_tokens": 5,
+          "requests": 0
+        }
+      ],
+      "name": "componentwise_clamp",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 2,
+        "cache_read_tokens": 1,
+        "input_tokens": 2,
+        "output_tokens": 9,
+        "requests": 0
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0.75,
+      "fallback_cost": 99,
+      "fallback_kind": "known",
+      "fallback_usages": [],
+      "name": "all_overstated",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "input_tokens": 0,
+        "output_tokens": 0,
+        "requests": 0
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0.25,
+      "fallback_cost": 0.25,
+      "fallback_kind": "legacy",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 6,
+          "cache_read_tokens": 8,
+          "input_tokens": 10,
+          "output_tokens": 5,
+          "requests": 3
+        }
+      ],
+      "name": "legacy_empty",
+      "responses": null,
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 1,
+      "fallback_cost": 0.25,
+      "fallback_kind": "legacy",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 3,
+          "cache_read_tokens": 6,
+          "input_tokens": 3,
+          "output_tokens": 1,
+          "requests": 2
+        }
+      ],
+      "name": "legacy_residual",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": false,
+      "cost_usd": 1.75,
+      "fallback_cost": 1,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 3,
+          "cache_read_tokens": 6,
+          "input_tokens": 3,
+          "output_tokens": 1,
+          "requests": 2
+        }
+      ],
+      "name": "unknown_response_known_residual",
+      "responses": [
+        {
+          "cost_known": false,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 1,
+      "fallback_cost": 0.25,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "input_tokens": 10,
+          "output_tokens": 0,
+          "requests": 2
+        }
+      ],
+      "name": "aggregate_residual_once",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 3,
+        "cache_read_tokens": 2,
+        "input_tokens": 17,
+        "output_tokens": 4,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0.75,
+      "fallback_cost": 0,
+      "fallback_kind": "known",
+      "fallback_usages": [
+        {
+          "cache_create_tokens": 3,
+          "cache_read_tokens": 6,
+          "input_tokens": 3,
+          "output_tokens": 1,
+          "requests": 2
+        }
+      ],
+      "name": "zero_priced_residual",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 6,
+        "cache_read_tokens": 8,
+        "input_tokens": 10,
+        "output_tokens": 5,
+        "requests": 3
+      }
+    },
+    {
+      "cost_known": true,
+      "cost_usd": 0.75,
+      "fallback_cost": 99,
+      "fallback_kind": "unknown",
+      "fallback_usages": [],
+      "name": "exact_usage_no_fallback",
+      "responses": [
+        {
+          "cost_known": true,
+          "cost_usd": 0.75,
+          "usage": {
+            "cache_create_tokens": 3,
+            "cache_read_tokens": 2,
+            "input_tokens": 7,
+            "output_tokens": 4,
+            "requests": 1
+          }
+        }
+      ],
+      "usage": {
+        "cache_create_tokens": 3,
+        "cache_read_tokens": 2,
+        "input_tokens": 7,
+        "output_tokens": 4,
+        "requests": 1
+      }
+    }
+  ],
+  "float_cases": [
+    {
+      "bits": "0000000000000000",
+      "json": "0"
+    },
+    {
+      "bits": "8000000000000000",
+      "json": "-0"
+    },
+    {
+      "bits": "3ff0000000000000",
+      "json": "1"
+    },
+    {
+      "bits": "3fd0000000000000",
+      "json": "0.25"
+    },
+    {
+      "bits": "bff4000000000000",
+      "json": "-1.25"
+    },
+    {
+      "bits": "3eb0c6f7a0b5ed8d",
+      "json": "0.000001"
+    },
+    {
+      "bits": "3e7ad7f29abcaf48",
+      "json": "1e-7"
+    },
+    {
+      "bits": "4415af1d78b58c40",
+      "json": "100000000000000000000"
+    },
+    {
+      "bits": "444b1ae4d6e2ef50",
+      "json": "1e+21"
+    },
+    {
+      "bits": "7fefffffffffffff",
+      "json": "1.7976931348623157e+308"
+    },
+    {
+      "bits": "0000000000000001",
+      "json": "5e-324"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/cost-reference/reference_test.go": "2ead239ac11d13d933f86ca2ba95eb46c28630feac1da030a862220632818eff",
+      "scripts/cost-reference/run.py": "e0e5f2d492b09cf00f79b0ac48b7dd3ff99cbdec88731dfb1db113606f963406"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/cost.go": "f73dab741fe89e4340bb5e09894ed64ed4832b366146cdfdce886c73aae2a4b1",
+      "internal/agent/cost_test.go": "0a3f7eb286254f7d11763c9b82d514f4bc8f2c34389ac7541dd4dbde815e55cc",
+      "internal/agent/model.go": "2bb06a0b3ceb1329a2a703b37a12adce7e9b7d17bf53057f99c9a1b9861712f1",
+      "internal/agent/subagent_run.go": "5652b1433ed2c7900dff53a6c94f784cd1a17b4d2eda4d73b8447531273ec81b",
+      "internal/agent/usage.go": "619655758f961e8bd5bd004cea7127bcc0ed916013cdaf785959f7edb1839d37"
+    }
+  }
+}

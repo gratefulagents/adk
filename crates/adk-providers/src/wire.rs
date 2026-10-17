@@ -8,11 +8,27 @@ use serde_json::{Value, json};
 const DETAILS_PREFIX: &str = "openrouter-reasoning-details:";
 
 pub fn encode_reasoning_details(details: &Value) -> String {
-    format!(
-        "{DETAILS_PREFIX}{}",
-        STANDARD_NO_PAD.encode(details.to_string())
-    )
+    encode_reasoning_details_raw(&details.to_string())
 }
+pub(crate) fn encode_reasoning_details_raw(raw: &str) -> String {
+    format!("{DETAILS_PREFIX}{}", STANDARD_NO_PAD.encode(raw))
+}
+pub(crate) fn original_chat_reasoning_details<'a>(source: &'a str, part: &str) -> Option<&'a str> {
+    use serde_json::value::RawValue;
+    type Object<'a> = std::collections::BTreeMap<String, &'a RawValue>;
+    let body: Object<'_> = serde_json::from_str(source).ok()?;
+    let choices: Vec<&RawValue> = serde_json::from_str(body.get("choices")?.get()).ok()?;
+    let choice: Object<'_> = serde_json::from_str(choices.first()?.get()).ok()?;
+    let message: Object<'_> = serde_json::from_str(choice.get(part)?.get()).ok()?;
+    Some(message.get("reasoning_details")?.get())
+}
+pub(crate) fn chat_reasoning_details_signature(details: &Value, source: Option<&str>) -> String {
+    match source.and_then(|source| original_chat_reasoning_details(source, "message")) {
+        Some(raw) => encode_reasoning_details_raw(raw),
+        None => encode_reasoning_details(details),
+    }
+}
+
 pub(crate) fn reasoning_details_text(details: &Value) -> String {
     details
         .as_array()
@@ -129,6 +145,7 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
         return Err(crate::invalid("model name is empty"));
     }
     let mut entries = Vec::new();
+    let mut seen_tool_calls = std::collections::BTreeSet::new();
     let mut system = Vec::new();
     if !request.instructions.is_empty() {
         if protocol == Protocol::Anthropic {
@@ -139,6 +156,18 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
     }
     let mut tool_images = Vec::new();
     for (input_index, item) in request.input.iter().enumerate() {
+        if let RunItem::ToolCall { call } = item {
+            call.validate_argument_projection()?;
+            if protocol == Protocol::Anthropic
+                && call.raw_arguments.as_ref().is_some_and(|raw| {
+                    !raw.is_empty() && serde_json::from_str::<Value>(raw).is_err()
+                })
+            {
+                return Err(crate::invalid(
+                    "invalid raw tool arguments cannot be embedded in provider JSON",
+                ));
+            }
+        }
         if !matches!(item, RunItem::ToolResult { .. }) && !tool_images.is_empty() {
             entries.push(json!({"role":"user","content":content(&tool_images, protocol, false)?}));
             tool_images.clear();
@@ -187,10 +216,16 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
             }
             RunItem::ToolCall { call } => match protocol {
                 Protocol::Responses => {
-                    json!({"type":"function_call","call_id":call.id,"name":call.name,"arguments":call.arguments.to_string()})
+                    let id = if call.id.trim().is_empty() {
+                        format!("call_{}", entries.len())
+                    } else {
+                        call.id.trim().to_owned()
+                    };
+                    seen_tool_calls.insert(id.clone());
+                    json!({"type":"function_call","call_id":id,"name":call.name,"arguments":call.argument_text().as_ref()})
                 }
                 Protocol::Chat => {
-                    json!({"role":"assistant","content":null,"tool_calls":[{"id":call.id,"type":"function","function":{"name":call.name,"arguments":call.arguments.to_string()}}]})
+                    json!({"role":"assistant","content":null,"tool_calls":[{"id":call.id,"type":"function","function":{"name":call.name,"arguments":call.argument_text().as_ref()}}]})
                 }
                 Protocol::Anthropic => {
                     json!({"role":"assistant","content":[{"type":"tool_use","id":call.id,"name":call.name,"input":call.arguments}]})
@@ -211,12 +246,18 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
                         }
                     }
                     let text = texts.join("\n");
-                    let text = if text.is_empty() {
+                    let text = if text.is_empty()
+                        || (protocol == Protocol::Responses && text.trim().is_empty())
+                    {
                         "(no output)"
                     } else {
                         &text
                     };
                     if protocol == Protocol::Responses {
+                        let call_id = call_id.trim();
+                        if call_id.is_empty() || !seen_tool_calls.contains(call_id) {
+                            continue;
+                        }
                         json!({"type":"function_call_output","call_id":call_id,"output":text})
                     } else {
                         json!({"role":"tool","tool_call_id":call_id,"content":text})
@@ -407,19 +448,45 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
         body["tools"] = tools.into();
     }
     if let Some(schema) = &request.output_schema {
-        let format = json!({"type":"json_schema","name":request.output_schema_name,"strict":request.output_schema_strict,"schema":schema});
-        match protocol {
-            Protocol::Responses => body["text"] = json!({"format":format}),
+        let schema: Value = match protocol {
+            Protocol::Anthropic => {
+                serde_json::from_str(schema.as_str()).map_err(|_| unsupported())?
+            }
+            Protocol::Chat | Protocol::Responses => {
+                match adk_codec::value::decode(schema.as_str().as_bytes())
+                    .map_err(|_| crate::invalid("invalid output schema"))?
+                {
+                    Value::Null => json!({"type":"object"}),
+                    schema @ Value::Object(_) => schema,
+                    _ => return Err(crate::invalid("output schema must be an object")),
+                }
+            }
+        };
+        let format = match protocol {
+            Protocol::Responses => {
+                body["text"] = json!({"format":{"type":"json_schema","name":request.output_schema_name,"strict":request.output_schema_strict}});
+                &mut body["text"]["format"]
+            }
             Protocol::Chat => {
-                body["response_format"] = json!({"type":"json_schema","json_schema":{"name":request.output_schema_name,"strict":request.output_schema_strict,"schema":schema}})
+                body["response_format"] = json!({"type":"json_schema","json_schema":{"name":request.output_schema_name,"strict":request.output_schema_strict}});
+                &mut body["response_format"]["json_schema"]
             }
             Protocol::Anthropic => {
-                body["output_format"] = json!({"type":"json_schema","schema":schema})
+                body["output_format"] = json!({"type":"json_schema"});
+                &mut body["output_format"]
             }
-        }
+        };
+        // Serializing a Value through json! would canonicalize Go's negative zero.
+        format["schema"] = schema;
     }
     // Structural fields are not replaceable through an untyped settings escape hatch.
     for (key, value) in &request.settings {
+        if key == "text_verbosity" && protocol == Protocol::Anthropic {
+            if !value.is_string() {
+                return Err(crate::invalid("text verbosity must be a string"));
+            }
+            continue;
+        }
         if matches!(
             key.as_str(),
             "model_fallbacks" | "text_verbosity" | "compaction_threshold"
@@ -496,6 +563,7 @@ pub fn usage(value: &Value, protocol: Protocol) -> Usage {
         ),
     };
     Usage {
+        requests: 1,
         input_tokens: input,
         output_tokens: output,
         cache_read_tokens: read,
@@ -552,11 +620,21 @@ fn call(
     arguments: &str,
     normalize: bool,
 ) -> Result<RunItem, Error> {
+    let raw = match &value[arguments] {
+        Value::String(raw) if raw.trim().is_empty() => "{}".into(),
+        Value::String(raw)
+            if normalize && adk_codec::value::validate(raw.trim().as_bytes()).is_err() =>
+        {
+            "{}".into()
+        }
+        Value::String(raw) => raw.trim().to_owned(),
+        input => input.to_string(),
+    };
     let arguments = match &value[arguments] {
+        Value::String(_) if normalize => serde_json::from_str(&raw).unwrap_or(Value::Null),
         Value::String(raw) if raw.trim().is_empty() => json!({}),
         Value::String(raw) => match serde_json::from_str(raw) {
             Ok(value) => value,
-            Err(_) if normalize => json!({}),
             Err(_) => {
                 return Err(Error::new(
                     ErrorCategory::ModelBehavior,
@@ -574,13 +652,31 @@ fn call(
     };
     Ok(RunItem::ToolCall {
         call: ToolCall {
+            raw_arguments: Some(raw),
             id: string(value, id)?,
             name: string(value, name)?,
             arguments,
         },
     })
 }
+/// Decode an HTTP body while retaining ordered RawMessage fragments for tracing.
+pub fn response_json(source: &[u8], protocol: Protocol) -> Result<ModelResponse, Error> {
+    let body: Value = serde_json::from_slice(source)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid provider response JSON"))?;
+    let source = std::str::from_utf8(source)
+        .map_err(|_| Error::new(ErrorCategory::Provider, "invalid provider response JSON"))?;
+    response_inner(&body, protocol, Some(source))
+}
+
 pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error> {
+    response_inner(body, protocol, None)
+}
+
+fn response_inner(
+    body: &Value,
+    protocol: Protocol,
+    source: Option<&str>,
+) -> Result<ModelResponse, Error> {
     if let Some(error) = crate::error::provider_error(body) {
         return Err(error);
     }
@@ -737,7 +833,7 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
             let signature = msg
                 .get("reasoning_details")
                 .filter(|value| !value.is_null())
-                .map(encode_reasoning_details)
+                .map(|details| chat_reasoning_details_signature(details, source))
                 .unwrap_or_else(|| {
                     msg["reasoning_opaque"]
                         .as_str()
@@ -843,7 +939,43 @@ pub fn response(body: &Value, protocol: Protocol) -> Result<ModelResponse, Error
             });
         }
     }
+    if protocol == Protocol::Anthropic
+        && let Some(source) = source
+    {
+        let original: std::collections::BTreeMap<&str, &serde_json::value::RawValue> =
+            serde_json::from_str(source).map_err(|_| {
+                Error::new(ErrorCategory::Provider, "invalid provider response JSON")
+            })?;
+        if let Some(content) = original.get("content") {
+            let blocks: Vec<std::collections::BTreeMap<&str, &serde_json::value::RawValue>> =
+                serde_json::from_str(content.get()).map_err(|_| {
+                    Error::new(ErrorCategory::Provider, "invalid provider content JSON")
+                })?;
+            let raw_calls = body["content"]
+                .as_array()
+                .into_iter()
+                .flatten()
+                .zip(&blocks)
+                .filter(|(block, _)| block["type"] == "tool_use");
+            for (call, (_, raw)) in items
+                .iter_mut()
+                .filter_map(|item| match item {
+                    RunItem::ToolCall { call } => Some(call),
+                    _ => None,
+                })
+                .zip(raw_calls)
+            {
+                call.raw_arguments = raw.get("input").map(|input| input.get().to_owned());
+            }
+        }
+    }
     Ok(ModelResponse {
+        snapshot_raw: Some(crate::snapshot::document(body, protocol, source)?),
+        snapshot_projection: Some(match protocol {
+            Protocol::Anthropic => adk_core::SnapshotProjection::GoAnthropicMessage,
+            Protocol::Chat | Protocol::Responses => adk_core::SnapshotProjection::GoOpenAiMessage,
+        }),
+        raw: Some(body.clone()),
         items,
         usage: usage(&body["usage"], protocol),
         end_turn,

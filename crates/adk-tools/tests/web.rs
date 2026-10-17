@@ -40,6 +40,7 @@ async fn invoke(private: bool, args: Value) -> ToolOutput {
         .execute(
             &context(),
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: "WebFetch".into(),
                 arguments: args,
@@ -187,6 +188,7 @@ async fn cancellation_and_deadline_close_pending_http_connections() {
                 .execute(
                     &ctx,
                     ToolCall {
+                        raw_arguments: None,
                         id: "call".into(),
                         name: "WebFetch".into(),
                         arguments: json!({"url":url}),

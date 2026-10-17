@@ -2,6 +2,107 @@ use adk_codec::{dto::*, replay, schema, timestamp::GoTimestamp};
 use serde_json::{Value, json};
 
 #[test]
+fn usage_add_and_total_match_original_sdk_example() {
+    let mut usage = Usage {
+        input_tokens: 100,
+        output_tokens: 50,
+        ..Default::default()
+    };
+    usage.add(&Usage {
+        input_tokens: 200,
+        output_tokens: 100,
+        requests: 1,
+        ..Default::default()
+    });
+    assert_eq!(usage.input_tokens, 300);
+    assert_eq!(usage.total_tokens(), 450);
+}
+
+#[test]
+fn usage_integer_negative_zero_is_accepted() {
+    let usage: Usage = serde_json::from_str(r#"{"requests":-0,"input_tokens":-0,"output_tokens":-0,"cache_read_tokens":-0,"cache_create_tokens":-0}"#).unwrap();
+    assert_eq!(usage, Usage::default());
+}
+
+#[test]
+fn usage_decode_matches_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/usage/observations.json")).unwrap();
+    let cases = fixture["decode_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 113);
+    for case in cases {
+        let input: Vec<u8> = case["input_hex"]
+            .as_str()
+            .unwrap()
+            .as_bytes()
+            .chunks_exact(2)
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect();
+        let decoded = adk_codec::from_go_json::<Usage>(&input);
+        assert_eq!(
+            decoded.is_ok(),
+            case["accepted"].as_bool().unwrap(),
+            "{}",
+            case["name"]
+        );
+        if let Ok(usage) = decoded {
+            assert_eq!(
+                adk_codec::to_go_json_bytes(&usage).unwrap(),
+                case["wire_json"].as_str().unwrap().as_bytes(),
+                "{}",
+                case["name"]
+            );
+        }
+    }
+}
+
+#[test]
+fn usage_in_place_updates_keep_null_fields() {
+    use serde::Deserialize;
+    let mut usage = Usage {
+        requests: 9,
+        input_tokens: 7,
+        output_tokens: 8,
+        cache_read_tokens: 2,
+        cache_create_tokens: 3,
+    };
+    let mut decoder = serde_json::Deserializer::from_str(
+        r#"{"REQUESTS":null,"input_tokens":null,"input_tokens":4,"output_tokens":null,"cache_read_tokens":null,"cache_create_tokens":null}"#,
+    );
+    Usage::deserialize_in_place(&mut decoder, &mut usage).unwrap();
+    assert_eq!(
+        usage,
+        Usage {
+            requests: 9,
+            input_tokens: 4,
+            output_tokens: 8,
+            cache_read_tokens: 2,
+            cache_create_tokens: 3
+        }
+    );
+}
+
+#[test]
+fn signed_usage_arithmetic_matches_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/usage/observations.json")).unwrap();
+    assert_eq!(
+        fixture["sdk_revision"],
+        "1dc92b73900fac74dc357a938e4b5eee6392b418"
+    );
+    let cases = fixture["cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 64);
+    for case in cases {
+        let mut sum: Usage = serde_json::from_value(case["left"].clone()).unwrap();
+        let right: Usage = serde_json::from_value(case["right"].clone()).unwrap();
+        sum.add(&right);
+        assert_eq!(serde_json::to_value(&sum).unwrap(), case["sum"]);
+        assert_eq!(sum.total_tokens(), case["total"].as_i64().unwrap());
+        assert_eq!(serde_json::to_value(&right).unwrap(), case["right"]);
+    }
+}
+
+#[test]
 fn all_sdk_fixture_transforms() {
     let fixture: Value = serde_json::from_str(include_str!("../../../fixtures/sdk.json")).unwrap();
     let cases = fixture["cases"].as_array().unwrap();
@@ -235,12 +336,11 @@ fn typed_schemas_describe_go_names_enum_precision_and_utf8() {
     assert_eq!(kind["type"], "integer");
     let snapshot_kind = serde_json::to_value(schema::<SnapshotType>()).unwrap();
     assert_eq!(snapshot_kind["type"], "string");
-    assert!(
-        snapshot_kind["enum"]
-            .as_array()
-            .unwrap()
-            .contains(&json!("reasoning"))
-    );
+    assert!(snapshot_kind.get("enum").is_none());
+    for kind in ["", "reasoning", "future_kind"] {
+        let decoded: SnapshotType = serde_json::from_value(json!(kind)).unwrap();
+        assert_eq!(serde_json::to_value(decoded).unwrap(), json!(kind));
+    }
     assert_eq!(
         serde_json::to_value(schema::<GoTimestamp>()).unwrap()["format"],
         "date-time"
@@ -275,7 +375,34 @@ fn state_rejects_order_dependencies_and_unknown_events() {
 }
 
 #[test]
-fn go_float_cost_wire_encoding() {
+fn typed_float_spelling_matches_exact_pinned_go_bytes() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/costs/sdk-result-cost.json")).unwrap();
+    let cases = fixture["float_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 11);
+    for case in cases {
+        let bits = u64::from_str_radix(case["bits"].as_str().unwrap(), 16).unwrap();
+        let response = ModelResponse {
+            cost_usd: f64::from_bits(bits),
+            ..Default::default()
+        };
+        for encoded in [
+            serde_json::to_vec(&response).unwrap(),
+            adk_codec::snapshots::to_go_json(&response).unwrap(),
+        ] {
+            let fields: std::collections::BTreeMap<String, Box<serde_json::value::RawValue>> =
+                serde_json::from_slice(&encoded).unwrap();
+            assert_eq!(
+                fields["CostUSD"].get(),
+                case["json"].as_str().unwrap(),
+                "bits={bits:x}"
+            );
+        }
+    }
+}
+
+#[test]
+fn float_cost_value_projection() {
     for (value, expected) in [
         (0.0, "0"),
         (-0.0, "0"),

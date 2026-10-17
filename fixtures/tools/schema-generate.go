@@ -4,8 +4,10 @@
 package main
 
 import (
+	"bytes"
 	"context"
 	"encoding/json"
+	"flag"
 	"fmt"
 	"go/ast"
 	"go/parser"
@@ -96,6 +98,8 @@ func enable(v reflect.Value) {
 	}
 }
 func main() {
+	verify := flag.Bool("check", false, "Compare schemas without modifying the fixture")
+	flag.Parse()
 	commit, err := exec.Command("git", "rev-parse", "HEAD").Output()
 	check(err)
 	if strings.TrimSpace(string(commit)) != pin {
@@ -146,6 +150,15 @@ func main() {
 	}{pin, "pkg/agentsdk/tools/registry.go:isRegistryControlFlowTool (AST; SDK Tool has no ControlFlow method)", rows}
 	encoded, err := json.MarshalIndent(fixture, "", "  ")
 	check(err)
-	check(os.WriteFile("../../fixtures/tools/schema-definitions.json", append(encoded, '\n'), 0644))
+	encoded = append(encoded, '\n')
+	if *verify {
+		expected, err := os.ReadFile("../../fixtures/tools/schema-definitions.json")
+		check(err)
+		if !bytes.Equal(expected, encoded) {
+			panic("pinned tool schema fixture differs")
+		}
+	} else {
+		check(os.WriteFile("../../fixtures/tools/schema-definitions.json", encoded, 0644))
+	}
 	fmt.Printf("%d SDK bundle schema samples generated\n", len(rows))
 }

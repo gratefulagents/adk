@@ -90,10 +90,11 @@ func scenarios() []scenario {
 }
 
 type model struct {
-	mu      sync.Mutex
-	gates   map[string]chan struct{}
-	started map[string]chan struct{}
-	calls   map[string][]any
+	mu           sync.Mutex
+	gates        map[string]chan struct{}
+	started      map[string]chan struct{}
+	calls        map[string][]any
+	cancelReturn chan struct{}
 }
 
 func (m *model) GetResponse(ctx context.Context, req sdk.ModelRequest) (*sdk.ModelResponse, error) {
@@ -118,6 +119,9 @@ func (m *model) GetResponse(ctx context.Context, req sdk.ModelRequest) (*sdk.Mod
 		select {
 		case <-gate:
 		case <-ctx.Done():
+			if m.cancelReturn != nil {
+				<-m.cancelReturn
+			}
 			return nil, ctx.Err()
 		}
 	}
@@ -204,6 +208,10 @@ func main() {
 	output := map[string]any{"cases": []any{}}
 	for _, sc := range scenarios() {
 		m := &model{gates: map[string]chan struct{}{}, started: map[string]chan struct{}{}, calls: map[string][]any{}}
+		if sc.Name == "cancel" {
+			// Observe cancellation-requested views before the runner can replace their error on return.
+			m.cancelReturn = make(chan struct{})
+		}
 		agents := map[string]*sdk.Agent{}
 		for _, name := range []string{"worker", "fast", "slow", "fail"} {
 			m.started[name] = make(chan struct{})
@@ -277,6 +285,9 @@ func main() {
 		var generic any
 		must(json.Unmarshal(serialized, &generic))
 		output["cases"] = append(output["cases"].([]any), map[string]any{"input": sc, "expected": normalize(generic, replacements)})
+		if m.cancelReturn != nil {
+			close(m.cancelReturn)
+		}
 		reg.CancelAll()
 		cancel()
 	}

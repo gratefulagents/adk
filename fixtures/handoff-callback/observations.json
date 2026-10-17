@@ -1,0 +1,728 @@
+{
+  "cases": [
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "{ \"reason\": \"billing\", \"nested\": {\"n\":1} }"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{ \"reason\": \"billing\", \"nested\": {\"n\":1} }",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "object",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "\"billing\""
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "\"billing\"",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "string",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "null"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "null",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "null",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "[\"billing\",2,null,{\"ok\":true}]"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "[\"billing\",2,null,{\"ok\":true}]",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "array",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        ""
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "missing_arguments",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 0,
+      "callback_inputs_raw": [],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": false,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{\"reason\":\"billing\"}",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "nil_callback",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target original",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "{\"first\":true}"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "h2",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{\"first\":true}",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "repeated_call",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "h2",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "{\"selected\":true}"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "lookup",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        },
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "other",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{\"selected\":true}",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "normal",
+      "same_run_context": true,
+      "scenario": "sibling_calls",
+      "target_input_outputs": [
+        {
+          "call_id": "lookup",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        },
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "other",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "{ \"reason\": \"billing\", \"nested\": {\"n\":1} }"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{ \"reason\": \"billing\", \"nested\": {\"n\":1} }",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "object",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "\"billing\""
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "\"billing\"",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "string",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "null"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "null",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "null",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "[\"billing\",2,null,{\"ok\":true}]"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "[\"billing\",2,null,{\"ok\":true}]",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "array",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        ""
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "missing_arguments",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 0,
+      "callback_inputs_raw": [],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "final_text": "done",
+      "has_callback": false,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{\"reason\":\"billing\"}",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "nil_callback",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        }
+      ],
+      "target_instructions": "target original",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "{\"first\":true}"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "h2",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{\"first\":true}",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "repeated_call",
+      "target_input_outputs": [
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "h2",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    },
+    {
+      "callback_count": 1,
+      "callback_inputs_raw": [
+        "{\"selected\":true}"
+      ],
+      "events": [
+        "model:router-model",
+        "old_agent_hook",
+        "run_hook",
+        "callback",
+        "input_filter",
+        "model:expert-model"
+      ],
+      "filter_outputs": [
+        {
+          "call_id": "lookup",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        },
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "other",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "final_text": "done",
+      "has_callback": true,
+      "has_custom_schema": false,
+      "hook_agent_identities_match": true,
+      "input_raw": "{\"selected\":true}",
+      "last_agent_is_target": true,
+      "last_agent_name": "expert",
+      "mode": "streamed",
+      "same_run_context": true,
+      "scenario": "sibling_calls",
+      "target_input_outputs": [
+        {
+          "call_id": "lookup",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        },
+        {
+          "call_id": "h1",
+          "content": "Handing off to expert",
+          "is_error": false
+        },
+        {
+          "call_id": "other",
+          "content": "not executed: the conversation was handed off to expert in this turn",
+          "is_error": true
+        }
+      ],
+      "target_instructions": "target seeded by callback",
+      "target_model": "expert-model"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/handoff-callback-reference/reference_test.go": "442af0b86c36a16a9616e456cf6dedeb91a2d71540168ea68cf05efef28232d3",
+      "scripts/handoff-callback-reference/run.py": "5e87d5ac486ea1a6072675cbd9bebbc9f19a8bb45a2b3a86b6e7f5845384ebca"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/handoff.go": "b27a3db25987e05001477d611f8227921532464cc569ec2d2cff801f4bc12a24",
+      "internal/agent/handoff_enhancements_test.go": "800bf79ce41a03948ca754642418ae28f7b1b8650a61c667c5426bf571227d5e",
+      "internal/agent/hooks.go": "54aa598d8c5452a05262ca1b1b28b9105a645891a586ef49344371b0183b6797",
+      "internal/agent/run_context.go": "79d96ddd0f84d206a8fd3a6f42b7a695aabe0b115aa1fd6078186823c9bc90fc",
+      "internal/agent/run_result.go": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/runner_test.go": "93f9b527d0c0b7bbbdfa0360c5a27697db2d42bf331753d2c05e120541d17ec3",
+      "internal/agent/stream_events.go": "bd15743e7a712c41fd2239f9fca07abe1831ab65c61bfb487763d920090f2484",
+      "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
+      "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894"
+    }
+  },
+  "source_observations": [
+    {
+      "observation": "When InputType is set, validation failure only logs a warning and still invokes OnHandoff; these executable callback cases intentionally use no custom schema.",
+      "source": "internal/agent/runner.go:1511-1518"
+    }
+  ]
+}

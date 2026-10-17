@@ -1,3 +1,12 @@
+#[path = "http/activity.rs"]
+mod activity;
+#[path = "http/reasoning.rs"]
+mod reasoning;
+#[path = "http/schemas.rs"]
+mod schemas;
+#[path = "http/usage.rs"]
+mod usage;
+
 use adk_core::{BoxFuture, Context, Error, Model, ModelEvent, ModelRequest, StreamingModel};
 use adk_providers::{auth::*, client::Provider, wire::Protocol};
 use adk_runtime::CancellationToken;
@@ -54,6 +63,7 @@ fn context() -> Context {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "test-model".into(),
         instructions: "test".into(),
         input: vec![],
@@ -98,6 +108,353 @@ fn read_request(socket: &mut TcpStream) -> String {
     }
     String::from_utf8(bytes).unwrap()
 }
+#[tokio::test]
+async fn openai_schema_normalization_reaches_the_http_body() {
+    for protocol in [Protocol::Chat, Protocol::Responses] {
+        for (raw, expected) in [
+            ("null", r#""schema":{"type":"object"}"#),
+            (r#"{"x":-0}"#, r#""schema":{"x":-0}"#),
+        ] {
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+            let server = std::thread::spawn(move || {
+                let (mut socket, _) = listener.accept().unwrap();
+                let captured = read_request(&mut socket);
+                let response = match protocol {
+                    Protocol::Chat => {
+                        r#"{"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}]}"#
+                    }
+                    Protocol::Responses => {
+                        r#"{"output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}]}"#
+                    }
+                    Protocol::Anthropic => unreachable!(),
+                };
+                write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{response}", response.len()).unwrap();
+                captured
+            });
+            let scope = Scope::new("fixture", &endpoint, None, AuthMode::ApiKey).unwrap();
+            let session =
+                Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap());
+            let provider = Provider::new("fixture", protocol, session).unwrap();
+            let mut input = request();
+            input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
+            provider.complete(&context(), input).await.unwrap();
+            let captured = server.join().unwrap();
+            let body = captured.split_once("\r\n\r\n").unwrap().1;
+            assert!(body.contains(expected), "{body}");
+        }
+    }
+}
+
+#[tokio::test]
+async fn chat_completions_original_fallback_requests() {
+    use adk_core::{Content, Message, Role, RunItem};
+    use serde_json::json;
+    for with_fallbacks in [true, false] {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+        let server = std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            let response = r#"{"id":"x","model":"m","choices":[{"index":0,"message":{"role":"assistant","content":"ok"},"finish_reason":"stop"}],"usage":{"prompt_tokens":1,"completion_tokens":1,"total_tokens":2}}"#;
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{response}", response.len()).unwrap();
+            captured
+        });
+        let mut input = request();
+        input.model = "deepseek/deepseek-v4-pro".into();
+        input.instructions.clear();
+        input.settings.insert("max_tokens".into(), json!(16));
+        input.input = vec![RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text { text: "hi".into() }],
+            },
+        }];
+        if with_fallbacks {
+            input.settings.insert(
+                "model_fallbacks".into(),
+                json!(["deepseek/deepseek-chat:free", "openrouter/auto"]),
+            );
+        }
+        provider(&endpoint)
+            .complete(&context(), input)
+            .await
+            .unwrap();
+        let captured = server.join().unwrap();
+        assert_eq!(
+            captured.lines().next(),
+            Some("POST /v1/chat/completions HTTP/1.1")
+        );
+        let body: serde_json::Value =
+            serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+        assert_eq!(body["model"], "deepseek/deepseek-v4-pro");
+        if with_fallbacks {
+            assert_eq!(
+                body["models"],
+                json!([
+                    "deepseek/deepseek-v4-pro",
+                    "deepseek/deepseek-chat:free",
+                    "openrouter/auto"
+                ])
+            );
+        } else {
+            assert!(body.get("models").is_none());
+        }
+    }
+}
+
+#[tokio::test]
+async fn copilot_original_stream_drops_nested_budget_reasoning() {
+    use adk_providers::factory::{Kind, RouteSpec};
+    use serde_json::json;
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        let captured = read_request(&mut socket);
+        let body = "data: [DONE]\n\n";
+        write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+        captured
+    });
+    let spec = RouteSpec {
+        kind: Kind::Copilot,
+        prefix: None,
+        endpoint: Some(endpoint),
+        protocol: Some(Protocol::Chat),
+        mode: AuthMode::CopilotOAuth,
+        account: None,
+    };
+    let model = spec
+        .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+        .unwrap();
+    let mut input = request();
+    input.model = "claude-sonnet-4.6".into();
+    input.instructions.clear();
+    input.settings.insert("max_tokens".into(), json!(4096));
+    input.settings.insert(
+        "thinking".into(),
+        json!({"type":"enabled", "budget_tokens":2048}),
+    );
+    let ctx = context();
+    let stream = model.stream(&ctx, input).await.unwrap();
+    drop(stream);
+    let captured = server.join().unwrap();
+    let body = captured.split_once("\r\n\r\n").unwrap().1;
+    assert!(!body.contains("\"reasoning\":"));
+}
+
+#[tokio::test]
+async fn responses_http_drops_orphan_output_without_losing_following_message() {
+    use adk_core::{Content, Message, Role, RunItem, ToolOutput};
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        let captured = read_request(&mut socket);
+        let body = r#"{"id":"resp_1","output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}]}"#;
+        write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+        captured
+    });
+    let scope = Scope::new("fixture", &endpoint, None, AuthMode::ApiKey).unwrap();
+    let model = Provider::new(
+        "fixture",
+        Protocol::Responses,
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+    )
+    .unwrap();
+    let mut input = request();
+    input.input = vec![
+        RunItem::ToolResult {
+            call_id: "missing".into(),
+            output: ToolOutput {
+                content: vec![Content::Text {
+                    text: "orphaned output".into(),
+                }],
+                is_error: false,
+                should_pause: false,
+            },
+        },
+        RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text {
+                    text: "continue".into(),
+                }],
+            },
+        },
+    ];
+    model.complete(&context(), input).await.unwrap();
+    let captured = server.join().unwrap();
+    assert_eq!(captured.lines().next(), Some("POST /v1/responses HTTP/1.1"));
+    let body: serde_json::Value =
+        serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+    assert_eq!(
+        body["input"],
+        serde_json::json!([{"role":"user","content":"continue"}])
+    );
+}
+
+#[tokio::test]
+async fn image_analysis_matches_pinned_public_helper() {
+    use adk_providers::client::ImageAnalysisRequest;
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/image-analysis/observations.json"
+    ))
+    .unwrap();
+    for case in fixture["cases"].as_array().unwrap() {
+        let input = &case["input"];
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+        let no_text = input["no_text"].as_bool().unwrap();
+        let server = (!case["request"].is_null()).then(|| std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            let mut body = String::from("data: {\"type\":\"response.created\",\"response\":{\"id\":\"vision\",\"model\":\"gpt-5.5\"}}\n\n");
+            if !no_text {
+                body.push_str("data: {\"type\":\"response.content_part.added\",\"output_index\":0,\"part\":{\"type\":\"output_text\"}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"delta\":\"  vision ok  \"}\n\ndata: {\"type\":\"response.output_text.done\",\"output_index\":0}\n\n");
+            }
+            body.push_str("data: {\"type\":\"response.completed\",\"response\":{\"id\":\"vision\",\"model\":\"gpt-5.5\",\"output\":[]}}\n\ndata: [DONE]\n\n");
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}", body.len(), body).unwrap();
+            captured
+        }));
+        let mut request = ImageAnalysisRequest::new(
+            input["model"].as_str().unwrap(),
+            input["data"].as_str().unwrap().as_bytes(),
+            input["mime"].as_str().unwrap(),
+            input["prompt"].as_str().unwrap(),
+        );
+        if !input["default"].as_bool().unwrap() {
+            request.detail = input["detail"].as_str().unwrap();
+        }
+        let result = provider(&endpoint).analyze_image(&context(), request).await;
+        if case["error"] == "" {
+            assert_eq!(
+                result.unwrap(),
+                case["result"].as_str().unwrap(),
+                "{}",
+                input["name"]
+            );
+        } else {
+            let error = result.unwrap_err();
+            assert_eq!(
+                error.info.category,
+                if no_text {
+                    adk_core::ErrorCategory::Provider
+                } else {
+                    adk_core::ErrorCategory::InvalidInput
+                }
+            );
+        }
+        if let Some(server) = server {
+            let captured = server.join().unwrap();
+            assert!(captured.starts_with("POST /v1/responses HTTP/1.1"));
+            assert!(
+                captured
+                    .to_lowercase()
+                    .contains("authorization: bearer fixture-token")
+            );
+            let body: serde_json::Value =
+                serde_json::from_str(captured.split_once("\r\n\r\n").unwrap().1).unwrap();
+            assert_eq!(body, case["request"], "{}", input["name"]);
+        }
+    }
+}
+
+#[tokio::test]
+async fn image_analysis_respects_cancellation_and_rejects_anthropic() {
+    use adk_providers::client::ImageAnalysisRequest;
+    let token = CancellationToken::new();
+    token.cancel();
+    let mut cancelled = context();
+    cancelled.cancellation = Arc::new(token);
+    let provider = provider("http://127.0.0.1:1");
+    let error = provider
+        .analyze_image(
+            &cancelled,
+            ImageAnalysisRequest::new("", b"image", "image/png", "describe"),
+        )
+        .await
+        .unwrap_err();
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Cancelled);
+    let scope = Scope::new("fixture", "http://127.0.0.1:1", None, AuthMode::ApiKey).unwrap();
+    let provider = Provider::new(
+        "anthropic",
+        Protocol::Anthropic,
+        Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+    )
+    .unwrap();
+    let error = provider
+        .analyze_image(
+            &context(),
+            ImageAnalysisRequest::new("", b"image", "image/png", "describe"),
+        )
+        .await
+        .unwrap_err();
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Unsupported);
+}
+
+#[tokio::test]
+async fn image_analysis_cancels_open_stream_and_redacts_http_failures() {
+    use adk_providers::client::ImageAnalysisRequest;
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let (ready_tx, ready_rx) = tokio::sync::oneshot::channel();
+    let (release_tx, release_rx) = std::sync::mpsc::channel();
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        read_request(&mut socket);
+        write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nTransfer-Encoding: chunked\r\n\r\n").unwrap();
+        ready_tx.send(()).unwrap();
+        release_rx.recv_timeout(Duration::from_secs(5)).unwrap();
+    });
+    let token = Arc::new(CancellationToken::new());
+    let mut ctx = context();
+    ctx.cancellation = token.clone();
+    let provider = provider(&endpoint);
+    let (result, ()) = tokio::join!(
+        provider.analyze_image(
+            &ctx,
+            ImageAnalysisRequest::new("", b"image", "image/png", "describe")
+        ),
+        async {
+            ready_rx.await.unwrap();
+            token.cancel();
+        },
+    );
+    release_tx.send(()).unwrap();
+    server.join().unwrap();
+    assert_eq!(
+        result.unwrap_err().info.category,
+        adk_core::ErrorCategory::Cancelled
+    );
+
+    let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+    let endpoint = format!("http://{}", listener.local_addr().unwrap());
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        read_request(&mut socket);
+        let body = "private-prompt fixture-token";
+        write!(
+            socket,
+            "HTTP/1.1 503 Unavailable\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{}",
+            body.len(),
+            body
+        )
+        .unwrap();
+    });
+    let error = self::provider(&endpoint)
+        .analyze_image(
+            &context(),
+            ImageAnalysisRequest::new("", b"image", "image/png", "private-prompt"),
+        )
+        .await
+        .unwrap_err();
+    server.join().unwrap();
+    assert_eq!(error.info.category, adk_core::ErrorCategory::Provider);
+    assert!(!error.to_string().contains("private-prompt"));
+    assert!(!error.to_string().contains("fixture-token"));
+}
+
 #[test]
 fn named_routes_preserve_gateway_model_ids_and_reject_unknown_prefixes() {
     let mut routes = adk_providers::routing::Routes::new("default");
@@ -153,6 +510,15 @@ async fn complete_sends_captured_request_and_normalizes_usage() {
     let response = provider.complete(&ctx, input).await.unwrap();
     assert_eq!(response.usage.context_tokens, Some(12));
     assert_eq!(response.usage.cache_read_tokens, 4);
+    let raw = response.raw.as_ref().unwrap();
+    assert_eq!(raw["id"], "c");
+    assert_eq!(raw["choices"][0]["message"]["content"], "hello");
+    assert_eq!(raw["usage"]["prompt_tokens_details"]["cached_tokens"], 4);
+    assert_eq!(
+        response.snapshot_raw.as_ref().unwrap().as_str(),
+        r#"{"id":"c","type":"message","role":"assistant","content":[{"type":"text","text":"hello"}],"model":"","stop_reason":"end_turn","usage":{"input_tokens":12,"output_tokens":2,"cache_read_input_tokens":4}}"#
+    );
+    assert!(response.metadata.is_empty());
     let request = server.join().unwrap();
     assert!(request.starts_with("POST /v1/chat/completions HTTP/1.1"));
     assert!(
@@ -233,7 +599,10 @@ async fn chunked_stream_emits_incremental_text_and_exactly_one_complete() {
     );
     let mut completes = 0;
     while let Some(event) = stream.next().await.unwrap() {
-        if matches!(event, ModelEvent::Complete { .. }) {
+        if let ModelEvent::Complete { response } = event {
+            let raw = response.raw.as_ref().unwrap();
+            assert_eq!(raw["choices"][0]["message"]["content"], "hé🙂");
+            assert_eq!(raw["choices"][0]["finish_reason"], "stop");
             completes += 1;
         }
     }
@@ -320,6 +689,7 @@ async fn native_compaction_uses_dedicated_endpoint_and_replayable_output() {
                     agent: "fixture".into(),
                     model: "test-model".into(),
                     history: vec![],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -402,11 +772,18 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
     #[derive(Default)]
     struct Price(Mutex<Vec<String>>);
     impl CostEstimator for Price {
-        fn cost(&self, model: &str, usage: &adk_core::Usage) -> f64 {
+        fn cost(&self, _: &str, _: &adk_core::Usage) -> f64 {
+            panic!("native compaction must preserve the optional price")
+        }
+        fn estimate_cost(&self, model: &str, usage: &adk_core::Usage) -> Option<f64> {
             assert_eq!(usage.input_tokens, 12);
             assert_eq!(usage.output_tokens, 2);
             self.0.lock().unwrap().push(model.into());
-            0.25
+            match model {
+                "work/vendor/model" => None,
+                "small" => Some(0.0),
+                _ => Some(0.25),
+            }
         }
     }
     let costs = Arc::new(Price::default());
@@ -431,13 +808,33 @@ async fn native_compactor_resolves_bindings_and_keeps_original_cost_names() {
                             }],
                         },
                     }],
+                    history_provenance: vec![adk_core::ItemProvenance::Agent {
+                        name: "original".into(),
+                    }],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
             )
             .await
             .unwrap();
-        assert_eq!(result.cost, 0.25);
+        assert_eq!(
+            result.cost,
+            if matches!(binding, "work/vendor/model" | "small") {
+                0.0
+            } else {
+                0.25
+            }
+        );
+        assert_eq!(result.cost_known, binding != "work/vendor/model");
+        assert!(
+            result.history_provenance.is_empty(),
+            "replacement history has no proven attribution correspondence"
+        );
+        assert_eq!(
+            adk_core::normalize_provenance(result.history.len(), &result.history_provenance)
+                .unwrap(),
+            vec![adk_core::ItemProvenance::Unknown]
+        );
         assert!(
             matches!(&result.history[0], adk_core::RunItem::Compaction { compaction } if compaction.encrypted_content == "opaque")
         );
@@ -504,6 +901,7 @@ async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
                     agent: "fixture".into(),
                     model: binding.into(),
                     history: vec![],
+                    history_provenance: vec![],
                     context_tokens: 20,
                     target_tokens: 5,
                 },
@@ -528,6 +926,7 @@ async fn native_compactor_rejects_incompatible_fallbacks_before_http() {
                 agent: "fixture".into(),
                 model: "chat/small".into(),
                 history: vec![],
+                history_provenance: vec![],
                 context_tokens: 20,
                 target_tokens: 5,
             },
@@ -1045,6 +1444,7 @@ async fn runner_consumes_http_phase_and_false_end_turn_before_final_answer() {
         .run(
             context(),
             RunRequest {
+                input_provenance: Vec::new(),
                 input: vec![],
                 policy: RunPolicy {
                     max_turns: 2.try_into().unwrap(),
@@ -1115,4 +1515,157 @@ async fn anthropic_thinking_repair_is_learned_only_for_its_model() {
         .map(|body| body["thinking"]["type"].as_str().unwrap())
         .collect();
     assert_eq!(kinds, ["enabled", "adaptive", "adaptive", "enabled"]);
+}
+
+#[test]
+fn generation_metadata_resolves_routes_aliases_and_cache_accounting_without_io() {
+    use adk_providers::{
+        factory::{Kind, RouteSpec},
+        routing::Routes,
+    };
+    for (protocol, includes_cache) in [
+        (Protocol::Responses, true),
+        (Protocol::Chat, true),
+        (Protocol::Anthropic, false),
+    ] {
+        let scope = Scope::new("wire", "http://127.0.0.1:9", None, AuthMode::ApiKey).unwrap();
+        let model = Arc::new(
+            Provider::new(
+                "wire",
+                protocol,
+                Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+            )
+            .unwrap(),
+        );
+        let mut routes = Routes::new("named");
+        routes.register_kind("named", Kind::OpenAi, model).unwrap();
+        let info = routes.info("named/gpt-5.6");
+        assert_eq!(info.provider, "wire");
+        assert_eq!(info.model, "gpt-5.6");
+        assert_eq!(info.input_tokens_include_cache, Some(includes_cache));
+    }
+    let model = RouteSpec {
+        kind: Kind::Copilot,
+        prefix: Some("work".into()),
+        endpoint: Some("http://127.0.0.1:9".into()),
+        protocol: None,
+        mode: AuthMode::CopilotOAuth,
+        account: None,
+    }
+    .build(Arc::new(StaticStore), Arc::new(NoRefresh))
+    .unwrap();
+    assert_eq!(
+        model.info("claude-sonnet-4.5").input_tokens_include_cache,
+        Some(false)
+    );
+    assert_eq!(model.info("gpt-5.6").input_tokens_include_cache, Some(true));
+}
+
+#[tokio::test]
+async fn complete_profiles_match_executed_public_sdk_over_http() {
+    let fixtures: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let mut count = 0;
+    for (name, case) in fixtures["provider_response_cases"].as_object().unwrap() {
+        if case["method"] != "complete" {
+            continue;
+        }
+        let protocol = match case["protocol"].as_str().unwrap() {
+            "chat" => Protocol::Chat,
+            "responses" => Protocol::Responses,
+            "anthropic" => Protocol::Anthropic,
+            _ => unreachable!(),
+        };
+        let body = case["body"].as_str().unwrap().to_owned();
+        let streaming = case["streaming"].as_bool().unwrap_or(false);
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let addr = listener.local_addr().unwrap();
+        let server = std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let request = read_request(&mut socket);
+            let kind = if streaming {
+                "text/event-stream"
+            } else {
+                "application/json"
+            };
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: {kind}\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            request
+        });
+        let endpoint = format!("http://{addr}/v1");
+        let scope = Scope::new("fixture", &endpoint, None, AuthMode::ApiKey).unwrap();
+        let provider = Provider::new(
+            "fixture",
+            protocol,
+            Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap()),
+        )
+        .unwrap();
+        let response = provider
+            .complete(&context(), request())
+            .await
+            .unwrap_or_else(|e| panic!("{name}: {e:?}"));
+        if name == "anthropic_compaction_cache" {
+            assert!(response.items.iter().any(|item| matches!(item, adk_core::RunItem::Compaction { compaction } if compaction.content == "summary <>&" && compaction.id == "ignored-id" && compaction.created_by == "ignored-origin")));
+            assert_eq!(response.end_turn, Some(true));
+        }
+        for projected in [
+            response.clone(),
+            serde_json::from_value(serde_json::to_value(&response).unwrap()).unwrap(),
+            serde_json::from_str(&serde_json::to_string(&response).unwrap()).unwrap(),
+        ] {
+            let snapshot = adk_codec::dto::ResponseSnapshot::try_from(&projected).unwrap();
+            assert_eq!(
+                adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
+                case["snapshot_json"].as_str().unwrap().as_bytes(),
+                "snapshot {name}"
+            );
+            assert_eq!(projected, response);
+        }
+        assert_eq!(
+            response.snapshot_raw.unwrap().as_str(),
+            case["raw_json"].as_str().unwrap(),
+            "{name}"
+        );
+        assert!(response.raw.is_some());
+        let request = server.join().unwrap();
+        let request: serde_json::Value =
+            serde_json::from_str(request.split_once("\r\n\r\n").unwrap().1).unwrap();
+        assert_eq!(request["stream"], streaming, "{name}");
+        count += 1;
+    }
+    assert_eq!(count, 8);
+}
+
+#[tokio::test]
+async fn buffered_chat_http_preserves_reasoning_signature_bytes() {
+    use adk_core::RunItem;
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    for case in fixture["buffered_chat_details"].as_array().unwrap() {
+        let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+        let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+        let body = case["body"].as_str().unwrap().to_owned();
+        let server = std::thread::spawn(move || {
+            let (mut socket, _) = listener.accept().unwrap();
+            let captured = read_request(&mut socket);
+            write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}", body.len()).unwrap();
+            captured
+        });
+        let response = provider(&endpoint)
+            .complete(&context(), request())
+            .await
+            .unwrap();
+        let RunItem::Reasoning { reasoning } = &response.items[0] else {
+            panic!("missing reasoning")
+        };
+        assert_eq!(reasoning.signature, case["signature"].as_str().unwrap());
+        let snapshot: serde_json::Value =
+            serde_json::from_str(response.snapshot_raw.unwrap().as_str()).unwrap();
+        assert_eq!(snapshot["content"][0]["signature"], case["signature"]);
+        assert_eq!(
+            server.join().unwrap().lines().next(),
+            Some("POST /v1/chat/completions HTTP/1.1")
+        );
+    }
 }

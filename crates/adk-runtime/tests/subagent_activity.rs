@@ -30,17 +30,20 @@ impl Model for ToolModel {
         Box::pin(async move {
             let calls = match self.0.fetch_add(1, Ordering::SeqCst) {
                 0 => vec![ToolCall {
+                    raw_arguments: None,
                     id: "write".into(),
                     name: "Write".into(),
                     arguments: serde_json::json!({"file_path": "output.txt", "content": "secret contents"}),
                 }],
                 1 => vec![
                     ToolCall {
+                        raw_arguments: None,
                         id: "read-output".into(),
                         name: "read_file".into(),
                         arguments: serde_json::json!({"path": "output.txt", "unused": "secret argument"}),
                     },
                     ToolCall {
+                        raw_arguments: None,
                         id: "read-seed".into(),
                         name: "read_file".into(),
                         arguments: serde_json::json!({"path": "seed.txt"}),
@@ -64,6 +67,9 @@ impl Model for ToolModel {
                     .collect()
             };
             Ok(ModelResponse {
+                snapshot_raw: None,
+                snapshot_projection: None,
+                raw: None,
                 items,
                 usage: Default::default(),
                 end_turn: None,

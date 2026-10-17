@@ -1,0 +1,1679 @@
+{
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "cases": [
+    {
+      "name": "nil_input",
+      "source_only": [],
+      "input": null,
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "empty_input",
+      "source_only": [],
+      "input": [],
+      "new_items": [],
+      "output": []
+    },
+    {
+      "name": "user_message",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ]
+    },
+    {
+      "name": "assistant_message",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ]
+    },
+    {
+      "name": "phased_messages",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "checking",
+            "phase": "commentary"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "checking",
+            "phase": "commentary"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ]
+    },
+    {
+      "name": "compaction",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ]
+    },
+    {
+      "name": "distinct_agent_history",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ]
+    },
+    {
+      "name": "agent_named_system",
+      "source_only": [
+        "agent-label-not-system-role"
+      ],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "agent label only"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "system"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "agent label only"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "system"
+          }
+        }
+      ]
+    },
+    {
+      "name": "agent_named_developer",
+      "source_only": [
+        "agent-label-not-developer-role"
+      ],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "agent label only"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "developer"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "agent label only"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "developer"
+          }
+        }
+      ]
+    },
+    {
+      "name": "zero_value_item",
+      "source_only": [
+        "message-without-payload"
+      ],
+      "input": [
+        {
+          "Type": 0,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ]
+    },
+    {
+      "name": "unknown_types",
+      "source_only": [
+        "unknown-native-item-types"
+      ],
+      "input": [
+        {
+          "Type": -1,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 99,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": -1,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 99,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ]
+    },
+    {
+      "name": "strip_tool_call",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 1,
+          "Message": null,
+          "ToolCall": {
+            "id": "call-1",
+            "name": "lookup",
+            "input": {
+              "query": "x",
+              "n": 2
+            }
+          },
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "strip_tool_output",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 2,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": {
+            "call_id": "call-1",
+            "content": "failure",
+            "is_error": true
+          },
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "strip_handoff_call",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 3,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "strip_handoff_output",
+      "source_only": [
+        "no-native-handoff_output-run-item"
+      ],
+      "input": [
+        {
+          "Type": 4,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "strip_reasoning",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 5,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": {
+            "id": "reason-1",
+            "text": "private",
+            "signature": "sig",
+            "redacted_data": "redacted",
+            "encrypted_content": "encrypted"
+          },
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "strip_tool_approval",
+      "source_only": [
+        "no-native-tool_approval-run-item"
+      ],
+      "input": [
+        {
+          "Type": 6,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": {
+            "tool_name": "lookup",
+            "input": {
+              "query": "x"
+            },
+            "call_id": "call-1",
+            "approved": true
+          },
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "all_six_stripped",
+      "source_only": [
+        "no-native-handoff_output-run-item",
+        "no-native-tool_approval-run-item"
+      ],
+      "input": [
+        {
+          "Type": 1,
+          "Message": null,
+          "ToolCall": {
+            "id": "call-1",
+            "name": "lookup",
+            "input": {
+              "query": "x",
+              "n": 2
+            }
+          },
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 2,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": {
+            "call_id": "call-1",
+            "content": "failure",
+            "is_error": true
+          },
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 3,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 4,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 5,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": {
+            "id": "reason-1",
+            "text": "private",
+            "signature": "sig",
+            "redacted_data": "redacted",
+            "encrypted_content": "encrypted"
+          },
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 6,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": {
+            "tool_name": "lookup",
+            "input": {
+              "query": "x"
+            },
+            "call_id": "call-1",
+            "approved": true
+          },
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "new_items": null,
+      "output": []
+    },
+    {
+      "name": "mixed_sequence",
+      "source_only": [
+        "no-native-handoff_output-run-item",
+        "no-native-tool_approval-run-item"
+      ],
+      "input": [
+        {
+          "Type": 1,
+          "Message": null,
+          "ToolCall": {
+            "id": "call-1",
+            "name": "lookup",
+            "input": {
+              "query": "x",
+              "n": 2
+            }
+          },
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 2,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": {
+            "call_id": "call-1",
+            "content": "failure",
+            "is_error": true
+          },
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 3,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "checking",
+            "phase": "commentary"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 4,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 5,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": {
+            "id": "reason-1",
+            "text": "private",
+            "signature": "sig",
+            "redacted_data": "redacted",
+            "encrypted_content": "encrypted"
+          },
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 6,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": {
+            "tool_name": "lookup",
+            "input": {
+              "query": "x"
+            },
+            "call_id": "call-1",
+            "approved": true
+          },
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "checking",
+            "phase": "commentary"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ]
+    },
+    {
+      "name": "native_mixed_sequence",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 1,
+          "Message": null,
+          "ToolCall": {
+            "id": "call-1",
+            "name": "lookup",
+            "input": {
+              "query": "x",
+              "n": 2
+            }
+          },
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 2,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": {
+            "call_id": "call-1",
+            "content": "failure",
+            "is_error": true
+          },
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 3,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": {
+            "from_agent": "alpha",
+            "to_agent": "beta"
+          },
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "checking",
+            "phase": "commentary"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 5,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": {
+            "id": "reason-1",
+            "text": "private",
+            "signature": "sig",
+            "redacted_data": "redacted",
+            "encrypted_content": "encrypted"
+          },
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ],
+      "new_items": null,
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "checking",
+            "phase": "commentary"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        }
+      ]
+    },
+    {
+      "name": "nil_input_nonempty_new_items",
+      "source_only": [],
+      "input": null,
+      "new_items": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 1,
+          "Message": null,
+          "ToolCall": {
+            "id": "call-1",
+            "name": "lookup",
+            "input": {
+              "query": "x",
+              "n": 2
+            }
+          },
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "output": []
+    },
+    {
+      "name": "empty_input_nonempty_new_items",
+      "source_only": [],
+      "input": [],
+      "new_items": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "output": []
+    },
+    {
+      "name": "new_items_ignored",
+      "source_only": [],
+      "input": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 1,
+          "Message": null,
+          "ToolCall": {
+            "id": "call-1",
+            "name": "lookup",
+            "input": {
+              "query": "x",
+              "n": 2
+            }
+          },
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ],
+      "new_items": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": "done",
+            "phase": "final_answer"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        },
+        {
+          "Type": 2,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": {
+            "call_id": "call-1",
+            "content": "failure",
+            "is_error": true
+          },
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        },
+        {
+          "Type": 7,
+          "Message": null,
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": {
+            "id": "cmp-1",
+            "content": "summary\n",
+            "encrypted_content": "opaque==",
+            "created_by": "provider"
+          },
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "beta"
+          }
+        }
+      ],
+      "output": [
+        {
+          "Type": 0,
+          "Message": {
+            "text": " user \u003cinput\u003e\n"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": null
+        },
+        {
+          "Type": 0,
+          "Message": {
+            "text": "assistant α"
+          },
+          "ToolCall": null,
+          "ToolOutput": null,
+          "HandoffCall": null,
+          "HandoffOutput": null,
+          "Reasoning": null,
+          "Compaction": null,
+          "ToolApproval": null,
+          "Agent": {
+            "Name": "alpha"
+          }
+        }
+      ]
+    }
+  ]
+}

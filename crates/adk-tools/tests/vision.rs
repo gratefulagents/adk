@@ -29,6 +29,7 @@ fn context(root: &Path) -> ToolContext {
 }
 fn call(arguments: Value) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: "call".into(),
         name: "AnalyzeImage".into(),
         arguments,

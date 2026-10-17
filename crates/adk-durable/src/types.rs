@@ -1,4 +1,4 @@
-use chrono::{DateTime, TimeZone, Utc};
+use chrono::{DateTime, FixedOffset, SecondsFormat, TimeZone, Utc};
 use serde::{Deserialize, Serialize};
 use serde_json::Value;
 use sha2::{Digest, Sha256};
@@ -8,8 +8,10 @@ use crate::{Error, Result};
 
 pub const SCHEMA_VERSION: i32 = 2;
 
-pub fn zero_time() -> DateTime<Utc> {
-    Utc.with_ymd_and_hms(1, 1, 1, 0, 0, 0).unwrap()
+pub fn zero_time() -> DateTime<FixedOffset> {
+    Utc.with_ymd_and_hms(1, 1, 1, 0, 0, 0)
+        .unwrap()
+        .fixed_offset()
 }
 
 macro_rules! ids {
@@ -33,43 +35,51 @@ ids! { TenantId => "ten", RunId => "run", AttemptId => "att", StepId => "step",
 ToolCallId => "tool", ApprovalId => "approval", ChildRunId => "child",
 EffectId => "effect", EventId => "event", LeaseToken => "lease" }
 
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum DataClassification {
-    #[default]
-    #[serde(rename = "")]
-    Unspecified,
-    Public,
-    Internal,
-    Sensitive,
-    Secret,
+macro_rules! wire_enum {
+    ($name:ident { $($variant:ident => $wire:literal),* $(,)? }) => {
+        #[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+        #[serde(from = "String", into = "String")]
+        pub enum $name { $($variant,)* Unknown(String) }
+        impl From<String> for $name {
+            fn from(value: String) -> Self {
+                match value.as_str() { $($wire => Self::$variant,)* _ => Self::Unknown(value) }
+            }
+        }
+        impl From<$name> for String {
+            fn from(value: $name) -> Self {
+                match value { $($name::$variant => $wire.into(),)* $name::Unknown(value) => value }
+            }
+        }
+        impl Default for $name {
+            fn default() -> Self { String::new().into() }
+        }
+    };
 }
+wire_enum!(DataClassification {
+    Unspecified => "", Public => "public", Internal => "internal",
+    Sensitive => "sensitive", Secret => "secret",
+});
 impl DataClassification {
     pub fn is_unspecified(&self) -> bool {
         *self == Self::Unspecified
     }
 }
-
-#[derive(Clone, Copy, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum RunStatus {
-    #[default]
-    #[serde(rename = "")]
-    Unspecified,
-    Pending,
-    Running,
-    Succeeded,
-    Failed,
-    Cancelled,
-}
+wire_enum!(RunStatus {
+    Unspecified => "", Pending => "pending", Running => "running",
+    Succeeded => "succeeded", Failed => "failed", Cancelled => "cancelled",
+});
 
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Attempt {
+    #[serde(deserialize_with = "null_default")]
     pub id: AttemptId,
-    pub started_at: DateTime<Utc>,
-    pub ended_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub started_at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub ended_at: DateTime<FixedOffset>,
     #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(deserialize_with = "null_default")]
     pub outcome: String,
 }
 impl Default for Attempt {
@@ -86,16 +96,21 @@ impl Default for Attempt {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Step {
+    #[serde(deserialize_with = "null_default")]
     pub id: StepId,
+    #[serde(deserialize_with = "null_default")]
     pub kind: String,
+    #[serde(deserialize_with = "null_default")]
     pub status: String,
     #[serde(
         skip_serializing_if = "Option::is_none",
         deserialize_with = "present_value"
     )]
     pub data: Option<Value>,
-    pub started_at: DateTime<Utc>,
-    pub ended_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub started_at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub ended_at: DateTime<FixedOffset>,
 }
 impl Default for Step {
     fn default() -> Self {
@@ -113,10 +128,14 @@ impl Default for Step {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ToolCall {
+    #[serde(deserialize_with = "null_default")]
     pub id: ToolCallId,
+    #[serde(deserialize_with = "null_default")]
     pub name: String,
+    #[serde(deserialize_with = "null_default")]
     pub status: String,
     #[serde(skip_serializing_if = "DataClassification::is_unspecified")]
+    #[serde(deserialize_with = "null_default")]
     pub classification: DataClassification,
     #[serde(
         skip_serializing_if = "Option::is_none",
@@ -128,8 +147,10 @@ pub struct ToolCall {
         deserialize_with = "present_value"
     )]
     pub output: Option<Value>,
-    pub started_at: DateTime<Utc>,
-    pub ended_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub started_at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub ended_at: DateTime<FixedOffset>,
 }
 impl Default for ToolCall {
     fn default() -> Self {
@@ -149,11 +170,16 @@ impl Default for ToolCall {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Approval {
+    #[serde(deserialize_with = "null_default")]
     pub id: ApprovalId,
+    #[serde(deserialize_with = "null_default")]
     pub status: String,
-    pub requested_at: DateTime<Utc>,
-    pub resolved_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub requested_at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub resolved_at: DateTime<FixedOffset>,
     #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(deserialize_with = "null_default")]
     pub resolved_by: String,
 }
 impl Default for Approval {
@@ -171,11 +197,16 @@ impl Default for Approval {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct ChildRun {
+    #[serde(deserialize_with = "null_default")]
     pub id: ChildRunId,
+    #[serde(deserialize_with = "null_default")]
     pub run_id: RunId,
+    #[serde(deserialize_with = "null_default")]
     pub status: RunStatus,
-    pub started_at: DateTime<Utc>,
-    pub ended_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub started_at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub ended_at: DateTime<FixedOffset>,
 }
 impl Default for ChildRun {
     fn default() -> Self {
@@ -192,12 +223,16 @@ impl Default for ChildRun {
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Cancellation {
-    pub requested_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub requested_at: DateTime<FixedOffset>,
     #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(deserialize_with = "null_default")]
     pub requested_by: String,
     #[serde(skip_serializing_if = "String::is_empty")]
+    #[serde(deserialize_with = "null_default")]
     pub reason: String,
-    pub acknowledged_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub acknowledged_at: DateTime<FixedOffset>,
 }
 impl Default for Cancellation {
     fn default() -> Self {
@@ -217,46 +252,50 @@ fn is_zero(n: &i64) -> bool {
 #[serde(default)]
 pub struct BudgetCounters {
     #[serde(skip_serializing_if = "is_zero")]
+    #[serde(deserialize_with = "null_default")]
     pub input_tokens: i64,
     #[serde(skip_serializing_if = "is_zero")]
+    #[serde(deserialize_with = "null_default")]
     pub output_tokens: i64,
     #[serde(skip_serializing_if = "is_zero")]
+    #[serde(deserialize_with = "null_default")]
     pub tool_calls: i64,
     #[serde(skip_serializing_if = "is_zero")]
+    #[serde(deserialize_with = "null_default")]
     pub cost_micros: i64,
     #[serde(skip_serializing_if = "is_zero")]
+    #[serde(deserialize_with = "null_default")]
     pub wall_time_ms: i64,
 }
 
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum EffectClassification {
-    Idempotent,
-    Deduplicated,
-    NonReplayable,
-}
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum EffectState {
-    Prepared,
-    Dispatched,
-    Succeeded,
-    Failed,
-    OutcomeUnknown,
-}
+wire_enum!(EffectClassification {
+    Idempotent => "idempotent", Deduplicated => "deduplicated", NonReplayable => "non_replayable",
+});
+wire_enum!(EffectState {
+    Prepared => "prepared", Dispatched => "dispatched", Succeeded => "succeeded",
+    Failed => "failed", OutcomeUnknown => "outcome_unknown",
+});
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Effect {
+    #[serde(deserialize_with = "null_default")]
     pub id: EffectId,
+    #[serde(deserialize_with = "null_default")]
     pub classification: EffectClassification,
     #[serde(default, skip_serializing_if = "DataClassification::is_unspecified")]
+    #[serde(deserialize_with = "null_default")]
     pub data_classification: DataClassification,
+    #[serde(deserialize_with = "null_default")]
     pub state: EffectState,
     #[serde(default, skip_serializing_if = "String::is_empty")]
+    #[serde(deserialize_with = "null_default")]
     pub idempotency_key: String,
     #[serde(default = "zero_time")]
-    pub prepared_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub prepared_at: DateTime<FixedOffset>,
     #[serde(default = "zero_time")]
-    pub updated_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub updated_at: DateTime<FixedOffset>,
     #[serde(
         default,
         skip_serializing_if = "Option::is_none",
@@ -274,8 +313,8 @@ impl Effect {
             data_classification: Default::default(),
             state: EffectState::Prepared,
             idempotency_key,
-            prepared_at: now,
-            updated_at: now,
+            prepared_at: now.fixed_offset(),
+            updated_at: now.fixed_offset(),
             outcome: None,
         }
     }
@@ -286,25 +325,25 @@ pub fn idempotency_key(run: &RunId, effect: &EffectId) -> String {
         Sha256::digest(format!("{run}:{effect}").as_bytes())
     )
 }
-#[derive(Clone, Copy, Debug, Eq, PartialEq, Serialize, Deserialize)]
-#[serde(rename_all = "snake_case")]
-pub enum RecoveryAction {
-    None,
-    Retry,
-    Reconcile,
-    OperatorResolution,
-}
-#[derive(Clone, Debug, Eq, PartialEq, Serialize, Deserialize)]
+wire_enum!(RecoveryAction {
+    None => "none", Retry => "retry", Reconcile => "reconcile", OperatorResolution => "operator_resolution",
+});
+#[derive(Clone, Debug, Default, Eq, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct RecoveryDecision {
+    #[serde(deserialize_with = "null_default")]
     pub action: RecoveryAction,
+    #[serde(deserialize_with = "null_default")]
     pub automatic: bool,
     #[serde(default, skip_serializing_if = "String::is_empty")]
+    #[serde(deserialize_with = "null_default")]
     pub idempotency_key: String,
 }
 pub fn recover_effect(effect: &Effect) -> RecoveryDecision {
     use EffectState::*;
     use RecoveryAction::*;
-    let (action, automatic) = match (effect.state, effect.classification) {
+    let (action, automatic) = match (&effect.state, &effect.classification) {
+        (EffectState::Unknown(_), _) | (_, EffectClassification::Unknown(_)) => (None, false),
         (Prepared, _) => (Retry, true),
         (Dispatched, EffectClassification::NonReplayable) => (Reconcile, false),
         (OutcomeUnknown, EffectClassification::NonReplayable) => (OperatorResolution, false),
@@ -320,7 +359,7 @@ pub fn recover_effect(effect: &Effect) -> RecoveryDecision {
 pub fn transition_effect(effect: &mut Effect, next: EffectState, now: DateTime<Utc>) -> Result<()> {
     use EffectState::*;
     if !matches!(
-        (effect.state, next),
+        (&effect.state, &next),
         (Prepared, Dispatched | Failed)
             | (Dispatched, Succeeded | Failed | OutcomeUnknown)
             | (OutcomeUnknown, Succeeded | Failed)
@@ -331,7 +370,7 @@ pub fn transition_effect(effect: &mut Effect, next: EffectState, now: DateTime<U
         )));
     }
     effect.state = next;
-    effect.updated_at = now;
+    effect.updated_at = now.fixed_offset();
     Ok(())
 }
 pub fn mark_interrupted_effect(effect: &mut Effect, now: DateTime<Utc>) -> Result<()> {
@@ -344,14 +383,21 @@ pub fn mark_interrupted_effect(effect: &mut Effect, now: DateTime<Utc>) -> Resul
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct Event {
+    #[serde(deserialize_with = "null_default")]
     pub id: EventId,
+    #[serde(deserialize_with = "null_default")]
     pub tenant_id: TenantId,
+    #[serde(deserialize_with = "null_default")]
     pub run_id: RunId,
+    #[serde(deserialize_with = "null_default")]
     pub sequence: u64,
-    pub at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub at: DateTime<FixedOffset>,
     #[serde(rename = "type")]
+    #[serde(deserialize_with = "null_default")]
     pub event_type: String,
     #[serde(skip_serializing_if = "DataClassification::is_unspecified")]
+    #[serde(deserialize_with = "null_default")]
     pub classification: DataClassification,
     #[serde(
         skip_serializing_if = "Option::is_none",
@@ -387,13 +433,20 @@ pub(crate) fn present_value<'de, D: serde::Deserializer<'de>>(
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 #[serde(default)]
 pub struct RunSnapshot {
+    #[serde(deserialize_with = "null_default")]
     pub schema_version: i32,
+    #[serde(deserialize_with = "null_default")]
     pub tenant_id: TenantId,
+    #[serde(deserialize_with = "null_default")]
     pub run_id: RunId,
+    #[serde(deserialize_with = "null_default")]
     pub revision: u64,
+    #[serde(deserialize_with = "null_default")]
     pub event_sequence: u64,
+    #[serde(deserialize_with = "null_default")]
     pub status: RunStatus,
     #[serde(skip_serializing_if = "DataClassification::is_unspecified")]
+    #[serde(deserialize_with = "null_default")]
     pub classification: DataClassification,
     #[serde(
         skip_serializing_if = "Option::is_none",
@@ -414,11 +467,17 @@ pub struct RunSnapshot {
     pub effects: Vec<Effect>,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub cancellation: Option<Cancellation>,
+    #[serde(deserialize_with = "null_default")]
     pub cumulative_budget: BudgetCounters,
-    pub created_at: DateTime<Utc>,
-    pub updated_at: DateTime<Utc>,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub retain_until: Option<DateTime<Utc>>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub created_at: DateTime<FixedOffset>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub updated_at: DateTime<FixedOffset>,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_optional_time"
+    )]
+    pub retain_until: Option<DateTime<FixedOffset>>,
 }
 impl Default for RunSnapshot {
     fn default() -> Self {
@@ -452,19 +511,25 @@ impl RunSnapshot {
             tenant_id,
             run_id,
             status: RunStatus::Pending,
-            created_at: now,
-            updated_at: now,
+            created_at: now.fixed_offset(),
+            updated_at: now.fixed_offset(),
             ..Self::default()
         }
     }
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
+#[serde(default)]
 pub struct Lease {
+    #[serde(deserialize_with = "null_default")]
     pub tenant_id: TenantId,
+    #[serde(deserialize_with = "null_default")]
     pub run_id: RunId,
+    #[serde(deserialize_with = "null_default")]
     pub owner: String,
+    #[serde(deserialize_with = "null_default")]
     pub token: LeaseToken,
-    pub expires_at: DateTime<Utc>,
+    #[serde(deserialize_with = "null_time", serialize_with = "serialize_time")]
+    pub expires_at: DateTime<FixedOffset>,
 }
 #[derive(Clone, Debug, PartialEq, Serialize, Deserialize)]
 pub struct Document {
@@ -472,4 +537,63 @@ pub struct Document {
     pub snapshot: RunSnapshot,
     #[serde(default, deserialize_with = "null_vec")]
     pub events: Vec<Event>,
+}
+
+fn null_default<'de, D: serde::Deserializer<'de>, T: Deserialize<'de> + Default>(
+    d: D,
+) -> std::result::Result<T, D::Error> {
+    Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
+}
+fn time_string(time: &DateTime<FixedOffset>) -> String {
+    let mut wire = time.to_rfc3339_opts(SecondsFormat::Nanos, true);
+    let dot = wire.find('.').unwrap();
+    let end = dot + 10;
+    let trimmed = wire[dot..end]
+        .trim_end_matches('0')
+        .trim_end_matches('.')
+        .len();
+    wire.replace_range(dot + trimmed..end, "");
+    wire
+}
+fn serialize_time<S: serde::Serializer>(
+    time: &DateTime<FixedOffset>,
+    serializer: S,
+) -> std::result::Result<S::Ok, S::Error> {
+    serializer.serialize_str(&time_string(time))
+}
+fn serialize_optional_time<S: serde::Serializer>(
+    time: &Option<DateTime<FixedOffset>>,
+    serializer: S,
+) -> std::result::Result<S::Ok, S::Error> {
+    time.as_ref().map(time_string).serialize(serializer)
+}
+fn null_time<'de, D: serde::Deserializer<'de>>(
+    d: D,
+) -> std::result::Result<DateTime<FixedOffset>, D::Error> {
+    Ok(Option::<DateTime<FixedOffset>>::deserialize(d)?.unwrap_or_else(zero_time))
+}
+impl Default for Effect {
+    fn default() -> Self {
+        Self {
+            id: Default::default(),
+            classification: Default::default(),
+            data_classification: Default::default(),
+            state: Default::default(),
+            idempotency_key: String::new(),
+            prepared_at: zero_time(),
+            updated_at: zero_time(),
+            outcome: None,
+        }
+    }
+}
+impl Default for Lease {
+    fn default() -> Self {
+        Self {
+            tenant_id: Default::default(),
+            run_id: Default::default(),
+            owner: String::new(),
+            token: Default::default(),
+            expires_at: zero_time(),
+        }
+    }
 }

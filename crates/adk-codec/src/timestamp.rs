@@ -3,8 +3,7 @@ use serde::{Deserialize, Deserializer, Serialize};
 use std::borrow::Cow;
 
 /// RFC3339 timestamps at nanosecond precision, without a floating-point conversion.
-#[derive(Clone, Debug, PartialEq, Eq, Serialize)]
-#[serde(transparent)]
+#[derive(Clone, Debug, PartialEq, Eq)]
 pub struct GoTimestamp(String);
 
 impl Default for GoTimestamp {
@@ -16,6 +15,65 @@ impl Default for GoTimestamp {
 impl GoTimestamp {
     pub fn as_str(&self) -> &str {
         &self.0
+    }
+
+    pub(crate) fn parse_event(input: &str) -> Option<Self> {
+        if !input.is_ascii() {
+            return None;
+        }
+        let mut text = input.to_owned();
+        if text.as_bytes().get(12) == Some(&b':') {
+            text.insert(11, '0');
+        }
+        if text.len() < 20 {
+            return None;
+        }
+        let mut end = 19;
+        if matches!(text.as_bytes()[end], b'.' | b',') {
+            end += 1;
+            let start = end;
+            while text.as_bytes().get(end).is_some_and(u8::is_ascii_digit) {
+                end += 1;
+            }
+            if end == start {
+                return None;
+            }
+            let fraction = text[start..end].chars().take(9).collect::<String>();
+            text = format!("{}.{}{}", &text[..19], fraction, &text[end..]);
+            end = 20 + fraction.len();
+        }
+        let zone = &text[end..];
+        if zone == "Z" {
+            return Self::parse(&text);
+        }
+        let bytes = zone.as_bytes();
+        if bytes.len() != 6
+            || !matches!(bytes[0], b'+' | b'-')
+            || bytes[3] != b':'
+            || !bytes[1..3]
+                .iter()
+                .chain(&bytes[4..])
+                .all(u8::is_ascii_digit)
+        {
+            return None;
+        }
+        let hours: u32 = zone[1..3].parse().ok()?;
+        let minutes: u32 = zone[4..6].parse().ok()?;
+        if hours > 24 || minutes > 60 {
+            return None;
+        }
+        let offset = hours * 60 + minutes;
+        let mut stamp = Self::parse(&format!("{}Z", &text[..end]))?;
+        if offset != 0 {
+            stamp.0.pop();
+            stamp.0.push_str(&format!(
+                "{}{:02}:{:02}",
+                char::from(bytes[0]),
+                offset / 60,
+                offset % 60
+            ));
+        }
+        Some(stamp)
     }
 
     fn parse(s: &str) -> Option<Self> {
@@ -118,5 +176,17 @@ impl JsonSchema for GoTimestamp {
     }
     fn json_schema(_: &mut SchemaGenerator) -> Schema {
         schemars::json_schema!({"type": "string", "format": "date-time"})
+    }
+}
+
+impl Serialize for GoTimestamp {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        // Go accepts some out-of-range offsets while parsing but cannot marshal them.
+        if Self::parse(&self.0).is_none() {
+            return Err(serde::ser::Error::custom(
+                "timestamp offset outside RFC3339 range",
+            ));
+        }
+        serializer.serialize_str(&self.0)
     }
 }

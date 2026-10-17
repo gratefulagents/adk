@@ -1,0 +1,413 @@
+{
+  "cases": [
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": true,
+        "detail": "",
+        "mime": "image/png",
+        "model": "",
+        "name": "default",
+        "no_text": false,
+        "prompt": "what is shown?"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "what is shown?",
+                "type": "input_text"
+              },
+              {
+                "detail": "high",
+                "image_url": "data:image/png;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": " LOW ",
+        "mime": " image/png ; charset=binary",
+        "model": " gpt-5.5 ",
+        "name": "low",
+        "no_text": false,
+        "prompt": " what is shown? "
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "what is shown?",
+                "type": "input_text"
+              },
+              {
+                "detail": "low",
+                "image_url": "data:image/png;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.5",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "original",
+        "mime": "image/jpeg",
+        "model": "gpt-5.5",
+        "name": "original",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "original",
+                "image_url": "data:image/jpeg;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.5",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "auto",
+        "mime": "image/webp",
+        "model": "",
+        "name": "auto",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "auto",
+                "image_url": "data:image/webp;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "other",
+        "mime": "image/gif",
+        "model": "",
+        "name": "unknown_detail",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "high",
+                "image_url": "data:image/gif;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "",
+        "mime": "",
+        "model": "",
+        "name": "empty_mime",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "high",
+                "image_url": "data:application/octet-stream;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "",
+        "mime": "image/ png",
+        "model": "",
+        "name": "invalid_mime",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "high",
+                "image_url": "data:application/octet-stream;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "",
+        "mime": "image/png,bad",
+        "model": "",
+        "name": "comma_mime",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "high",
+                "image_url": "data:application/octet-stream;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": "vision ok"
+    },
+    {
+      "error": "image data is empty",
+      "input": {
+        "data": "",
+        "default": false,
+        "detail": "",
+        "mime": "image/png",
+        "model": "",
+        "name": "empty_data",
+        "no_text": false,
+        "prompt": "describe"
+      },
+      "path": "",
+      "request": null,
+      "result": ""
+    },
+    {
+      "error": "prompt is required",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "",
+        "mime": "image/png",
+        "model": "",
+        "name": "empty_prompt",
+        "no_text": false,
+        "prompt": " \t "
+      },
+      "path": "",
+      "request": null,
+      "result": ""
+    },
+    {
+      "error": "streaming response ended without output content (id=\"vision\" model=\"gpt-5.5\" stop_reason=\"end_turn\")",
+      "input": {
+        "data": "hello",
+        "default": false,
+        "detail": "",
+        "mime": "image/png",
+        "model": "",
+        "name": "no_text",
+        "no_text": true,
+        "prompt": "describe"
+      },
+      "path": "/v1/responses",
+      "request": {
+        "input": [
+          {
+            "content": [
+              {
+                "text": "describe",
+                "type": "input_text"
+              },
+              {
+                "detail": "high",
+                "image_url": "data:image/png;base64,aGVsbG8=",
+                "type": "input_image"
+              }
+            ],
+            "role": "user"
+          }
+        ],
+        "instructions": "Analyze the image and answer the user's prompt. Be concise and specific.",
+        "max_output_tokens": 4096,
+        "model": "gpt-5.6-sol",
+        "prompt_cache_retention": "in_memory",
+        "store": false,
+        "stream": true,
+        "truncation": "auto"
+      },
+      "result": ""
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/image-analysis-reference/reference_test.go": "0840ac86c5cc28cdd31cb6769b4c77a3ec3c5c59d6efda3b1454f65723a2d94d",
+      "scripts/image-analysis-reference/run.py": "83dc20493c61fbfe98d1399ef594ffb747c782484197f516051810bdcc005a0d"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/openai/client.go": "a306feeaad2929f44bd63700b41931e2ecf05d794f64b12a4e8172c843c0f68a",
+      "internal/openai/client_test.go": "22cdcb97008890f0c6375609282a52c7abdb202fc6e37ba91629d7e71f674680",
+      "pkg/agentsdk/providers/openai/model.go": "55031b55d8a18bc645e32562befad9e842e742650bd7a7e7aa11bd0c78b1b0b8"
+    }
+  }
+}

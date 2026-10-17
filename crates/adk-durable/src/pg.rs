@@ -171,7 +171,7 @@ impl RunStore for PostgresStore {
             run_id: run.clone(),
             owner: owner.into(),
             token: LeaseToken::new(),
-            expires_at: expiry(now, ttl)?,
+            expires_at: expiry(now, ttl)?.fixed_offset(),
         };
         tx.execute("UPDATE durable_runs SET lease_owner=$1,lease_token=$2,lease_until=$3 WHERE tenant_id=$4 AND run_id=$5", &[&lease.owner, &lease.token.as_str(), &lease.expires_at, &tenant.as_str(), &run.as_str()])?;
         tx.commit()?;
@@ -195,7 +195,7 @@ impl RunStore for PostgresStore {
         renewed.owner = row
             .get::<_, Option<String>>("lease_owner")
             .ok_or_else(|| Error::Invalid("lease owner is absent".into()))?;
-        renewed.expires_at = expiry(now, ttl)?;
+        renewed.expires_at = expiry(now, ttl)?.fixed_offset();
         tx.execute(
             "UPDATE durable_runs SET lease_until=$1 WHERE tenant_id=$2 AND run_id=$3",
             &[

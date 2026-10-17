@@ -21,6 +21,24 @@ source types and acceptance IDs are retained in the manifest. [`docs/tools.md`](
 records the implementation and verification boundary. Its draft acceptance status does
 not assert complete security review, native-browser availability, or live external-service validation.
 
+Runtime facade composition, file-mode/role loading, event/trace adapters and their
+regressions reference the same pinned Grateful Agents SDK v0.0.115 source
+(`1dc92b73900fac74dc357a938e4b5eee6392b418`), especially `pkg/agentsdk/runtime`,
+`host`, `events`, `tracestore`, `otel` and `examples/features`. They remain
+GPL-3.0-only. The immutable source inventory and current acceptance overlay are
+separate: API mapping does not imply behavioral parity. External Rust-framework
+research records design inspiration, not copied implementation or relicensing.
+The optional OpenTelemetry API/SDK dependencies retain their Apache-2.0 license.
+
+## Go Unicode printable ranges
+
+`crates/adk/src/content_logger/printable.rs` is generated from Go 1.26.8
+`strconv.IsPrint` (Unicode 15.0.0), Copyright 2013 The Go Authors. All rights
+reserved. Its BSD-3-Clause license is retained in
+[`docs/migration/licenses/go-LICENSE.txt`](docs/migration/licenses/go-LICENSE.txt)
+and must accompany source and binary redistributions. The reference fixture
+records source and license SHA-256 hashes; no Go runtime is linked into ADK.
+
 ## matchit 0.8.4
 
 `adk-mcp` reaches `matchit` through `axum 0.8.9`. The package declares `MIT AND

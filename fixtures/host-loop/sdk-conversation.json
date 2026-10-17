@@ -1,0 +1,4163 @@
+{
+  "build_assistant_turn_summary": [
+    {
+      "name": "empty",
+      "input": {
+        "items": null
+      },
+      "output": {
+        "text": ""
+      }
+    },
+    {
+      "name": "user-and-image-not-assistant",
+      "input": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "user must not count"
+          },
+          {
+            "type": "message",
+            "agent_name": "assistant",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "type": "reasoning",
+            "reasoning": {
+              "text": "not a message"
+            }
+          }
+        ]
+      },
+      "output": {
+        "text": ""
+      }
+    },
+    {
+      "name": "unique-assistant-first-two-tools-issues",
+      "input": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "ignore user"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": " first\nanswer "
+          },
+          {
+            "type": "message",
+            "agent_name": "other-worker",
+            "message_text": "first answer"
+          },
+          {
+            "type": "message",
+            "agent_name": "system-summary",
+            "message_text": "second"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "third omitted"
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "success omitted"
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": " failure\none ",
+              "is_error": true
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "failure one",
+              "is_error": true
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "second failure",
+              "is_error": true
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "third failure omitted",
+              "is_error": true
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "1",
+              "name": "zeta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "2",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "3",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "4",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "5",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "6",
+              "name": "delta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "7",
+              "name": "gamma",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "8",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "message",
+            "message_text": "not a tool"
+          }
+        ]
+      },
+      "output": {
+        "text": "first answer\nsecond\nTools: alpha x 2, beta x 2,  x 1, delta x 1\nIssues: failure one | second failure"
+      }
+    },
+    {
+      "name": "unique-successes-without-assistant",
+      "input": {
+        "items": [
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": " result\none "
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "result one"
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "two"
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "three omitted"
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "bad",
+              "is_error": true
+            }
+          }
+        ]
+      },
+      "output": {
+        "text": "Key results: result one | two\nIssues: bad"
+      }
+    },
+    {
+      "name": "dedup-after-220-rune-truncation",
+      "input": {
+        "items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界a"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界b"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "second unique"
+          }
+        ]
+      },
+      "output": {
+        "text": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界...\nsecond unique"
+      }
+    },
+    {
+      "name": "results-and-issues-120-rune-cap",
+      "input": {
+        "items": [
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂"
+            }
+          },
+          {
+            "type": "tool_output",
+            "tool_output": {
+              "call_id": "call",
+              "content": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+              "is_error": true
+            }
+          }
+        ]
+      },
+      "output": {
+        "text": "Key results: 🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂...\nIssues: éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé..."
+      }
+    }
+  ],
+  "build_conversation_tail": [
+    {
+      "name": "empty",
+      "input": {
+        "messages": null,
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 0
+      },
+      "output": {
+        "items": null,
+        "count": 0
+      }
+    },
+    {
+      "name": "floor-exclude-roles-images",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "below floor",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "assistant",
+            "Content": "at floor",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "excluded current",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": " \n\t ",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "assistant",
+            "Content": "  assistant\nsummary 界🙂  ",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "system",
+            "Content": "  system\r\nsummary  ",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": " \n ",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "ID": 8,
+            "Role": "tool",
+            "Content": "unknown role stays user",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "Assistant",
+            "Content": "case-sensitive role",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 2,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 3,
+        "limit": 8
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "agent_name": "assistant-summary",
+            "message_text": "assistant summary 界🙂"
+          },
+          {
+            "type": "message",
+            "agent_name": "system-summary",
+            "message_text": "system\r summary"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "type": "message",
+            "message_text": "unknown role stays user"
+          },
+          {
+            "type": "message",
+            "message_text": "case-sensitive role"
+          }
+        ],
+        "count": 5
+      }
+    },
+    {
+      "name": "last-two-after-filter",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "below floor",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "assistant",
+            "Content": "at floor",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "excluded current",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": " \n\t ",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "assistant",
+            "Content": "  assistant\nsummary 界🙂  ",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "system",
+            "Content": "  system\r\nsummary  ",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": " \n ",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "ID": 8,
+            "Role": "tool",
+            "Content": "unknown role stays user",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "Assistant",
+            "Content": "case-sensitive role",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 2,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 3,
+        "limit": 2
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "unknown role stays user"
+          },
+          {
+            "type": "message",
+            "message_text": "case-sensitive role"
+          }
+        ],
+        "count": 2
+      }
+    },
+    {
+      "name": "all-filtered",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "below floor",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "assistant",
+            "Content": "at floor",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "excluded current",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": " \n\t ",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "assistant",
+            "Content": "  assistant\nsummary 界🙂  ",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "system",
+            "Content": "  system\r\nsummary  ",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": " \n ",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "ID": 8,
+            "Role": "tool",
+            "Content": "unknown role stays user",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "Assistant",
+            "Content": "case-sensitive role",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 9,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 8
+      },
+      "output": {
+        "items": null,
+        "count": 0
+      }
+    },
+    {
+      "name": "limit-0",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "message-1",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "user",
+            "Content": "message-2",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "message-3",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": "message-4",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "user",
+            "Content": "message-5",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "user",
+            "Content": "message-6",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": "message-7",
+            "Images": null
+          },
+          {
+            "ID": 8,
+            "Role": "user",
+            "Content": "message-8",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "user",
+            "Content": "message-9",
+            "Images": null
+          },
+          {
+            "ID": 10,
+            "Role": "user",
+            "Content": "message-10",
+            "Images": null
+          },
+          {
+            "ID": 11,
+            "Role": "user",
+            "Content": "message-11",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 0
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "message-4"
+          },
+          {
+            "type": "message",
+            "message_text": "message-5"
+          },
+          {
+            "type": "message",
+            "message_text": "message-6"
+          },
+          {
+            "type": "message",
+            "message_text": "message-7"
+          },
+          {
+            "type": "message",
+            "message_text": "message-8"
+          },
+          {
+            "type": "message",
+            "message_text": "message-9"
+          },
+          {
+            "type": "message",
+            "message_text": "message-10"
+          },
+          {
+            "type": "message",
+            "message_text": "message-11"
+          }
+        ],
+        "count": 8
+      }
+    },
+    {
+      "name": "limit--2",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "message-1",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "user",
+            "Content": "message-2",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "message-3",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": "message-4",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "user",
+            "Content": "message-5",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "user",
+            "Content": "message-6",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": "message-7",
+            "Images": null
+          },
+          {
+            "ID": 8,
+            "Role": "user",
+            "Content": "message-8",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "user",
+            "Content": "message-9",
+            "Images": null
+          },
+          {
+            "ID": 10,
+            "Role": "user",
+            "Content": "message-10",
+            "Images": null
+          },
+          {
+            "ID": 11,
+            "Role": "user",
+            "Content": "message-11",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": -2
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "message-4"
+          },
+          {
+            "type": "message",
+            "message_text": "message-5"
+          },
+          {
+            "type": "message",
+            "message_text": "message-6"
+          },
+          {
+            "type": "message",
+            "message_text": "message-7"
+          },
+          {
+            "type": "message",
+            "message_text": "message-8"
+          },
+          {
+            "type": "message",
+            "message_text": "message-9"
+          },
+          {
+            "type": "message",
+            "message_text": "message-10"
+          },
+          {
+            "type": "message",
+            "message_text": "message-11"
+          }
+        ],
+        "count": 8
+      }
+    },
+    {
+      "name": "limit-1",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "message-1",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "user",
+            "Content": "message-2",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "message-3",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": "message-4",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "user",
+            "Content": "message-5",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "user",
+            "Content": "message-6",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": "message-7",
+            "Images": null
+          },
+          {
+            "ID": 8,
+            "Role": "user",
+            "Content": "message-8",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "user",
+            "Content": "message-9",
+            "Images": null
+          },
+          {
+            "ID": 10,
+            "Role": "user",
+            "Content": "message-10",
+            "Images": null
+          },
+          {
+            "ID": 11,
+            "Role": "user",
+            "Content": "message-11",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 1
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "message-11"
+          }
+        ],
+        "count": 1
+      }
+    },
+    {
+      "name": "limit-20",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "user",
+            "Content": "message-1",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Role": "user",
+            "Content": "message-2",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Role": "user",
+            "Content": "message-3",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Role": "user",
+            "Content": "message-4",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Role": "user",
+            "Content": "message-5",
+            "Images": null
+          },
+          {
+            "ID": 6,
+            "Role": "user",
+            "Content": "message-6",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "user",
+            "Content": "message-7",
+            "Images": null
+          },
+          {
+            "ID": 8,
+            "Role": "user",
+            "Content": "message-8",
+            "Images": null
+          },
+          {
+            "ID": 9,
+            "Role": "user",
+            "Content": "message-9",
+            "Images": null
+          },
+          {
+            "ID": 10,
+            "Role": "user",
+            "Content": "message-10",
+            "Images": null
+          },
+          {
+            "ID": 11,
+            "Role": "user",
+            "Content": "message-11",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 20
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "message-1"
+          },
+          {
+            "type": "message",
+            "message_text": "message-2"
+          },
+          {
+            "type": "message",
+            "message_text": "message-3"
+          },
+          {
+            "type": "message",
+            "message_text": "message-4"
+          },
+          {
+            "type": "message",
+            "message_text": "message-5"
+          },
+          {
+            "type": "message",
+            "message_text": "message-6"
+          },
+          {
+            "type": "message",
+            "message_text": "message-7"
+          },
+          {
+            "type": "message",
+            "message_text": "message-8"
+          },
+          {
+            "type": "message",
+            "message_text": "message-9"
+          },
+          {
+            "type": "message",
+            "message_text": "message-10"
+          },
+          {
+            "type": "message",
+            "message_text": "message-11"
+          }
+        ],
+        "count": 11
+      }
+    },
+    {
+      "name": "slice-order-not-id-sort",
+      "input": {
+        "messages": [
+          {
+            "ID": 90,
+            "Role": "",
+            "Content": "first",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Role": "",
+            "Content": "second",
+            "Images": null
+          },
+          {
+            "ID": 60,
+            "Role": "",
+            "Content": "last",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 2
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "second"
+          },
+          {
+            "type": "message",
+            "message_text": "last"
+          }
+        ],
+        "count": 2
+      }
+    },
+    {
+      "name": "nonpositive-exclude-disabled",
+      "input": {
+        "messages": [
+          {
+            "ID": -1,
+            "Role": "",
+            "Content": "negative",
+            "Images": null
+          },
+          {
+            "ID": 0,
+            "Role": "",
+            "Content": "zero",
+            "Images": null
+          },
+          {
+            "ID": 1,
+            "Role": "",
+            "Content": "positive",
+            "Images": null
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": -2,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": -1,
+        "limit": 0
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "negative"
+          },
+          {
+            "type": "message",
+            "message_text": "zero"
+          },
+          {
+            "type": "message",
+            "message_text": "positive"
+          }
+        ],
+        "count": 3
+      }
+    },
+    {
+      "name": "unicode-1200-rune-cap",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Role": "assistant",
+            "Content": "界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "exclude_message_id": 0,
+        "limit": 0
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "agent_name": "assistant-summary",
+            "message_text": "界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂界🙂...",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "count": 1
+      }
+    }
+  ],
+  "build_working_state_context": [
+    {
+      "name": "empty",
+      "input": {
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        }
+      },
+      "output": {
+        "text": ""
+      }
+    },
+    {
+      "name": "all-fields-last-four",
+      "input": {
+        "state": {
+          "Goal": "  finish\nshipping  ",
+          "CurrentMode": " plan\nraw ",
+          "CurrentStep": " inspect\ncode ",
+          "LastUserMessage": "new direction",
+          "LastAssistantSummary": "checked\nsource",
+          "RecentTurnSummaries": [
+            "discard-me",
+            "one",
+            "two\nlines",
+            "",
+            "five"
+          ],
+          "HistoryFloorMessageID": 99,
+          "LastResponseID": "not-in-context",
+          "Data": {
+            "ignored": true
+          }
+        }
+      },
+      "output": {
+        "text": "## Durable Working State\nCurrent objective: finish shipping\nMode:  plan\nraw \nCurrent step: inspect code\nLatest user direction: new direction\nLatest assistant summary: checked source\nRecent progress:\n- one\n- two lines\n- \n- five"
+      }
+    },
+    {
+      "name": "same-goal-direction-omitted",
+      "input": {
+        "state": {
+          "Goal": "same",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "same",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        }
+      },
+      "output": {
+        "text": "## Durable Working State\nCurrent objective: same"
+      }
+    },
+    {
+      "name": "raw-equality-before-trimming",
+      "input": {
+        "state": {
+          "Goal": " same ",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "same",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        }
+      },
+      "output": {
+        "text": "## Durable Working State\nCurrent objective: same\nLatest user direction: same"
+      }
+    },
+    {
+      "name": "whitespace-fields-not-empty",
+      "input": {
+        "state": {
+          "Goal": " \n ",
+          "CurrentMode": "",
+          "CurrentStep": "\t",
+          "LastUserMessage": "",
+          "LastAssistantSummary": " ",
+          "RecentTurnSummaries": [
+            " "
+          ],
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        }
+      },
+      "output": {
+        "text": "## Durable Working State\nCurrent objective: \nCurrent step: \nLatest assistant summary: \nRecent progress:\n- "
+      }
+    },
+    {
+      "name": "unicode-320-rune-caps",
+      "input": {
+        "state": {
+          "Goal": "界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界",
+          "CurrentMode": "",
+          "CurrentStep": "🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂",
+          "LastUserMessage": "ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+          "LastAssistantSummary": "λλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλ",
+          "RecentTurnSummaries": [
+            "文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文"
+          ],
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        }
+      },
+      "output": {
+        "text": "## Durable Working State\nCurrent objective: 界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界...\nCurrent step: 🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂🙂...\nLatest user direction: éééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé...\nLatest assistant summary: λλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλλ...\nRecent progress:\n- 文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文文..."
+      }
+    },
+    {
+      "name": "non-context-fields-only",
+      "input": {
+        "state": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 22,
+          "LastResponseID": "response",
+          "Data": {
+            "goal": "not-used"
+          }
+        }
+      },
+      "output": {
+        "text": ""
+      }
+    }
+  ],
+  "collect_immediate_run_items": [
+    {
+      "name": "empty",
+      "input": {
+        "messages": null,
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": null,
+        "count": 0,
+        "cursor": 0,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "all-blank",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": "\n",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": null,
+        "count": 0,
+        "cursor": 2,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "queue-before-immediates",
+      "input": {
+        "messages": [
+          {
+            "ID": 20,
+            "Content": "queued",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 21,
+            "Content": " first\nimmediate ",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 22,
+            "Content": "second",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "first\nimmediate"
+          },
+          {
+            "type": "message",
+            "message_text": "second"
+          }
+        ],
+        "count": 2,
+        "cursor": 0,
+        "consumed_immediate_after": [
+          21,
+          22
+        ]
+      }
+    },
+    {
+      "name": "consumed-prefix-queue-barrier",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": "consumed",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Content": "queue",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Content": "consumed later",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Content": "fresh",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          2,
+          4,
+          99
+        ]
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "fresh"
+          }
+        ],
+        "count": 1,
+        "cursor": 2,
+        "consumed_immediate_after": [
+          2,
+          4,
+          5,
+          99
+        ]
+      }
+    },
+    {
+      "name": "all-consumed-with-trailing-blank",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": "done",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          1
+        ]
+      },
+      "output": {
+        "items": null,
+        "count": 0,
+        "cursor": 2,
+        "consumed_immediate_after": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "immediate-prefix-then-queue",
+      "input": {
+        "messages": [
+          {
+            "ID": 10,
+            "Content": "now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 11,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 12,
+            "Content": "later",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 13,
+            "Content": "next now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "now"
+          },
+          {
+            "type": "message",
+            "message_text": "next now"
+          }
+        ],
+        "count": 2,
+        "cursor": 11,
+        "consumed_immediate_after": [
+          10,
+          13
+        ]
+      }
+    },
+    {
+      "name": "image-only-immediate",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " \n ",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "count": 1,
+        "cursor": 1,
+        "consumed_immediate_after": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "image-only-queue-barrier",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": "",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "ID": 2,
+            "Content": "now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "now"
+          }
+        ],
+        "count": 1,
+        "cursor": 0,
+        "consumed_immediate_after": [
+          2
+        ]
+      }
+    },
+    {
+      "name": "unknown-mode-is-queued",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " default\nqueue ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": "case-sensitive",
+            "Mode": "Immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          1,
+          2
+        ]
+      },
+      "output": {
+        "items": null,
+        "count": 0,
+        "cursor": 0,
+        "consumed_immediate_after": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "name": "out-of-order-prefix-not-max-id",
+      "input": {
+        "messages": [
+          {
+            "ID": 90,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Content": "already consumed",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 60,
+            "Content": "queued",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Content": "now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          7
+        ]
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "now"
+          }
+        ],
+        "count": 1,
+        "cursor": 7,
+        "consumed_immediate_after": [
+          3,
+          7
+        ]
+      }
+    },
+    {
+      "name": "out-of-order-immediate-slice-order",
+      "input": {
+        "messages": [
+          {
+            "ID": 90,
+            "Content": "first",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Content": "second",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 60,
+            "Content": "third",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "first"
+          },
+          {
+            "type": "message",
+            "message_text": "second"
+          },
+          {
+            "type": "message",
+            "message_text": "third"
+          }
+        ],
+        "count": 3,
+        "cursor": 60,
+        "consumed_immediate_after": [
+          7,
+          60,
+          90
+        ]
+      }
+    },
+    {
+      "name": "duplicate-immediate-id",
+      "input": {
+        "messages": [
+          {
+            "ID": 5,
+            "Content": "first",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Content": "second same id",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "first"
+          }
+        ],
+        "count": 1,
+        "cursor": 5,
+        "consumed_immediate_after": [
+          5
+        ]
+      }
+    }
+  ],
+  "derive_working_state_goal": [
+    {
+      "name": "reply-00",
+      "input": {
+        "raw_reply": "",
+        "effective_prompt": " effective\nprompt "
+      },
+      "output": {
+        "text": "effective\nprompt"
+      }
+    },
+    {
+      "name": "reply-01",
+      "input": {
+        "raw_reply": " \n\t",
+        "effective_prompt": " "
+      },
+      "output": {
+        "text": ""
+      }
+    },
+    {
+      "name": "reply-02",
+      "input": {
+        "raw_reply": " APPROVE ",
+        "effective_prompt": " original "
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-03",
+      "input": {
+        "raw_reply": "Deny",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-04",
+      "input": {
+        "raw_reply": "request changes",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-05",
+      "input": {
+        "raw_reply": "request_changes",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-06",
+      "input": {
+        "raw_reply": "APPROVE: ship",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-07",
+      "input": {
+        "raw_reply": "deny: nope",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-08",
+      "input": {
+        "raw_reply": "Request Changes: revise",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-09",
+      "input": {
+        "raw_reply": "REQUEST_CHANGES: revise",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "original"
+      }
+    },
+    {
+      "name": "reply-10",
+      "input": {
+        "raw_reply": "approve",
+        "effective_prompt": " "
+      },
+      "output": {
+        "text": "approve"
+      }
+    },
+    {
+      "name": "reply-11",
+      "input": {
+        "raw_reply": "request changes: revise",
+        "effective_prompt": ""
+      },
+      "output": {
+        "text": "request changes: revise"
+      }
+    },
+    {
+      "name": "reply-12",
+      "input": {
+        "raw_reply": " approve later ",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "approve later"
+      }
+    },
+    {
+      "name": "reply-13",
+      "input": {
+        "raw_reply": "approve : spaced colon",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "approve : spaced colon"
+      }
+    },
+    {
+      "name": "reply-14",
+      "input": {
+        "raw_reply": " new\n方向🙂 ",
+        "effective_prompt": "original"
+      },
+      "output": {
+        "text": "new\n方向🙂"
+      }
+    }
+  ],
+  "result_helpers": [
+    {
+      "name": "final-output-missing",
+      "input": {
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "final-output-null",
+      "input": {
+        "final_output": null,
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "final-output-string",
+      "input": {
+        "final_output": "  final\n界🙂  ",
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "  final\n界🙂  ",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "final-output-number",
+      "input": {
+        "final_output": 42,
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "final-output-object",
+      "input": {
+        "final_output": {
+          "answer": "not text"
+        },
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "final-output-array",
+      "input": {
+        "final_output": [
+          "not text"
+        ],
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "final-output-boolean",
+      "input": {
+        "final_output": true,
+        "new_items": null,
+        "final_history": null,
+        "interruption": null,
+        "interruptions": null,
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": null,
+        "input_count": 0,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "empty-plural",
+      "input": {
+        "new_items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "final_history": [
+          {
+            "type": "message",
+            "message_text": "old history must not be returned"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "interruption": null,
+        "interruptions": [],
+        "legacy_shape": "empty",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "input_count": 2,
+        "is_interrupted": false,
+        "all_interruptions": null
+      }
+    },
+    {
+      "name": "singular-legacy",
+      "input": {
+        "new_items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "final_history": [
+          {
+            "type": "message",
+            "message_text": "old history must not be returned"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "interruption": {
+          "tool_name": "write",
+          "tool_input": {
+            "path": "one"
+          },
+          "tool_call_id": "c1",
+          "parent_context": [
+            {
+              "type": "message",
+              "agent_name": "parent",
+              "message_text": "prior context"
+            }
+          ]
+        },
+        "interruptions": null,
+        "legacy_shape": "singular-only",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "input_count": 2,
+        "is_interrupted": true,
+        "all_interruptions": [
+          {
+            "tool_name": "write",
+            "tool_input": {
+              "path": "one"
+            },
+            "tool_call_id": "c1",
+            "parent_context": [
+              {
+                "type": "message",
+                "agent_name": "parent",
+                "message_text": "prior context"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "singular-empty-plural",
+      "input": {
+        "new_items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "final_history": [
+          {
+            "type": "message",
+            "message_text": "old history must not be returned"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "interruption": {
+          "tool_name": "write",
+          "tool_input": {
+            "path": "one"
+          },
+          "tool_call_id": "c1",
+          "parent_context": [
+            {
+              "type": "message",
+              "agent_name": "parent",
+              "message_text": "prior context"
+            }
+          ]
+        },
+        "interruptions": [],
+        "legacy_shape": "singular-only",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "input_count": 2,
+        "is_interrupted": true,
+        "all_interruptions": [
+          {
+            "tool_name": "write",
+            "tool_input": {
+              "path": "one"
+            },
+            "tool_call_id": "c1",
+            "parent_context": [
+              {
+                "type": "message",
+                "agent_name": "parent",
+                "message_text": "prior context"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    {
+      "name": "consistent-plural",
+      "input": {
+        "new_items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "final_history": [
+          {
+            "type": "message",
+            "message_text": "old history must not be returned"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "interruption": {
+          "tool_name": "write",
+          "tool_input": {
+            "path": "one"
+          },
+          "tool_call_id": "c1",
+          "parent_context": [
+            {
+              "type": "message",
+              "agent_name": "parent",
+              "message_text": "prior context"
+            }
+          ]
+        },
+        "interruptions": [
+          {
+            "tool_name": "write",
+            "tool_input": {
+              "path": "one"
+            },
+            "tool_call_id": "c1",
+            "parent_context": [
+              {
+                "type": "message",
+                "agent_name": "parent",
+                "message_text": "prior context"
+              }
+            ]
+          },
+          {
+            "tool_name": "delete",
+            "tool_input": {
+              "path": "two"
+            },
+            "tool_call_id": "c2"
+          }
+        ],
+        "legacy_shape": "consistent",
+        "source_only": false
+      },
+      "output": {
+        "final_text": "",
+        "input_list": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "input_count": 2,
+        "is_interrupted": true,
+        "all_interruptions": [
+          {
+            "tool_name": "write",
+            "tool_input": {
+              "path": "one"
+            },
+            "tool_call_id": "c1",
+            "parent_context": [
+              {
+                "type": "message",
+                "agent_name": "parent",
+                "message_text": "prior context"
+              }
+            ]
+          },
+          {
+            "tool_name": "delete",
+            "tool_input": {
+              "path": "two"
+            },
+            "tool_call_id": "c2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "plural-without-singular",
+      "input": {
+        "new_items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "final_history": [
+          {
+            "type": "message",
+            "message_text": "old history must not be returned"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "interruption": null,
+        "interruptions": [
+          {
+            "tool_name": "write",
+            "tool_input": {
+              "path": "one"
+            },
+            "tool_call_id": "c1",
+            "parent_context": [
+              {
+                "type": "message",
+                "agent_name": "parent",
+                "message_text": "prior context"
+              }
+            ]
+          },
+          {
+            "tool_name": "delete",
+            "tool_input": {
+              "path": "two"
+            },
+            "tool_call_id": "c2"
+          }
+        ],
+        "legacy_shape": "contradictory-plural-only",
+        "source_only": true
+      },
+      "output": {
+        "final_text": "",
+        "input_list": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "input_count": 2,
+        "is_interrupted": false,
+        "all_interruptions": [
+          {
+            "tool_name": "write",
+            "tool_input": {
+              "path": "one"
+            },
+            "tool_call_id": "c1",
+            "parent_context": [
+              {
+                "type": "message",
+                "agent_name": "parent",
+                "message_text": "prior context"
+              }
+            ]
+          },
+          {
+            "tool_name": "delete",
+            "tool_input": {
+              "path": "two"
+            },
+            "tool_call_id": "c2"
+          }
+        ]
+      }
+    },
+    {
+      "name": "singular-disagrees-with-plural",
+      "input": {
+        "new_items": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "final_history": [
+          {
+            "type": "message",
+            "message_text": "old history must not be returned"
+          },
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "interruption": {
+          "tool_name": "write",
+          "tool_input": {
+            "path": "one"
+          },
+          "tool_call_id": "c1",
+          "parent_context": [
+            {
+              "type": "message",
+              "agent_name": "parent",
+              "message_text": "prior context"
+            }
+          ]
+        },
+        "interruptions": [
+          {
+            "tool_name": "delete",
+            "tool_input": {
+              "path": "two"
+            },
+            "tool_call_id": "c2"
+          }
+        ],
+        "legacy_shape": "contradictory-singular-not-first",
+        "source_only": true
+      },
+      "output": {
+        "final_text": "",
+        "input_list": [
+          {
+            "type": "message",
+            "agent_name": "worker",
+            "message_text": "new"
+          },
+          {
+            "type": "message",
+            "message_images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "input_count": 2,
+        "is_interrupted": true,
+        "all_interruptions": [
+          {
+            "tool_name": "delete",
+            "tool_input": {
+              "path": "two"
+            },
+            "tool_call_id": "c2"
+          }
+        ]
+      }
+    }
+  ],
+  "schema_version": 1,
+  "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+  "select_next_user_message": [
+    {
+      "name": "empty",
+      "input": {
+        "messages": null,
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 0,
+          "Content": "",
+          "Mode": "",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": false,
+        "skip_cursor": 0,
+        "immediate": false,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "all-blank",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": "\n",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 0,
+          "Content": "",
+          "Mode": "",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": false,
+        "skip_cursor": 2,
+        "immediate": false,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "queue-before-immediates",
+      "input": {
+        "messages": [
+          {
+            "ID": 20,
+            "Content": "queued",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 21,
+            "Content": " first\nimmediate ",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 22,
+            "Content": "second",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 21,
+          "Content": " first\nimmediate ",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": true,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "consumed-prefix-queue-barrier",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": "consumed",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Content": "queue",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 4,
+            "Content": "consumed later",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Content": "fresh",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          2,
+          4,
+          99
+        ]
+      },
+      "output": {
+        "message": {
+          "ID": 5,
+          "Content": "fresh",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 2,
+        "immediate": true,
+        "consumed_immediate_after": [
+          2,
+          4,
+          99
+        ]
+      }
+    },
+    {
+      "name": "all-consumed-with-trailing-blank",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": "done",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          1
+        ]
+      },
+      "output": {
+        "message": {
+          "ID": 0,
+          "Content": "",
+          "Mode": "",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": false,
+        "skip_cursor": 2,
+        "immediate": false,
+        "consumed_immediate_after": [
+          1
+        ]
+      }
+    },
+    {
+      "name": "immediate-prefix-then-queue",
+      "input": {
+        "messages": [
+          {
+            "ID": 10,
+            "Content": "now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 11,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 12,
+            "Content": "later",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 13,
+            "Content": "next now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 10,
+          "Content": "now",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": true,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "image-only-immediate",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " \n ",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 1,
+          "Content": " \n ",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": [
+            {
+              "media_type": "image/png",
+              "data": "aGVsbG8=",
+              "detail": "high"
+            },
+            {
+              "media_type": "image/jpeg",
+              "data": "AAEC",
+              "detail": "low"
+            }
+          ]
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": true,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "image-only-queue-barrier",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": "",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": [
+              {
+                "media_type": "image/png",
+                "data": "aGVsbG8=",
+                "detail": "high"
+              },
+              {
+                "media_type": "image/jpeg",
+                "data": "AAEC",
+                "detail": "low"
+              }
+            ]
+          },
+          {
+            "ID": 2,
+            "Content": "now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 2,
+          "Content": "now",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": true,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "unknown-mode-is-queued",
+      "input": {
+        "messages": [
+          {
+            "ID": 1,
+            "Content": " default\nqueue ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 2,
+            "Content": "case-sensitive",
+            "Mode": "Immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          1,
+          2
+        ]
+      },
+      "output": {
+        "message": {
+          "ID": 1,
+          "Content": " default\nqueue ",
+          "Mode": "",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": false,
+        "consumed_immediate_after": [
+          1,
+          2
+        ]
+      }
+    },
+    {
+      "name": "out-of-order-prefix-not-max-id",
+      "input": {
+        "messages": [
+          {
+            "ID": 90,
+            "Content": " ",
+            "Mode": "",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Content": "already consumed",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 60,
+            "Content": "queued",
+            "Mode": "enqueue",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 3,
+            "Content": "now",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": [
+          7
+        ]
+      },
+      "output": {
+        "message": {
+          "ID": 3,
+          "Content": "now",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 7,
+        "immediate": true,
+        "consumed_immediate_after": [
+          7
+        ]
+      }
+    },
+    {
+      "name": "out-of-order-immediate-slice-order",
+      "input": {
+        "messages": [
+          {
+            "ID": 90,
+            "Content": "first",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 7,
+            "Content": "second",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 60,
+            "Content": "third",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 90,
+          "Content": "first",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": true,
+        "consumed_immediate_after": []
+      }
+    },
+    {
+      "name": "duplicate-immediate-id",
+      "input": {
+        "messages": [
+          {
+            "ID": 5,
+            "Content": "first",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          },
+          {
+            "ID": 5,
+            "Content": "second same id",
+            "Mode": "immediate",
+            "CreatedAt": "0001-01-01T00:00:00Z",
+            "Images": null
+          }
+        ],
+        "consumed_immediate": null
+      },
+      "output": {
+        "message": {
+          "ID": 5,
+          "Content": "first",
+          "Mode": "immediate",
+          "CreatedAt": "0001-01-01T00:00:00Z",
+          "Images": null
+        },
+        "ok": true,
+        "skip_cursor": 0,
+        "immediate": true,
+        "consumed_immediate_after": []
+      }
+    }
+  ],
+  "summarize_turn_tool_calls": [
+    {
+      "name": "frequency-ties-limit-0",
+      "input": {
+        "items": [
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "1",
+              "name": "zeta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "2",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "3",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "4",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "5",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "6",
+              "name": "delta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "7",
+              "name": "gamma",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "8",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "message",
+            "message_text": "not a tool"
+          }
+        ],
+        "limit": 0
+      },
+      "output": {
+        "summaries": [
+          "alpha x 2",
+          "beta x 2",
+          " x 1",
+          "delta x 1",
+          "gamma x 1",
+          "zeta x 1"
+        ]
+      }
+    },
+    {
+      "name": "frequency-ties-limit--1",
+      "input": {
+        "items": [
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "1",
+              "name": "zeta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "2",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "3",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "4",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "5",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "6",
+              "name": "delta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "7",
+              "name": "gamma",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "8",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "message",
+            "message_text": "not a tool"
+          }
+        ],
+        "limit": -1
+      },
+      "output": {
+        "summaries": [
+          "alpha x 2",
+          "beta x 2",
+          " x 1",
+          "delta x 1",
+          "gamma x 1",
+          "zeta x 1"
+        ]
+      }
+    },
+    {
+      "name": "frequency-ties-limit-1",
+      "input": {
+        "items": [
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "1",
+              "name": "zeta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "2",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "3",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "4",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "5",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "6",
+              "name": "delta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "7",
+              "name": "gamma",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "8",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "message",
+            "message_text": "not a tool"
+          }
+        ],
+        "limit": 1
+      },
+      "output": {
+        "summaries": [
+          "alpha x 2"
+        ]
+      }
+    },
+    {
+      "name": "frequency-ties-limit-4",
+      "input": {
+        "items": [
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "1",
+              "name": "zeta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "2",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "3",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "4",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "5",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "6",
+              "name": "delta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "7",
+              "name": "gamma",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "8",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "message",
+            "message_text": "not a tool"
+          }
+        ],
+        "limit": 4
+      },
+      "output": {
+        "summaries": [
+          "alpha x 2",
+          "beta x 2",
+          " x 1",
+          "delta x 1"
+        ]
+      }
+    },
+    {
+      "name": "frequency-ties-limit-20",
+      "input": {
+        "items": [
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "1",
+              "name": "zeta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "2",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "3",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "4",
+              "name": "beta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "5",
+              "name": "alpha",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "6",
+              "name": "delta",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "7",
+              "name": "gamma",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "tool_call",
+            "tool_call": {
+              "id": "8",
+              "input": {
+                "value": "secret",
+                "run_id": "user-run-123",
+                "timestamp": "2024-01-02T03:04:05Z"
+              }
+            }
+          },
+          {
+            "type": "message",
+            "message_text": "not a tool"
+          }
+        ],
+        "limit": 20
+      },
+      "output": {
+        "summaries": [
+          "alpha x 2",
+          "beta x 2",
+          " x 1",
+          "delta x 1",
+          "gamma x 1",
+          "zeta x 1"
+        ]
+      }
+    },
+    {
+      "name": "no-calls",
+      "input": {
+        "items": [
+          {
+            "type": "message",
+            "message_text": "hello"
+          }
+        ],
+        "limit": 0
+      },
+      "output": {
+        "summaries": null
+      }
+    }
+  ],
+  "truncate_context_text": [
+    {
+      "name": "text-00",
+      "input": {
+        "text": "",
+        "max": 1
+      },
+      "output": {
+        "text": ""
+      }
+    },
+    {
+      "name": "text-01",
+      "input": {
+        "text": " \n\t ",
+        "max": 0
+      },
+      "output": {
+        "text": ""
+      }
+    },
+    {
+      "name": "text-02",
+      "input": {
+        "text": " a\n b\t c\r\nd  ",
+        "max": 0
+      },
+      "output": {
+        "text": "a  b\t c\r d"
+      }
+    },
+    {
+      "name": "text-03",
+      "input": {
+        "text": " a\n b\t c\r\nd  ",
+        "max": -3
+      },
+      "output": {
+        "text": "a  b\t c\r d"
+      }
+    },
+    {
+      "name": "text-04",
+      "input": {
+        "text": "界🙂é",
+        "max": 1
+      },
+      "output": {
+        "text": "界..."
+      }
+    },
+    {
+      "name": "text-05",
+      "input": {
+        "text": "界🙂é",
+        "max": 2
+      },
+      "output": {
+        "text": "界🙂..."
+      }
+    },
+    {
+      "name": "text-06",
+      "input": {
+        "text": "界🙂é",
+        "max": 3
+      },
+      "output": {
+        "text": "界🙂é"
+      }
+    },
+    {
+      "name": "text-07",
+      "input": {
+        "text": "界🙂é",
+        "max": 4
+      },
+      "output": {
+        "text": "界🙂é"
+      }
+    },
+    {
+      "name": "text-08",
+      "input": {
+        "text": "é🙂",
+        "max": 1
+      },
+      "output": {
+        "text": "e..."
+      }
+    },
+    {
+      "name": "text-09",
+      "input": {
+        "text": "a\nb",
+        "max": 2
+      },
+      "output": {
+        "text": "a ..."
+      }
+    },
+    {
+      "name": "text-10",
+      "input": {
+        "text": "  hi ",
+        "max": 2
+      },
+      "output": {
+        "text": "hi"
+      }
+    }
+  ]
+}

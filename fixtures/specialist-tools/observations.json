@@ -1,0 +1,882 @@
+{
+  "accessCases": [
+    {
+      "access": "",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "\t\n\u000b\f\r \u0085\u00a0\u1680\u2000\u2001\u2002\u2003\u2004\u2005\u2006\u2007\u2008\u2009\u200a\u2028\u2029\u202f\u205f\u3000",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "full",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "write",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "workspace-write",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "workspace_write",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "execution",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "danger-full-access",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "danger_full_access",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "read-only",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "read_only",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "readonly",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "analysis",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "Readonly",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": " FULL ",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "WORKSPACE_WRITE",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": " wor\u212aspace-wr\u0130te ",
+      "adapterCalls": [],
+      "normalized": "full",
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "full"
+    },
+    {
+      "access": "full-access",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "full_access",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "typo",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "\u001cfull\u001f",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "\ufefffull",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "\u200bfull",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    },
+    {
+      "access": "\u017full",
+      "adapterCalls": [
+        "none-ro:read-only",
+        "none-mut:read-only",
+        "bash:read-only",
+        "bad:read-only",
+        "rename:read-only"
+      ],
+      "normalized": "read-only",
+      "outputIDs": [
+        "read",
+        "none-ro",
+        "safe",
+        "finish",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ],
+      "role": "read-only"
+    }
+  ],
+  "defaultNames": {
+    "AskUserQuestion": true,
+    "finish": true,
+    "present_plan": true
+  },
+  "defaultStrip": [
+    "read",
+    "edit",
+    "none-ro",
+    "none-mut",
+    "bash",
+    "bad",
+    "rename",
+    "read",
+    "case",
+    "space",
+    "empty"
+  ],
+  "guideCases": [
+    {
+      "guide": "",
+      "handoffs": null,
+      "name": "empty",
+      "specialists": {}
+    },
+    {
+      "guide": "",
+      "handoffs": null,
+      "name": "blank-keys",
+      "specialists": {
+        "": "ignored",
+        " \t\u0085": "ignored"
+      }
+    },
+    {
+      "guide": "Available specialist sub-agents (delegate via the subagent tool, agent_name=<name>):\n- executor: Implement a bounded change\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call \u2014 use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile \u2014 do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait \u2014 it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nSignal tools: finish\n",
+      "handoffs": null,
+      "name": "original-guidance",
+      "specialists": {
+        "executor": "Implement a bounded change"
+      }
+    },
+    {
+      "guide": "Available specialist sub-agents (delegate via the subagent tool, agent_name=<name>):\n-  a :  \n \n- a: line one\nline two\n- z: Specialist sub-agent\n- \u00c1: accent\n- \u754c: Unicode\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call \u2014 use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile \u2014 do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait \u2014 it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nSignal tools: finish\n",
+      "handoffs": null,
+      "name": "sorted-raw-keys-and-descriptions",
+      "specialists": {
+        "": "skip",
+        " a ": " \n ",
+        "a": "line one\nline two",
+        "z": "",
+        "\u00c1": "accent",
+        "\u754c": "Unicode"
+      }
+    },
+    {
+      "guide": "Handoffs (transfer full control):\n- transfer_to_z: Transfer to z\n- transfer_to_a: custom description\n- : Transfer to  target \n\nSignal tools: finish\n",
+      "handoffs": [
+        {
+          "Description": "",
+          "Target": "z",
+          "Tool": "transfer_to_z"
+        },
+        {
+          "Description": "custom description",
+          "Target": "a",
+          "Tool": "transfer_to_a"
+        },
+        {
+          "Description": "",
+          "Target": " target ",
+          "Tool": ""
+        }
+      ],
+      "name": "handoffs-only",
+      "specialists": {}
+    },
+    {
+      "guide": "Available specialist sub-agents (delegate via the subagent tool, agent_name=<name>):\n- worker: Specialist sub-agent\n\nBy default, the \"message\" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.\nGive each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.\nInclude only the pieces that materially affect this task:\n- the exact task or deliverable for this sub-agent\n- the goal or outcome this task must support\n- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands\n- constraints, acceptance criteria, and non-goals that shape the task\n- prior decisions, findings, or draft work this task depends on\n- the expected output format and any file ownership boundaries\n\nDistill the context; do NOT paste the user's original request verbatim or dump irrelevant history.\nDo NOT send the same large background block to every task if only one sub-agent needs it.\nPlanning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.\nExecution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.\n\nSYNC VS BACKGROUND: mode=\"sync\" (default) returns the result in the same subagent call \u2014 use it when you need the result before continuing.\nmode=\"background\" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.\nOnly use background mode when you have genuinely independent work to do meanwhile \u2014 do not spawn and then idle-poll.\n\nFILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.\nNever let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.\nInclude \"Files you own: [...]\" in each message so the sub-agent stays in its lane.\n\nDAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.\ndepends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.\nmode=\"sync\" on a tasks array waits for the whole graph and returns all results; mode=\"background\" returns the task ids immediately.\n\nEFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.\n- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.\n- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.\n- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.\nState an explicit effort budget in each task packet (e.g. \"aim for under 10 tool calls\") so sub-agents do not over-explore.\n\nARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.\nRead the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.\n\nSTATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.\nCompleted task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.\nUse subagent_status (detail=\"activity\") for evidence on a specific task before steering; detail=\"graph\" shows the dependency DAG.\nThe SDK will not let you final-answer while background tasks are still active.\n\nWAITING: When you have nothing left to do but wait for background tasks, call subagent_wait \u2014 it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).\nNEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.\n\nSTEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action=\"message\" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action=\"cancel\" stops the task.\nKeep steering messages short and specific.\n\nHandoffs (transfer full control):\n- same:  \n- same: second\nline\n\nSignal tools: finish\n",
+      "handoffs": [
+        {
+          "Description": " ",
+          "Target": "target",
+          "Tool": "same"
+        },
+        {
+          "Description": "second\nline",
+          "Target": "next",
+          "Tool": "same"
+        }
+      ],
+      "name": "combined",
+      "specialists": {
+        "worker": ""
+      }
+    }
+  ],
+  "inputIDs": [
+    "read",
+    "edit",
+    "none-ro",
+    "none-mut",
+    "bash",
+    "bad",
+    "rename",
+    "read",
+    "finish",
+    "plan",
+    "ask",
+    "case",
+    "space",
+    "empty"
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/specialist-tools-reference/delegation_test.go": "ee8aef6efc66df24d8288ca3077ec021f3d57a0aec43da747fd69c6df5b6eed2",
+      "scripts/specialist-tools-reference/reference_test.go": "978308b79a145e91192e1cdb6f096538b80c79d6d23f9dfffb5ef1ca46ccf13a",
+      "scripts/specialist-tools-reference/run.py": "3f030fbb927384a08fab9ce0d37079a8b72f2d2777f8a65ff32bdda8bae1659b"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/run_context.go": "79d96ddd0f84d206a8fd3a6f42b7a695aabe0b115aa1fd6078186823c9bc90fc",
+      "internal/agent/tool.go": "158236e8b91b82a869e61a92ad9d08eebfe5c32910372cbe4246eabe2cc3f4d6",
+      "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
+      "pkg/agentsdk/specialists.go": "3f0bfe8d9e686ef00b16c709e9b3e71659389caf8fb3275c4958b05804b61e59",
+      "pkg/agentsdk/specialists_test.go": "e7ac2ae109c36d3a7c3b89d060d7e11526df11b5faa85f38531790d93eb850b5"
+    }
+  },
+  "specs": [
+    {
+      "adapter": false,
+      "id": "read",
+      "name": "Read",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": false,
+      "id": "edit",
+      "name": "Edit",
+      "readOnly": false,
+      "replacement": ""
+    },
+    {
+      "adapter": true,
+      "id": "none-ro",
+      "name": "NoneRO",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": true,
+      "id": "none-mut",
+      "name": "NoneMut",
+      "readOnly": false,
+      "replacement": ""
+    },
+    {
+      "adapter": true,
+      "id": "bash",
+      "name": "Bash",
+      "readOnly": false,
+      "replacement": "safe"
+    },
+    {
+      "adapter": false,
+      "id": "safe",
+      "name": "Bash",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": true,
+      "id": "bad",
+      "name": "OriginalRO",
+      "readOnly": true,
+      "replacement": "edit"
+    },
+    {
+      "adapter": true,
+      "id": "rename",
+      "name": "original",
+      "readOnly": false,
+      "replacement": "finish"
+    },
+    {
+      "adapter": false,
+      "id": "finish",
+      "name": "finish",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": false,
+      "id": "plan",
+      "name": "present_plan",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": false,
+      "id": "ask",
+      "name": "AskUserQuestion",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": false,
+      "id": "case",
+      "name": "Finish",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": false,
+      "id": "space",
+      "name": "finish ",
+      "readOnly": true,
+      "replacement": ""
+    },
+    {
+      "adapter": false,
+      "id": "empty",
+      "name": "",
+      "readOnly": true,
+      "replacement": ""
+    }
+  ],
+  "stripCases": [
+    {
+      "names": null,
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ]
+    },
+    {
+      "names": {},
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "finish",
+        "plan",
+        "ask",
+        "case",
+        "space",
+        "empty"
+      ]
+    },
+    {
+      "names": {
+        "AskUserQuestion": true,
+        "finish": true,
+        "present_plan": true
+      },
+      "outputIDs": [
+        "read",
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "read",
+        "case",
+        "space",
+        "empty"
+      ]
+    },
+    {
+      "names": {
+        "": true,
+        "Finish": true,
+        "Read": true,
+        "absent": true,
+        "finish": false
+      },
+      "outputIDs": [
+        "edit",
+        "none-ro",
+        "none-mut",
+        "bash",
+        "bad",
+        "rename",
+        "finish",
+        "plan",
+        "ask",
+        "space"
+      ]
+    }
+  ]
+}

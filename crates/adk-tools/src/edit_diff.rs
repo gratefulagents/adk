@@ -159,3 +159,168 @@ pub(crate) fn render(
     }
     go_string(&result)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::render;
+
+    fn diff(content: &str, old: &str, new: &str, replace_all: bool) -> String {
+        let count = memchr::memmem::find_iter(content.as_bytes(), old.as_bytes()).count();
+        let offsets: Vec<_> = memchr::memmem::find_iter(content.as_bytes(), old.as_bytes())
+            .take(if replace_all { 256 } else { 1 })
+            .collect();
+        render(
+            content.as_bytes(),
+            old.as_bytes(),
+            new.as_bytes(),
+            &offsets,
+            replace_all && count > 256,
+        )
+    }
+
+    #[test]
+    fn pinned_edit_diff_line_and_join_examples() {
+        for (name, content, old, new, all, expected) in [
+            (
+                "single",
+                "a\nb\nc\nd\ne\nf\ng\nh\n",
+                "d",
+                "D",
+                false,
+                "@@ -1,7 +1,7 @@\n a\n b\n c\n-d\n+D\n e\n f\n g",
+            ),
+            (
+                "multiline",
+                "a\nb\nc\nd\ne\nf\ng\nh\n",
+                "c\nd",
+                "X",
+                false,
+                "@@ -1,7 +1,6 @@\n a\n b\n-c\n-d\n+X\n e\n f\n g",
+            ),
+            (
+                "partial",
+                "func foo() {\n\treturn oldValue\n}\n",
+                "oldValue",
+                "newValue",
+                false,
+                "@@ -1,3 +1,3 @@\n func foo() {\n-\treturn oldValue\n+\treturn newValue\n }",
+            ),
+            (
+                "nearby",
+                "a\ntarget\nb\nc\ntarget\nd\n",
+                "target",
+                "T",
+                true,
+                "@@ -1,6 +1,6 @@\n a\n-target\n+T\n b\n c\n-target\n+T\n d",
+            ),
+            (
+                "same line",
+                "foo bar foo\nother\n",
+                "foo",
+                "qux",
+                true,
+                "@@ -1,2 +1,2 @@\n-foo bar foo\n+qux bar qux\n other",
+            ),
+            (
+                "deletion",
+                "a\nb\nc\n",
+                "b\n",
+                "",
+                false,
+                "@@ -1,3 +1,2 @@\n a\n-b\n c",
+            ),
+            (
+                "join",
+                "foo\nbar\n",
+                "foo\n",
+                "baz",
+                false,
+                "@@ -1,2 +1,1 @@\n-foo\n-bar\n+bazbar",
+            ),
+            (
+                "keep newline",
+                "foo\nbar\n",
+                "foo\n",
+                "baz\n",
+                false,
+                "@@ -1,2 +1,2 @@\n-foo\n+baz\n bar",
+            ),
+            (
+                "prefix join",
+                "a\nxfoo\nbar\nc\n",
+                "foo\n",
+                "",
+                false,
+                "@@ -1,4 +1,3 @@\n a\n-xfoo\n-bar\n+xbar\n c",
+            ),
+            (
+                "cascade",
+                "a\na\nb\n",
+                "a\n",
+                "A",
+                true,
+                "@@ -1,3 +1,1 @@\n-a\n-a\n-b\n+AAb",
+            ),
+            (
+                "EOF",
+                "foo\nbar\n",
+                "bar\n",
+                "B",
+                false,
+                "@@ -1,2 +1,2 @@\n foo\n-bar\n+B",
+            ),
+            (
+                "append",
+                "a\nb",
+                "b",
+                "b\nc",
+                false,
+                "@@ -1,2 +1,3 @@\n a\n-b\n+b\n+c",
+            ),
+            ("no match", "a\nb\n", "missing", "x", false, ""),
+        ] {
+            assert_eq!(diff(content, old, new, all), expected, "{name}");
+        }
+    }
+
+    #[test]
+    fn pinned_edit_diff_distant_hunks_and_line_number_shifts() {
+        let mut lines = ["line"; 30];
+        lines[4] = "target";
+        lines[24] = "target";
+        let content = lines.join("\n") + "\n";
+        let output = diff(&content, "target", "changed", true);
+        assert_eq!(output.matches("@@").count(), 4);
+        assert!(output.contains("@@ -2,7 +2,7 @@"));
+        assert!(output.contains("@@ -22,7 +22,7 @@"));
+        assert_eq!(output.matches("-target").count(), 2);
+        assert_eq!(output.matches("+changed").count(), 2);
+        let content = content.replace("target", "first");
+        let output = diff(&content, "first", "first\nadded\nadded", true);
+        assert!(output.contains("@@ -2,7 +2,9 @@"));
+        assert!(output.contains("@@ -22,7 +24,9 @@"));
+    }
+
+    #[test]
+    fn empty_new_ranges_and_match_cap_boundaries() {
+        for content in ["x", "x\n"] {
+            assert_eq!(diff(content, content, "", false), "@@ -1,1 +0,0 @@\n-x");
+        }
+        assert_eq!(diff("\n", "\n", "", false), "@@ -1,1 +0,0 @@\n-");
+        assert_eq!(diff("\n", "\n", "\n\n", false), "@@ -1,1 +1,2 @@\n-\n+\n+");
+        for count in [256, 257] {
+            let output = diff(&"x\n".repeat(count), "x", "y", true);
+            assert_eq!(output.matches("-x").count(), 256);
+            assert_eq!(output.matches("+y").count(), 256);
+            assert_eq!(output.ends_with("... [diff truncated]"), count == 257);
+        }
+    }
+
+    #[test]
+    fn pinned_edit_diff_truncation_caps() {
+        let content = format!("padding {}\ntarget\n", "x".repeat(70)).repeat(500);
+        let output = diff(&content, "target", "changed", true);
+        assert!(output.len() <= 8192 + "... [diff truncated]".len() + 1);
+        assert!(output.ends_with("... [diff truncated]"));
+    }
+}

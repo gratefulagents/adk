@@ -41,6 +41,127 @@ func TestADKContinuationGolden(t *testing.T) {
         "reasoning_details_json": details,
         "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
     }
+    var outputSchemas []map[string]any
+    for _, raw := range []string{`null`, `{}`, `"schema"`, `7`, `[]`, `true`, `false`, `{"type":27}`, `{"x":-0}`, `{"x":9007199254740993}`, `{"x":1e400}`, `{"x":1e400,"x":1}`, `{"x":"\ud800"}`, `{"x":1,"x":2}`} {
+        schema := &anthropic.OutputSchema{Name:"result", Schema:json.RawMessage(raw), Strict:true}
+        normalized, err := outputSchemaMap(schema)
+        _, chatErr := chatResponseFormat(schema)
+        _, responsesErr := responseFormatFromSchema(schema)
+        if (err != nil) != (chatErr != nil) || (err != nil) != (responsesErr != nil) { t.Fatal("schema acceptance differs between helpers") }
+        row := map[string]any{"raw":raw, "error":err != nil}
+        if err == nil {
+            encoded, marshalErr := json.Marshal(normalized)
+            if marshalErr != nil { t.Fatal(marshalErr) }
+            row["schema_json"] = string(encoded)
+        }
+        outputSchemas = append(outputSchemas, row)
+    }
+    golden["output_schemas"] = outputSchemas
+    var normalizedArguments []map[string]string
+    for _, raw := range []string{
+        "", " \t\n", "\u0085{}\u00a0", ` {"q":1} `, `{"q":"\ud800"}`, `{"q":"\udc00"}`,
+        `{"q":"\ud83d\ude00"}`, `{"q":1e999}`, `{"q":1,"q":2}`, `null`, `42`,
+        `{"q":}`, `{} {}`, strings.Repeat("[", 128) + "0" + strings.Repeat("]", 128),
+        strings.Repeat("[", 10000) + "0" + strings.Repeat("]", 10000),
+        strings.Repeat("[", 10001) + "0" + strings.Repeat("]", 10001),
+    } {
+        normalizedArguments = append(normalizedArguments, map[string]string{
+            "input": raw, "normalized": string(normalizeArguments(raw)),
+        })
+    }
+    golden["normalized_arguments"] = normalizedArguments
+    var bufferedDetails []map[string]any
+    var streamedDetails []map[string]any
+    for _, raw := range []string{
+        `[{"type":"reasoning.text","text":"inspect state"},{"type":"reasoning.encrypted","data":"opaque"}]`,
+        `[ { "type" : "reasoning.encrypted", "data" : "opaque", "index" : 0 } ]`,
+        `[{"z":1e+02,"type":"reasoning.encrypted","data":"\\u0061","a":-0}]`,
+        `[{"type":"reasoning.text","text":"hé🙂","text":"last"}]`,
+        "[{\"type\":\"reasoning.text\",\"text\":\"<>&\u2028\u2029\"}]",
+    } {
+        body := `{"id":"gen-1","choices":[{"message":{"role":"assistant","reasoning":"inspect state","reasoning_details":` + raw + `,"content":"answer"},"finish_reason":"stop"}]}`
+        var chat chatCompletionResponse
+        if err := json.Unmarshal([]byte(body), &chat); err != nil { t.Fatal(err) }
+        response, err := toAnthropicResponseFromChat(chat)
+        if err != nil { t.Fatal(err) }
+        bufferedDetails = append(bufferedDetails, map[string]any{"body":body, "details":raw, "signature":response.Content[0].Signature})
+        chunks := []string{
+            `{"choices":[{"index":0,"delta":{"reasoning":"inspect ","reasoning_details":` + raw + `}}]}`,
+            `{"choices":[{"index":0,"delta":{"reasoning":"state","reasoning_details":` + raw + `}}]}`,
+            `{"choices":[{"index":0,"delta":{"content":"answer"},"finish_reason":"stop"}]}`,
+            `[DONE]`,
+        }
+        sse := ""
+        for _, chunk := range chunks { sse += "data: " + chunk + "\n\n" }
+        streamed := drainChatStream(t, sse)
+        streamedDetails = append(streamedDetails, map[string]any{"chunks":chunks, "signature":streamed.Content[0].Signature, "details":string(decodeOpenRouterReasoningDetails(streamed.Content[0].Signature))})
+    }
+    golden["buffered_chat_details"] = bufferedDetails
+    golden["streamed_chat_details"] = streamedDetails
+    var reasoningGates []map[string]any
+    for _, kind := range []string{"enabled", "disabled", "adaptive", "", " ENABLED "} {
+        for _, budget := range []int{-1, 0, 2048} {
+            for _, effort := range []string{"", " high "} {
+                req := anthropic.CreateMessageRequest{Model: "gpt-5.6", MaxTokens: 8192,
+                    Thinking: &anthropic.ThinkingConfig{Type: kind, BudgetTokens: budget}, ReasoningEffort: effort}
+                chat, err := toChatRequest(req)
+                if err != nil { t.Fatal(err) }
+                response, err := toResponseParams(req)
+                if err != nil { t.Fatal(err) }
+                projections := map[string]any{}
+                for name, value := range map[string]any{"chat": chat, "responses": response} {
+                    encoded, err := json.Marshal(value)
+                    if err != nil { t.Fatal(err) }
+                    var body map[string]any
+                    if err := json.Unmarshal(encoded, &body); err != nil { t.Fatal(err) }
+                    projections[name] = body["reasoning"]
+                }
+                reasoningGates = append(reasoningGates, map[string]any{"type": kind, "budget": budget,
+                    "effort": effort, "chat": projections["chat"], "responses": projections["responses"]})
+            }
+        }
+    }
+    golden["reasoning_gates"] = reasoningGates
+    type toolOperation struct {
+        Kind string `json:"kind"`
+        ID string `json:"id"`
+        Text string `json:"text"`
+        Image bool `json:"image"`
+    }
+    toolCases := []struct { name string; operations []toolOperation }{
+        {"orphan", []toolOperation{{"result", "call_missing", "/repo", false}, {"text", "", "continue", false}}},
+        {"matched", []toolOperation{{"call", "call_1", "", false}, {"result", "call_1", "/repo", false}}},
+        {"result-before-call", []toolOperation{{"result", "call_1", "/repo", false}, {"call", "call_1", "", false}}},
+        {"trimmed-identifiers", []toolOperation{{"call", " call_1 ", "", false}, {"result", "\tcall_1\n", "/repo", false}}},
+        {"generated-identifier", []toolOperation{{"call", " ", "", false}, {"result", "call_0", "/repo", false}}},
+        {"blank-result-identifier", []toolOperation{{"call", "", "", false}, {"result", " ", "/repo", false}}},
+        {"repeated-result", []toolOperation{{"call", "call_1", "", false}, {"result", "call_1", "first", false}, {"result", "call_1", "second", false}}},
+        {"orphan-image", []toolOperation{{"result", "orphan", "inspect", true}, {"text", "", "continue", false}}},
+        {"matched-image", []toolOperation{{"call", "image-call", "", false}, {"result", "image-call", "inspect", true}}},
+        {"blank-output", []toolOperation{{"call", "call_1", "", false}, {"result", "call_1", " \t\n", false}}},
+    }
+    var toolPairs []map[string]any
+    for _, tc := range toolCases {
+        var messages []anthropic.Message
+        for _, op := range tc.operations {
+            message := anthropic.Message{Role: anthropic.RoleUser}
+            switch op.Kind {
+            case "call":
+                message.Role = anthropic.RoleAssistant
+                message.Content = []anthropic.ContentBlock{anthropic.NewToolUseBlock(op.ID, "Bash", []byte(`{"command":"pwd"}`))}
+            case "result":
+                message.Content = []anthropic.ContentBlock{anthropic.NewToolResultBlock(op.ID, op.Text, false)}
+                if op.Image { message.Content = append(message.Content, anthropic.NewImageBlock("image/png", "cG5n")) }
+            case "text":
+                message.Content = []anthropic.ContentBlock{anthropic.NewTextBlock(op.Text)}
+            }
+            messages = append(messages, message)
+        }
+        items, err := toResponseInputItems(messages)
+        if err != nil { t.Fatal(err) }
+        toolPairs = append(toolPairs, map[string]any{"name": tc.name, "operations": tc.operations, "items": items})
+    }
+    golden["responses_tool_pairs"] = toolPairs
     var prices []map[string]any
     var models []string
     for model := range modelPricing { models = append(models, model) }

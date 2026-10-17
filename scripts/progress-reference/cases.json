@@ -1,0 +1,783 @@
+[
+  {
+    "name": "empty_snapshot",
+    "ops": [
+      {
+        "op": "snapshot"
+      }
+    ]
+  },
+  {
+    "name": "session_and_step_deduplication",
+    "ops": [
+      {
+        "op": "session",
+        "args": [
+          "starting"
+        ],
+        "n": [
+          2
+        ]
+      },
+      {
+        "op": "step",
+        "args": [
+          "starting"
+        ]
+      },
+      {
+        "op": "step",
+        "args": [
+          "reviewing"
+        ]
+      },
+      {
+        "op": "init"
+      }
+    ]
+  },
+  {
+    "name": "assistant_thinking_does_not_replace_activity",
+    "ops": [
+      {
+        "op": "text",
+        "args": [
+          "  Hello\n世界 界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界  "
+        ]
+      },
+      {
+        "op": "thinking",
+        "args": [
+          "private\nreasoning"
+        ]
+      },
+      {
+        "op": "text",
+        "args": [
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "name": "tool_step_inference",
+    "ops": [
+      {
+        "op": "init"
+      },
+      {
+        "op": "tool",
+        "args": [
+          "LSP",
+          ""
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Bash",
+          "git diff"
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Edit",
+          ""
+        ]
+      },
+      {
+        "op": "step",
+        "args": [
+          "starting"
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Write",
+          ""
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Bash",
+          "git diff"
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Bash",
+          "git add x && git commit -m x"
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Write",
+          ""
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Bash",
+          "git diff"
+        ]
+      },
+      {
+        "op": "tool",
+        "args": [
+          "read_file",
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "name": "tool_result_success_and_error",
+    "ops": [
+      {
+        "op": "tool_result",
+        "args": [
+          "Read",
+          "  read\nfile  "
+        ]
+      },
+      {
+        "op": "tool_result",
+        "args": [
+          "Bash",
+          "bad ééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé"
+        ],
+        "n": [
+          1
+        ]
+      },
+      {
+        "op": "tool_result",
+        "args": [
+          "Write",
+          ""
+        ]
+      }
+    ]
+  },
+  {
+    "name": "lifecycle_preserves_full_summary",
+    "ops": [
+      {
+        "op": "text",
+        "args": [
+          "previous"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "",
+          ""
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "failure",
+          "  error\n界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界界  "
+        ]
+      }
+    ]
+  },
+  {
+    "name": "result_summary_field_order_and_fallback",
+    "ops": [
+      {
+        "op": "result"
+      },
+      {
+        "op": "result",
+        "args": [
+          "failed",
+          "https://example.test/pr/1",
+          "\néééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééééé",
+          "testing"
+        ]
+      }
+    ]
+  },
+  {
+    "name": "hook_is_noop",
+    "ops": [
+      {
+        "op": "hook"
+      }
+    ]
+  },
+  {
+    "name": "usage_accumulates_and_sorts_models",
+    "ops": [
+      {
+        "op": "usage",
+        "args": [
+          "z-model"
+        ],
+        "n": [
+          10,
+          2,
+          3,
+          4
+        ],
+        "cost": 0.125
+      },
+      {
+        "op": "usage",
+        "args": [
+          "a-model"
+        ],
+        "n": [
+          5,
+          1,
+          2,
+          3
+        ],
+        "cost": 0.25
+      },
+      {
+        "op": "usage",
+        "args": [
+          "z-model"
+        ],
+        "n": [
+          7,
+          3,
+          1,
+          2
+        ],
+        "cost": 0.125
+      },
+      {
+        "op": "usage",
+        "args": [
+          ""
+        ],
+        "n": [
+          0,
+          0,
+          0,
+          0
+        ]
+      }
+    ]
+  },
+  {
+    "name": "nested_usage_forwards_without_parent_activity",
+    "ops": [
+      {
+        "op": "session",
+        "args": [
+          "reviewing"
+        ],
+        "n": [
+          3
+        ]
+      },
+      {
+        "op": "text",
+        "args": [
+          "parent"
+        ]
+      },
+      {
+        "op": "thinking",
+        "args": [
+          "parent thought"
+        ]
+      },
+      {
+        "op": "child",
+        "args": [
+          "child"
+        ]
+      },
+      {
+        "op": "child",
+        "args": [
+          "nested"
+        ],
+        "target": "child"
+      },
+      {
+        "op": "root_id",
+        "args": [
+          "root-B"
+        ]
+      },
+      {
+        "op": "text",
+        "args": [
+          "child text"
+        ],
+        "target": "child"
+      },
+      {
+        "op": "thinking",
+        "args": [
+          "nested thought"
+        ],
+        "target": "nested"
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Write",
+          ""
+        ],
+        "target": "nested"
+      },
+      {
+        "op": "usage",
+        "args": [
+          "z-model"
+        ],
+        "n": [
+          9,
+          4,
+          3,
+          2
+        ],
+        "cost": 0.25,
+        "target": "nested"
+      },
+      {
+        "op": "usage",
+        "args": [
+          "a-model"
+        ],
+        "n": [
+          1,
+          2,
+          0,
+          0
+        ],
+        "cost": 0.125,
+        "target": "child"
+      },
+      {
+        "op": "retry",
+        "args": [
+          "429"
+        ],
+        "n": [
+          500,
+          1,
+          3
+        ],
+        "target": "nested"
+      },
+      {
+        "op": "session",
+        "args": [
+          "next"
+        ],
+        "n": [
+          4
+        ]
+      }
+    ]
+  },
+  {
+    "name": "session_completion_does_not_double_count",
+    "ops": [
+      {
+        "op": "session",
+        "args": [
+          "starting"
+        ],
+        "n": [
+          1
+        ]
+      },
+      {
+        "op": "usage",
+        "args": [
+          "model"
+        ],
+        "n": [
+          10,
+          2,
+          3,
+          4
+        ],
+        "cost": 0.125
+      },
+      {
+        "op": "tool",
+        "args": [
+          "Write",
+          ""
+        ]
+      },
+      {
+        "op": "complete",
+        "args": [
+          "model",
+          "stop"
+        ],
+        "n": [
+          10,
+          2,
+          3,
+          4,
+          2,
+          1500
+        ],
+        "cost": 0.125
+      },
+      {
+        "op": "drain"
+      },
+      {
+        "op": "drain"
+      },
+      {
+        "op": "session",
+        "args": [
+          "next"
+        ],
+        "n": [
+          2
+        ]
+      }
+    ]
+  },
+  {
+    "name": "ring_eviction_does_not_drain_pending",
+    "ops": [
+      {
+        "op": "session",
+        "args": [
+          "starting"
+        ],
+        "n": [
+          1
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 0"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 1"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 2"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 3"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 4"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 5"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 6"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 7"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 8"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 9"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 10"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 11"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 12"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 13"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 14"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 15"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 16"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 17"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 18"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 19"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 20"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 21"
+        ]
+      },
+      {
+        "op": "lifecycle",
+        "args": [
+          "tick",
+          "event 22"
+        ]
+      },
+      {
+        "op": "drain"
+      },
+      {
+        "op": "drain"
+      }
+    ]
+  },
+  {
+    "name": "retry_and_compaction_callbacks",
+    "ops": [
+      {
+        "op": "retry",
+        "args": [
+          "429"
+        ],
+        "n": [
+          750,
+          2,
+          5
+        ]
+      },
+      {
+        "op": "compact",
+        "args": [
+          "summary ignored"
+        ],
+        "n": [
+          2000,
+          400
+        ]
+      }
+    ]
+  },
+  {
+    "name": "subagent_completion_reuses_start_span",
+    "ops": [
+      {
+        "op": "start",
+        "args": [
+          "task",
+          "description",
+          "worker",
+          "model",
+          "worktree",
+          "prompt"
+        ]
+      },
+      {
+        "op": "progress",
+        "args": [
+          "task",
+          "Read"
+        ],
+        "n": [
+          2,
+          40,
+          500
+        ]
+      },
+      {
+        "op": "root_id",
+        "args": [
+          "root-B"
+        ]
+      },
+      {
+        "op": "finish",
+        "args": [
+          "task",
+          "completed",
+          "result\ntext",
+          "stop"
+        ],
+        "n": [
+          10,
+          2,
+          3,
+          4,
+          2
+        ],
+        "cost": 0.125
+      }
+    ]
+  },
+  {
+    "name": "orphan_completion_emits_start_and_end",
+    "ops": [
+      {
+        "op": "finish",
+        "args": [
+          "missing",
+          "failed",
+          "error",
+          "failure"
+        ],
+        "n": [
+          2,
+          1,
+          0,
+          0,
+          1
+        ],
+        "cost": 0.25
+      }
+    ]
+  },
+  {
+    "name": "nonterminal_completion_retains_metadata",
+    "ops": [
+      {
+        "op": "start",
+        "args": [
+          "task",
+          "description",
+          "worker",
+          "model",
+          "none",
+          "prompt"
+        ]
+      },
+      {
+        "op": "finish",
+        "args": [
+          "task",
+          "running",
+          "partial",
+          ""
+        ],
+        "n": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      },
+      {
+        "op": "finish",
+        "args": [
+          "task",
+          "stopped",
+          "cancelled",
+          "cancelled"
+        ],
+        "n": [
+          0,
+          0,
+          0,
+          0,
+          1
+        ]
+      }
+    ]
+  }
+]

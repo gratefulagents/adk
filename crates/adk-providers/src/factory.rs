@@ -106,6 +106,17 @@ pub fn supports_chat_completions(model: &str) -> bool {
     !model.to_ascii_lowercase().contains("codex")
 }
 
+/// Validate model selection for hosts that require Chat Completions only.
+pub fn validate_chat_completions_model(model: &str) -> Result<(), Error> {
+    if supports_chat_completions(model) {
+        Ok(())
+    } else {
+        Err(crate::invalid(
+            "model is not compatible with the OpenAI chat completions API; use a chat-completions model such as gpt-4.1 or gpt-4.1-mini",
+        ))
+    }
+}
+
 /// Each named instance supplies its own host-owned store and refresh boundary.
 /// Omitted endpoint/protocol use canonical defaults, not another instance's values.
 pub struct RouteSpec {

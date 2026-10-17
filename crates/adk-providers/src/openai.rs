@@ -50,6 +50,7 @@ pub(crate) fn shape(
             request
                 .settings
                 .get("thinking")
+                .filter(|value| protocol == Protocol::Responses || value["type"] == "enabled")
                 .and_then(|value| value["budget_tokens"].as_u64())
         })
         .unwrap_or(0);

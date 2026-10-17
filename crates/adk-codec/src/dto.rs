@@ -1,13 +1,225 @@
 use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
+use std::borrow::Cow;
 
-fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
+pub struct ModelSettings {
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_optional_go_float"
+    )]
+    pub temperature: Option<f64>,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub max_tokens: i64,
+    #[serde(
+        skip_serializing_if = "Option::is_none",
+        serialize_with = "serialize_optional_go_float"
+    )]
+    pub top_p: Option<f64>,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub tool_choice: String,
+    #[serde(skip_serializing_if = "Option::is_none")]
+    pub parallel_tool_calls: Option<bool>,
+    #[serde(skip_serializing_if = "is_zero")]
+    pub thinking_budget: i64,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub reasoning_effort: String,
+    #[serde(skip_serializing_if = "String::is_empty")]
+    pub text_verbosity: String,
+    #[serde(skip_serializing_if = "empty_stop_sequences")]
+    pub stop_sequences: Option<Vec<String>>,
+}
+
+impl ModelSettings {
+    pub fn merge(&self, overrides: &Self) -> Self {
+        let mut merged = self.clone();
+        if overrides.temperature.is_some() {
+            merged.temperature = overrides.temperature;
+        }
+        if overrides.max_tokens > 0 {
+            merged.max_tokens = overrides.max_tokens;
+        }
+        if overrides.top_p.is_some() {
+            merged.top_p = overrides.top_p;
+        }
+        if !overrides.tool_choice.is_empty() {
+            merged.tool_choice.clone_from(&overrides.tool_choice);
+        }
+        if overrides.parallel_tool_calls.is_some() {
+            merged.parallel_tool_calls = overrides.parallel_tool_calls;
+        }
+        if overrides.thinking_budget > 0 {
+            merged.thinking_budget = overrides.thinking_budget;
+        }
+        if !overrides.reasoning_effort.is_empty() {
+            merged
+                .reasoning_effort
+                .clone_from(&overrides.reasoning_effort);
+        }
+        if !overrides.text_verbosity.is_empty() {
+            merged.text_verbosity.clone_from(&overrides.text_verbosity);
+        }
+        if overrides
+            .stop_sequences
+            .as_ref()
+            .is_some_and(|values| !values.is_empty())
+        {
+            merged.stop_sequences.clone_from(&overrides.stop_sequences);
+        }
+        merged
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModelRetryAdvice {
+    pub should_retry: bool,
+    #[serde(rename = "RetryAfterMS")]
+    pub retry_after_ms: i64,
+    pub reason: String,
+}
+
+fn empty_stop_sequences(value: &Option<Vec<String>>) -> bool {
+    value.as_ref().is_none_or(Vec::is_empty)
+}
+
+fn serialize_optional_go_float<S: serde::Serializer>(
+    value: &Option<f64>,
+    serializer: S,
+) -> Result<S::Ok, S::Error> {
+    match value {
+        Some(value) => serialize_go_float(value, serializer),
+        None => serializer.serialize_none(),
+    }
+}
+
+#[derive(
+    Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(transparent)]
+pub struct ModeReasoningLevel(#[serde(deserialize_with = "null_default")] pub Cow<'static, str>);
+
+impl ModeReasoningLevel {
+    pub const NONE: Self = Self(Cow::Borrowed("none"));
+    pub const MINIMAL: Self = Self(Cow::Borrowed("minimal"));
+    pub const LOW: Self = Self(Cow::Borrowed("low"));
+    pub const MEDIUM: Self = Self(Cow::Borrowed("medium"));
+    pub const HIGH: Self = Self(Cow::Borrowed("high"));
+    pub const XHIGH: Self = Self(Cow::Borrowed("xhigh"));
+    pub const MAX: Self = Self(Cow::Borrowed("max"));
+}
+impl std::ops::Deref for ModeReasoningLevel {
+    type Target = str;
+    fn deref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+impl std::fmt::Display for ModeReasoningLevel {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
+
+#[derive(
+    Clone, Debug, Default, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, JsonSchema,
+)]
+#[serde(transparent)]
+pub struct ModeTextVerbosity(#[serde(deserialize_with = "null_default")] pub Cow<'static, str>);
+
+impl ModeTextVerbosity {
+    pub const LOW: Self = Self(Cow::Borrowed("low"));
+    pub const MEDIUM: Self = Self(Cow::Borrowed("medium"));
+    pub const HIGH: Self = Self(Cow::Borrowed("high"));
+}
+impl std::ops::Deref for ModeTextVerbosity {
+    type Target = str;
+    fn deref(&self) -> &str {
+        self.0.as_ref()
+    }
+}
+impl std::fmt::Display for ModeTextVerbosity {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        std::fmt::Display::fmt(&self.0, f)
+    }
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeRoleRouting {
+    pub model: String,
+    pub fallback_models: Option<Vec<String>>,
+    pub reasoning_level: String,
+    pub text_verbosity: String,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeRouting {
+    pub default_model: String,
+    pub fallback_models: Option<Vec<String>>,
+    pub reasoning_level: String,
+    pub text_verbosity: String,
+    pub role_overrides: Option<std::collections::BTreeMap<String, ModeRoleRouting>>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeConstraints {
+    pub max_turns: i64,
+    pub sub_agent_max_turns: i64,
+    pub max_concurrent_sub_agents: i64,
+    pub max_retries: i64,
+    pub max_runtime_minutes: i64,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeTemplateSpec {
+    pub name: String,
+    pub version: String,
+    pub display_name: String,
+    pub description: String,
+    pub category: String,
+    pub autonomous: bool,
+    pub tool_access: String,
+    pub instructions: String,
+    pub model_routing: Option<ModeRouting>,
+    pub constraints: Option<ModeConstraints>,
+}
+
+/// Compatibility-only pinned Go role; `None` preserves a nil fallback slice.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct RoleSpec {
+    pub name: String,
+    pub description: String,
+    pub instructions: String,
+    pub tool_access: String,
+    pub model_override: String,
+    pub fallback_models: Option<Vec<String>>,
+}
+
+/// Compatibility-only Go slice; nil and allocated empty catalogs stay distinct.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(transparent)]
+pub struct RoleCatalog(pub Option<Vec<RoleSpec>>);
+
+pub(crate) fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
     d: D,
 ) -> Result<T, D::Error> {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
 }
-fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
+pub(crate) fn null_default_elements<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
+    d: D,
+) -> Result<Vec<T>, D::Error> {
+    Ok(Option::<Vec<Option<T>>>::deserialize(d)?
+        .unwrap_or_default()
+        .into_iter()
+        .map(Option::unwrap_or_default)
+        .collect())
+}
+pub fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
     if !v.is_finite() {
         return Err(serde::ser::Error::custom("nonfinite Go float"));
     }
@@ -23,24 +235,78 @@ fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::E
     } else {
         v.to_string()
     };
-    let number: serde_json::Number = text.parse().map_err(serde::ser::Error::custom)?;
-    number.serialize(s)
+    // Re-parsing this finite-float spelling would turn "-0" into "0".
+    serde_json::Number::from_string_unchecked(text).serialize(s)
 }
 
 fn is_zero<T: Default + PartialEq>(v: &T) -> bool {
     *v == T::default()
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+pub struct Cursor {
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub message_id: i64,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub token: String,
+}
+
 // RawMessage distinguishes a nil slice from the explicit JSON bytes `null`.
-#[derive(Clone, Debug, Default, PartialEq)]
+#[derive(Clone, Debug, Default)]
 pub enum RawJson {
     #[default]
     Missing,
     Present(Value),
+    Encoded(Box<serde_json::value::RawValue>),
+    EncodedBytes(Vec<u8>),
 }
 impl RawJson {
+    /// Original lexical bytes, or the JSON encoding of a parsed value.
+    pub fn bytes(&self) -> std::borrow::Cow<'_, [u8]> {
+        match self {
+            Self::Missing => std::borrow::Cow::Borrowed(b""),
+            Self::Present(value) => std::borrow::Cow::Owned(value.to_string().into_bytes()),
+            Self::Encoded(raw) => std::borrow::Cow::Borrowed(raw.get().as_bytes()),
+            Self::EncodedBytes(bytes) => std::borrow::Cow::Borrowed(bytes),
+        }
+    }
+    pub fn try_text(&self) -> Result<std::borrow::Cow<'_, str>, std::str::Utf8Error> {
+        match self {
+            Self::Missing => Ok(std::borrow::Cow::Borrowed("")),
+            Self::Present(value) => Ok(std::borrow::Cow::Owned(value.to_string())),
+            Self::Encoded(raw) => Ok(std::borrow::Cow::Borrowed(raw.get())),
+            Self::EncodedBytes(bytes) => std::str::from_utf8(bytes).map(std::borrow::Cow::Borrowed),
+        }
+    }
+    /// Returns no projection for missing or non-projectable raw JSON. Use
+    /// `try_value` when the distinction matters.
+    pub fn value(&self) -> Option<std::borrow::Cow<'_, Value>> {
+        self.try_value().ok().flatten()
+    }
+    pub fn try_value(&self) -> Result<Option<std::borrow::Cow<'_, Value>>, serde_json::Error> {
+        match self {
+            Self::Missing => Ok(None),
+            Self::Present(value) => Ok(Some(std::borrow::Cow::Borrowed(value))),
+            Self::Encoded(raw) => {
+                serde_json::from_str(raw.get()).map(|value| Some(std::borrow::Cow::Owned(value)))
+            }
+            Self::EncodedBytes(bytes) => {
+                let text = std::str::from_utf8(bytes).map_err(serde::de::Error::custom)?;
+                serde_json::from_str(text).map(|value| Some(std::borrow::Cow::Owned(value)))
+            }
+        }
+    }
     pub fn is_missing(&self) -> bool {
         matches!(self, Self::Missing)
+    }
+}
+impl PartialEq for RawJson {
+    fn eq(&self, other: &Self) -> bool {
+        match (self.try_value(), other.try_value()) {
+            (Ok(left), Ok(right)) => left == right,
+            (Err(_), Err(_)) => self.bytes() == other.bytes(),
+            _ => false,
+        }
     }
 }
 impl Serialize for RawJson {
@@ -48,12 +314,19 @@ impl Serialize for RawJson {
         match self {
             Self::Missing => s.serialize_none(),
             Self::Present(v) => v.serialize(s),
+            Self::Encoded(raw) => raw.serialize(s),
+            Self::EncodedBytes(bytes) => {
+                let text = std::str::from_utf8(bytes).map_err(serde::ser::Error::custom)?;
+                let raw: &serde_json::value::RawValue =
+                    serde_json::from_str(text).map_err(serde::ser::Error::custom)?;
+                raw.serialize(s)
+            }
         }
     }
 }
 impl<'de> Deserialize<'de> for RawJson {
     fn deserialize<D: Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        Value::deserialize(d).map(Self::Present)
+        Box::<serde_json::value::RawValue>::deserialize(d).map(Self::Encoded)
     }
 }
 impl JsonSchema for RawJson {
@@ -65,14 +338,26 @@ impl JsonSchema for RawJson {
     }
 }
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(transparent)]
 pub struct RunItemType(pub i64);
 
-#[derive(Clone, Copy, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
-#[serde(rename_all = "snake_case")]
+impl RunItemType {
+    pub const MESSAGE: Self = Self(0);
+    pub const TOOL_CALL: Self = Self(1);
+    pub const TOOL_OUTPUT: Self = Self(2);
+    pub const HANDOFF_CALL: Self = Self(3);
+    pub const HANDOFF_OUTPUT: Self = Self(4);
+    pub const REASONING: Self = Self(5);
+    pub const TOOL_APPROVAL: Self = Self(6);
+    pub const COMPACTION: Self = Self(7);
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, Deserialize, JsonSchema)]
+#[serde(from = "String", into = "String")]
 pub enum SnapshotType {
     #[default]
+    Unspecified,
     Message,
     ToolCall,
     ToolOutput,
@@ -82,6 +367,41 @@ pub enum SnapshotType {
     ToolApproval,
     Compaction,
     Unknown,
+    Other(String),
+}
+impl From<String> for SnapshotType {
+    fn from(value: String) -> Self {
+        match value.as_str() {
+            "" => Self::Unspecified,
+            "message" => Self::Message,
+            "tool_call" => Self::ToolCall,
+            "tool_output" => Self::ToolOutput,
+            "handoff_call" => Self::HandoffCall,
+            "handoff_output" => Self::HandoffOutput,
+            "reasoning" => Self::Reasoning,
+            "tool_approval" => Self::ToolApproval,
+            "compaction" => Self::Compaction,
+            "unknown" => Self::Unknown,
+            _ => Self::Other(value),
+        }
+    }
+}
+impl From<SnapshotType> for String {
+    fn from(value: SnapshotType) -> Self {
+        match value {
+            SnapshotType::Unspecified => "".into(),
+            SnapshotType::Message => "message".into(),
+            SnapshotType::ToolCall => "tool_call".into(),
+            SnapshotType::ToolOutput => "tool_output".into(),
+            SnapshotType::HandoffCall => "handoff_call".into(),
+            SnapshotType::HandoffOutput => "handoff_output".into(),
+            SnapshotType::Reasoning => "reasoning".into(),
+            SnapshotType::ToolApproval => "tool_approval".into(),
+            SnapshotType::Compaction => "compaction".into(),
+            SnapshotType::Unknown => "unknown".into(),
+            SnapshotType::Other(value) => value,
+        }
+    }
 }
 impl From<RunItemType> for SnapshotType {
     fn from(t: RunItemType) -> Self {
@@ -99,7 +419,7 @@ impl From<RunItemType> for SnapshotType {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct MessageOutput {
     #[serde(rename = "text", deserialize_with = "null_default")]
@@ -118,7 +438,7 @@ pub struct MessageOutput {
     pub images: Vec<ImageAttachment>,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ImageAttachment {
     #[serde(rename = "media_type", deserialize_with = "null_default")]
@@ -133,7 +453,7 @@ pub struct ImageAttachment {
     pub detail: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolCallData {
     #[serde(rename = "id", deserialize_with = "null_default")]
@@ -144,7 +464,7 @@ pub struct ToolCallData {
     pub input: RawJson,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolOutputData {
     #[serde(
@@ -165,7 +485,7 @@ pub struct ToolOutputData {
     pub is_error: bool,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct HandoffCallData {
     #[serde(rename = "from_agent", deserialize_with = "null_default")]
@@ -174,7 +494,7 @@ pub struct HandoffCallData {
     pub to_agent: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct HandoffOutputData {
     #[serde(rename = "from_agent", deserialize_with = "null_default")]
@@ -183,7 +503,7 @@ pub struct HandoffOutputData {
     pub to_agent: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ReasoningData {
     #[serde(
@@ -218,7 +538,7 @@ pub struct ReasoningData {
     pub encrypted_content: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct CompactionData {
     #[serde(
@@ -247,7 +567,7 @@ pub struct CompactionData {
     pub created_by: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolApprovalData {
     #[serde(rename = "tool_name", deserialize_with = "null_default")]
@@ -260,27 +580,37 @@ pub struct ToolApprovalData {
     pub approved: bool,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct Usage {
-    #[serde(rename = "requests", deserialize_with = "null_default")]
+    #[serde(rename = "requests")]
     pub requests: i64,
-    #[serde(rename = "input_tokens", deserialize_with = "null_default")]
+    #[serde(rename = "input_tokens")]
     pub input_tokens: i64,
-    #[serde(rename = "output_tokens", deserialize_with = "null_default")]
+    #[serde(rename = "output_tokens")]
     pub output_tokens: i64,
-    #[serde(
-        rename = "cache_read_tokens",
-        deserialize_with = "null_default",
-        skip_serializing_if = "is_zero"
-    )]
+    #[serde(rename = "cache_read_tokens", skip_serializing_if = "is_zero")]
     pub cache_read_tokens: i64,
-    #[serde(
-        rename = "cache_create_tokens",
-        deserialize_with = "null_default",
-        skip_serializing_if = "is_zero"
-    )]
+    #[serde(rename = "cache_create_tokens", skip_serializing_if = "is_zero")]
     pub cache_create_tokens: i64,
+}
+
+impl Usage {
+    /// Input plus output tokens, with the SDK's signed wrapping arithmetic.
+    pub fn total_tokens(&self) -> i64 {
+        self.input_tokens.wrapping_add(self.output_tokens)
+    }
+
+    /// Merge all five counters using the SDK's 64-bit signed arithmetic.
+    pub fn add(&mut self, other: &Self) {
+        self.requests = self.requests.wrapping_add(other.requests);
+        self.input_tokens = self.input_tokens.wrapping_add(other.input_tokens);
+        self.output_tokens = self.output_tokens.wrapping_add(other.output_tokens);
+        self.cache_read_tokens = self.cache_read_tokens.wrapping_add(other.cache_read_tokens);
+        self.cache_create_tokens = self
+            .cache_create_tokens
+            .wrapping_add(other.cache_create_tokens);
+    }
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
@@ -288,7 +618,7 @@ pub struct Usage {
 pub struct ResponseSnapshot {
     #[serde(
         rename = "items",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub items: Vec<RunItemSnapshot>,
@@ -298,31 +628,31 @@ pub struct ResponseSnapshot {
     pub end_turn: Option<bool>,
     #[serde(
         rename = "texts",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub texts: Vec<String>,
     #[serde(
         rename = "reasoning",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub reasoning: Vec<ReasoningSnapshot>,
     #[serde(
         rename = "reasoning_texts",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub reasoning_texts: Vec<String>,
     #[serde(
         rename = "thinking_texts",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub thinking_texts: Vec<String>,
     #[serde(
         rename = "tool_calls",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub tool_calls: Vec<ToolCallSnapshot>,
@@ -363,7 +693,7 @@ pub struct RunItemSnapshot {
     pub message_phase: String,
     #[serde(
         rename = "message_images",
-        deserialize_with = "null_default",
+        deserialize_with = "null_default_elements",
         skip_serializing_if = "Vec::is_empty"
     )]
     pub message_images: Vec<ImageAttachment>,
@@ -1051,4 +1381,36 @@ pub struct ChildToolEvent {
     pub is_error: bool,
     #[serde(rename = "DurationMS")]
     pub duration_ms: i64,
+}
+
+/// Owned SDK subagent progress projection, not a native runtime observation.
+#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[serde(default, rename_all = "PascalCase")]
+pub struct SubagentStreamEvent {
+    #[serde(rename = "TaskID")]
+    pub task_id: String,
+    pub agent_name: String,
+    pub status: String,
+    pub message: String,
+    #[serde(rename = "ToolUseID")]
+    pub tool_use_id: String,
+    #[serde(rename = "ParentCallID")]
+    pub parent_call_id: String,
+    pub depends_on: Option<Vec<String>>,
+    pub waiting_on: Option<Vec<String>>,
+    pub current_step: String,
+    pub last_tool: String,
+    pub files_written: i64,
+    pub messages_received: i64,
+    pub last_parent_message: String,
+    pub tool_count: i32,
+    pub tokens: i64,
+    #[serde(rename = "DurationMS")]
+    pub duration_ms: i64,
+    #[serde(rename = "CostUSD", serialize_with = "serialize_go_float")]
+    pub cost_usd: f64,
+    pub cost_known: bool,
+    pub num_turns: i32,
+    pub stop_reason: String,
+    pub result_text: String,
 }

@@ -10,17 +10,23 @@ publish.workspace = true
 runtime = ["dep:adk-runtime"]
 
 [dependencies]
+adk-codec.workspace = true
 adk-core.workspace = true
 adk-runtime = { workspace = true, optional = true }
 serde.workspace = true
-serde_json.workspace = true
+serde_json = { workspace = true, features = ["raw_value"] }
 tokio.workspace = true
 thiserror.workspace = true
 reqwest = { version = "=0.12.28", default-features = false, features = ["rustls-tls", "json", "stream"] }
 sha2 = "0.10"
+unicode-general-category = "=0.6.0"
 httpdate = "1"
+percent-encoding = "=2.3.2"
 base64 = "=0.22.1"
 time = { version = "=0.3.47", features = ["parsing", "formatting"] }
 
 [dev-dependencies]
+http = "1"
+futures-util = { version = "0.3", default-features = false, features = ["std"] }
+tokio = { workspace = true, features = ["test-util"] }
 adk-runtime.workspace = true

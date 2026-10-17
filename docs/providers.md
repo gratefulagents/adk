@@ -13,6 +13,12 @@ traits, typed history and pull-owned async streams remain independent of HTTP
 clients and secret storage. See the compiled example in `adk_providers` and the
 [client research](migration/provider-research.md).
 
+Hosts requiring Chat Completions only can call
+`adk_providers::factory::validate_chat_completions_model` before selecting a model.
+It uses `supports_chat_completions` and returns an actionable `InvalidInput` error
+for Codex-family names. Unlike the Go diagnostic, it does not echo caller-supplied
+model text. This is explicit host validation, not automatic request-path rejection.
+
 ## Baseline capability and evidence map
 
 Reference: SDK `1dc92b73900fac74dc357a938e4b5eee6392b418`,
@@ -55,8 +61,14 @@ max→xhigh→high and none→minimal→low ladders. Anthropic heals at most onc
 request and remembers shape/effort caps per provider/model instance. Foreign
 compaction retains its context summary but cannot replay an incompatible
 encrypted blob. Unknown opaque reasoning fails closed. `NativeCompactor` and
-`BaselineCosts` are opt-in runner adapters; unknown cost remains `None` in routing
-and becomes zero only at the runner's documented numeric estimator boundary.
+`BaselineCosts` are opt-in runner adapters. Unknown prices remain `None` through
+`CostEstimator::estimate_cost` into generation traces (`cost_known: false`), while
+numeric accounting still charges zero. A known free price remains `Some(0.0)`.
+Existing numeric-only estimators default to a known estimate and are evaluated
+once per response. Retained completions from failed streams preserve the same
+distinction and exact per-response amount, rather than subtracting cumulative
+floating-point totals. Provider-specific fallback prices still apply: an unknown
+Anthropic model can have a known default price; an unknown OpenAI model does not.
 `NativeCompactor` takes the runner's `Routes` registry and resolves named routes
 and size aliases before sending a provider-local model ID. Register its shared
 `Arc<Provider>` with `Routes::register_kind` (or `register` for literal IDs).
@@ -72,6 +84,34 @@ scoped prompt-cache affinity, not a learned prompt-cache capability registry.
 Neither unused predicates nor a hypothetical registry are counted as missing
 baseline features.
 
+## Per-call completion reasoning
+
+`Model::complete_with_observers` accepts optional transport-activity and reasoning
+sinks. Native providers, Routes and Copilot deliver decoded reasoning chunks inline
+while consuming SSE for a completion call, retaining the same final response.
+Sinks must return quickly; callers must reconcile repeated chunks if they retry a
+call. Ordinary JSON responses do not synthesize live deltas. The existing fallback
+for SSE without its content-type buffers the body before decoding and is not live.
+Third-party models default to their activity-aware completion implementation when
+they do not implement reasoning observation. The runner uses native streaming
+where available and these callbacks for completion-only bindings when blocking
+reasoning is enabled. Callback lifetimes are bounded to the model call so borrowed
+generation state cannot escape into later attempts.
+
+## Per-call transport activity
+
+`Model::complete_with_activity` and `StreamingModel::stream_with_activity` accept
+an optional `ModelActivitySink` (`Arc<dyn Fn() + Send + Sync>`). Native providers
+notify once per nonempty response-body chunk, including discarded SSE heartbeat
+comments and body reads during bounded shape-repair handling. Routes and Copilot
+forward the same per-call sink. Callbacks run inline and must return quickly;
+notifications are not model events or proof that output was exposed to the host.
+The runner uses them to reset idle timeouts without extending cancellation or
+absolute deadlines. Existing model implementations inherit methods that delegate
+to their ordinary complete/stream calls; they must override the activity-aware
+method to report otherwise-hidden progress. No context-global callback or
+process-global observer is installed.
+
 ## Ownership/security contract
 
 The host supplies a `CredentialStore`, preserves secrets and revisions, and
@@ -79,6 +119,33 @@ shares one `Session` per actual credential scope. Multiple unrelated sessions
 for one rotating refresh token are **not** a distributed refresh lock. Storage
 implementations must enforce their own cross-process single-flight semantics.
 Store and refresh trait errors must be sanitized by the host.
+
+Endpoint construction trims surrounding Unicode whitespace before URL parsing,
+matching Go `strings.TrimSpace`; padding does not create a different credential
+or prompt-cache scope. Metadata discovery percent-decodes the path before trimming
+Unicode whitespace, removing inference suffixes and detecting `/v1`, then escapes
+it with Go path rules. Encoded non-UTF-8 bytes remain bytes rather than replacement
+characters. Scope and transport dot-segment canonicalization remain unchanged;
+this does not claim full raw URL parity.
+
+Canonical scopes retain explicit default and empty ports (`:443`, `:00443`, `:`)
+rather than merging them with an omitted port. Their credential and prompt-cache
+keys remain distinct, including after session reconstruction. This distinction is
+required by the SDK's raw-host backend predicates: an explicit port prevents
+ChatGPT/Copilot metadata special-casing and Codex client-version query decoration.
+The transport URL still uses reqwest's canonical representation; this is not a
+claim of byte-identical raw URL or HTTP Host-header formatting.
+
+For OpenAI OAuth, configure `Session::with_codex_client_version("0.999.0")`
+before wrapping the session in `Arc`, then share that session with the provider
+and metadata resolver. Values are trimmed; blank values use the pinned
+`metadata::DEFAULT_CODEX_CLIENT_VERSION` (`0.153.4`). The same immutable setting
+adds `client_version` to ChatGPT metadata, inference and compaction URLs,
+including retries; it is not an authentication header or credential-material
+field. Refresh/rotation does not replace it, and credential/prompt-cache scope
+does not change. API-key routes and unrelated hosts do not receive the query.
+Configured endpoint query strings remain rejected; this option does not relax
+endpoint validation or read process-global environment variables.
 
 Copilot uses the pinned factory's fallback heuristic (Claude → Messages,
 GPT-5/Codex → Responses, others → Chat), not an implicit `/models` network lookup.
@@ -152,3 +219,126 @@ image requests and routing fallback. Record provider/model/API mode, test timest
 status and normalized usage only; never record authorization, refresh bodies,
 account identifiers, raw prompts or unredacted server errors. Do not run this matrix
 in ordinary CI or silently substitute API keys for an unavailable OAuth account.
+
+### Explicit image analysis
+
+`adk::providers::client::{Provider, ImageAnalysisRequest}` exposes an explicit
+image-analysis helper, separate from the `AnalyzeImage` tool (which only attaches
+loaded images to a conversation). Given an owned provider and request context:
+
+```rust,ignore
+let mut request = ImageAnalysisRequest::new(
+    "gpt-5.5", image_bytes, "image/png", "What is shown?",
+);
+request.detail = "low"; // Constructor defaults to high.
+let answer = provider.analyze_image(&context, request).await?;
+```
+
+The helper always posts to Responses, even if ordinary model calls use Chat. It
+shares the existing HTTP client and credential session; it performs no discovery,
+login, implicit credential lookup or detached work. Empty model uses the pinned
+chat default; supply a provider-local model, not a route-prefixed name. Defaults
+are 4096 output tokens, automatic truncation, no storage, in-memory prompt-cache
+retention and high detail. `low`, `original` and `auto` are recognized after
+case/whitespace normalization; other details use high. MIME parameters are
+removed; blank or malformed MIME labels fall back to `application/octet-stream`.
+Images are base64 data URLs. The helper returns trimmed, newline-joined nonblank
+text or a safe error. Anthropic-protocol instances reject this OpenAI-specific
+operation before dispatch.
+
+The 11 independently executed pinned public-helper cases in
+`fixtures/image-analysis/observations.json` compare exact request JSON, validation,
+text and no-output behavior against local HTTP servers. Native regressions also
+cover cancellation before dispatch and during an open stream, unsupported
+protocols, and redacted HTTP failures. As with other native providers, transient
+retry scheduling is host-owned rather than copying the Go client's retry loop;
+error strings are sanitized, not byte-identical. Codex mode retains the existing
+Responses rewriting/session machinery, but this helper's credentialed OAuth and
+live image understanding remain **unverified**.
+
+### Ordered diagnostic snapshots
+
+`ModelResponse::raw` still contains native provider data. The independent optional
+`snapshot_raw: Option<adk_core::JsonDocument>` carries an ordered, normalized raw
+response for compatibility trace snapshots. `JsonDocument::new` validates syntax
+without requiring a `Value` projection or rewriting member order, number spellings
+or duplicate keys. Lone surrogates and deeply nested raw payloads are representable;
+format-specific depth limits are enforced by codecs, not this text container. Its native
+serde representation is a string, so a checkpoint round-trip through
+`serde_json::Value` does not silently reorder it. The codec embeds its content as
+JSON when producing a compatibility snapshot; custom models may leave it `None`
+and retain the existing native-raw fallback (including explicit JSON null).
+Neither field authorizes disclosure: full trace capture is still opt-in.
+
+Chat and Responses tool arguments use Go syntax validity, including the 10,000
+container limit, rather than requiring a Serde `Value`. Valid raw arguments are
+retained for tool execution, follow-up requests and snapshots; empty or invalid
+JSON normalizes to `{}`. A valid raw payload that Serde cannot project has a
+`Null` argument projection, consistent with `ToolCall::validate_argument_projection`.
+Native opt-in schema validation still checks that projection. This does not change
+Anthropic argument handling or claim whole-provider Unicode/depth parity.
+
+Anthropic SSE usage follows the pinned SDK's distinct model paths. Completion
+retains initial input/cache counters and replaces output tokens on every message
+delta, including zero or omitted output. Streaming merges nonzero reported
+counters and retains prior counts when updates are zero/null/omitted. Native usage,
+context-token totals and compatibility snapshots agree for the selected path;
+ordinary JSON responses are not passed through these accumulators.
+
+Providers additionally set `snapshot_projection: Option<SnapshotProjection>` to
+explicitly identify the pinned OpenAI or Anthropic normalized-message format.
+When tagged, the compatibility codec derives items, usage and end-turn from that
+ordered document, not from native execution fields. This preserves the SDK's
+omitted end-turn, canonical compaction content and raw tool-argument spelling
+without discarding native information. Missing or malformed tagged documents
+produce a bridge error. Untagged custom documents retain the previous fallback;
+the codec never guesses a format from JSON shape. Both the tag and ordered JSON
+survive checkpoints, including `serde_json::Value` serialization.
+
+The pinned Go fixture executes real public providers against local HTTP servers.
+Two Chat completion and seven public streaming raw documents now have exact-byte
+Rust checks, including raw tool-argument order/numbers, SDK omission/default rules,
+SSE-only Type/stop-reason behavior, and Anthropic block-start versus delta content.
+The native response remains separate: for example, the SDK's streamed Responses
+raw document omits unclosed compaction blocks, without deleting native compaction
+items or the original provider payload. An id-less Anthropic start still counts
+as a start for duplicate/ordering validation; Responses tool-argument events may
+identify an existing item by their explicit output index.
+
+This is **not complete provider snapshot parity**. The fixture also records
+`GetResponse` separately from `StreamResponse`: both may use SSE internally but
+produce different documents. In particular, complete-method Anthropic SDK
+accumulation canonicalizes tool arguments and has a distinct compaction-content
+representation; standard Responses completion drains fields differently. All eight recorded complete-method profiles now have exact-byte checks through
+Rust's actual HTTP provider, in addition to the public streaming checks. Standard
+Anthropic/Responses complete calls consume SSE incrementally, while Copilot keeps
+its protocol-specific transport choice. Complete Anthropic arguments preserve Go's
+Float64 canonicalization (including negative zero), and its compatibility-only
+compaction union encoding does not replace the native summary. The eight complete
+and seven public-stream cases also compare full response snapshots, including
+items, aggregates, usage and end-turn, through serialization and completed-run
+checkpoint recovery. Unrepresented provider cases remain unverified; these
+fixtures do not close entire provider capabilities. The fixture's
+`streaming` flag describes transport; `method` identifies the public SDK call.
+
+## Incremental Anthropic response assembly
+
+`adk_providers::anthropic::StreamAssembler` is a separate, caller-owned partial
+response assembler for SDK/shim events. `add(&str)` accepts one UTF-8 JSON event;
+`response()` returns an owned SDK-shaped JSON snapshot without closing it. Only
+stopped blocks appear, in stop order. Duplicate stops and unknown events are
+ignored; starts replace an open builder at that index. Message starts are not
+required for partial blocks. This does not relax `client::StreamState` transport
+ordering, terminal validation or error handling.
+
+The input boundary uses Serde, not the Go JSON decoder. Syntax/type errors leave
+state unchanged. Invalid accumulated tool argument JSON is reported when encoding
+a response, not silently replaced. Raw valid tool argument spelling survives
+encoding. Snapshots do not borrow mutable assembler state.
+
+`fixtures/anthropic-assembler/observations.json` contains16 independent pinned-Go
+scenarios and117 snapshots, covering all block families, replacement/duplicate
+starts and stops, missing message starts, encrypted reasoning/compaction, raw
+arguments and signed/nonzero usage updates. Regenerate or verify via
+`python3 scripts/anthropic-assembler-reference/run.py [--check]`. These are bounded
+assembly semantics, not complete provider or JSON-decoder equivalence.

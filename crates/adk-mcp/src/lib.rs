@@ -4,6 +4,7 @@ pub mod config;
 pub mod connection;
 mod names;
 pub mod server;
+pub mod session;
 pub mod tools;
 pub mod transport;
 

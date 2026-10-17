@@ -2,6 +2,35 @@
 
 ## Current continuation evidence
 
+### Mode template and routing compatibility codecs
+
+Added compatibility-only `ModeTemplateSpec`, `ModeConstraints`, `ModeRouting`
+and `ModeRoleRouting`, covering the six template/runner Go data types through
+sealed Go byte entrypoints. The independent immutable-SDK oracle records 993
+cases: 578 accepted and 415 rejected. Successful cases compare unnormalized
+state and exact marshalled bytes; rejected cases compare rejection only.
+Coverage includes 64-bit integer boundaries/spelling, Unicode repair, nil/empty
+containers, map entry reset, repeated pointer objects and slice backing slots.
+
+The initial implementation failed the actual-Go pointer regression: shortening
+then re-expanding a fallback slice through repeated pointer objects lost the
+hidden `"tail"` element. Pointer decoding now retains the ordered object fields
+until finalization, validating each occurrence before a later null can reset it.
+All codec tests, including the 993-case comparator, pass. The 41 associated
+claims cover data declarations only, not constraint enforcement, model binding,
+routing resolution or full native conversion. See
+`scripts/mode-codec-reference/README.md` for reproduction and limits.
+
+Fresh Rust 1.88 Linux: **1,730 workspace tests and 10 doctests passed;
+0 failed, 30 ignored**. Strict lint/typecheck/rustdoc, formatting, the full
+feature matrix, standalone consumer and platform-purity checks passed.
+Independent Go reproduction, source-bound evidence, 54 ledger/audit validators,
+artifact checks and source locks passed. The first evidence run correctly
+rejected missing mode-test execution; the explicit test list was fixed and
+the complete evidence command rerun successfully. Ledger: **988 verified /
+7,903 unresolved /251 excluded**. Full issue acceptance remains incomplete.
+
+
 ### Standalone mode-routing bridge
 
 Added builder-gated `specialists::mode_routing_from_template_spec`, copying raw

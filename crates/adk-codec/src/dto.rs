@@ -2,6 +2,50 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeRoleRouting {
+    pub model: String,
+    pub fallback_models: Option<Vec<String>>,
+    pub reasoning_level: String,
+    pub text_verbosity: String,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeRouting {
+    pub default_model: String,
+    pub fallback_models: Option<Vec<String>>,
+    pub reasoning_level: String,
+    pub text_verbosity: String,
+    pub role_overrides: Option<std::collections::BTreeMap<String, ModeRoleRouting>>,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeConstraints {
+    pub max_turns: i64,
+    pub sub_agent_max_turns: i64,
+    pub max_concurrent_sub_agents: i64,
+    pub max_retries: i64,
+    pub max_runtime_minutes: i64,
+}
+
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct ModeTemplateSpec {
+    pub name: String,
+    pub version: String,
+    pub display_name: String,
+    pub description: String,
+    pub category: String,
+    pub autonomous: bool,
+    pub tool_access: String,
+    pub instructions: String,
+    pub model_routing: Option<ModeRouting>,
+    pub constraints: Option<ModeConstraints>,
+}
+
 /// Compatibility-only pinned Go role; `None` preserves a nil fallback slice.
 #[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
 #[serde(rename_all = "PascalCase")]

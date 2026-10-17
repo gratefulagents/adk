@@ -16922,6 +16922,908 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-A331522C97991BD3": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeModelRouting.DefaultModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::default_model",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting.DefaultModel, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FF45D736AC110AC4": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeModelRouting.FallbackModels",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::fallback_models",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting.FallbackModels, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D69E91B595C76460": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeModelRouting.ReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::reasoning_level",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting.ReasoningLevel, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8564E5E4D47457FF": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeModelRouting.RoleOverrides",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::role_overrides",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting.RoleOverrides, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4811906CF18A17BB": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeModelRouting.TextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::text_verbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting.TextVerbosity, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8122D84F3E1AE95C": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6F1DD0F4F43DFE89": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoleModelRouting.FallbackModels",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::fallback_models",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeRoleModelRouting.FallbackModels, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-65ACA69FFE45B46F": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoleModelRouting.Model",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::model",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeRoleModelRouting.Model, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FE89972DB727E5F2": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoleModelRouting.ReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::reasoning_level",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeRoleModelRouting.ReasoningLevel, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-17FF58826FC841AA": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoleModelRouting.TextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::text_verbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeRoleModelRouting.TextVerbosity, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3363CEA65C5B6847": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoleModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeRoleModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D8300A4623F61A0C": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A86A6290A21B0738": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeRoleModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModeRoleModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A510A9FA7D8DA392": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "Constraints.MaxConcurrentSubAgents",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeConstraints::max_concurrent_sub_agents",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration Constraints.MaxConcurrentSubAgents, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BA13C09228714D8A": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "Constraints.MaxRetries",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeConstraints::max_retries",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration Constraints.MaxRetries, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6A002FC05E5BF712": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "Constraints.MaxRuntimeMinutes",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeConstraints::max_runtime_minutes",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration Constraints.MaxRuntimeMinutes, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B511F9F08C9BE9EC": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "Constraints.MaxTurns",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeConstraints::max_turns",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration Constraints.MaxTurns, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9871E9385200898A": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "Constraints.SubAgentMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeConstraints::sub_agent_max_turns",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration Constraints.SubAgentMaxTurns, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-659B69239EEF5332": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "Constraints",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeConstraints",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration Constraints, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D17453FF85C87B6F": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "ModelRouting.DefaultModel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::default_model",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModelRouting.DefaultModel, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E063FA5D955EA3F7": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "ModelRouting.FallbackModels",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::fallback_models",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModelRouting.FallbackModels, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9964AD4E96C380B1": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "ModelRouting.ReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::reasoning_level",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModelRouting.ReasoningLevel, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EC124C207C151465": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "ModelRouting.RoleOverrides",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::role_overrides",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModelRouting.RoleOverrides, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A8E973537A896D96": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "ModelRouting.TextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting::text_verbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModelRouting.TextVerbosity, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8A66DDA44C6FB39F": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "ModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration ModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8970AD5D83EBD9F9": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "RoleModelRouting.FallbackModels",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::fallback_models",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration RoleModelRouting.FallbackModels, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0643BB3EDAA7ED23": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "RoleModelRouting.Model",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::model",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration RoleModelRouting.Model, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2686F26EC544761A": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "RoleModelRouting.ReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::reasoning_level",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration RoleModelRouting.ReasoningLevel, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BAE282CBDE6A9DBB": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "RoleModelRouting.TextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting::text_verbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration RoleModelRouting.TextVerbosity, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0A695ED9F6E7EFF9": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "RoleModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration RoleModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-00983352CD04B4A2": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Autonomous",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::autonomous",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Autonomous, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8BB98B89DEA5FC6E": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Category",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::category",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Category, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-CECD913DA6A85557": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Constraints",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::constraints",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Constraints, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6F29902276E80285": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Description",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::description",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Description, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B5D9E67ED6B1AFA8": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.DisplayName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::display_name",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.DisplayName, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1AAB706BDF4E70CC": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Instructions",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::instructions",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Instructions, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9C1890E1E11FF43D": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.ModelRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::model_routing",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.ModelRouting, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0879BA627386000D": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Name",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::name",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Name, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AB7C71061350D839": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.ToolAccess",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::tool_access",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.ToolAccess, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FFD54167252B4A72": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec.Version",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec::version",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec.Version, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-75031F24F64C33E2": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": "TemplateSpec",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility data declaration TemplateSpec, not execution or routing resolution. The independent pinned Go oracle observes all six template/runner types in 993 byte-input cases (578 accepted,415 rejected): every field, zero/null/missing/duplicate/casefold semantics, signed 64-bit integer bounds and spelling, nil versus empty slices/maps, map merge with fresh entry values, pointer merge/reset, retained slice backing slots across pointer objects, Unicode repair/escaping and ignored-value depth limits. Sealed byte entrypoints compare unnormalized successful decoded state and exact marshal bytes; rejected inputs compare rejection only. The original routing regression is a source anchor, not codec evidence. No identical error wording, partial mutation state on error, arbitrary invalid-UTF8 in-memory Go strings, ordinary Serde byte parity, native builder conversion, constraint enforcement, provider/model binding or runtime behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

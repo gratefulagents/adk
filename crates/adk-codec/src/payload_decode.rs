@@ -117,6 +117,10 @@ macro_rules! target {
     )*};
 }
 target!(
+    ModeRoleRouting,
+    ModeRouting,
+    ModeConstraints,
+    ModeTemplateSpec,
     RoleSpec,
     RoleCatalog,
     Cursor,
@@ -168,6 +172,41 @@ impl sealed::Sealed for ToolApprovalData {
 }
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
+
+go_object!(ModeRoleRouting,
+    "model" => model: scalar,
+    "reasoninglevel" => reasoning_level: scalar,
+    "textverbosity" => text_verbosity: scalar
+    preserve_nil { "fallbackmodels" => fallback_models }
+);
+go_object!(ModeRouting,
+    "defaultmodel" => default_model: scalar,
+    "reasoninglevel" => reasoning_level: scalar,
+    "textverbosity" => text_verbosity: scalar,
+    "roleoverrides" => role_overrides: map
+    preserve_nil { "fallbackmodels" => fallback_models }
+);
+go_object!(ModeConstraints,
+    "maxturns" => max_turns: integer,
+    "subagentmaxturns" => sub_agent_max_turns: integer,
+    "maxconcurrentsubagents" => max_concurrent_sub_agents: integer,
+    "maxretries" => max_retries: integer,
+    "maxruntimeminutes" => max_runtime_minutes: integer
+);
+go_object!(ModeTemplateSpec,
+    "name" => name: scalar,
+    "version" => version: scalar,
+    "displayname" => display_name: scalar,
+    "description" => description: scalar,
+    "category" => category: scalar,
+    "autonomous" => autonomous: scalar,
+    "toolaccess" => tool_access: scalar,
+    "instructions" => instructions: scalar,
+    pointers {
+        "modelrouting" => model_routing,
+        "constraints" => constraints
+    }
+);
 
 go_object!(RoleSpec,
     "name" => name: scalar,

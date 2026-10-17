@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Quoted host guardrail regex literals
+
+Reproduced rejection of a Go-valid quoted literal containing `(?u)`. Host rules
+now translate `\Q...\E` outside character classes, including quotes extending
+to the end of the pattern. Rust-only flags are checked only in unquoted group
+syntax; quoting does not enable them. Seven additional actual-Go ChatLoop cases
+cover metacharacters, Unicode, empty/unterminated quotes, following operators
+and nonmatches. All11 lexical-input scenarios agree on tool execution and
+tripwire disposition. Unsupported class escapes and Rust-only flags remain
+rejected; no whole RE2 equivalence or new ledger closure is claimed.
+
+Fresh Rust1.88 Linux: **1,656 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone consumer/
+purity,20 scenarios, host-session, Go harness tests/vet/build, twice-exact fixture
+regeneration, all bound evidence,51 validators, artifacts/overlay/audit and source
+locks passed. The host fixture has61 scenarios/62 runs. Ledger remains
+**878 verified /8,013 unresolved /251 excluded**; issue11 remains incomplete.
+
 ### SDK-shaped host progress callback
 
 Corrected RunStatusSink::publish_progress to accept progress::ProgressSnapshot,

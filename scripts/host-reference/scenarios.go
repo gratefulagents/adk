@@ -183,6 +183,13 @@ func scenarios() []scenario {
 		{`{"value":"secret","value":"public"}`, `secret`},
 		{`{"value":"\u0073ecret"}`, `\\u0073ecret`},
 		{`{"value":"\u0073ecret"}`, `secret`},
+		{`{"value":"a.b[0](?u)"}`, `\Qa.b[0](?u)\E`},
+		{`{"value":"axb0"}`, `\Qa.b[0]\E`},
+		{`{"value":"secret"}`, `\Qsecret`},
+		{`{"value":"secret"}`, `\Q\Esecret`},
+		{`{"value":"a.b42"}`, `\Qa.b\E\d+`},
+		{`{"value":"a.b"}`, `\Qa.b\E$`},
+		{`{"value":"界.*"}`, `\Q界.*\E`},
 	} {
 		s = baseline(fmt.Sprintf("raw-input-rule-%d", index))
 		s.RawInput = input.raw

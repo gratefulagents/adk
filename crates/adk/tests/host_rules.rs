@@ -29,6 +29,8 @@ async fn literal_shell_operators_are_not_character_class_set_syntax() {
         ("~~backup", "~~backup"),
         (r"[\&\&]", "&"),
         (r"\[a--b\]", "[a--b]"),
+        (r"\Q[a&&b](?u)\E", "[a&&b](?u)"),
+        (r"\Q(?x)\E", "(?x)"),
     ] {
         let compiled = compile_guardrail_rules(&[rule(pattern)]).unwrap();
         let call = ToolCall {
@@ -43,6 +45,20 @@ async fn literal_shell_operators_are_not_character_class_set_syntax() {
             .unwrap()
             .unwrap();
         assert!(result.tripwire_triggered, "{pattern}");
+    }
+}
+
+#[test]
+fn quoting_does_not_enable_rust_only_flags_or_class_escapes() {
+    for pattern in [r"\Qa\E(?u)b", r"(?x)\Qabc\E", r"(?R)a", r"(?-u)a"] {
+        let error = compile_guardrail_rules(&[rule(pattern)]).err().unwrap();
+        assert_eq!(error.info.category, ErrorCategory::Unsupported, "{pattern}");
+    }
+    for pattern in [r"[\Qa\E]", r"\\Qa\E", r"\E"] {
+        assert!(
+            compile_guardrail_rules(&[rule(pattern)]).is_err(),
+            "{pattern}"
+        );
     }
 }
 

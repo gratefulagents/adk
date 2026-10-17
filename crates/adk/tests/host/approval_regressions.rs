@@ -327,7 +327,7 @@ async fn input_rules_match_original_argument_text_in_pinned_host_runs() {
                 .starts_with("raw-input-rule-")
         })
         .collect();
-    assert_eq!(cases.len(), 4);
+    assert_eq!(cases.len(), 11);
     for case in cases {
         let fixture = Arc::new(Fixture::default());
         let executed = Arc::new(Mutex::new(vec![]));

@@ -863,7 +863,7 @@ async fn dynamic_rules_match_go_actions_and_multi_star_globs() {
         );
     }
     let result = compile_guardrail_rules(&[GuardrailRule {
-        regex: r"\Qquoted\E".into(),
+        regex: r"\C".into(),
         rule_type: "tool-input".into(),
         ..Default::default()
     }]);

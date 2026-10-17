@@ -19,22 +19,13 @@ pub struct CompiledGuardrails {
 }
 /// Input rules match original UTF-8 argument text when available.
 /// Compile before any model execution. This is the shared Go/Rust regex subset,
-/// not a claim that Rust's regex parser implements RE2. Go-only escapes (e.g.
-/// `\Q...\E`, `\C`) fail explicitly. Perl classes/boundaries inside character
+/// not a claim that Rust's regex parser implements RE2. Quoted `\Q...\E`
+/// literals are translated outside classes. Perl classes/boundaries inside character
 /// classes are rejected; outside classes their ASCII Go semantics are preserved.
 pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardrails, Error> {
     let mut compiled = CompiledGuardrails::default();
-    let rust_only_flags = Regex::new(r"\(\?[a-zA-Z-]*[xuR]").expect("static regex");
+    let rust_only_flags = Regex::new(r"^\(\?[a-zA-Z-]*[xuR]").expect("static regex");
     for rule in rules {
-        if rust_only_flags.is_match(&rule.regex) {
-            return Err(Error::new(
-                ErrorCategory::Unsupported,
-                format!(
-                    "guardrail {:?}: Rust-only regex flags are not Go compatible",
-                    rule.name
-                ),
-            ));
-        }
         let mut pattern = String::new();
         let mut chars = rule.regex.chars().peekable();
         let mut in_class = false;
@@ -50,6 +41,18 @@ pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardr
                     pattern.push(c);
                     break;
                 };
+                if escaped == 'Q' && !in_class {
+                    let mut literal = String::new();
+                    while let Some(quoted) = chars.next() {
+                        if quoted == '\\' && chars.peek() == Some(&'E') {
+                            chars.next();
+                            break;
+                        }
+                        literal.push(quoted);
+                    }
+                    pattern.push_str(&regex::escape(&literal));
+                    continue;
+                }
                 if "dDsSwWbB".contains(escaped) {
                     if in_class {
                         return Err(Error::new(
@@ -76,6 +79,24 @@ pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardr
                     pattern.push(escaped);
                 }
             } else {
+                if c == '('
+                    && !in_class
+                    && rust_only_flags.is_match(&format!(
+                        "({}",
+                        chars
+                            .clone()
+                            .take_while(|c| c.is_ascii_alphabetic() || matches!(c, '?' | '-'))
+                            .collect::<String>()
+                    ))
+                {
+                    return Err(Error::new(
+                        ErrorCategory::Unsupported,
+                        format!(
+                            "guardrail {:?}: Rust-only regex flags are not Go compatible",
+                            rule.name
+                        ),
+                    ));
+                }
                 if c == '[' {
                     if in_class {
                         return Err(Error::new(

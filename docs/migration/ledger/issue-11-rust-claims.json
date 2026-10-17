@@ -15363,6 +15363,38 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-8086935E118994EF": {
+      "source": "internal/anthropic/audit_fixes_test.go",
+      "source_name": "TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "client::tests::anthropic_partial_usage_matches_original_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem",
+      "rationale": "Only this original partial-state regression is closed. The native accumulator receives the same message_start and message_delta sequence and checks input1200/cache-read800/cache-creation50/output42 without inventing terminal or content events. Additional actual Go/native HTTP cases verify zero/null/nonzero counter updates through both model APIs. No whole assembler, source-file, signed-count or lifecycle permissiveness claim is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-7074AF7725902174": {
+      "source": "internal/anthropic/audit_fixes_test.go",
+      "source_name": "TestStreamAssemblerPreservesEndTurnFalse",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState"
+      ],
+      "rust_test_identifiers": [
+        "client::tests::anthropic_partial_end_turn_matches_original_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerPreservesEndTurnFalse",
+      "rationale": "Only this original partial-state regression is closed: a single message_delta with explicit false end_turn retains present false rather than absent or true. The native accumulator is inspected before any artificial message-start/terminal event, matching the original assertion scope. This does not claim terminal-response acceptance, the full Response method, source-file or package equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

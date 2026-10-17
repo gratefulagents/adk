@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Two original Anthropic partial-state regressions
+
+Literal native counterparts now verify the original omitted-input/cache usage and
+explicit-false end-turn tests. They inspect partial accumulator state after the
+same event sequences, without introducing terminal/content events absent from the
+original tests. Only these two test IDs are closed, not the assembler API, whole
+source file, terminal-response acceptance or lifecycle permissiveness.
+
+Both native tests, strict provider lint/format, refreshed bound evidence,
+51 validators, artifact/overlay/audit and source-lock checks pass. Original pinned
+Go report: **920 passed /5 skipped across38 packages**. Ledger: **861 verified
+/8,030 unresolved /251 excluded**. No production code changed after the full
+1,634-test/10-doctest verification below.
+
 ### Anthropic usage accumulator parity
 
 Native Anthropic SSE usage no longer overwrites known input/cache counters with

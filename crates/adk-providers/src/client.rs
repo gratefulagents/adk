@@ -1464,6 +1464,28 @@ mod tests {
     use super::*;
     use crate::auth::{CredentialStore, Material, Refresh, Scope, Secret, cache_scope};
 
+    #[test]
+    fn anthropic_partial_usage_matches_original_regression() {
+        let mut state = StreamState::new(Protocol::Anthropic);
+        state.event(r#"{"type":"message_start","message":{"id":"msg_1","usage":{"input_tokens":1200,"cache_read_input_tokens":800,"cache_creation_input_tokens":50}}}"#).unwrap();
+        state.event(r#"{"type":"message_delta","delta":{"type":"message_delta","stop_reason":"end_turn"},"usage":{"output_tokens":42}}"#).unwrap();
+        let usage = wire::usage(&state.body["usage"], Protocol::Anthropic);
+        assert_eq!(usage.input_tokens, 1200);
+        assert_eq!(usage.cache_read_tokens, 800);
+        assert_eq!(usage.cache_creation_tokens, 50);
+        assert_eq!(usage.output_tokens, 42);
+    }
+
+    #[test]
+    fn anthropic_partial_end_turn_matches_original_regression() {
+        let mut state = StreamState::new(Protocol::Anthropic);
+        state.event(r#"{"type":"message_delta","delta":{"type":"message_delta","stop_reason":"end_turn","end_turn":false}}"#).unwrap();
+        assert_eq!(
+            state.body.get("end_turn").and_then(Value::as_bool),
+            Some(false)
+        );
+    }
+
     #[tokio::test]
     async fn body_read_activity_matches_original_sdk_test() {
         use std::sync::atomic::{AtomicUsize, Ordering};

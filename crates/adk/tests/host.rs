@@ -25,6 +25,7 @@ struct Fixture {
     fail_final: Mutex<bool>,
     fail_gate: Mutex<Option<usize>>,
     gate_count: Mutex<usize>,
+    gate_requests: Mutex<Vec<ToolApprovalRequest>>,
     handoff: Mutex<RunBatch>,
     rules: Mutex<Vec<GuardrailRule>>,
     pause: bool,
@@ -559,6 +560,7 @@ impl ApprovalGate for Fixture {
         request: ToolApprovalRequest,
     ) -> BoxFuture<'a, Result<adk::runtime::compat::GoApprovalDecision, Error>> {
         assert_eq!(request.reason, "tool approval required");
+        self.gate_requests.lock().unwrap().push(request);
         self.event("gate");
         Box::pin(async {
             let mut count = self.gate_count.lock().unwrap();
@@ -615,6 +617,65 @@ fn approval_options(fixture: &Arc<Fixture>) -> ChatLoopOptions {
     )));
     options
 }
+#[tokio::test]
+async fn host_approval_preserves_original_argument_text() {
+    let oracle: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/host-loop/sdk-chatloop.json"
+    ))
+    .unwrap();
+    let source = oracle["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| case["name"] == "batch-approved-before-model-resume")
+        .unwrap()["runs"][0]["calls"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|call| call["op"] == "gate.approve")
+        .unwrap()["args"]
+        .clone();
+    for raw in [
+        Some(source["input"].as_str().unwrap()),
+        Some(r#"{ "n": 1e0, "n": 2.0, "text": "\u0061" }"#),
+        None,
+    ] {
+        let fixture = Arc::new(Fixture::default());
+        let options = approval_options(&fixture);
+        let input = raw.map_or_else(
+            || json!({"native": true}),
+            |raw| serde_json::from_str(raw).unwrap(),
+        );
+        let expected = raw.map_or_else(|| input.to_string(), str::to_owned);
+        let call = ToolCall {
+            id: "c1".into(),
+            name: "write".into(),
+            arguments: input.clone(),
+            raw_arguments: raw.map(str::to_owned),
+        };
+        *fixture.responses.lock().unwrap() =
+            VecDeque::from([Ok(response(vec![RunItem::ToolCall { call }], false))]);
+        let result = ChatLoop::new(options).run(context()).await.unwrap();
+        let mut requests = fixture.gate_requests.lock().unwrap();
+        assert_eq!(requests.len(), 1);
+        assert_eq!(requests[0].tool_name, source["name"].as_str().unwrap());
+        assert_eq!(requests[0].reason, source["reason"].as_str().unwrap());
+        assert_eq!(requests[0].input, input);
+        assert_eq!(requests[0].input_json, expected);
+        requests[0].input_json.clear();
+        let retained = result
+            .result
+            .history
+            .iter()
+            .find_map(|item| match item {
+                RunItem::ToolCall { call } => Some(call),
+                _ => None,
+            })
+            .unwrap();
+        assert_eq!(retained.argument_text(), expected);
+    }
+}
+
 #[tokio::test]
 async fn approval_batch_is_committed_before_next_model_and_rebases_markers() {
     let fixture = Arc::new(Fixture::default());

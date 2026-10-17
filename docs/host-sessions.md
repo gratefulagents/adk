@@ -98,6 +98,13 @@ failure. The default maximum is 12 approval resumes, checked after persisting
 the interrupted runner batch. An approved tool's pause resolves the entire
 pending approval batch without making another model call.
 
+Approval gates receive both the parsed `ToolApprovalRequest::input` and owned
+`input_json` text. The latter preserves the original UTF-8 tool arguments,
+including whitespace, duplicate keys, escapes and numeric spelling; native
+value-only calls use their JSON encoding. Modifying the gate's copy cannot alter
+retained call history. Arbitrary non-UTF-8 Go byte slices are not a native tool
+argument representation.
+
 Without a gate, the loop synthesizes denied approval/error-output pairs,
 persists them and finalizes without executing tools. The result retains the
 source SDK's interrupted state and prior final history; no executable

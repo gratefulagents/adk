@@ -194,6 +194,8 @@ pub trait PlatformToolFactory: Send + Sync {
 pub struct ToolApprovalRequest {
     pub tool_name: String,
     pub input: serde_json::Value,
+    /// Exact UTF-8 input text, including empty input; native values use JSON encoding.
+    pub input_json: String,
     pub reason: String,
 }
 pub trait ApprovalGate: Send + Sync {
@@ -681,6 +683,7 @@ impl GoApprovalGate for Gate {
             ToolApprovalRequest {
                 tool_name: request.call.name.clone(),
                 input: request.call.arguments.clone(),
+                input_json: request.call.argument_text().into_owned(),
                 reason: "tool approval required".into(),
             },
         )

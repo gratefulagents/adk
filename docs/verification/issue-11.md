@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Host approval gates retain original argument text
+
+`ToolApprovalRequest` now exposes owned `input_json` alongside the parsed
+`input`. The adapter copies `ToolCall::argument_text()` instead of making hosts
+reconstruct text from a JSON value. A real ChatLoop approval test compares the
+pinned Go gate's whitespace-preserving input, duplicate-key/numeric/escape text,
+and native value-only fallback. Mutating the gate's owned copy leaves retained
+history unchanged. This is a UTF-8 native capability, not a claim that arbitrary
+Go byte slices are represented; no additional ledger IDs are closed.
+
+Fresh Rust1.88 Linux: **1,640 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone
+consumer/purity,20 offline scenarios, host-session, bound evidence and all51
+validators, artifacts/overlay/audit and immutable source locks passed. Ledger
+remains **863 verified /8,028 unresolved /251 excluded**. Issue11 is incomplete.
+
 ### Host permission normalization uses simple Unicode lowercase
 
 Reproduced the native host parser rejecting `worKspace-write` while the pinned

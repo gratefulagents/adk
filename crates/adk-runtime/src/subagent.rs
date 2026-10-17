@@ -1706,6 +1706,9 @@ pub struct ChildControl {
     active_tools: Arc<AsyncMutex<Vec<(String, String, String)>>>,
 }
 impl ChildControl {
+    pub(crate) fn root_run_id(&self) -> &str {
+        &self.handle.inner.context.run_id
+    }
     pub fn task_id(&self) -> &str {
         &self.id
     }

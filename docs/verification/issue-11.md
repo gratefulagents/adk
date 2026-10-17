@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Child default cache namespace
+
+Reproduced a child request hashing its task-specific execution ID rather than the
+shared owner identity. Pinned `subagent_registry.go` supplies the parent trace to
+child RunConfig; the native child runner now uses the scheduler's root run ID
+when its configured namespace is absent or blank. Explicit overrides remain
+intact. No run-ID string parsing or public invocation-field change is involved.
+
+The expanded regression checks five namespace forms, two inherited key forms and
+two tasks (20 requests). A separate integration test compares the default child
+request directly with the independently executed Go root-trace fixture. Fresh
+Rust 1.88 Linux: **1,755 workspace +10 doctests passed; 0 failed, 30 ignored**;
+36 subagent integration tests, strict Clippy/typecheck/rustdoc/format, facade
+matrix and standalone consumer/purity passed. All bound references, 55 validators,
+artifact/overlay/audit and source locks passed. No additional ledger records are
+closed: **1,068 verified /7,823 unresolved /251 excluded**; full acceptance remains
+incomplete.
+
 ### Exported prompt-cache configuration inputs
 
 Mapped the two logical-key/namespace fields to native `RunnerConfig`, with an

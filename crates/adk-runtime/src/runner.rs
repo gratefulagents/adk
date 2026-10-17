@@ -4437,6 +4437,13 @@ impl Runner {
         config.progress = progress;
         config.force_final_summary_turn = true;
         config.prompt_cache_key = Some(invocation.task_id.clone());
+        if config
+            .prompt_cache_namespace
+            .as_deref()
+            .is_none_or(|namespace| namespace.trim().is_empty())
+        {
+            config.prompt_cache_namespace = Some(control.root_run_id().to_owned());
+        }
         struct ChildInstructions {
             provider: Arc<dyn InstructionProvider>,
             suffix: String,

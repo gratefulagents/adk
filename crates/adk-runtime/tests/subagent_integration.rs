@@ -179,45 +179,108 @@ fn parent(model: Arc<FakeModel>, session: Arc<SubagentSession>) -> Runner {
 #[tokio::test]
 async fn child_prompt_cache_key_uses_task_identity_not_parent_key() {
     use sha2::{Digest, Sha256};
-    for parent_key in [None, Some("parent-key-must-not-leak".to_owned())] {
-        let model = FakeModel::new(vec![answer("done"), answer("done")], Duration::ZERO);
-        let child = Runner::new(
-            AgentConfig::new("child", ModelBinding::complete("fake", model.clone())),
-            RunnerConfig {
-                prompt_cache_key: parent_key,
-                prompt_cache_namespace: Some("shared-run".into()),
-                ..Default::default()
-            },
-        )
-        .unwrap();
-        let (owner, _) = session_with_runner(child, None).await;
-        let handle = owner.handle();
-        let mut keys = Vec::new();
-        for task_id in ["task-stable-123", "task-stable-124"] {
-            let mut submission = Submission::new("worker", "go");
-            submission.id = task_id.into();
-            let id = handle.submit(submission).await.unwrap();
-            assert_eq!(id, task_id);
-            let tasks = tokio::time::timeout(
-                Duration::from_secs(2),
-                handle.wait(std::slice::from_ref(&id), WaitMode::All, None),
+    for (namespace, expected_namespace) in [
+        (None, "parent"),
+        (Some(""), "parent"),
+        (Some(" \t\u{0085}"), "parent"),
+        (Some("shared-run"), "shared-run"),
+        (Some(" \u{2003}shared-run\u{3000}"), "shared-run"),
+    ] {
+        for parent_key in [None, Some("parent-key-must-not-leak".to_owned())] {
+            let model = FakeModel::new(vec![answer("done"), answer("done")], Duration::ZERO);
+            let child = Runner::new(
+                AgentConfig::new("child", ModelBinding::complete("fake", model.clone())),
+                RunnerConfig {
+                    prompt_cache_key: parent_key,
+                    prompt_cache_namespace: namespace.map(str::to_owned),
+                    ..Default::default()
+                },
             )
-            .await
-            .unwrap()
             .unwrap();
-            assert_eq!(tasks[0].status, TaskStatus::Completed);
-            keys.push(format!("{:x}", Sha256::digest(format!("shared-run\0{id}"))));
-        }
-        {
-            let requests = model.requests.lock().unwrap();
-            assert_eq!(requests.len(), 2);
-            for (request, key) in requests.iter().zip(&keys) {
-                assert_eq!(request.settings["prompt_cache_key"], *key);
+            let (owner, _) = session_with_runner(child, None).await;
+            let handle = owner.handle();
+            let mut keys = Vec::new();
+            for task_id in ["task-stable-123", "task-stable-124"] {
+                let mut submission = Submission::new("worker", "go");
+                submission.id = task_id.into();
+                let id = handle.submit(submission).await.unwrap();
+                assert_eq!(id, task_id);
+                let tasks = tokio::time::timeout(
+                    Duration::from_secs(2),
+                    handle.wait(std::slice::from_ref(&id), WaitMode::All, None),
+                )
+                .await
+                .unwrap()
+                .unwrap();
+                assert_eq!(tasks[0].status, TaskStatus::Completed);
+                keys.push(format!(
+                    "{:x}",
+                    Sha256::digest(format!("{expected_namespace}\0{id}"))
+                ));
             }
-            assert_ne!(keys[0], keys[1]);
+            {
+                let requests = model.requests.lock().unwrap();
+                assert_eq!(requests.len(), 2);
+                for (request, key) in requests.iter().zip(&keys) {
+                    assert_eq!(request.settings["prompt_cache_key"], *key);
+                }
+                assert_ne!(keys[0], keys[1]);
+            }
+            owner.shutdown().await.unwrap();
         }
-        owner.shutdown().await.unwrap();
     }
+}
+
+#[tokio::test]
+async fn child_default_cache_namespace_matches_go_root_trace() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-prompt-cache.json"
+    ))
+    .unwrap();
+    let expected = fixture["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| {
+            case["trace_id"] == "run-1"
+                && case["logical"] == "task-stable-123"
+                && case["namespace"] == ""
+                && case["streaming"] == false
+        })
+        .unwrap();
+    let model = FakeModel::new(vec![answer("done")], Duration::ZERO);
+    let executor = RunnerChildExecutor::new(
+        [("worker".into(), runner("worker", model.clone()))]
+            .into_iter()
+            .collect(),
+        Arc::new(TestHost),
+    );
+    let owner = Scheduler::new(
+        Context {
+            run_id: "run-1".into(),
+            ..context()
+        },
+        SchedulerConfig {
+            agents: [("worker".into(), SecurityBaseline::default())]
+                .into_iter()
+                .collect(),
+            ..Default::default()
+        },
+        Arc::new(executor),
+        None,
+    )
+    .unwrap();
+    let handle = owner.handle();
+    let mut submission = Submission::new("worker", "go");
+    submission.id = "task-stable-123".into();
+    let id = handle.submit(submission).await.unwrap();
+    let tasks = handle.wait(&[id], WaitMode::All, None).await.unwrap();
+    assert_eq!(tasks[0].status, TaskStatus::Completed);
+    assert_eq!(
+        model.requests.lock().unwrap()[0].settings["prompt_cache_key"],
+        expected["keys"][0]
+    );
+    owner.shutdown().await.unwrap();
 }
 
 #[tokio::test]

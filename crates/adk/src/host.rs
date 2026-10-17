@@ -3,7 +3,7 @@
 //! Typed batches preserve approval journals and authorship across caller-supplied
 //! history, ordered persistence and explicit session ownership.
 use crate::builder::{ModeSpec, RoleSpec, SessionHandle, SessionState};
-use crate::observability::ProgressSnapshot;
+use crate::progress::ProgressSnapshot;
 use adk_codec::approval::{ApprovalMarker, ApprovalMarkerBoundary, ApprovalPhase};
 use adk_core::*;
 use adk_runtime::compat::{GoApprovalBoundary, GoApprovalDecision, GoApprovalGate};

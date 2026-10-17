@@ -15680,6 +15680,23 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-9DF76FE8D882507F": {
+      "source": "pkg/agentsdk/chatloop.go",
+      "source_name": "RunStatusSink.PublishProgress",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::RunStatusSink::publish_progress"
+      ],
+      "rust_test_identifiers": [
+        "progress_boundary::sdk_progress_snapshots_reach_host_sink_without_native_projection",
+        "order_matches_real_go_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewProgressTracker",
+      "rationale": "Closes the host callback parameter contract: SDK-compatible progress snapshots, not the distinct native observability counter projection.107 independently executed SDK tracker states retain all snapshot fields through a dyn RunStatusSink callback. Fixture clock placeholders are replaced with fixed valid timestamps only to exercise passthrough, not to claim clock timing. Existing loop-order tests preserve host-owned publication: no automatic progress or trace-ID callbacks are added. This does not close all status methods, the ProgressSnapshot JSON decoder/type or whole host implementation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

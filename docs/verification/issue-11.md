@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### SDK-shaped host progress callback
+
+Corrected RunStatusSink::publish_progress to accept progress::ProgressSnapshot,
+not the distinct native observability counters. A compile-time reproduction
+identified the incompatible callback parameter. All107 pinned-Go tracker states
+now retain every field through a dyn host sink, including model usage, signed
+tokens, cost and recent events. Fixture timestamps use a fixed valid instant
+for passthrough; no timing or general decoder equivalence is claimed. Publication
+remains host-owned, not automatically invoked by ChatLoop.
+
+Fresh Rust1.88 Linux: **1,655 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, external consumer/
+purity,20 offline scenarios, host-session, bound reference evidence,51 validators,
+artifacts/overlay/audit and immutable source locks passed. One callback contract
+closed: **878 verified /8,013 unresolved /251 excluded**. Issue11 is not complete.
+
 ### Original host guardrail regressions and safe failure context
 
 Reproduced two original regression failures: host rule compilation lacked its

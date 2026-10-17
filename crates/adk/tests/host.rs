@@ -1,5 +1,5 @@
 #![cfg(feature = "host")]
-use adk::{builder, host, observability};
+use adk::{builder, host, progress};
 use adk::{
     core::*,
     runtime::{AgentConfig, CancellationToken, ModelBinding, Observation, RunHooks},
@@ -16,6 +16,9 @@ type MessagePage = Result<(Vec<UserMessage>, Cursor), Error>;
 
 #[path = "host/approval_regressions.rs"]
 mod approval_regressions;
+
+#[path = "host/progress_boundary.rs"]
+mod progress_boundary;
 
 #[derive(Default)]
 struct Fixture {
@@ -234,7 +237,7 @@ impl RunStatusSink for Fixture {
     fn publish_progress<'a>(
         &'a self,
         _: &'a Context,
-        _: &'a observability::ProgressSnapshot,
+        _: &'a progress::ProgressSnapshot,
     ) -> BoxFuture<'a, Result<(), Error>> {
         panic!("not automatic")
     }

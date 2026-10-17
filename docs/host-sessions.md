@@ -24,6 +24,13 @@ Supply optional `SessionStore`, `ConfigSource`, `PlatformToolFactory`,
 hooks are composed rather than replaced. Tool-factory results replace the
 agent's tool list, so return any base tools you want to retain.
 
+`RunStatusSink::publish_progress` accepts the SDK-compatible
+`progress::ProgressSnapshot` (step, session, USD/token totals, per-model usage and
+events), not the distinct native `observability::ProgressSnapshot` counters.
+Hosts can pass `ProgressTracker::snapshot()` directly. Progress and trace-ID
+publication remain host-driven; ChatLoop does not invoke those two methods
+automatically. It publishes the final result at successful finalization.
+
 `ChatLoop::run` performs one invocation, not an infinite conversation loop.
 The default session is owned. `Session::Borrowed(handle)` binds an existing
 owner without closing it. Call `close().await` to drain an owned session;

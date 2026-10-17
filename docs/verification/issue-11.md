@@ -2,6 +2,28 @@
 
 ## Current continuation evidence
 
+### Direct completion reasoning observers
+
+Added `ModelReasoningSink` and optional `Model::complete_with_observers` for
+provider completions that consume SSE internally. Providers, Routes and Copilot
+forward nonempty reasoning chunks inline without changing the final response or
+synthesizing deltas from ordinary JSON. Existing third-party models delegate to
+the activity-aware path; runner reasoning continues to use native streaming.
+The pre-existing missing-content-type SSE fallback remains buffered, not live.
+
+Three HTTP regressions cover callback-before-completion handshakes, wrapper
+forwarding, all three protocols, empty-chunk filtering, both SSE decoding paths
+and no JSON replay. The pinned original `TestDrainStreamFeedsReasoningSink`
+passed; its Go process emitted a host telemetry-sidecar warning, not a test failure.
+Fresh Rust1.88: **1,623 passed /0 failed /30 ignored**, **9 doctests**; strict
+workspace Clippy/rustdoc/format, full facade matrix, standalone consumer/purity,
+all20 offline scenarios, host-session, bound evidence,51 validators, artifacts,
+audit and source locks passed. Preliminary runs were stopped for the empty-chunk
+correction and are not the reported final results. All46 remote CI checks passed
+on preceding53f35535; this change's remote CI is not yet claimed.
+Ledger remains **857 verified /8,034 unresolved /251 excluded**. No context-key,
+whole-package or full issue closure is inferred from this bounded implementation.
+
 ### Unicode endpoint padding preserves scope identity
 
 Provider scopes trim surrounding Unicode whitespace before URL parsing, matching

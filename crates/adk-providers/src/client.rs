@@ -6,8 +6,8 @@ use crate::{
     wire::{self, Protocol},
 };
 use adk_core::{
-    BoxFuture, Context, Error, ErrorCategory, Model, ModelActivitySink, ModelEvent, ModelRequest,
-    ModelResponse, ModelStream, StreamingModel,
+    BoxFuture, Context, Error, ErrorCategory, Model, ModelActivitySink, ModelEvent,
+    ModelReasoningSink, ModelRequest, ModelResponse, ModelStream, StreamingModel,
 };
 use base64::{Engine, engine::general_purpose::STANDARD};
 use reqwest::Client;
@@ -418,6 +418,15 @@ impl Model for Provider {
         request: ModelRequest,
         activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_observers(context, request, activity, None)
+    }
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+        reasoning: Option<ModelReasoningSink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             let mode = self.session.scope().mode;
             let streaming = match mode {
@@ -451,6 +460,12 @@ impl Model for Provider {
                     closed: false,
                 };
                 while let Some(event) = stream.read().await? {
+                    if let ModelEvent::ReasoningDelta { delta } = &event
+                        && !delta.is_empty()
+                        && let Some(sink) = &reasoning
+                    {
+                        sink(delta);
+                    }
                     if let ModelEvent::Complete { response } = event {
                         return Ok(response);
                     }
@@ -473,6 +488,12 @@ impl Model for Provider {
             let mut complete = None;
             for event in decoder.feed(&bytes)? {
                 for event in state.event(&event.data)? {
+                    if let ModelEvent::ReasoningDelta { delta } = &event
+                        && !delta.is_empty()
+                        && let Some(sink) = &reasoning
+                    {
+                        sink(delta);
+                    }
                     if let ModelEvent::Complete { response } = event {
                         complete = Some(response);
                     }

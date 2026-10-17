@@ -4,8 +4,8 @@ use crate::{
     factory::{Kind, RouteSpec},
 };
 use adk_core::{
-    BoxFuture, Context, Error, Model, ModelActivitySink, ModelRequest, ModelResponse, ModelStream,
-    StreamingModel,
+    BoxFuture, Context, Error, Model, ModelActivitySink, ModelReasoningSink, ModelRequest,
+    ModelResponse, ModelStream, StreamingModel,
 };
 use std::{collections::BTreeMap, sync::Arc};
 
@@ -152,15 +152,24 @@ impl Model for Routes {
     fn complete_with_activity<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_observers(context, request, activity, None)
+    }
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
         activity: Option<ModelActivitySink>,
+        reasoning: Option<ModelReasoningSink>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             context.check_active()?;
             let (route, name) = self.resolve(&request.model)?;
             request.model = name;
             route
-                .complete_with_activity(context, request, activity)
+                .complete_with_observers(context, request, activity, reasoning)
                 .await
         })
     }

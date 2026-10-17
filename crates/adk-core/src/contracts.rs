@@ -90,6 +90,10 @@ pub struct ModelInfo {
 /// Called inline; implementations must be thread-safe and return quickly.
 pub type ModelActivitySink = Arc<dyn Fn() + Send + Sync>;
 
+/// Incremental reasoning in transport order. Called inline; return quickly.
+/// A retried call can repeat chunks; the final response remains authoritative.
+pub type ModelReasoningSink = Arc<dyn Fn(&str) + Send + Sync>;
+
 /// Provider-neutral completion boundary. Streaming is a separate capability;
 /// implementations must not simulate it by silently buffering a complete call.
 pub trait Model: Send + Sync {
@@ -117,6 +121,18 @@ pub trait Model: Send + Sync {
         _activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         self.complete(context, request)
+    }
+
+    /// Observe transport activity and incremental reasoning during completion.
+    /// Models without live reasoning retain their activity-aware completion path.
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+        _reasoning: Option<ModelReasoningSink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, activity)
     }
 }
 

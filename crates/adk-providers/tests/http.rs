@@ -1,5 +1,7 @@
 #[path = "http/activity.rs"]
 mod activity;
+#[path = "http/reasoning.rs"]
+mod reasoning;
 
 use adk_core::{BoxFuture, Context, Error, Model, ModelEvent, ModelRequest, StreamingModel};
 use adk_providers::{auth::*, client::Provider, wire::Protocol};

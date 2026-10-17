@@ -2,8 +2,8 @@
 //! No environment flags or discovery requests are performed implicitly.
 use crate::{auth::Session, client::Provider, wire::Protocol};
 use adk_core::{
-    BoxFuture, Context, Error, Model, ModelActivitySink, ModelRequest, ModelResponse, ModelStream,
-    StreamingModel,
+    BoxFuture, Context, Error, Model, ModelActivitySink, ModelReasoningSink, ModelRequest,
+    ModelResponse, ModelStream, StreamingModel,
 };
 use std::sync::Arc;
 
@@ -136,12 +136,21 @@ impl Model for Copilot {
     fn complete_with_activity<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_observers(context, request, activity, None)
+    }
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
         activity: Option<ModelActivitySink>,
+        reasoning: Option<ModelReasoningSink>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         request.model = normalize(&request.model).to_owned();
         self.select(&request.model)
-            .complete_with_activity(context, request, activity)
+            .complete_with_observers(context, request, activity, reasoning)
     }
 }
 impl StreamingModel for Copilot {

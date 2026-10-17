@@ -84,6 +84,18 @@ scoped prompt-cache affinity, not a learned prompt-cache capability registry.
 Neither unused predicates nor a hypothetical registry are counted as missing
 baseline features.
 
+## Per-call completion reasoning
+
+`Model::complete_with_observers` accepts optional transport-activity and reasoning
+sinks. Native providers, Routes and Copilot deliver decoded reasoning chunks inline
+while consuming SSE for a completion call, retaining the same final response.
+Sinks must return quickly; callers must reconcile repeated chunks if they retry a
+call. Ordinary JSON responses do not synthesize live deltas. The existing fallback
+for SSE without its content-type buffers the body before decoding and is not live.
+Third-party models default to their activity-aware completion implementation when
+they do not implement reasoning observation. The runner continues to use its
+native streaming capability for blocking-reasoning progress.
+
 ## Per-call transport activity
 
 `Model::complete_with_activity` and `StreamingModel::stream_with_activity` accept

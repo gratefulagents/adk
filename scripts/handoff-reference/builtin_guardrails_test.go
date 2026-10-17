@@ -41,8 +41,8 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if !reflect.DeepEqual(fixture.InputGuardNames, []string{"block-destructive-commands", "detect-secret-leak"}) || !reflect.DeepEqual(fixture.OutputGuardNames, []string{"detect-secret-in-output"}) {
 		t.Fatal("builtin guard order changed")
 	}
-	if len(fixture.Cases) != 94 {
-		t.Fatalf("got %d cases, want 94", len(fixture.Cases))
+	if len(fixture.Cases) != 97 {
+		t.Fatalf("got %d cases, want 97", len(fixture.Cases))
 	}
 	seen := map[string]bool{}
 	for _, c := range fixture.Cases {

@@ -141,6 +141,9 @@ func builtinScenarios() []builtinCase {
 			cases = append(cases, builtinCase{Name: phase + "_" + kind, Phase: phase, ToolName: "read_file", Recipe: builtinRecipe{Version: 1, Kind: kind, Length: 36, Encoding: encoding}})
 		}
 	}
+	for _, kind := range []string{"github_token", "aws_pair", "pem_closed"} {
+		cases = append(cases, builtinCase{Name: "input_raw_" + kind, Phase: "input", ToolName: "read_file", Recipe: builtinRecipe{Version: 1, Kind: kind, Length: 36, Encoding: "raw"}})
+	}
 	cases = append(cases, builtinCase{Name: "input_gcp_escaped_json_text", Phase: "input", ToolName: "read_file", Recipe: builtinRecipe{Version: 1, Kind: "gcp_service_account", Length: 36, Encoding: "json_text"}})
 	return cases
 }

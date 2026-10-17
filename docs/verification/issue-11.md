@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Secret-input original-text guardrail fix
+
+The expanded actual-Go oracle reproduced a second raw-input bypass: opaque
+credential text with a null parsed projection did not trip native secret-input
+checks. The guard now scans original argument text before its existing stronger
+decoded-value inspection. Its durable identity advances to v2. Three new recipe
+cases cover raw GitHub/AWS/PEM inputs without storing credential-shaped values
+in the fixture:97 cases total,96 exact comparisons and one intentionally stronger
+native decoded-marker result. A real native runner regression verifies both raw
+secret input and malformed destructive input trip their respective guards before
+any tool execution, without leaking the secret into guardrail reports.
+
+Fresh Rust1.88 Linux: **1,695 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace/builder-only lint/typecheck, rustdoc/format, full feature matrix,
+external consumer/purity,20 scenarios, host-session, Go tests/vet/build and exact
+fixture checks, bound evidence,51 validators/artifacts/audit/locks passed. Initial
+integration-test field accesses were corrected to the native RunOutcome/Report
+shapes before passing verification. Ledger unchanged: **925/7,966/251**. Full
+issue11 acceptance remains incomplete.
+
 ### Destructive guardrail original-input parsing
 
 Reproduced a fail-open guardrail result for the original malformed shell-input

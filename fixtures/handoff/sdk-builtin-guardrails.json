@@ -2487,6 +2487,108 @@
       "final_content": null
     },
     {
+      "name": "input_raw_github_token",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "github_token",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential GitHub token detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "input_raw_aws_pair",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "aws_pair",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential AWS access key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "input_raw_pem_closed",
+      "phase": "input",
+      "tool_name": "read_file",
+      "recipe": {
+        "version": 1,
+        "kind": "pem_closed",
+        "length": 36,
+        "encoding": "raw"
+      },
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": "Potential private key detected in tool input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
       "name": "input_gcp_escaped_json_text",
       "phase": "input",
       "tool_name": "read_file",

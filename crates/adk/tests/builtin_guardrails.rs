@@ -105,10 +105,10 @@ async fn direct_input_names_typed_arguments_and_narrow_shell_policy() {
             format!(
                 "adk.builtin.{}.v{}",
                 guard.name(),
-                if guard.name() == "block-destructive-commands" {
-                    2
-                } else {
+                if guard.name() == "detect-secret-in-output" {
                     1
+                } else {
+                    2
                 }
             )
         );
@@ -823,6 +823,76 @@ async fn destructive_guardrail_checks_original_shell_argument_text() {
             result.is_some_and(|r| r.tripwire_triggered),
             blocked,
             "{input}"
+        );
+    }
+}
+
+#[tokio::test]
+async fn raw_argument_guardrails_trip_before_tool_execution() {
+    let secret = token();
+    for (name, raw, guard) in [
+        (
+            "reader",
+            format!("opaque prefix {secret} suffix"),
+            "detect-secret-leak",
+        ),
+        (
+            "Bash",
+            r#"{"command": "rm -rf /""#.into(),
+            "block-destructive-commands",
+        ),
+    ] {
+        let probe = Arc::new(Probe {
+            definition: ToolDefinition {
+                name: name.into(),
+                description: String::new(),
+                input_schema: schemars::json_schema!(true),
+                read_only: true,
+                requires_approval: false,
+            },
+            calls: AtomicUsize::new(0),
+            result: output("safe".into()),
+        });
+        let mut input = call(name, Value::Null);
+        input.raw_arguments = Some(raw);
+        let model = Arc::new(Script(Mutex::new(VecDeque::from([
+            response(vec![RunItem::ToolCall { call: input }]),
+            response(vec![]),
+        ]))));
+        let mut agent = AgentConfig::new("agent", ModelBinding::complete("offline", model));
+        agent.tools.push(probe.clone());
+        let runner = Runner::new(
+            agent,
+            RunnerConfig {
+                tool_input_guardrails: builtin_tool_input_guardrails(),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let result = runner
+            .run(
+                context(),
+                RunRequest {
+                    input: vec![],
+                    input_provenance: vec![],
+                    policy: RunPolicy::default(),
+                },
+                Arc::new(TestHost),
+            )
+            .await
+            .unwrap()
+            .result;
+        assert_eq!(probe.calls.load(Ordering::SeqCst), 0);
+        assert!(
+            result
+                .guardrails
+                .iter()
+                .any(|r| r.guardrail_name == guard && r.tripwire_triggered)
+        );
+        assert!(
+            !serde_json::to_string(&result.guardrails)
+                .unwrap()
+                .contains(&secret)
         );
     }
 }

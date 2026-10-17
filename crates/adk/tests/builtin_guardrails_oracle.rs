@@ -92,7 +92,7 @@ async fn builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_represen
     let mut matched = 0;
     let mut hardened = 0;
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 94);
+    assert_eq!(cases.len(), 97);
     for case in cases {
         let name = case["name"].as_str().unwrap();
         let source = recipe(case);
@@ -189,5 +189,5 @@ async fn builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_represen
         }
         matched += 1;
     }
-    assert_eq!((matched, hardened), (93, 1));
+    assert_eq!((matched, hardened), (96, 1));
 }

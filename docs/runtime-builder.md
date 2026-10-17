@@ -207,8 +207,8 @@ runtime's string replacement contract would otherwise discard non-text content.
 Scalar output keeps its error/pause flags. These are explicit native limits,
 not full SDK guardrail parity.
 
-The independent Go fixture has 94 cases. Rust compares guard order, tripwire and
-replacement decisions plus exact redacted output bytes for 93 cases, including
+The independent Go fixture has 97 cases. Rust compares guard order, tripwire and
+replacement decisions plus exact redacted output bytes for 96 cases, including
 original malformed raw arguments; one escaped credential-marker case deliberately
 receives stronger native protection. Go parser-error wording and guardrail prose are not claimed
 byte-identical. The offline `guardrails` feature example exercises the public

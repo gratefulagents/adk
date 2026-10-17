@@ -86,7 +86,7 @@ impl Guardrail for Builtin {
     fn durable_key(&self) -> Option<&str> {
         Some(match self {
             Self::Destructive => "adk.builtin.block-destructive-commands.v2",
-            Self::SecretInput => "adk.builtin.detect-secret-leak.v1",
+            Self::SecretInput => "adk.builtin.detect-secret-leak.v2",
             Self::SecretOutput => "adk.builtin.detect-secret-in-output.v1",
         })
     }
@@ -142,7 +142,7 @@ impl Guardrail for Builtin {
                             _ => Ok(()),
                         }
                     }
-                    check_secrets(&call.arguments.to_string())
+                    check_secrets(&call.argument_text())
                         .and_then(|_| scan(&call.arguments))
                         .err()
                         .map(|error| blocked(error.to_string()))

@@ -30,7 +30,11 @@ null leaves them unchanged and any wrong-typed field fails closed. Value-only
 calls retain their canonical fallback. Unknown fields are ignored subject to the
 native JSON depth limit; deeper input fails closed rather than claiming Go's
 entire parsing domain. The destructive guard's durable key is version 2, rejecting
-checkpoints bound to the earlier argument-projection behavior.
+checkpoints bound to the earlier argument-projection behavior. The builtin secret
+input guard also scans original argument text before its additional decoded-value
+inspection; malformed or opaque text cannot hide credentials behind a null
+projection. Its durable key is version 2 as well. Diagnostic reports do not carry
+the matched credential.
 
 Durable runs require a nonempty `Guardrail::durable_key` for deterministic checks.
 Ordered names/keys participate in the checkpoint policy fingerprint; changing

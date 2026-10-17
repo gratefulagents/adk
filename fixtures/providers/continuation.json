@@ -1156,6 +1156,71 @@
       }
     }
   ],
+  "output_schemas": [
+    {
+      "error": false,
+      "raw": "null",
+      "schema_json": "{\"type\":\"object\"}"
+    },
+    {
+      "error": false,
+      "raw": "{}",
+      "schema_json": "{}"
+    },
+    {
+      "error": true,
+      "raw": "\"schema\""
+    },
+    {
+      "error": true,
+      "raw": "7"
+    },
+    {
+      "error": true,
+      "raw": "[]"
+    },
+    {
+      "error": true,
+      "raw": "true"
+    },
+    {
+      "error": true,
+      "raw": "false"
+    },
+    {
+      "error": false,
+      "raw": "{\"type\":27}",
+      "schema_json": "{\"type\":27}"
+    },
+    {
+      "error": false,
+      "raw": "{\"x\":-0}",
+      "schema_json": "{\"x\":-0}"
+    },
+    {
+      "error": false,
+      "raw": "{\"x\":9007199254740993}",
+      "schema_json": "{\"x\":9007199254740992}"
+    },
+    {
+      "error": true,
+      "raw": "{\"x\":1e400}"
+    },
+    {
+      "error": true,
+      "raw": "{\"x\":1e400,\"x\":1}"
+    },
+    {
+      "error": false,
+      "raw": "{\"x\":\"\\ud800\"}",
+      "schema_json": "{\"x\":\"�\"}"
+    },
+    {
+      "error": false,
+      "raw": "{\"x\":1,\"x\":2}",
+      "schema_json": "{\"x\":2}"
+    }
+  ],
   "reasoning_details_json": [
     {
       "type": "reasoning.encrypted",

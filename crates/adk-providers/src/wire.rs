@@ -448,17 +448,36 @@ pub fn request(request: &ModelRequest, protocol: Protocol, stream: bool) -> Resu
         body["tools"] = tools.into();
     }
     if let Some(schema) = &request.output_schema {
-        let schema: Value = serde_json::from_str(schema.as_str()).map_err(|_| unsupported())?;
-        let format = json!({"type":"json_schema","name":request.output_schema_name,"strict":request.output_schema_strict,"schema":schema});
-        match protocol {
-            Protocol::Responses => body["text"] = json!({"format":format}),
+        let schema: Value = match protocol {
+            Protocol::Anthropic => {
+                serde_json::from_str(schema.as_str()).map_err(|_| unsupported())?
+            }
+            Protocol::Chat | Protocol::Responses => {
+                match adk_codec::value::decode(schema.as_str().as_bytes())
+                    .map_err(|_| crate::invalid("invalid output schema"))?
+                {
+                    Value::Null => json!({"type":"object"}),
+                    schema @ Value::Object(_) => schema,
+                    _ => return Err(crate::invalid("output schema must be an object")),
+                }
+            }
+        };
+        let format = match protocol {
+            Protocol::Responses => {
+                body["text"] = json!({"format":{"type":"json_schema","name":request.output_schema_name,"strict":request.output_schema_strict}});
+                &mut body["text"]["format"]
+            }
             Protocol::Chat => {
-                body["response_format"] = json!({"type":"json_schema","json_schema":{"name":request.output_schema_name,"strict":request.output_schema_strict,"schema":schema}})
+                body["response_format"] = json!({"type":"json_schema","json_schema":{"name":request.output_schema_name,"strict":request.output_schema_strict}});
+                &mut body["response_format"]["json_schema"]
             }
             Protocol::Anthropic => {
-                body["output_format"] = json!({"type":"json_schema","schema":schema})
+                body["output_format"] = json!({"type":"json_schema"});
+                &mut body["output_format"]
             }
-        }
+        };
+        // Serializing a Value through json! would canonicalize Go's negative zero.
+        format["schema"] = schema;
     }
     // Structural fields are not replaceable through an untyped settings escape hatch.
     for (key, value) in &request.settings {

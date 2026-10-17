@@ -1082,19 +1082,43 @@ fn anthropic_ignores_sdk_verbosity_without_losing_reasoning_budget() {
 }
 
 #[test]
-fn output_schema_documents_are_forwarded_without_shape_validation() {
+fn anthropic_output_schema_documents_are_forwarded_without_shape_validation() {
     for raw in ["null", "\"schema\"", "7", "[]", "true", "{\"type\":27}"] {
         let mut input = request();
         input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
         let expected: serde_json::Value = serde_json::from_str(raw).unwrap();
-        for protocol in [Protocol::Chat, Protocol::Responses, Protocol::Anthropic] {
-            let body = wire::request(&input, protocol, false).unwrap();
-            let format = match protocol {
-                Protocol::Chat => &body["response_format"]["json_schema"],
-                Protocol::Responses => &body["text"]["format"],
-                Protocol::Anthropic => &body["output_format"],
-            };
-            assert_eq!(format.get("schema"), Some(&expected));
+        let body = wire::request(&input, Protocol::Anthropic, false).unwrap();
+        assert_eq!(body["output_format"].get("schema"), Some(&expected));
+    }
+}
+
+#[test]
+fn openai_output_schema_map_matches_pinned_go() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["output_schemas"].as_array().unwrap();
+    assert_eq!(cases.len(), 14);
+    for case in cases {
+        let raw = case["raw"].as_str().unwrap();
+        let mut input = request();
+        input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
+        for protocol in [Protocol::Chat, Protocol::Responses] {
+            let result = wire::request(&input, protocol, false);
+            assert_eq!(result.is_err(), case["error"].as_bool().unwrap(), "{raw}");
+            if let Ok(body) = result {
+                let schema = match protocol {
+                    Protocol::Chat => &body["response_format"]["json_schema"]["schema"],
+                    Protocol::Responses => &body["text"]["format"]["schema"],
+                    Protocol::Anthropic => unreachable!(),
+                };
+                assert_eq!(
+                    schema.to_string(),
+                    case["schema_json"].as_str().unwrap(),
+                    "{raw}"
+                );
+            }
         }
     }
 }

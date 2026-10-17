@@ -2,6 +2,30 @@
 
 ## Current continuation evidence
 
+### Corrected provider-specific output-schema boundaries
+
+The earlier all-provider scalar-forwarding expectation was wrong. Core/runner
+`JsonDocument` acceptance remains correct, but pinned OpenAI `outputSchemaMap`
+requires an object, maps JSON null to `{"type":"object"}`, and decodes values with
+Go finite-float64 and replacement-string semantics. Chat and Responses now follow
+that boundary; Anthropic scalar/array/null forwarding is unchanged. No local JSON
+Schema compilation was added. Native127-container value depth and broader raw
+Anthropic fidelity remain unclaimed.
+
+Fourteen independent Go cases cover root shapes, null defaults, unknown schema
+keywords, overflow (including overwritten duplicates), integer rounding, negative
+zero, lone-surrogate replacement and duplicate keys. The native comparator first
+failed on null; an intermediate fix exposed `json!` losing negative zero. Direct
+Value insertion fixes that loss. Captured HTTP tests verify null normalization
+and negative-zero bytes for both OpenAI protocols. The first full run rejected an
+empty Responses test fixture; a valid nonempty fixture and the final rerun passed.
+
+Fresh Rust1.88: **1,626 passed /0 failed /30 ignored**, **9 doctests**; strict
+workspace Clippy/rustdoc/format, full facade matrix, standalone consumer/purity,
+all20 offline scenarios, host-session, bound Go/native evidence,51 validators,
+artifacts/audit and source locks passed. Ledger remains **858 verified /8,033
+unresolved /251 excluded**. No full schema-map, provider or issue closure is claimed.
+
 ### Reasoning callable type evidence
 
 The reasoning callback type alone is now verified, with retained capture, ordered

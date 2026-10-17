@@ -558,7 +558,8 @@ attribution because their historical agent names were not reliable.
 `Config::output_schema` accepts an `adk::core::JsonDocument`, for example
 `JsonDocument::new(r#"{"type":"object"}"#.into())?`. It preserves JSON text
 without requiring an object/boolean schema or compiling JSON Schema. Scalars,
-arrays and explicit JSON `null` are supported. `None` disables structured output;
+arrays and explicit JSON `null` are retained by the core/runner; provider-specific
+restrictions still apply. `None` disables structured output;
 `Some(JsonDocument::new("null".into())?)` still enables it. Native request Serde
 stores the document as a string, preserving that distinction and raw spelling
 through checkpoints; provider wire requests embed the JSON value instead.
@@ -572,9 +573,12 @@ Normal and streamed runs carry the schema/name/strict flag in `ModelRequest` and
 return parsed `RunResult::final_output`. The `structured_output` offline feature
 example demonstrates builder configuration, observational validation and explicit
 bundle closure. Output schemas are forwarded without local JSON Schema compilation,
-matching the SDK; providers may reject unsupported schemas. Tool schemas retain
-their existing typed validation. Tool-only construction does not inspect output
-schemas. `JsonDocument` requires valid JSON syntax; malformed raw schema bytes are
+matching the SDK. OpenAI Chat and Responses require object schemas and normalize
+JSON `null` to `{"type":"object"}`. Their object values use Go-compatible string
+replacement and finite-float64 number semantics; scalar/array roots and overflowing
+numbers are rejected locally. Anthropic retains scalar/array/null forwarding.
+Tool schemas retain their existing typed validation. Tool-only construction does
+not inspect output schemas. `JsonDocument` requires valid JSON syntax; malformed raw schema bytes are
 not accepted. Provider request shaping still projects schemas through `Value`,
 so arbitrary raw Unicode/depth and exact wire-token fidelity are not claimed.
 

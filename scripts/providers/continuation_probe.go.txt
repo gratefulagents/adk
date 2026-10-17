@@ -41,6 +41,22 @@ func TestADKContinuationGolden(t *testing.T) {
         "reasoning_details_json": details,
         "reasoning_details_signature": encodeOpenRouterReasoningDetails(details),
     }
+    var outputSchemas []map[string]any
+    for _, raw := range []string{`null`, `{}`, `"schema"`, `7`, `[]`, `true`, `false`, `{"type":27}`, `{"x":-0}`, `{"x":9007199254740993}`, `{"x":1e400}`, `{"x":1e400,"x":1}`, `{"x":"\ud800"}`, `{"x":1,"x":2}`} {
+        schema := &anthropic.OutputSchema{Name:"result", Schema:json.RawMessage(raw), Strict:true}
+        normalized, err := outputSchemaMap(schema)
+        _, chatErr := chatResponseFormat(schema)
+        _, responsesErr := responseFormatFromSchema(schema)
+        if (err != nil) != (chatErr != nil) || (err != nil) != (responsesErr != nil) { t.Fatal("schema acceptance differs between helpers") }
+        row := map[string]any{"raw":raw, "error":err != nil}
+        if err == nil {
+            encoded, marshalErr := json.Marshal(normalized)
+            if marshalErr != nil { t.Fatal(marshalErr) }
+            row["schema_json"] = string(encoded)
+        }
+        outputSchemas = append(outputSchemas, row)
+    }
+    golden["output_schemas"] = outputSchemas
     var normalizedArguments []map[string]string
     for _, raw := range []string{
         "", " \t\n", "\u0085{}\u00a0", ` {"q":1} `, `{"q":"\ud800"}`, `{"q":"\udc00"}`,

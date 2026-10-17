@@ -105,6 +105,44 @@ fn read_request(socket: &mut TcpStream) -> String {
     String::from_utf8(bytes).unwrap()
 }
 #[tokio::test]
+async fn openai_schema_normalization_reaches_the_http_body() {
+    for protocol in [Protocol::Chat, Protocol::Responses] {
+        for (raw, expected) in [
+            ("null", r#""schema":{"type":"object"}"#),
+            (r#"{"x":-0}"#, r#""schema":{"x":-0}"#),
+        ] {
+            let listener = TcpListener::bind("127.0.0.1:0").unwrap();
+            let endpoint = format!("http://{}/v1", listener.local_addr().unwrap());
+            let server = std::thread::spawn(move || {
+                let (mut socket, _) = listener.accept().unwrap();
+                let captured = read_request(&mut socket);
+                let response = match protocol {
+                    Protocol::Chat => {
+                        r#"{"choices":[{"message":{"content":"ok"},"finish_reason":"stop"}]}"#
+                    }
+                    Protocol::Responses => {
+                        r#"{"output":[{"type":"message","role":"assistant","content":[{"type":"output_text","text":"ok"}]}]}"#
+                    }
+                    Protocol::Anthropic => unreachable!(),
+                };
+                write!(socket, "HTTP/1.1 200 OK\r\nContent-Type: application/json\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{response}", response.len()).unwrap();
+                captured
+            });
+            let scope = Scope::new("fixture", &endpoint, None, AuthMode::ApiKey).unwrap();
+            let session =
+                Arc::new(Session::new(scope, Arc::new(StaticStore), Arc::new(NoRefresh)).unwrap());
+            let provider = Provider::new("fixture", protocol, session).unwrap();
+            let mut input = request();
+            input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
+            provider.complete(&context(), input).await.unwrap();
+            let captured = server.join().unwrap();
+            let body = captured.split_once("\r\n\r\n").unwrap().1;
+            assert!(body.contains(expected), "{body}");
+        }
+    }
+}
+
+#[tokio::test]
 async fn chat_completions_original_fallback_requests() {
     use adk_core::{Content, Message, Role, RunItem};
     use serde_json::json;

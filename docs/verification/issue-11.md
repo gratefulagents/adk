@@ -2,6 +2,28 @@
 
 ## Current continuation evidence
 
+### Destructive guardrail original-input parsing
+
+Reproduced a fail-open guardrail result for the original malformed shell-input
+regression: the raw argument text was ignored when its parsed Value was null.
+The builtin now checks original text (canonical fallback for value-only calls),
+with case-insensitive shell keys, ordered duplicate strings, null preservation
+and fail-closed wrong types. Its durable identity advances to v2. The independent
+Go oracle expands to94 cases:93 match disposition/output bytes and one retains
+intentional stronger native secret inspection. All11 previously excluded raw
+malformed cases are now compared; seven new parsing cases are independently run.
+Only the original malformed-input test record is newly closed; deep native JSON
+limits remain fail-closed, not claimed as unrestricted Go parsing equivalence.
+
+Fresh Rust1.88 Linux: **1,694 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace and builder-only lint/typecheck, rustdoc/format, full feature
+matrix/consumer/purity,20 offline examples, host-session, Go tests/vet/build,
+twice-exact fixture checks, bound evidence,51 validators/artifacts/audit/locks
+passed. The first matrix exposed a missing direct codec dependency under the
+builder-only feature; the feature now binds the already-transitive dependency
+and the final matrix passes. Ledger: **925 verified /7,966 unresolved /251
+excluded**. Full issue11 acceptance remains incomplete.
+
 ### Original builtin secret-output regressions
 
 Ported original GitHub/PEM/AWS/GCP and positive/negative corpus assertions through

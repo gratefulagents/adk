@@ -109,6 +109,13 @@ func builtinScenarios() []builtinCase {
 	}
 	for _, item := range []struct{ name, params string }{
 		{"cmd_only", `{"cmd":"rm -rf /"}`},
+		{"original_malformed", `{"command": "rm -rf /"`},
+		{"uppercase_command", `{"COMMAND":"rm -rf /"}`},
+		{"duplicate_null", `{"command":"rm -rf /","command":null}`},
+		{"duplicate_wrong_type", `{"command":7,"command":"git status"}`},
+		{"duplicate_last_string", `{"command":"rm -rf /","command":"git status"}`},
+		{"uppercase_cmd", `{"command":null,"CMD":"rm -rf /"}`},
+		{"mixedcase_command", `{"Command":"rm -rf /"}`},
 		{"command_wins_safe", `{"command":"printf hello","cmd":"rm -rf /"}`},
 		{"command_wins_blocked", `{"command":"rm -rf /","cmd":"printf hello"}`},
 		{"empty_command_fallback", `{"command":"","cmd":"rm -rf /"}`},

@@ -16492,6 +16492,23 @@
         "x86_64-unknown-linux-gnu",
         "builder"
       ]
+    },
+    "SDK-2D2CC117AF4C3E5D": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestDestructiveCommandGuardrail_MalformedJSONFailsClosed",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_input_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "destructive_guardrail_checks_original_shell_argument_text",
+        "builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_representable"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestDestructiveCommandGuardrail_MalformedJSONFailsClosed",
+      "rationale": "Reproduced the original malformed command object bypass through a null parsed projection, then switched the builtin to original argument text. The exact original input now trips, as do independently executed malformed Go fixture cases. Additional duplicate/null/type/case cases preserve the bounded Go string-field semantics. This closes only the original malformed-input regression, not unrestricted Go JSON parsing or whole builtin API parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
     }
   }
 }

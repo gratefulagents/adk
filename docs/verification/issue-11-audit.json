@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7967,
-    "verified": 924
+    "unresolved": 7966,
+    "verified": 925
   },
   "groups": [
     {
@@ -2319,8 +2319,8 @@
         "files:unresolved": 5,
         "files:verified": 1,
         "packages:unresolved": 1,
-        "tests:unresolved": 9,
-        "tests:verified": 8,
+        "tests:unresolved": 8,
+        "tests:verified": 9,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::guardrails",
@@ -2337,7 +2337,6 @@
         "SDK-016F059F8E3329FB",
         "SDK-184A655241421699",
         "SDK-2CB65644A7975768",
-        "SDK-2D2CC117AF4C3E5D",
         "SDK-34A7C05FCD24CC31",
         "SDK-3BEB7F16D5B22C73",
         "SDK-4762D73699DB64D8",
@@ -2396,6 +2395,7 @@
         "SDK-0E9E54DF5CC5F03E",
         "SDK-1E00129C0812E950",
         "SDK-268930A66A67E819",
+        "SDK-2D2CC117AF4C3E5D",
         "SDK-3B14BC5EA25B2ABD",
         "SDK-56A8FB798AE595AD",
         "SDK-5735EA30ADDA667D",
@@ -10959,8 +10959,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "b495417528a8dd08af7b449a1fb3d8bded066309869eb82f4c42aac4c6f6c92f",
-    "docs/migration/ledger/issue-11-rust-claims.json": "c1279660e7559a244b7d78091625903392a7f661e74bdad6e5050d4650b50e80",
+    "docs/migration/ledger/issue-11-overlay.json": "5ea4f8d97d811b4b3f77e347ae0bbd6853e7c5098687cfc3bfee313d3e4b2534",
+    "docs/migration/ledger/issue-11-rust-claims.json": "2aaf75c4cc215e813dfa2f584e078447b0ce5415e51a86ba4b27e22a87261910",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10969,6 +10969,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 922
+    "rust_test": 923
   }
 }

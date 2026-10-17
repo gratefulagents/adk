@@ -102,7 +102,15 @@ async fn direct_input_names_typed_arguments_and_narrow_shell_policy() {
     for guard in guards.into_iter().chain(builtin_tool_output_guardrails()) {
         assert_eq!(
             guard.durable_key().unwrap(),
-            format!("adk.builtin.{}.v1", guard.name())
+            format!(
+                "adk.builtin.{}.v{}",
+                guard.name(),
+                if guard.name() == "block-destructive-commands" {
+                    2
+                } else {
+                    1
+                }
+            )
         );
         assert!(
             guard
@@ -791,4 +799,30 @@ async fn original_gcp_service_account_marker_blocks_whole_output() {
             .unwrap()
             .contains("GCP service-account key")
     );
+}
+
+#[tokio::test]
+async fn destructive_guardrail_checks_original_shell_argument_text() {
+    for (input, blocked) in [
+        (r#"{"command": "rm -rf /""#, true),
+        (r#"{"COMMAND":"rm -rf /"}"#, true),
+        (r#"{"command":"rm -rf /","command":null}"#, true),
+        (r#"{"command":7,"command":"git status"}"#, true),
+        (r#"{"command":"rm -rf /","command":"git status"}"#, false),
+        (r#"{"command":null,"CMD":"rm -rf /"}"#, true),
+        ("null", false),
+        (r#"{"command":null}"#, false),
+    ] {
+        let mut call = call("Bash", serde_json::from_str(input).unwrap_or(Value::Null));
+        call.raw_arguments = Some(input.into());
+        let result = builtin_tool_input_guardrails()[0]
+            .check(&context(), "a", GuardrailInput::ToolInput(&call))
+            .await
+            .unwrap();
+        assert_eq!(
+            result.is_some_and(|r| r.tripwire_triggered),
+            blocked,
+            "{input}"
+        );
+    }
 }

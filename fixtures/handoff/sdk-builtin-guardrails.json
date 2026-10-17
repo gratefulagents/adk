@@ -1238,6 +1238,177 @@
       "final_content": null
     },
     {
+      "name": "params_original_malformed",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\": \"rm -rf /\"",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: unexpected end of JSON input",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_uppercase_command",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"COMMAND\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_duplicate_null",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\",\"command\":null}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_duplicate_wrong_type",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":7,\"command\":\"git status\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked: cannot parse shell tool input for destructive-command check: json: cannot unmarshal number into Go struct field .command of type string",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_duplicate_last_string",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":\"rm -rf /\",\"command\":\"git status\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "detect-secret-leak",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_uppercase_cmd",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"command\":null,\"CMD\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
+      "name": "params_mixedcase_command",
+      "phase": "input",
+      "tool_name": "bash",
+      "recipe": {
+        "version": 1,
+        "kind": "literal"
+      },
+      "params": "{\"Command\":\"rm -rf /\"}",
+      "guards": [
+        {
+          "name": "block-destructive-commands",
+          "error": "",
+          "result": {
+            "Output": "Blocked destructive command: recursive removal of root paths is not allowed",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "final_content": null
+    },
+    {
       "name": "params_command_wins_safe",
       "phase": "input",
       "tool_name": "bash",
@@ -1725,7 +1896,7 @@
       "final_content": null
     },
     {
-      "name": "output_literal_65",
+      "name": "output_literal_72",
       "phase": "output",
       "tool_name": "read_file",
       "recipe": {
@@ -1748,7 +1919,7 @@
       "final_content": ""
     },
     {
-      "name": "output_literal_66",
+      "name": "output_literal_73",
       "phase": "output",
       "tool_name": "read_file",
       "recipe": {
@@ -1771,7 +1942,7 @@
       "final_content": "before\nordinary output\nafter"
     },
     {
-      "name": "output_literal_67",
+      "name": "output_literal_74",
       "phase": "output",
       "tool_name": "read_file",
       "recipe": {

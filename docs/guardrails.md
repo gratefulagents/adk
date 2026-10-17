@@ -23,6 +23,15 @@ and is not a claim of unrestricted error-text equivalence. Host configuration
 compilation failures retain their error category and cause with explicit
 `compile guardrail rules` context, before any model dispatch.
 
+Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
+original malformed input cannot be hidden by a null parsed projection. Shell
+keys are case-insensitive; duplicate string values replace earlier values, while
+null leaves them unchanged and any wrong-typed field fails closed. Value-only
+calls retain their canonical fallback. Unknown fields are ignored subject to the
+native JSON depth limit; deeper input fails closed rather than claiming Go's
+entire parsing domain. The destructive guard's durable key is version 2, rejecting
+checkpoints bound to the earlier argument-projection behavior.
+
 Durable runs require a nonempty `Guardrail::durable_key` for deterministic checks.
 Ordered names/keys participate in the checkpoint policy fingerprint; changing
 one rejects recovery. Completed recovery retains reports without re-running

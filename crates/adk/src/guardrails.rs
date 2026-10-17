@@ -25,11 +25,45 @@ enum Builtin {
     SecretOutput,
 }
 
-#[derive(Default, Deserialize)]
-#[serde(default)]
+#[derive(Default)]
 struct ShellArguments {
-    command: Option<String>,
-    cmd: Option<String>,
+    command: String,
+    cmd: String,
+}
+
+impl<'de> Deserialize<'de> for ShellArguments {
+    fn deserialize<D: serde::Deserializer<'de>>(deserializer: D) -> Result<Self, D::Error> {
+        struct Visitor;
+        impl<'de> serde::de::Visitor<'de> for Visitor {
+            type Value = ShellArguments;
+
+            fn expecting(&self, formatter: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+                formatter.write_str("shell arguments object")
+            }
+
+            fn visit_map<M: serde::de::MapAccess<'de>>(
+                self,
+                mut map: M,
+            ) -> Result<Self::Value, M::Error> {
+                let mut arguments = ShellArguments::default();
+                while let Some(key) = map.next_key::<String>()? {
+                    let field = if key.eq_ignore_ascii_case("command") {
+                        &mut arguments.command
+                    } else if key.eq_ignore_ascii_case("cmd") {
+                        &mut arguments.cmd
+                    } else {
+                        map.next_value::<serde::de::IgnoredAny>()?;
+                        continue;
+                    };
+                    if let Some(value) = map.next_value::<Option<String>>()? {
+                        *field = value;
+                    }
+                }
+                Ok(arguments)
+            }
+        }
+        deserializer.deserialize_map(Visitor)
+    }
 }
 
 fn blocked(message: impl Into<String>) -> GuardrailResult {
@@ -51,7 +85,7 @@ impl Guardrail for Builtin {
 
     fn durable_key(&self) -> Option<&str> {
         Some(match self {
-            Self::Destructive => "adk.builtin.block-destructive-commands.v1",
+            Self::Destructive => "adk.builtin.block-destructive-commands.v2",
             Self::SecretInput => "adk.builtin.detect-secret-leak.v1",
             Self::SecretOutput => "adk.builtin.detect-secret-in-output.v1",
         })
@@ -73,25 +107,19 @@ impl Guardrail for Builtin {
                     {
                         return Ok(None);
                     }
-                    if !call.arguments.is_object() && !call.arguments.is_null() {
-                        return Ok(Some(blocked(
-                            "Cannot parse shell tool input for destructive-command check",
-                        )));
-                    }
-                    let Ok(params) = (if call.arguments.is_null() {
-                        Ok(ShellArguments::default())
-                    } else {
-                        serde_json::from_value::<ShellArguments>(call.arguments.clone())
-                    }) else {
+                    let Ok(params) = adk_codec::userinput::decode::<Option<ShellArguments>>(
+                        call.argument_text().as_bytes(),
+                    ) else {
                         return Ok(Some(blocked(
                             "Cannot parse shell tool input for destructive-command check",
                         )));
                     };
-                    let command = params
-                        .command
-                        .filter(|s| !s.is_empty())
-                        .or(params.cmd)
-                        .unwrap_or_default();
+                    let params = params.unwrap_or_default();
+                    let command = if params.command.is_empty() {
+                        params.cmd
+                    } else {
+                        params.command
+                    };
                     if command.is_empty() {
                         return Ok(None);
                     }

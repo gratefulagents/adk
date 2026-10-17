@@ -89,29 +89,21 @@ async fn builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_represen
         cancellation: Arc::new(CancellationToken::new()),
         deadline: None,
     };
-    let mut unrepresentable = vec![];
     let mut matched = 0;
     let mut hardened = 0;
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 87);
+    assert_eq!(cases.len(), 94);
     for case in cases {
         let name = case["name"].as_str().unwrap();
         let source = recipe(case);
         let input = case["phase"] == "input";
         let arguments = if input {
-            match serde_json::from_str(&source) {
-                Ok(arguments) => arguments,
-                Err(_) => {
-                    // Native ToolCall has a typed Value; raw malformed JSON cannot enter a guard.
-                    unrepresentable.push(name);
-                    continue;
-                }
-            }
+            serde_json::from_str(&source).unwrap_or(Value::Null)
         } else {
             json!({})
         };
         let call = ToolCall {
-            raw_arguments: None,
+            raw_arguments: input.then(|| source.clone()),
             id: "call".into(),
             name: case["tool_name"].as_str().unwrap().into(),
             arguments,
@@ -197,22 +189,5 @@ async fn builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_represen
         }
         matched += 1;
     }
-    unrepresentable.sort();
-    assert_eq!(
-        unrepresentable,
-        vec![
-            "name_BASH_malformed",
-            "name_ExEcUtE_malformed",
-            "name_ShElL_malformed",
-            "name_bash_malformed",
-            "name_custom_BaSh_tool_malformed",
-            "name_exec_malformed",
-            "name_read_file_malformed",
-            "name_sh_malformed",
-            "name_shell_malformed",
-            "params_empty",
-            "params_trailing",
-        ]
-    );
-    assert_eq!((matched, hardened), (75, 1));
+    assert_eq!((matched, hardened), (93, 1));
 }

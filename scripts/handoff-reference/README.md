@@ -433,7 +433,7 @@ committed fixture; the targeted race-detector test passed 100 repetitions.
 
 `go run -mod=readonly . builtin-guardrails` invokes the actual public SDK builtin
 input/output guard `Fn`s in order, stopping on a tripwire and applying sequential
-output replacement exactly as the runner does. The 87 cases cover 75 input and
+output replacement exactly as the runner does. The 94 cases cover 82 input and
 12 output scenarios: shell-like naming, command/cmd precedence, safe/destructive
 commands, malformed arguments, ordinary secret redaction and partial-credential
 whole-output blocking. Commands are classified only, never executed.
@@ -448,9 +448,9 @@ SDK output guards and reject leaked synthetic fragments. No credentials,
 network calls, CLI or evaluation adapter are involved.
 
 Native comparison checks names, ordered tripwire/replacement decisions and
-exact final redacted bytes for 75 cases. Eleven malformed raw-JSON inputs are
-unrepresentable by native typed `Value` arguments and are counted explicitly,
-not called passes. One escaped JSON credential marker is intentionally blocked
+exact final redacted bytes for 93 cases, including malformed raw JSON via
+`ToolCall::raw_arguments`, duplicate/null fields and case-insensitive shell keys.
+One escaped JSON credential marker is intentionally blocked
 by native decoded-value inspection where the SDK raw-text guard passes it.
 Guardrail prose and Go JSON parser error strings are not compared as byte parity.
 The new feature therefore does not close aggregate SDK builtin-guardrail ledger

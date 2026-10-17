@@ -3282,3 +3282,27 @@ async fn handoff_compaction_cancellation_drops_carry_before_target_dispatch() {
     assert_eq!(carry.dropped.load(Ordering::SeqCst), 1);
     assert_eq!(model.requests.lock().unwrap().len(), 1);
 }
+
+#[tokio::test]
+async fn original_critic_verifier_approved_and_rejected() {
+    for (reply, approved) in [
+        ("Checked everything.\nVERDICT: APPROVED", true),
+        ("VERDICT: REJECTED\n1. widget.go does not exist", false),
+    ] {
+        let model = Script::new(vec![Ok(response(
+            vec![message(Role::Assistant, reply)],
+            true,
+        ))]);
+        let agent = AgentConfig::new("critic", ModelBinding::complete("offline", model));
+        let verifier = CriticVerifier::new(agent, "build the widget", Arc::new(Quiet)).unwrap();
+        let feedback = verifier
+            .verify(&context(), &json!("widget built"))
+            .await
+            .unwrap();
+        if approved {
+            assert!(feedback.is_empty());
+        } else {
+            assert!(feedback.contains("widget.go does not exist"));
+        }
+    }
+}

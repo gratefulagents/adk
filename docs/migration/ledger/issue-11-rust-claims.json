@@ -16234,6 +16234,104 @@
         "x86_64-unknown-linux-gnu",
         "codec"
       ]
+    },
+    "SDK-7AC9682E2353ABC0": {
+      "source": "pkg/agentsdk/events/events_test.go",
+      "source_name": "TestLineWriterBuffersPartialLines",
+      "implementation_symbols": [
+        "crates/adk-codec/src/line_writer.rs::LineWriter"
+      ],
+      "rust_test_identifiers": [
+        "original_line_writer_buffers_partial_lines"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterBuffersPartialLines",
+      "rationale": "Ports the original input and every assertion in the named native counterpart. The three line-writer cases retain exact JSON and chunk boundaries, event variants, child duration/parent linkage, subagent wait/message metadata and partial-line silence then compact log. This does not claim all UTF-8 or oversized line behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-19AD7287265BF2F4": {
+      "source": "pkg/agentsdk/events/events_test.go",
+      "source_name": "TestLineWriterEmitsChildToolEvents",
+      "implementation_symbols": [
+        "crates/adk-codec/src/line_writer.rs::LineWriter"
+      ],
+      "rust_test_identifiers": [
+        "original_line_writer_emits_child_tool_event"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsChildToolEvents",
+      "rationale": "Ports the original input and every assertion in the named native counterpart. The three line-writer cases retain exact JSON and chunk boundaries, event variants, child duration/parent linkage, subagent wait/message metadata and partial-line silence then compact log. This does not claim all UTF-8 or oversized line behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-FD125AC2AEE8131C": {
+      "source": "pkg/agentsdk/events/events_test.go",
+      "source_name": "TestLineWriterEmitsSubAgentEvents",
+      "implementation_symbols": [
+        "crates/adk-codec/src/line_writer.rs::LineWriter"
+      ],
+      "rust_test_identifiers": [
+        "original_line_writer_emits_subagent_event"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsSubAgentEvents",
+      "rationale": "Ports the original input and every assertion in the named native counterpart. The three line-writer cases retain exact JSON and chunk boundaries, event variants, child duration/parent linkage, subagent wait/message metadata and partial-line silence then compact log. This does not claim all UTF-8 or oversized line behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-E4F341DDFC9BCB54": {
+      "source": "pkg/agentsdk/verifier_test.go",
+      "source_name": "TestNewCriticVerifierApprovedAndRejected",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/verifier.rs::CriticVerifier"
+      ],
+      "rust_test_identifiers": [
+        "original_critic_verifier_approved_and_rejected"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewCriticVerifierApprovedAndRejected",
+      "rationale": "Ports the original input and every assertion in the named native counterpart. The approved and rejected critic runs use the original task, candidate and model replies with an actual native runner and host. Approval returns empty feedback; rejection retains the missing widget evidence. This does not claim the entire verifier helper or arbitrary model behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-C7B9836EBFFDC64D": {
+      "source": "pkg/agentsdk/events/events_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/line_writer.rs::LineWriter"
+      ],
+      "rust_test_identifiers": [
+        "original_line_writer_emits_child_tool_event",
+        "original_line_writer_emits_subagent_event",
+        "original_line_writer_buffers_partial_lines"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/events/TestLineWriterEmitsChildToolEvents",
+      "rationale": "Ports every original input and assertion from this complete test file. The three line-writer cases retain exact JSON and chunk boundaries, event variants, child duration/parent linkage, subagent wait/message metadata and partial-line silence then compact log. This does not claim all UTF-8 or oversized line behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-D3142940B69F40D5": {
+      "source": "pkg/agentsdk/verifier_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/verifier.rs::CriticVerifier"
+      ],
+      "rust_test_identifiers": [
+        "original_critic_verifier_approved_and_rejected"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNewCriticVerifierApprovedAndRejected",
+      "rationale": "Ports every original input and assertion from this complete test file. The approved and rejected critic runs use the original task, candidate and model replies with an actual native runner and host. Approval returns empty feedback; rejection retains the missing widget evidence. This does not claim the entire verifier helper or arbitrary model behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

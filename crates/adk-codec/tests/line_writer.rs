@@ -94,3 +94,51 @@ fn explicit_flush_and_shared_host_ownership() {
     discard.write_all(b"discard\npartial").unwrap();
     discard.flush().unwrap();
 }
+
+#[test]
+fn original_line_writer_emits_child_tool_event() {
+    let events = RefCell::new(Vec::new());
+    let mut writer = LineWriter::new(|event| events.borrow_mut().push(event));
+    writer.write_all(concat!(r#"{"type":"tool_end","agent_name":"researcher","tool":"Bash","tool_use_id":"child_1","parent_call_id":"parent_1","is_error":true,"output":"exit 2","tool_duration_ms":42}"#, "\n").as_bytes()).unwrap();
+    let events = events.borrow();
+    assert_eq!(events.len(), 1);
+    let LineEvent::ChildTool(child) = &events[0] else {
+        panic!("expected child tool event")
+    };
+    assert_eq!(child.parent_call_id, "parent_1");
+    assert_eq!(child.duration_ms, 42);
+}
+
+#[test]
+fn original_line_writer_emits_subagent_event() {
+    let events = RefCell::new(Vec::new());
+    let mut writer = LineWriter::new(|event| events.borrow_mut().push(event));
+    writer.write_all(concat!(r#"{"type":"subagent_status","task_id":"task_1","agent_name":"researcher","status":"running","message":"running","subagent_waiting_on":["task_0"],"subagent_messages_received":2}"#, "\n").as_bytes()).unwrap();
+    let events = events.borrow();
+    assert_eq!(events.len(), 1);
+    let LineEvent::Subagent(subagent) = &events[0] else {
+        panic!("expected subagent event")
+    };
+    assert_eq!(subagent.task_id, "task_1");
+    assert_eq!(subagent.agent_name, "researcher");
+    assert_eq!(subagent.status, "running");
+    assert_eq!(subagent.messages_received, 2);
+    assert_eq!(subagent.waiting_on.as_ref().unwrap(), &["task_0"]);
+}
+
+#[test]
+fn original_line_writer_buffers_partial_lines() {
+    let events = RefCell::new(Vec::new());
+    let mut writer = LineWriter::new(|event| events.borrow_mut().push(event));
+    writer
+        .write_all(br#"{"type":"tool_end","tool":"Bash","is_error":true,"output":"hello"#)
+        .unwrap();
+    assert!(events.borrow().is_empty());
+    writer.write_all(b" world\"}\n").unwrap();
+    let events = events.borrow();
+    assert_eq!(events.len(), 1);
+    let LineEvent::Log(text) = &events[0] else {
+        panic!("expected compact log")
+    };
+    assert!(text.contains("hello world"));
+}

@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Original event adapter and critic regressions
+
+Ported the three original line-writer cases with exact JSON/chunks and every
+assertion: child parent/duration fields, subagent waiting/message fields, and
+partial-line silence then combined compact log. Ported the original critic
+approval/rejection case through real native runner execution with original task,
+candidate and model replies. Closed four original tests and two complete source
+test files, not the entire adapter/verifier implementations.
+
+Fresh Rust1.88 Linux: **1,686 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format, five line-writer tests and the targeted
+critic case, independent original Go tests, bound evidence,51 validators,
+artifacts/overlay/audit and immutable source locks passed. Production behavior
+is unchanged. Ledger: **915 verified /7,976 unresolved /251 excluded**; full
+issue11 acceptance remains incomplete.
+
 ### Original user-input helper regressions
 
 Ported all five original user-input tests: quick-action identity/legacy-key

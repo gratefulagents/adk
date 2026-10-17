@@ -148,6 +148,26 @@ impl<'de, T: serde::de::DeserializeOwned> serde::de::DeserializeSeed<'de> for Po
     }
 }
 
+pub(crate) struct ObjectSeed<'a, T>(pub(crate) &'a mut GoPointer<T>);
+impl<'de, T: serde::de::DeserializeOwned> serde::de::DeserializeSeed<'de> for ObjectSeed<'_, T> {
+    type Value = ();
+    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+        d.deserialize_option(self)
+    }
+}
+impl<'de, T: serde::de::DeserializeOwned> serde::de::Visitor<'de> for ObjectSeed<'_, T> {
+    type Value = ();
+    fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.write_str("an SDK value object or null")
+    }
+    fn visit_none<E: serde::de::Error>(self) -> Result<(), E> {
+        Ok(())
+    }
+    fn visit_some<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+        serde::de::DeserializeSeed::deserialize(PointerSeed(self.0), d)
+    }
+}
+
 pub(crate) struct MapSeed<'a, T>(pub(crate) &'a mut Option<std::collections::BTreeMap<String, T>>);
 impl<'de, T: Deserialize<'de>> serde::de::DeserializeSeed<'de> for MapSeed<'_, T> {
     type Value = ();
@@ -177,6 +197,9 @@ impl<'de, T: Deserialize<'de>> serde::de::Visitor<'de> for MapSeed<'_, T> {
 }
 
 macro_rules! read_field {
+    ($map:ident, $out:expr, object) => {
+        $map.next_value_seed($crate::go_decode::ObjectSeed(&mut $out))?;
+    };
     ($map:ident, $out:expr, pointer) => {
         $map.next_value_seed($crate::go_decode::PointerSeed(&mut $out))?;
     };
@@ -205,7 +228,7 @@ macro_rules! read_field {
 }
 
 macro_rules! go_object {
-    ($ty:ident, $( $key:literal => $field:ident : $kind:ident ),* $(,)? $(; $( $slice_key:literal => $slice:ident ),* )? $( preserve_nil { $( $nil_key:literal => $nil_slice:ident ),* } )? $( pointers { $( $ptr_key:literal => $ptr:ident ),* } )?) => {
+    ($ty:ident, $( $key:literal => $field:ident : $kind:ident ),* $(,)? $(; $( $slice_key:literal => $slice:ident ),* )? $( preserve_nil { $( $nil_key:literal => $nil_slice:ident ),* } )? $( pointers { $( $ptr_key:literal => $ptr:ident ),* } )? $( objects { $( $obj_key:literal => $obj:ident ),* } )?) => {
         impl<'de> Deserialize<'de> for $ty {
             fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
                 let mut out = Self::default();
@@ -228,6 +251,7 @@ macro_rules! go_object {
                         $($(let mut $slice = GoSlice::from_values(std::mem::take(&mut out.$slice));)*)?
                         $($(let mut $nil_slice = out.$nil_slice.take().map(GoSlice::from_values).unwrap_or_default();)*)?
                         $($(let mut $ptr = $crate::go_decode::GoPointer::from_value(out.$ptr.take()).map_err(serde::de::Error::custom)?;)*)?
+                        $($(let mut $obj = $crate::go_decode::GoPointer::from_value(Some(std::mem::take(&mut out.$obj))).map_err(serde::de::Error::custom)?;)*)?
                         while let Some(key) = map.next_key::<String>()? {
                             let key = fold_key(&key);
                             match key.as_str() {
@@ -235,12 +259,14 @@ macro_rules! go_object {
                                 $($($slice_key => { read_field!(map, $slice, slice); })*)?
                                 $($($nil_key => { read_field!(map, $nil_slice, slice); })*)?
                                 $($($ptr_key => { read_field!(map, $ptr, pointer); })*)?
+                                $($($obj_key => { read_field!(map, $obj, object); })*)?
                                 _ => { map.next_value::<serde::de::IgnoredAny>()?; }
                             }
                         }
                         $($(out.$slice = $slice.into_values().unwrap_or_default();)*)?
                         $($(out.$nil_slice = $nil_slice.into_values();)*)?
                         $($(out.$ptr = $ptr.into_value().map_err(serde::de::Error::custom)?;)*)?
+                        $($(out.$obj = $obj.into_value().map_err(serde::de::Error::custom)?.expect("value object state remains non-null");)*)?
                         Ok(())
                     }
                 }

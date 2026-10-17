@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Lossless nested routing-result decoding
+
+`mode::ModeRoutingResolution` now supports both sealed byte entrypoints and uses
+the lossless settings DTO. Repeated nested value structs retain raw field order
+until finalization, preserving hidden stop-sequence backing slots. Unlike pointer
+objects, a null nested settings value is a no-op. Existing pure routing output
+and standalone composition remain unchanged.
+
+The actual pinned-Go oracle adds **453 result inputs (275 accepted, 178 rejected)**,
+including all 298 settings inputs under the correct nested depth. Successful
+cases compare every result field, exact nested binary64/nil state and exact
+output bytes. The combined corpus is **1,812 inputs (1,075 accepted, 737 rejected)**.
+A dedicated regression verifies shortening a stop slice, encountering a null
+settings object, and re-expanding through null elements without losing the tail.
+Seven result data/alias records are scoped to this fresh-value byte codec, not
+ordinary Serde in-place mutation, Go pointer identity or runtime execution.
+
+Fresh Rust 1.88 Linux: **1,742 workspace tests +10 doctests passed; 0 failed,
+30 ignored**. Strict all-feature lint/typecheck/rustdoc, formatting, full facade
+matrix and external consumer/purity, independent bound references, 55 validators,
+artifact/overlay/audit and source locks pass. Ledger: **1,049 verified /7,842
+unresolved /251 excluded**. Full retained acceptance is still incomplete.
+
 ### Lossless model-settings compatibility record
 
 Added a separate `dto::ModelSettings` to the sealed byte codec; the existing

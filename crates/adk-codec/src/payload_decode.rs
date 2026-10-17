@@ -1,5 +1,6 @@
 use crate::dto::*;
 use crate::go_decode::{ElementSeed, GoSlice, fold_key, go_object, normalize_strings, read_field};
+use crate::mode::ModeRoutingResolution;
 use serde::Deserialize;
 
 mod sealed {
@@ -117,6 +118,7 @@ macro_rules! target {
     )*};
 }
 target!(
+    ModeRoutingResolution,
     ModelSettings,
     ModeReasoningLevel,
     ModeTextVerbosity,
@@ -155,8 +157,6 @@ impl sealed::Sealed for ToolCallData {
 }
 impl GoJsonDecode for ToolCallData {}
 impl GoJsonEncode for ToolCallData {}
-impl sealed::Sealed for crate::mode::ModeRoutingResolution {}
-impl GoJsonEncode for crate::mode::ModeRoutingResolution {}
 impl sealed::Sealed for ToolApprovalData {
     const RAW_INPUT: bool = true;
     fn restore_raw(&mut self, raw: RawJson) {
@@ -178,6 +178,13 @@ impl sealed::Sealed for ToolApprovalData {
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
 
+go_object!(ModeRoutingResolution,
+    "model" => model: scalar,
+    "reasoninglevel" => reasoning_level: scalar,
+    "textverbosity" => text_verbosity: scalar
+    preserve_nil { "fallbackmodels" => fallback_models }
+    objects { "modelsettings" => model_settings }
+);
 go_object!(ModelSettings,
     "temperature" => temperature: raw,
     "max_tokens" => max_tokens: integer,

@@ -21,6 +21,7 @@ func TestNativeModeCodecReference(t *testing.T) {
 		typeOf reflect.Type
 	}{
 		{"ModelSettings", reflect.TypeOf(ModelSettings{})},
+		{"RoutingResolution", reflect.TypeOf(ModeRoutingResolution{})},
 		{"ReasoningLevel", reflect.TypeOf(ModeReasoningLevel(""))},
 		{"TextVerbosity", reflect.TypeOf(ModeTextVerbosity(""))},
 		{"TemplateSpec", reflect.TypeOf(sdkmode.TemplateSpec{})},
@@ -42,20 +43,14 @@ func TestNativeModeCodecReference(t *testing.T) {
 			} else {
 				row["decoded_fields"] = value.Elem().Interface()
 				if target.name == "ModelSettings" {
-					state := map[string]any{}
-					for i := 0; i < target.typeOf.NumField(); i++ {
-						field := value.Elem().Field(i)
-						if field.Kind() == reflect.Pointer && field.Type().Elem().Kind() == reflect.Float64 {
-							if field.IsNil() {
-								state[target.typeOf.Field(i).Name] = nil
-							} else {
-								state[target.typeOf.Field(i).Name] = fmt.Sprintf("%016x", math.Float64bits(field.Elem().Float()))
-							}
-						} else {
-							state[target.typeOf.Field(i).Name] = field.Interface()
-						}
+					row["settings_state"] = nativeSettingsState(value.Elem())
+				} else if target.name == "RoutingResolution" {
+					resolution := value.Elem().Interface().(ModeRoutingResolution)
+					row["resolution_state"] = map[string]any{
+						"Model": resolution.Model, "FallbackModels": resolution.FallbackModels,
+						"ReasoningLevel": resolution.ReasoningLevel, "TextVerbosity": resolution.TextVerbosity,
+						"ModelSettings": nativeSettingsState(reflect.ValueOf(resolution.ModelSettings)),
 					}
-					row["settings_state"] = state
 				}
 				encoded, marshalErr := json.Marshal(value.Interface())
 				row["marshal_ok"] = marshalErr == nil
@@ -111,6 +106,9 @@ func TestNativeModeCodecReference(t *testing.T) {
 			case reflect.Map:
 				initial = `{"keep":{"Model":"keep"},"same":{"Model":"old","FallbackModels":["old","tail"]}}`
 				values = []string{"null", "{}", `{"new":null}`, `{"same":null}`, `{"same":{}}`, `{"same":{"ReasoningLevel":"high"}}`, `{"same":{"FallbackModels":[null]}}`, `{"same":{"Model":"first"},"same":{"TextVerbosity":"last"}}`, `{"x":{},"X":{},"猫":{"Model":" raw "},"<>&":null,"\ud800":{}}`, "{\"\xff\":{\"Model\":\"\xff\"}}", "[]", "true", "42", `"map"`, `{"x":[]}`, `{"x":42}`}
+			case reflect.Struct:
+				initial = `{"temperature":-0,"top_p":0.5,"max_tokens":7,"stop_sequences":["old","tail"]}`
+				values = []string{"null", "{}", `{"temperature":null}`, `{"temperature":-0,"top_p":1e-7}`, `{"stop_sequences":[null]}`, `{"stop_sequences":[]}`, `{"stop_sequences":null}`, `{"thinking_budget":-9,"tool_choice":"raw"}`, "42", "true", "[]", `"settings"`}
 			case reflect.Pointer:
 				if field.Type.Elem().Kind() == reflect.Float64 {
 					initial = "-0"
@@ -144,6 +142,23 @@ func TestNativeModeCodecReference(t *testing.T) {
 		for _, depth := range []int{128, 9998, 9999, 10000} {
 			add(fmt.Sprintf("unknown-depth-%d", depth), `{"unknown":`+strings.Repeat("[", depth)+"0"+strings.Repeat("]", depth)+`}`)
 		}
+		if target.name == "RoutingResolution" {
+			for _, prior := range cases {
+				row := prior.(map[string]any)
+				if row["type"] == "ModelSettings" {
+					input, err := hex.DecodeString(row["input_hex"].(string))
+					if err != nil {
+						t.Fatal(err)
+					}
+					add("nested/"+row["id"].(string), `{"ModelSettings":`+string(input)+`}`)
+				}
+			}
+			for index, middle := range []string{`{"stop_sequences":["short"]}`, `{"stop_sequences":[]}`, `{"stop_sequences":null}`, "null", "{}"} {
+				add(fmt.Sprintf("value-backing-slots-%d", index), `{"ModelSettings":{"temperature":-0,"stop_sequences":["old","tail"]},"ModelSettings":`+middle+`,"ModelSettings":null,"ModelSettings":{"stop_sequences":[null,null,null]}}`)
+			}
+			add("value-invalid-before-null", `{"ModelSettings":{"temperature":1e309},"ModelSettings":null}`)
+			add("value-field-fold", `{"MODELSETTINGS":{"temperature":-0},"ModelSettings":{"TEMPERATURE":null,"MAX_TOKENS":7},"modelsettings":{"ſtop_sequences":[]}}`)
+		}
 		if target.name == "TemplateSpec" {
 			for index, middle := range []string{`{"FallbackModels":["short"]}`, `{"FallbackModels":[]}`, `{"FallbackModels":null}`, "null"} {
 				add(fmt.Sprintf("pointer-backing-slots-%d", index), `{"ModelRouting":{"FallbackModels":["old","tail"]},"ModelRouting":`+middle+`,"ModelRouting":{"FallbackModels":[null,null,null]}}`)
@@ -175,4 +190,22 @@ func TestNativeModeCodecReference(t *testing.T) {
 	if err := os.WriteFile(os.Getenv("MODE_CODEC_OUTPUT"), output, 0600); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func nativeSettingsState(value reflect.Value) map[string]any {
+	state := map[string]any{}
+	for i := 0; i < value.Type().NumField(); i++ {
+		field := value.Field(i)
+		name := value.Type().Field(i).Name
+		if field.Kind() == reflect.Pointer && field.Type().Elem().Kind() == reflect.Float64 {
+			if field.IsNil() {
+				state[name] = nil
+			} else {
+				state[name] = fmt.Sprintf("%016x", math.Float64bits(field.Elem().Float()))
+			}
+		} else {
+			state[name] = field.Interface()
+		}
+	}
+	return state
 }

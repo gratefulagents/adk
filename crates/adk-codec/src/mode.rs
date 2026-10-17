@@ -23,7 +23,7 @@ pub struct ModeRoutingResolution {
     pub fallback_models: Option<Vec<String>>,
     pub reasoning_level: String,
     pub text_verbosity: String,
-    pub model_settings: crate::snapshots::ModelSettings,
+    pub model_settings: crate::dto::ModelSettings,
 }
 
 pub fn resolve_mode_routing(

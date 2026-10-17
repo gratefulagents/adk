@@ -1,3 +1,4 @@
+use adk_codec::mode::ModeRoutingResolution;
 use adk_codec::{
     GoJsonDecode, GoJsonEncode,
     dto::{
@@ -59,10 +60,11 @@ fn pinned_mode_codec_oracle() {
         assert_eq!(format!("{digest:x}"), expected.as_str().unwrap(), "{path}");
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 1359);
+    assert_eq!(cases.len(), 1812);
     for case in cases {
         match case["type"].as_str().unwrap() {
             "ModelSettings" => compare_settings(case),
+            "RoutingResolution" => compare_resolution(case),
             "ReasoningLevel" => compare::<ModeReasoningLevel>(case),
             "TextVerbosity" => compare::<ModeTextVerbosity>(case),
             "TemplateSpec" => compare::<ModeTemplateSpec>(case),
@@ -235,17 +237,7 @@ fn compare_settings(case: &Value) {
         "{id}: {decoded:?}"
     );
     let Ok(decoded) = decoded else { return };
-    let state = serde_json::json!({
-        "Temperature": decoded.temperature.map(|v| format!("{:016x}", v.to_bits())),
-        "MaxTokens": decoded.max_tokens,
-        "TopP": decoded.top_p.map(|v| format!("{:016x}", v.to_bits())),
-        "ToolChoice": decoded.tool_choice,
-        "ParallelToolCalls": decoded.parallel_tool_calls,
-        "ThinkingBudget": decoded.thinking_budget,
-        "ReasoningEffort": decoded.reasoning_effort,
-        "TextVerbosity": decoded.text_verbosity,
-        "StopSequences": decoded.stop_sequences,
-    });
+    let state = settings_state(&decoded);
     assert_eq!(state, case["settings_state"], "unnormalized state: {id}");
     assert_eq!(case["marshal_ok"], true, "{id}");
     assert_eq!(
@@ -299,4 +291,58 @@ fn settings_reject_nonfinite_encoding() {
         assert_eq!(case["marshal_ok"], false);
         assert!(to_go_json_bytes(&settings).is_err());
     }
+}
+
+fn settings_state(decoded: &ModelSettings) -> Value {
+    serde_json::json!({
+        "Temperature": decoded.temperature.map(|v| format!("{:016x}", v.to_bits())),
+        "MaxTokens": decoded.max_tokens,
+        "TopP": decoded.top_p.map(|v| format!("{:016x}", v.to_bits())),
+        "ToolChoice": decoded.tool_choice,
+        "ParallelToolCalls": decoded.parallel_tool_calls,
+        "ThinkingBudget": decoded.thinking_budget,
+        "ReasoningEffort": decoded.reasoning_effort,
+        "TextVerbosity": decoded.text_verbosity,
+        "StopSequences": decoded.stop_sequences,
+    })
+}
+
+fn compare_resolution(case: &Value) {
+    let id = case["id"].as_str().unwrap();
+    let decoded =
+        from_go_json::<ModeRoutingResolution>(&unhex(case["input_hex"].as_str().unwrap()));
+    assert_eq!(
+        decoded.is_ok(),
+        case["decode_ok"].as_bool().unwrap(),
+        "{id}: {decoded:?}"
+    );
+    let Ok(decoded) = decoded else { return };
+    let state = serde_json::json!({
+        "Model": decoded.model,
+        "FallbackModels": decoded.fallback_models,
+        "ReasoningLevel": decoded.reasoning_level,
+        "TextVerbosity": decoded.text_verbosity,
+        "ModelSettings": settings_state(&decoded.model_settings),
+    });
+    assert_eq!(state, case["resolution_state"], "unnormalized state: {id}");
+    assert_eq!(case["marshal_ok"], true, "{id}");
+    assert_eq!(
+        to_go_json_bytes(&decoded).unwrap(),
+        unhex(case["marshal_hex"].as_str().unwrap()),
+        "exact bytes: {id}"
+    );
+}
+
+#[test]
+fn nested_settings_null_is_noop_and_retains_backing_slots() {
+    let resolution: ModeRoutingResolution = from_go_json(br#"{"Model":"raw","ModelSettings":{"temperature":-0,"stop_sequences":["old","tail"]},"ModelSettings":{"stop_sequences":["short"]},"ModelSettings":null,"ModelSettings":{"stop_sequences":[null,null,null]}}"#).unwrap();
+    assert_eq!(
+        resolution.model_settings.temperature.unwrap().to_bits(),
+        (-0.0_f64).to_bits()
+    );
+    assert_eq!(
+        resolution.model_settings.stop_sequences.as_ref().unwrap(),
+        &["short", "tail", ""]
+    );
+    assert_eq!(to_go_json_bytes(&resolution).unwrap(), br#"{"Model":"raw","FallbackModels":null,"ReasoningLevel":"","TextVerbosity":"","ModelSettings":{"temperature":-0,"stop_sequences":["short","tail",""]}}"#);
 }

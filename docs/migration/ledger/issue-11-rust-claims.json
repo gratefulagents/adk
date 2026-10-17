@@ -18930,6 +18930,146 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-1446DC680A4B4100": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingResolution.TextVerbosity",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution::text_verbosity",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution.TextVerbosity. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3A0A5E8BBE282804": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingResolution.ReasoningLevel",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution::reasoning_level",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution.ReasoningLevel. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4769C77001D2D573": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingResolution.Model",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution::model",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution.Model. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A974C97F1EB84D6A": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingResolution.ModelSettings",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution::model_settings",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution.ModelSettings. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D80FC3ECFBF13B04": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingResolution.FallbackModels",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution::fallback_models",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution.FallbackModels. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EDC1C050195C7523": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ModeRoutingResolution",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EF526EB2697D52AE": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ModeRoutingResolution",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "nested_settings_null_is_noop_and_retains_backing_slots",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

@@ -8,12 +8,15 @@ The runner tests an immutable SDK archive at
 
 Actual `encoding/json.Unmarshal` and `json.Marshal` observations cover mode
 `TemplateSpec`, `Constraints`, `ModelRouting`, `RoleModelRouting`, and the
-runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases, `ModelSettings`, plus the open
+runner's `ModeModelRouting` and `ModeRoleModelRouting` aliases, `ModelSettings`,
+`ModeRoutingResolution`, plus the open
 `ModeReasoningLevel` and `ModeTextVerbosity` string types and ten constants. Provenance
 records archive, source and harness hashes, Go version, OS and architecture.
 The fixture records reflected field names/types/tags or scalar kinds and
-1,359 cases: 800 accepted and 559 rejected (993 mode structured-data cases,
-68 named-string cases and 298 ModelSettings cases). Six additional native
+1,812 cases: 1,075 accepted and 737 rejected (993 mode structured-data cases,
+68 named-string cases, 298 ModelSettings cases and 453 routing-result cases).
+Nested value objects retain backing slots across repeated fields, and null is
+a no-op rather than the reset used for pointer objects. Six additional native
 nonfinite-pointer encoding cases all reject. Settings compare explicit nil/empty
 slice state and binary64 bit strings independently of omitempty/JSON numeric
 normalization, including negative zero, underflow, overflow, subnormal values,
@@ -30,7 +33,8 @@ JSON and ignored values at the Go depth boundary.
 
 Rust compatibility-only targets are
 `adk_codec::dto::{ModelSettings, ModeTemplateSpec, ModeConstraints, ModeRouting, ModeRoleRouting}`
-through sealed `from_go_json` and `to_go_json_bytes`. Ordinary Serde is not a
+and `adk_codec::mode::ModeRoutingResolution`, through sealed `from_go_json` and
+`to_go_json_bytes`. Ordinary Serde is not a
 Go byte-decoding entrypoint. Named labels use open
 `dto::{ModeReasoningLevel, ModeTextVerbosity}` wrappers with typed associated
 constants; unknown strings remain valid and the empty default is not explicit

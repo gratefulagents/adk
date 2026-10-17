@@ -3,6 +3,15 @@
 use adk::codec::{dto, from_go_json, to_go_json_bytes};
 
 #[test]
+fn cursor_codec_is_available_without_host_runtime() {
+    let cursor: dto::Cursor =
+        from_go_json(br#"{"MESSAGE_ID":-0,"to\u212aen":"next","token":null}"#).unwrap();
+    assert_eq!(cursor.message_id, 0);
+    assert_eq!(cursor.token, "next");
+    assert_eq!(to_go_json_bytes(&cursor).unwrap(), br#"{"token":"next"}"#);
+}
+
+#[test]
 fn payload_decoder_is_available_through_standalone_facade() {
     let message: dto::MessageOutput =
         from_go_json(br#"{"TEXT":"hello","text":null,"images":[null]}"#).unwrap();

@@ -28,13 +28,16 @@ claim of complete SDK parity or acceptance closure**.
   conversation helpers plus four bounded public RunResult convenience methods.
 - `main_test.go`: independent semantic assertions on ordering, pagination,
   preparation, persistence/error short circuits, approval batching, and limits.
-- `check.py`: checks clean pin and local module replacement, regenerates both modes twice
+- `check.py`: checks clean pin and local module replacement, regenerates all three modes twice
   in memory, compares **exact bytes**, and rechecks SDK cleanliness. It never
   rewrites the fixture or SDK.
 - `../../fixtures/host-loop/sdk-chatloop.json`: 50 scenario records, 51 Run calls
   (one scenario calls the same loop twice).
 - `../../fixtures/host-loop/sdk-conversation.json`: 80 conversation cases and
   13 RunResult cases, independent of ChatLoop execution.
+- `cursor.go` / `../../fixtures/host-loop/sdk-cursor.json`: 41 direct public
+  Cursor JSON cases, including signed bounds, negative zero, folded keys,
+  duplicate/null fields, invalid strings, unknown fields and depth limits.
 
 From the repository root:
 
@@ -57,6 +60,8 @@ checker; regeneration is not an automatic way to bless a mismatch):
   > fixtures/host-loop/sdk-chatloop.json
 (cd scripts/host-reference && /usr/local/go/bin/go run -mod=readonly . --conversation) \
   > fixtures/host-loop/sdk-conversation.json
+(cd scripts/host-reference && /usr/local/go/bin/go run -mod=readonly . --cursor) \
+  > fixtures/host-loop/sdk-cursor.json
 python3 scripts/host-reference/check.py
 ```
 

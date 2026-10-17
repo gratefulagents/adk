@@ -1,5 +1,21 @@
 use serde::Deserialize;
 
+pub(crate) struct IntegerSeed<'a, T>(pub(crate) &'a mut T);
+impl<'de, T: std::str::FromStr> serde::de::DeserializeSeed<'de> for IntegerSeed<'_, T>
+where
+    T::Err: std::fmt::Display,
+{
+    type Value = ();
+    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+        let value: Option<Box<serde_json::value::RawValue>> = serde::Deserialize::deserialize(d)?;
+        if let Some(value) = value {
+            // Serde classifies -0 as a float, but Go accepts it for integer fields.
+            *self.0 = value.get().parse().map_err(serde::de::Error::custom)?;
+        }
+        Ok(())
+    }
+}
+
 // Go retains backing-array elements across repeated nonempty slice fields.
 #[derive(Default)]
 pub(crate) struct GoSlice<T> {
@@ -83,6 +99,9 @@ impl<'de, T: Deserialize<'de> + Default> Deserialize<'de> for GoSlice<T> {
 }
 
 macro_rules! read_field {
+    ($map:ident, $out:expr, integer) => {
+        $map.next_value_seed($crate::go_decode::IntegerSeed(&mut $out))?;
+    };
     ($map:ident, $out:expr, scalar) => {
         $map.next_value_seed(ElementSeed(&mut $out))?;
     };

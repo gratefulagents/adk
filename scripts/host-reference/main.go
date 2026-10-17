@@ -277,9 +277,12 @@ func execute(spec scenario) object {
 }
 func main() {
 	conversation := flag.Bool("conversation", false, "emit the independent conversation and RunResult helper fixture")
+	cursor := flag.Bool("cursor", false, "emit host cursor JSON observations")
 	flag.Parse()
 	var fixture object
-	if *conversation {
+	if *cursor {
+		fixture = cursorFixture()
+	} else if *conversation {
 		fixture = conversationFixture()
 	} else {
 		cases := []object{}

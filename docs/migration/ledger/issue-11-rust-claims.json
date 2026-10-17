@@ -15428,6 +15428,90 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-1199495D308E642D": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Cursor",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk/src/host.rs::Cursor"
+      ],
+      "rust_test_identifiers": [
+        "cursor_json_matches_pinned_host_record",
+        "cursor_serde_roundtrip_and_in_place_nulls_preserve_persistence_state",
+        "cursor_codec_is_available_without_host_runtime"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesToolApprovalAndResumes",
+      "rationale": "The two-field host Cursor record, its two member fields and host alias share a canonical Rust record, available through host or compat-only facade. Forty-one independently executed pinned public Cursor JSON cases compare acceptance, both decoded fields and exact re-encoded bytes: omission/defaults, signed limits and negative zero, folded/unknown keys, duplicate/null semantics, malformed strings and depth limits. Native persistence roundtrip and in-place null retention are also tested. The original ChatLoop regression is a supporting package regression; direct Cursor JSON behavior is established by the independent cursor oracle, not inferred from that test. Go partial error mutation/error text and non-UTF-8 in-memory strings are not native API representations; explicit from_go_json handles incoming invalid string bytes by Go replacement. This closes only the Cursor record/members/alias, not ChatLoop lifecycle or all host records.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host",
+        "compat"
+      ],
+      "source": "pkg/agentsdk/chatloop.go",
+      "source_name": "Cursor.MessageID"
+    },
+    "SDK-DCA81A17EC32ABF4": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Cursor",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk/src/host.rs::Cursor"
+      ],
+      "rust_test_identifiers": [
+        "cursor_json_matches_pinned_host_record",
+        "cursor_serde_roundtrip_and_in_place_nulls_preserve_persistence_state",
+        "cursor_codec_is_available_without_host_runtime"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesToolApprovalAndResumes",
+      "rationale": "The two-field host Cursor record, its two member fields and host alias share a canonical Rust record, available through host or compat-only facade. Forty-one independently executed pinned public Cursor JSON cases compare acceptance, both decoded fields and exact re-encoded bytes: omission/defaults, signed limits and negative zero, folded/unknown keys, duplicate/null semantics, malformed strings and depth limits. Native persistence roundtrip and in-place null retention are also tested. The original ChatLoop regression is a supporting package regression; direct Cursor JSON behavior is established by the independent cursor oracle, not inferred from that test. Go partial error mutation/error text and non-UTF-8 in-memory strings are not native API representations; explicit from_go_json handles incoming invalid string bytes by Go replacement. This closes only the Cursor record/members/alias, not ChatLoop lifecycle or all host records.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host",
+        "compat"
+      ],
+      "source": "pkg/agentsdk/chatloop.go",
+      "source_name": "Cursor.Token"
+    },
+    "SDK-1C3E43F30B46B7CD": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Cursor",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk/src/host.rs::Cursor"
+      ],
+      "rust_test_identifiers": [
+        "cursor_json_matches_pinned_host_record",
+        "cursor_serde_roundtrip_and_in_place_nulls_preserve_persistence_state",
+        "cursor_codec_is_available_without_host_runtime"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesToolApprovalAndResumes",
+      "rationale": "The two-field host Cursor record, its two member fields and host alias share a canonical Rust record, available through host or compat-only facade. Forty-one independently executed pinned public Cursor JSON cases compare acceptance, both decoded fields and exact re-encoded bytes: omission/defaults, signed limits and negative zero, folded/unknown keys, duplicate/null semantics, malformed strings and depth limits. Native persistence roundtrip and in-place null retention are also tested. The original ChatLoop regression is a supporting package regression; direct Cursor JSON behavior is established by the independent cursor oracle, not inferred from that test. Go partial error mutation/error text and non-UTF-8 in-memory strings are not native API representations; explicit from_go_json handles incoming invalid string bytes by Go replacement. This closes only the Cursor record/members/alias, not ChatLoop lifecycle or all host records.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host",
+        "compat"
+      ],
+      "source": "pkg/agentsdk/chatloop.go",
+      "source_name": "Cursor"
+    },
+    "SDK-240A2FA313BB667F": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Cursor",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk/src/host.rs::Cursor"
+      ],
+      "rust_test_identifiers": [
+        "cursor_json_matches_pinned_host_record",
+        "cursor_serde_roundtrip_and_in_place_nulls_preserve_persistence_state",
+        "cursor_codec_is_available_without_host_runtime"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesToolApprovalAndResumes",
+      "rationale": "The two-field host Cursor record, its two member fields and host alias share a canonical Rust record, available through host or compat-only facade. Forty-one independently executed pinned public Cursor JSON cases compare acceptance, both decoded fields and exact re-encoded bytes: omission/defaults, signed limits and negative zero, folded/unknown keys, duplicate/null semantics, malformed strings and depth limits. Native persistence roundtrip and in-place null retention are also tested. The original ChatLoop regression is a supporting package regression; direct Cursor JSON behavior is established by the independent cursor oracle, not inferred from that test. Go partial error mutation/error text and non-UTF-8 in-memory strings are not native API representations; explicit from_go_json handles incoming invalid string bytes by Go replacement. This closes only the Cursor record/members/alias, not ChatLoop lifecycle or all host records.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host",
+        "compat"
+      ],
+      "source": "pkg/agentsdk/host/host.go",
+      "source_name": "Cursor"
     }
   }
 }

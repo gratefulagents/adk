@@ -15,12 +15,12 @@ mod sealed {
     }
 }
 
-/// The bounded item-payload targets supported by [`from_go_json`].
+/// The bounded compatibility records supported by [`from_go_json`].
 ///
 /// This trait is sealed; `RunItem` and `Agent` are not supported targets.
 pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 
-/// Decode a pinned SDK item payload with Go string replacement and object semantics.
+/// Decode a pinned SDK record with Go string replacement and object semantics.
 ///
 /// Unlike ordinary Serde JSON decoding, malformed UTF-8 and lone UTF-16
 /// surrogates in typed strings and keys are replaced as in Go. Raw `input`
@@ -55,12 +55,12 @@ pub fn from_go_json<T: GoJsonDecode>(input: &[u8]) -> Result<T, serde_json::Erro
     Ok(decoded)
 }
 
-/// The bounded payload targets supported by [`to_go_json_bytes`].
+/// The bounded compatibility records supported by [`to_go_json_bytes`].
 ///
 /// This trait is sealed; `RunItem` and `Agent` are not supported targets.
 pub trait GoJsonEncode: sealed::Sealed {}
 
-/// Encode a payload with Go field order, raw-byte preservation and HTML escaping.
+/// Encode a record with Go field order, raw-byte preservation and HTML escaping.
 ///
 /// Unlike ordinary Serde serialization, raw input may contain invalid UTF-8.
 /// Public `EncodedBytes` values are syntax-checked without a `Value` projection.
@@ -117,6 +117,7 @@ macro_rules! target {
     )*};
 }
 target!(
+    Cursor,
     MessageOutput,
     ImageAttachment,
     ToolOutputData,
@@ -165,6 +166,7 @@ impl sealed::Sealed for ToolApprovalData {
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
 
+go_object!(Cursor, "message_id" => message_id: integer, "token" => token: scalar);
 go_object!(MessageOutput, "text" => text: scalar, "phase" => phase: scalar; "images" => images);
 go_object!(ImageAttachment, "media_type" => media_type: scalar, "data" => data: scalar, "detail" => detail: scalar);
 go_object!(ToolCallData, "id" => id: scalar, "name" => name: scalar, "input" => input: raw);

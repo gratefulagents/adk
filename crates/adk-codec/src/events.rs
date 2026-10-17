@@ -1,5 +1,5 @@
 //! Formatting for typed SDK content events, separate from native observations.
-use crate::dto::ContentEvent;
+use crate::{dto::ContentEvent, go_decode::IntegerSeed};
 
 /// Compact debug rendering matching the pinned SDK helper.
 ///
@@ -404,22 +404,6 @@ impl<'de> serde::de::DeserializeSeed<'de> for SliceSeed<'_> {
     type Value = ();
     fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
         serde::Deserialize::deserialize_in_place(d, self.0)
-    }
-}
-
-struct IntegerSeed<'a, T>(&'a mut T);
-impl<'de, T: std::str::FromStr> serde::de::DeserializeSeed<'de> for IntegerSeed<'_, T>
-where
-    T::Err: std::fmt::Display,
-{
-    type Value = ();
-    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
-        let value: Option<Box<serde_json::value::RawValue>> = serde::Deserialize::deserialize(d)?;
-        if let Some(value) = value {
-            // Serde classifies -0 as a float, but Go accepts it for integer fields.
-            *self.0 = value.get().parse().map_err(serde::de::Error::custom)?;
-        }
-        Ok(())
     }
 }
 

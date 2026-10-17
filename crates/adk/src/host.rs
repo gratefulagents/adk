@@ -28,11 +28,7 @@ pub use fileconfig::build_mode_directive;
 mod rules;
 pub use rules::{CompiledGuardrails, GuardrailRule, compile_guardrail_rules};
 
-#[derive(Clone, Debug, Default, PartialEq, Eq)]
-pub struct Cursor {
-    pub message_id: i64,
-    pub token: String,
-}
+pub use adk_codec::dto::Cursor;
 #[derive(Clone, Debug, Default)]
 pub struct UserMessage {
     pub id: i64,

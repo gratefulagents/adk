@@ -38,6 +38,15 @@ The cursor advances as each page is loaded, before model execution. A later
 page/model/store failure therefore does not roll back already consumed pages.
 The default page size is 50; a short page or unchanged cursor ends pagination.
 
+`host::Cursor` is the shared `codec::dto::Cursor` record and supports Serde
+persistence (`message_id` and `token`, omitted when zero/empty). Use
+`codec::from_go_json::<host::Cursor>` and `codec::to_go_json_bytes` when reading
+or writing the pinned SDK format: these include Go key folding, duplicate/null
+field behavior, signed integer parsing, malformed string replacement, nesting
+limits and HTML escaping. Ordinary Serde remains available for native JSON;
+Go decoder partial mutation and exact error messages are not reproduced. The
+same record/codec is available with only the `compat` feature.
+
 Each call reloads handoff history from `ConfigSource`; previous call results
 are not silently retained as the next call's prompt. A store must supply its
 own replay history through that collaborator. `RunBatch` keeps native items,

@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Host cursor persistence and pinned JSON codec
+
+`host::Cursor` now shares the canonical compatibility record, with Serde
+persistence and explicit Go JSON byte decoding/encoding.41 direct pinned-Go cases
+verify both fields and exact encoded bytes, including omission, signed limits,
+integer negative zero, duplicate/null/folded keys, unknown values, invalid string
+replacement and depth limits. Native persistence/in-place behavior and compat-only
+embedding also pass. Ordinary i64 Serde rejected `-0` before the existing event
+integer seed was shared with the cursor decoder. Four record/member/host-alias
+IDs are closed; no other host types or lifecycle capabilities are inferred.
+
+Fresh Rust1.88 Linux: **1,643 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone consumer/
+purity,20 offline scenarios, host-session, Go harness tests/vet/build, all bound
+oracles,51 validators, artifacts/overlay/audit and source locks passed. Initial
+evidence generation correctly rejected the missing explicit host_cursor test
+target; after adding it, final generation and validation passed. Ledger:
+**867 verified /8,024 unresolved /251 excluded**. All46 remote checks passed on
+prior64311231; new-head CI is not yet claimed. Issue11 remains incomplete.
+
 ### Host approval gates retain original argument text
 
 `ToolApprovalRequest` now exposes owned `input_json` alongside the parsed

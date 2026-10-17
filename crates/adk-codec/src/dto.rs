@@ -40,6 +40,14 @@ fn is_zero<T: Default + PartialEq>(v: &T) -> bool {
     *v == T::default()
 }
 
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+pub struct Cursor {
+    #[serde(default, skip_serializing_if = "is_zero")]
+    pub message_id: i64,
+    #[serde(default, skip_serializing_if = "String::is_empty")]
+    pub token: String,
+}
+
 // RawMessage distinguishes a nil slice from the explicit JSON bytes `null`.
 #[derive(Clone, Debug, Default)]
 pub enum RawJson {

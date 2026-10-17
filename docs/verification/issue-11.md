@@ -2,6 +2,30 @@
 
 ## Current continuation evidence
 
+### Complete mode data package and original routing regressions
+
+Reviewed the complete one-file `pkg/agentsdk/mode` package: four structs and
+24 fields, no functions, initialization or host resources. Its exact source
+hash matches the independent 993-case oracle; all 28 declarations already have
+verified mappings. File/package closure is limited to this data-only package,
+not the broader `sdk::mode` group or internal routing implementation.
+
+Added exact counterparts for every assertion in the original 80-line
+`mode_routing_test.go`: seven reasoning effort/budget cases, architect overrides,
+planner inheritance and empty routing. Both original Go test entrypoints and
+all seven table subtests were freshly executed and passed. This closes six
+records: the original test file, its two tests and table site, plus the mode
+data file/package.
+
+Fresh Rust 1.88 Linux: **1,736 workspace tests +10 doctests passed;
+0 failed, 30 ignored**. Strict workspace lint/typecheck, formatting,
+independent reference reproduction, source-bound evidence, 55 validators,
+artifact/overlay/audit and source locks passed. Runtime implementation is
+unchanged from `470c870`, whose full feature/consumer/purity/docs checks passed.
+Ledger: **999 verified /7,892 unresolved /251 excluded**. Full acceptance
+remains incomplete.
+
+
 ### Pure top-level and per-role routing resolution
 
 Added compatibility `resolve_mode_routing` and `resolve_role_mode_routing`,

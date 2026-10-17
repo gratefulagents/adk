@@ -17923,6 +17923,144 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-A8D453C0C59C7DE1": {
+      "source": "internal/agent/mode_routing_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression",
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Complete review of the pinned80-line mode_routing_test.go accounts for both test entrypoints and the one dynamic table subtest site. Native exact counterparts retain all seven reasoning effort/budget pairs and every architect override, planner inheritance and empty-routing assertion using the original model/provider/role strings. Independent actual-Go routing/settings oracles supplement, rather than replace, those original assertions. This closes only the original regression files record, not the entire mode_routing.go implementation, constants/types, provider construction or unrelated runtime behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "compat"
+      ]
+    },
+    "SDK-DC29DFF605C139A2": {
+      "source": "internal/agent/mode_routing_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression",
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Complete review of the pinned80-line mode_routing_test.go accounts for both test entrypoints and the one dynamic table subtest site. Native exact counterparts retain all seven reasoning effort/budget pairs and every architect override, planner inheritance and empty-routing assertion using the original model/provider/role strings. Independent actual-Go routing/settings oracles supplement, rather than replace, those original assertions. This closes only the original regression subtests record, not the entire mode_routing.go implementation, constants/types, provider construction or unrelated runtime behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "compat"
+      ]
+    },
+    "SDK-B2888DBA870688B4": {
+      "source": "internal/agent/mode_routing_test.go",
+      "source_name": "TestModeReasoningSettings",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression",
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings",
+      "rationale": "Complete review of the pinned80-line mode_routing_test.go accounts for both test entrypoints and the one dynamic table subtest site. Native exact counterparts retain all seven reasoning effort/budget pairs and every architect override, planner inheritance and empty-routing assertion using the original model/provider/role strings. Independent actual-Go routing/settings oracles supplement, rather than replace, those original assertions. This closes only the original regression tests record, not the entire mode_routing.go implementation, constants/types, provider construction or unrelated runtime behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "compat"
+      ]
+    },
+    "SDK-B208436220F4341C": {
+      "source": "internal/agent/mode_routing_test.go",
+      "source_name": "TestResolveRoleModeRouting",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression",
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "pinned_mode_and_role_routing_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Complete review of the pinned80-line mode_routing_test.go accounts for both test entrypoints and the one dynamic table subtest site. Native exact counterparts retain all seven reasoning effort/budget pairs and every architect override, planner inheritance and empty-routing assertion using the original model/provider/role strings. Independent actual-Go routing/settings oracles supplement, rather than replace, those original assertions. This closes only the original regression tests record, not the entire mode_routing.go implementation, constants/types, provider construction or unrelated runtime behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime",
+        "compat"
+      ]
+    },
+    "SDK-90C762A3BFF3F45F": {
+      "source": "pkg/agentsdk/mode/types.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec",
+        "crates/adk-codec/src/dto.rs::ModeConstraints",
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes",
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Complete review of pkg/agentsdk/mode: the package contains exactly one1201-byte source file, types.go at SHA2569fe21e79a566477f263fbd3e190e123432a4a6607889e9b388ace006e86676c6, defining four data structs and24 fields, with no functions, initialization, build constraints, host resources or package-local tests. All28 API declarations have independently verified codec mappings. The actual immutable Go oracle binds that exact source hash and exercises993 byte inputs across template and runner data types, comparing successful unnormalized state and exact bytes, including pointers, container allocation identity, repeated fields, Unicode and signed64-bit bounds. The two candidate original mode-routing tests have exact native assertion counterparts and independently passing Go anchors. The compat feature exposes these data shapes without platform dependencies. This closes only the data-only package/file, not the broader sdk::mode verification group, internal routing implementation, arbitrary Go reflection/type identity, native builder settings or runtime constraint enforcement.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3C6050853B5C592E": {
+      "source": null,
+      "source_name": "mode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec",
+        "crates/adk-codec/src/dto.rs::ModeConstraints",
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes",
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Complete review of pkg/agentsdk/mode: the package contains exactly one1201-byte source file, types.go at SHA2569fe21e79a566477f263fbd3e190e123432a4a6607889e9b388ace006e86676c6, defining four data structs and24 fields, with no functions, initialization, build constraints, host resources or package-local tests. All28 API declarations have independently verified codec mappings. The actual immutable Go oracle binds that exact source hash and exercises993 byte inputs across template and runner data types, comparing successful unnormalized state and exact bytes, including pointers, container allocation identity, repeated fields, Unicode and signed64-bit bounds. The two candidate original mode-routing tests have exact native assertion counterparts and independently passing Go anchors. The compat feature exposes these data shapes without platform dependencies. This closes only the data-only package/file, not the broader sdk::mode verification group, internal routing implementation, arbitrary Go reflection/type identity, native builder settings or runtime constraint enforcement.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

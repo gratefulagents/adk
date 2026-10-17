@@ -105,3 +105,53 @@ fn routing_results_own_fallbacks_and_do_not_share_mutations() {
     assert_eq!(first.fallback_models.unwrap()[0], "small");
     assert_eq!(routing.fallback_models.unwrap()[1], "small");
 }
+
+#[test]
+fn original_resolve_role_mode_routing_regression() {
+    let routing: ModeRouting = from_go_json(
+        br#"{
+        "DefaultModel":"openai/gpt-5.4",
+        "FallbackModels":["anthropic/claude-sonnet-4-6"],
+        "ReasoningLevel":"medium",
+        "TextVerbosity":"low",
+        "RoleOverrides":{"architect":{
+            "Model":"anthropic/claude-sonnet-4-6",
+            "FallbackModels":["copilot/gpt-4.1"],
+            "ReasoningLevel":"high",
+            "TextVerbosity":"high"
+        }}
+    }"#,
+    )
+    .unwrap();
+    let architect = resolve_role_mode_routing(
+        "openai/gpt-5.3-codex",
+        "openai",
+        "architect",
+        Some(&routing),
+    );
+    assert_eq!(architect.model, "anthropic/claude-sonnet-4-6");
+    assert_eq!(architect.fallback_models.unwrap(), ["copilot/gpt-4.1"]);
+    assert_eq!(architect.reasoning_level, "high");
+    assert_eq!(architect.model_settings.thinking_budget, 8192);
+    assert_eq!(architect.text_verbosity, "high");
+    assert_eq!(architect.model_settings.text_verbosity, "high");
+    let planner =
+        resolve_role_mode_routing("openai/gpt-5.3-codex", "openai", "planner", Some(&routing));
+    assert_eq!(planner.model, "openai/gpt-5.4");
+    assert_eq!(
+        planner.fallback_models.unwrap(),
+        ["anthropic/claude-sonnet-4-6"]
+    );
+    assert_eq!(planner.reasoning_level, "medium");
+    assert_eq!(planner.model_settings.thinking_budget, 4096);
+    assert_eq!(planner.text_verbosity, "low");
+    assert_eq!(planner.model_settings.text_verbosity, "low");
+    let empty = resolve_role_mode_routing(
+        "openai/gpt-5.3-codex",
+        "openai",
+        "executor",
+        Some(&ModeRouting::default()),
+    );
+    assert_eq!(empty.reasoning_level, "");
+    assert_eq!(empty.model_settings.thinking_budget, 0);
+}

@@ -21,3 +21,27 @@ fn routing_labels_and_budgets_match_independently_executed_sdk_helpers() {
         assert_eq!(separate, combined);
     }
 }
+
+#[test]
+fn original_mode_reasoning_settings_regression() {
+    for (level, budget) in [
+        ("none", 0),
+        ("minimal", 1024),
+        ("low", 2048),
+        ("medium", 4096),
+        ("high", 8192),
+        ("xhigh", 16384),
+        ("max", 24576),
+    ] {
+        let settings = reasoning_settings(level);
+        assert_eq!(
+            settings
+                .get("thinking_budget")
+                .and_then(Value::as_i64)
+                .unwrap_or_default(),
+            budget,
+            "{level}"
+        );
+        assert_eq!(settings["reasoning_effort"], level);
+    }
+}

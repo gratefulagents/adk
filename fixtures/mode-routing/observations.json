@@ -7,6 +7,7 @@
         "provider": "",
         "routing": null
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -86,6 +87,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -159,6 +161,7 @@
         "provider": "",
         "routing": null
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -238,6 +241,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -311,6 +315,7 @@
         "provider": "",
         "routing": null
       },
+      "resolved_model": "gpt-5.6-terra",
       "roles": [
         {
           "name": "worker",
@@ -390,6 +395,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-terra",
       "roles": [
         {
           "name": "worker",
@@ -463,6 +469,7 @@
         "provider": "",
         "routing": null
       },
+      "resolved_model": "gpt-5.6-sol",
       "roles": [
         {
           "name": "worker",
@@ -542,6 +549,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-sol",
       "roles": [
         {
           "name": "worker",
@@ -615,6 +623,7 @@
         "provider": "",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -694,6 +703,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -767,6 +777,7 @@
         "provider": " OpenAI ",
         "routing": null
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -846,6 +857,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -919,6 +931,7 @@
         "provider": " OpenAI ",
         "routing": null
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -998,6 +1011,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -1071,6 +1085,7 @@
         "provider": " OpenAI ",
         "routing": null
       },
+      "resolved_model": "gpt-5.6-terra",
       "roles": [
         {
           "name": "worker",
@@ -1150,6 +1165,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-terra",
       "roles": [
         {
           "name": "worker",
@@ -1223,6 +1239,7 @@
         "provider": " OpenAI ",
         "routing": null
       },
+      "resolved_model": "gpt-5.6-sol",
       "roles": [
         {
           "name": "worker",
@@ -1302,6 +1319,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-sol",
       "roles": [
         {
           "name": "worker",
@@ -1375,6 +1393,7 @@
         "provider": " OpenAI ",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -1454,6 +1473,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -1527,6 +1547,7 @@
         "provider": " ANTHROPIC ",
         "routing": null
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -1606,6 +1627,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -1679,6 +1701,7 @@
         "provider": " ANTHROPIC ",
         "routing": null
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -1758,6 +1781,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -1831,6 +1855,7 @@
         "provider": " ANTHROPIC ",
         "routing": null
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -1910,6 +1935,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -1983,6 +2009,7 @@
         "provider": " ANTHROPIC ",
         "routing": null
       },
+      "resolved_model": "claude-opus-4-6",
       "roles": [
         {
           "name": "worker",
@@ -2062,6 +2089,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-opus-4-6",
       "roles": [
         {
           "name": "worker",
@@ -2135,6 +2163,7 @@
         "provider": " ANTHROPIC ",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -2214,6 +2243,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -2287,6 +2317,7 @@
         "provider": "copilot",
         "routing": null
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -2366,6 +2397,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -2439,6 +2471,7 @@
         "provider": "copilot",
         "routing": null
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -2518,6 +2551,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -2591,6 +2625,7 @@
         "provider": "copilot",
         "routing": null
       },
+      "resolved_model": "MEDIUM",
       "roles": [
         {
           "name": "worker",
@@ -2670,6 +2705,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "MEDIUM",
       "roles": [
         {
           "name": "worker",
@@ -2743,6 +2779,7 @@
         "provider": "copilot",
         "routing": null
       },
+      "resolved_model": "Large",
       "roles": [
         {
           "name": "worker",
@@ -2822,6 +2859,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Large",
       "roles": [
         {
           "name": "worker",
@@ -2895,6 +2933,7 @@
         "provider": "copilot",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -2974,6 +3013,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -3047,6 +3087,7 @@
         "provider": "claude",
         "routing": null
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -3126,6 +3167,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -3199,6 +3241,7 @@
         "provider": "claude",
         "routing": null
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -3278,6 +3321,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -3351,6 +3395,7 @@
         "provider": "claude",
         "routing": null
       },
+      "resolved_model": "MEDIUM",
       "roles": [
         {
           "name": "worker",
@@ -3430,6 +3475,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "MEDIUM",
       "roles": [
         {
           "name": "worker",
@@ -3503,6 +3549,7 @@
         "provider": "claude",
         "routing": null
       },
+      "resolved_model": "Large",
       "roles": [
         {
           "name": "worker",
@@ -3582,6 +3629,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Large",
       "roles": [
         {
           "name": "worker",
@@ -3655,6 +3703,7 @@
         "provider": "claude",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -3734,6 +3783,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -3807,6 +3857,7 @@
         "provider": "anthrop\u0130c",
         "routing": null
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -3886,6 +3937,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -3959,6 +4011,7 @@
         "provider": "anthrop\u0130c",
         "routing": null
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -4038,6 +4091,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -4111,6 +4165,7 @@
         "provider": "anthrop\u0130c",
         "routing": null
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -4190,6 +4245,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-sonnet-4-6",
       "roles": [
         {
           "name": "worker",
@@ -4263,6 +4319,7 @@
         "provider": "anthrop\u0130c",
         "routing": null
       },
+      "resolved_model": "claude-opus-4-6",
       "roles": [
         {
           "name": "worker",
@@ -4342,6 +4399,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-opus-4-6",
       "roles": [
         {
           "name": "worker",
@@ -4415,6 +4473,7 @@
         "provider": "anthrop\u0130c",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -4494,6 +4553,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -4567,6 +4627,7 @@
         "provider": "openai-compatible",
         "routing": null
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -4646,6 +4707,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "",
       "roles": [
         {
           "name": "worker",
@@ -4719,6 +4781,7 @@
         "provider": "openai-compatible",
         "routing": null
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -4798,6 +4861,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -4871,6 +4935,7 @@
         "provider": "openai-compatible",
         "routing": null
       },
+      "resolved_model": "MEDIUM",
       "roles": [
         {
           "name": "worker",
@@ -4950,6 +5015,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "MEDIUM",
       "roles": [
         {
           "name": "worker",
@@ -5023,6 +5089,7 @@
         "provider": "openai-compatible",
         "routing": null
       },
+      "resolved_model": "Large",
       "roles": [
         {
           "name": "worker",
@@ -5102,6 +5169,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Large",
       "roles": [
         {
           "name": "worker",
@@ -5175,6 +5243,7 @@
         "provider": "openai-compatible",
         "routing": null
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -5254,6 +5323,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "Custom/\u732b",
       "roles": [
         {
           "name": "worker",
@@ -5339,6 +5409,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -5478,6 +5549,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -5617,6 +5689,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -5756,6 +5829,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -5895,6 +5969,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6034,6 +6109,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6186,6 +6262,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6287,6 +6364,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6409,6 +6487,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6514,6 +6593,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6635,6 +6715,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6744,6 +6825,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6866,6 +6948,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -6975,6 +7058,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7097,6 +7181,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7206,6 +7291,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7328,6 +7414,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7437,6 +7524,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7559,6 +7647,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7668,6 +7757,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7790,6 +7880,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -7899,6 +7990,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8021,6 +8113,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8122,6 +8215,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8225,6 +8319,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8325,6 +8420,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8416,6 +8512,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8516,6 +8613,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8610,6 +8708,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8719,6 +8818,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8809,6 +8909,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -8948,6 +9049,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9051,6 +9153,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9190,6 +9293,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9329,6 +9433,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9468,6 +9573,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9607,6 +9713,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9746,6 +9853,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9898,6 +10006,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -9999,6 +10108,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10121,6 +10231,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10226,6 +10337,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10347,6 +10459,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10456,6 +10569,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10578,6 +10692,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10687,6 +10802,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10809,6 +10925,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -10918,6 +11035,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11040,6 +11158,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11149,6 +11268,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11271,6 +11391,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11380,6 +11501,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11502,6 +11624,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11611,6 +11734,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11733,6 +11857,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11834,6 +11959,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -11937,6 +12063,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12037,6 +12164,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12128,6 +12256,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12228,6 +12357,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12322,6 +12452,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12431,6 +12562,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12521,6 +12653,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12660,6 +12793,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "gpt-5.6-luna",
       "roles": [
         {
           "name": "worker",
@@ -12763,6 +12897,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -12902,6 +13037,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13041,6 +13177,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13180,6 +13317,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13319,6 +13457,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13458,6 +13597,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13610,6 +13750,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13711,6 +13852,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13833,6 +13975,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -13938,6 +14081,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14059,6 +14203,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14168,6 +14313,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14290,6 +14436,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14399,6 +14546,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14521,6 +14669,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14630,6 +14779,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14752,6 +14902,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14861,6 +15012,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -14983,6 +15135,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15092,6 +15245,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15214,6 +15368,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15323,6 +15478,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15445,6 +15601,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15546,6 +15703,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15649,6 +15807,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15749,6 +15908,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15840,6 +16000,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -15940,6 +16101,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -16034,6 +16196,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -16143,6 +16306,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -16233,6 +16397,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -16372,6 +16537,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -16475,6 +16641,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -16614,6 +16781,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -16753,6 +16921,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -16892,6 +17061,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17031,6 +17201,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17170,6 +17341,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17322,6 +17494,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17423,6 +17596,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17545,6 +17719,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17650,6 +17825,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17771,6 +17947,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -17880,6 +18057,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18002,6 +18180,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18111,6 +18290,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18233,6 +18413,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18342,6 +18523,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18464,6 +18646,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18573,6 +18756,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18695,6 +18879,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18804,6 +18989,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -18926,6 +19112,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19035,6 +19222,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19157,6 +19345,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19258,6 +19447,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19361,6 +19551,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19461,6 +19652,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19552,6 +19744,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19652,6 +19845,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19746,6 +19940,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19855,6 +20050,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -19945,6 +20141,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20084,6 +20281,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20187,6 +20385,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20326,6 +20525,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20465,6 +20665,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20604,6 +20805,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20743,6 +20945,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -20882,6 +21085,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21034,6 +21238,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21135,6 +21340,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21257,6 +21463,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21362,6 +21569,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21483,6 +21691,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21592,6 +21801,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21714,6 +21924,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21823,6 +22034,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -21945,6 +22157,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22054,6 +22267,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22176,6 +22390,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22285,6 +22500,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22407,6 +22623,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22516,6 +22733,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22638,6 +22856,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22747,6 +22966,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22869,6 +23089,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -22970,6 +23191,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23073,6 +23295,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23173,6 +23396,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23264,6 +23488,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23364,6 +23589,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23458,6 +23684,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23567,6 +23794,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23657,6 +23885,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23796,6 +24025,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -23899,6 +24129,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24038,6 +24269,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24177,6 +24409,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24316,6 +24549,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24455,6 +24689,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24594,6 +24829,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24746,6 +24982,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24847,6 +25084,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -24969,6 +25207,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25074,6 +25313,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25195,6 +25435,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25304,6 +25545,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25426,6 +25668,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25535,6 +25778,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25657,6 +25901,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25766,6 +26011,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25888,6 +26134,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -25997,6 +26244,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26119,6 +26367,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26228,6 +26477,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26350,6 +26600,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26459,6 +26710,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26581,6 +26833,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26682,6 +26935,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26785,6 +27039,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26885,6 +27140,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -26976,6 +27232,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -27076,6 +27333,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -27170,6 +27428,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -27279,6 +27538,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -27369,6 +27629,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -27508,6 +27769,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "claude-haiku-4-5",
       "roles": [
         {
           "name": "worker",
@@ -27611,6 +27873,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -27750,6 +28013,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -27889,6 +28153,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28028,6 +28293,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28167,6 +28433,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28306,6 +28573,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28458,6 +28726,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28559,6 +28828,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28681,6 +28951,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28786,6 +29057,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -28907,6 +29179,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29016,6 +29289,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29138,6 +29412,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29247,6 +29522,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29369,6 +29645,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29478,6 +29755,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29600,6 +29878,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29709,6 +29988,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29831,6 +30111,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -29940,6 +30221,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30062,6 +30344,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30171,6 +30454,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30293,6 +30577,7 @@
           "TextVerbosity": " MED\u0130UM "
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30394,6 +30679,7 @@
           "TextVerbosity": "low"
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30497,6 +30783,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30597,6 +30884,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30688,6 +30976,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30788,6 +31077,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30882,6 +31172,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -30991,6 +31282,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -31081,6 +31373,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -31220,6 +31513,7 @@
           "TextVerbosity": ""
         }
       },
+      "resolved_model": "small",
       "roles": [
         {
           "name": "worker",
@@ -31312,7 +31606,7 @@
     "goOS": "linux",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/mode-routing-reference/reference_test.go": "49547118e696c0dc94c7756aea4902476efd926861f829b4325020638ec2ac16",
+      "scripts/mode-routing-reference/reference_test.go": "5c65e9c77587ad231fda228f9d20e6073111f456f7410e85d125b59319aa577d",
       "scripts/mode-routing-reference/run.py": "f4168c2275117c5a73ede8940844fec29eeb4a178b6e70c0ad68bb07d88e3698"
     },
     "license": "GPL-3.0-only",

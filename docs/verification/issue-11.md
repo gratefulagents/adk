@@ -2,6 +2,28 @@
 
 ## Current continuation evidence
 
+### Direct model-alias resolution
+
+Exposed `adk::codec::mode::resolve_model_for_provider`, sharing the pure resolver
+already used by mode/role routing. The actual-Go oracle now checks 294 direct
+alias results in addition to 1,764 routing results. The complete implementation
+file, both API/alias records, original test and complete test file are reviewed
+and covered. Unknown providers preserve trimmed model names; only Anthropic
+supplies an empty-model default. No model construction or provider validation
+is performed.
+
+The newly required original Go regression was absent from the prior bounded
+reference selection. Refreshing the claim-driven reference suite executed it:
+**923 original Go test/subtest records passed, 5 skipped**. No missing reference
+was treated as a pass. Fresh Rust 1.88 Linux: **1,737 workspace tests +10 doctests
+passed; 0 failed, 30 ignored**. Strict lint/typecheck/rustdoc/format, full feature
+matrix, standalone consumer/purity, independent reproduction, bound evidence,
+55 validators, artifact/overlay/audit and source locks passed.
+
+Ledger: **1,004 verified /7,887 unresolved /251 excluded**. Full retained
+acceptance remains incomplete.
+
+
 ### Complete mode data package and original routing regressions
 
 Reviewed the complete one-file `pkg/agentsdk/mode` package: four structs and

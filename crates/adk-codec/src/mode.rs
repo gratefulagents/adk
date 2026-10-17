@@ -36,7 +36,7 @@ pub fn resolve_mode_routing(
         .filter(|model| !model.is_empty())
         .unwrap_or(base_model);
     let mut result = ModeRoutingResolution {
-        model: resolve_model(model, provider),
+        model: resolve_model_for_provider(model, provider),
         ..Default::default()
     };
     if let Some(routing) = routing {
@@ -62,7 +62,7 @@ pub fn resolve_role_mode_routing(
         .and_then(|roles| roles.get(role_name))
     {
         if !role.model.trim().is_empty() {
-            result.model = resolve_model(&role.model, provider);
+            result.model = resolve_model_for_provider(&role.model, provider);
         }
         if role
             .fallback_models
@@ -82,7 +82,7 @@ fn resolve_fallbacks(models: Option<&[String]>, provider: &str) -> Option<Vec<St
         .iter()
         .map(|model| model.trim())
         .filter(|model| !model.is_empty())
-        .map(|model| resolve_model(model, provider))
+        .map(|model| resolve_model_for_provider(model, provider))
         .collect();
     (!models.is_empty()).then_some(models)
 }
@@ -96,7 +96,7 @@ fn lowercase(value: &str) -> String {
         .collect()
 }
 
-fn resolve_model(model: &str, provider: &str) -> String {
+pub fn resolve_model_for_provider(model: &str, provider: &str) -> String {
     match (lowercase(provider).as_str(), lowercase(model).as_str()) {
         ("anthropic", "" | "medium") => "claude-sonnet-4-6",
         ("anthropic", "small") => "claude-haiku-4-5",

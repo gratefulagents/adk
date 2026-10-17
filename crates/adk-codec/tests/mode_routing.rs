@@ -1,7 +1,7 @@
 use adk_codec::{
     dto::{ModeRoleRouting, ModeRouting},
     from_go_json,
-    mode::{resolve_mode_routing, resolve_role_mode_routing},
+    mode::{resolve_mode_routing, resolve_model_for_provider, resolve_role_mode_routing},
     to_go_json_bytes,
 };
 use serde_json::Value;
@@ -37,6 +37,11 @@ fn pinned_mode_and_role_routing_oracle() {
         let before = routing.clone();
         let model = input["base_model"].as_str().unwrap();
         let provider = input["provider"].as_str().unwrap();
+        assert_eq!(
+            resolve_model_for_provider(model, provider),
+            case["resolved_model"].as_str().unwrap(),
+            "{id}"
+        );
         let top = resolve_mode_routing(model, provider, routing.as_ref());
         assert_eq!(serde_json::to_value(&top).unwrap(), case["top"], "{id}");
         assert_eq!(
@@ -154,4 +159,9 @@ fn original_resolve_role_mode_routing_regression() {
     );
     assert_eq!(empty.reasoning_level, "");
     assert_eq!(empty.model_settings.thinking_budget, 0);
+}
+
+#[test]
+fn original_model_resolution_leaves_unknown_providers_alone() {
+    assert_eq!(resolve_model_for_provider("small", "local"), "small");
 }

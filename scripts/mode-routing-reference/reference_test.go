@@ -64,7 +64,7 @@ func TestNativeModeRoutingReference(t *testing.T) {
 		if string(before) != encode(in) {
 			t.Fatal("routing resolution mutated its input")
 		}
-		cases = append(cases, map[string]any{"id": fmt.Sprintf("routing-%d", index), "input": in, "top": top, "top_json": encode(top), "roles": roles})
+		cases = append(cases, map[string]any{"id": fmt.Sprintf("routing-%d", index), "input": in, "resolved_model": ResolveModelForProvider(in.BaseModel, in.Provider), "top": top, "top_json": encode(top), "roles": roles})
 	}
 	encoded, err := json.Marshal(map[string]any{"schema_version": 1, "cases": cases})
 	if err != nil {

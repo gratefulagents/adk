@@ -347,7 +347,10 @@ all-blank role fallback list clears inherited fallbacks, while an empty list
 inherits them. `ModeRoutingResolution` supports `to_go_json_bytes`, but is not a
 Go decoding target. The independent oracle compares 1,764 results and exact
 bytes; the standalone consumer exercises decode → conversion → role resolution
-→ encoding. Provider request clamping and execution policy remain separate.
+→ encoding. `adk::codec::mode::resolve_model_for_provider` also exposes the
+pure alias lookup directly: unknown providers retain trimmed model names;
+empty provider means OpenAI, while only Anthropic supplies an empty-model
+default. Provider request clamping and execution policy remain separate.
 
 ### Compatibility role/catalog DTOs
 

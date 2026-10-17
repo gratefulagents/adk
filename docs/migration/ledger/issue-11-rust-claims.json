@@ -18061,6 +18061,91 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-6DD384539B31A27A": {
+      "source": "internal/agent/model_resolution.go",
+      "source_name": "ResolveModelForProvider",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_model_for_provider"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "original_model_resolution_leaves_unknown_providers_alone"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveModelForProviderLeavesUnknownProvidersAlone",
+      "rationale": "Complete review of model_resolution.go accounts for the public helper, its two private provider branches and defaultAnthropicModel constant. The native direct helper trims labels, applies Go simple lowercase only for matching, treats empty provider as OpenAI, maps small/medium/large exactly, returns the Anthropic default for empty model and preserves trimmed unknown/provider-qualified names. The independent pinned Go oracle directly calls ResolveModelForProvider for294 inputs in addition to1764 mode/role resolutions. The exact original unknown-provider test is ported and required to independently pass in Go; its complete ten-line file has no other behavior. These records cover only pure label resolution and that regression, not provider construction, request validation, credentials, live services or fallback execution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A271E835C93C6F78": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ResolveModelForProvider",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_model_for_provider"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "original_model_resolution_leaves_unknown_providers_alone"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveModelForProviderLeavesUnknownProvidersAlone",
+      "rationale": "Complete review of model_resolution.go accounts for the public helper, its two private provider branches and defaultAnthropicModel constant. The native direct helper trims labels, applies Go simple lowercase only for matching, treats empty provider as OpenAI, maps small/medium/large exactly, returns the Anthropic default for empty model and preserves trimmed unknown/provider-qualified names. The independent pinned Go oracle directly calls ResolveModelForProvider for294 inputs in addition to1764 mode/role resolutions. The exact original unknown-provider test is ported and required to independently pass in Go; its complete ten-line file has no other behavior. These records cover only pure label resolution and that regression, not provider construction, request validation, credentials, live services or fallback execution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2AFB713BCF1D8BD3": {
+      "source": "internal/agent/model_resolution.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_model_for_provider"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "original_model_resolution_leaves_unknown_providers_alone"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveModelForProviderLeavesUnknownProvidersAlone",
+      "rationale": "Complete review of model_resolution.go accounts for the public helper, its two private provider branches and defaultAnthropicModel constant. The native direct helper trims labels, applies Go simple lowercase only for matching, treats empty provider as OpenAI, maps small/medium/large exactly, returns the Anthropic default for empty model and preserves trimmed unknown/provider-qualified names. The independent pinned Go oracle directly calls ResolveModelForProvider for294 inputs in addition to1764 mode/role resolutions. The exact original unknown-provider test is ported and required to independently pass in Go; its complete ten-line file has no other behavior. These records cover only pure label resolution and that regression, not provider construction, request validation, credentials, live services or fallback execution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AD7ED68A4BCCE8A6": {
+      "source": "internal/agent/model_resolution_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_model_for_provider"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "original_model_resolution_leaves_unknown_providers_alone"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveModelForProviderLeavesUnknownProvidersAlone",
+      "rationale": "Complete review of model_resolution.go accounts for the public helper, its two private provider branches and defaultAnthropicModel constant. The native direct helper trims labels, applies Go simple lowercase only for matching, treats empty provider as OpenAI, maps small/medium/large exactly, returns the Anthropic default for empty model and preserves trimmed unknown/provider-qualified names. The independent pinned Go oracle directly calls ResolveModelForProvider for294 inputs in addition to1764 mode/role resolutions. The exact original unknown-provider test is ported and required to independently pass in Go; its complete ten-line file has no other behavior. These records cover only pure label resolution and that regression, not provider construction, request validation, credentials, live services or fallback execution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A2A3EBB272F40551": {
+      "source": "internal/agent/model_resolution_test.go",
+      "source_name": "TestResolveModelForProviderLeavesUnknownProvidersAlone",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_model_for_provider"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "original_model_resolution_leaves_unknown_providers_alone"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveModelForProviderLeavesUnknownProvidersAlone",
+      "rationale": "Complete review of model_resolution.go accounts for the public helper, its two private provider branches and defaultAnthropicModel constant. The native direct helper trims labels, applies Go simple lowercase only for matching, treats empty provider as OpenAI, maps small/medium/large exactly, returns the Anthropic default for empty model and preserves trimmed unknown/provider-qualified names. The independent pinned Go oracle directly calls ResolveModelForProvider for294 inputs in addition to1764 mode/role resolutions. The exact original unknown-provider test is ported and required to independently pass in Go; its complete ten-line file has no other behavior. These records cover only pure label resolution and that regression, not provider construction, request validation, credentials, live services or fallback execution.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

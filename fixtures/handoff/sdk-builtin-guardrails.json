@@ -1,4 +1,606 @@
 {
+  "tool_patterns": [
+    {
+      "name": "",
+      "pattern": "",
+      "matches": true
+    },
+    {
+      "name": "",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "*ite",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "*write",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "write",
+      "pattern": "write",
+      "matches": true
+    },
+    {
+      "name": "write",
+      "pattern": "wr*",
+      "matches": true
+    },
+    {
+      "name": "write",
+      "pattern": "*ite",
+      "matches": true
+    },
+    {
+      "name": "write",
+      "pattern": "*write",
+      "matches": true
+    },
+    {
+      "name": "write",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "write",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "read_file",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "*ite",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "*write",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "read_file",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "*ite",
+      "matches": true
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "*write",
+      "matches": true
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "mcp_sql_db_write",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "*write",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "*ite",
+      "matches": true
+    },
+    {
+      "name": "*write",
+      "pattern": "*write",
+      "matches": true
+    },
+    {
+      "name": "*write",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "**",
+      "matches": true
+    },
+    {
+      "name": "*write",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "*write",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "*ite",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "*write",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "foo*",
+      "matches": true
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "foo**",
+      "matches": true
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "foo*bar",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "猫-read",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "*ite",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "*write",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "猫-read",
+      "pattern": "猫*",
+      "matches": true
+    },
+    {
+      "name": "猫-read",
+      "pattern": "*read",
+      "matches": true
+    },
+    {
+      "name": "猫-read",
+      "pattern": "\n*",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "*",
+      "matches": true
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "write",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "wr*",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "*ite",
+      "matches": true
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "*write",
+      "matches": true
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "*sql*_write",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "*sql*",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "wr*te",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "**",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "foo*",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "foo**",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "猫*",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "*read",
+      "matches": false
+    },
+    {
+      "name": "file\nwrite",
+      "pattern": "\n*",
+      "matches": false
+    }
+  ],
   "schema_version": 1,
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "input_guard_names": [

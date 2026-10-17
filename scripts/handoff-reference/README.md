@@ -462,3 +462,8 @@ module and GPL-3.0-only provenance policy. Source entry points are
 `pkg/agentsdk/guardrails/builtin.go` (`BuiltinToolInputGuardrails` and
 `BuiltinToolOutputGuardrails`) and their exported runtime types, at the pin above.
 The generator contains fixture construction only, not copied matchers.
+
+The same fixture includes 120 independently executed public `MatchToolPattern`
+observations from `pkg/agentsdk/guardrails/rules.go`. They cover exact and empty
+strings, edge-star precedence, literal internal/repeated stars, Unicode and
+newlines. These compare the public helper, not ChatLoop's different glob matcher.

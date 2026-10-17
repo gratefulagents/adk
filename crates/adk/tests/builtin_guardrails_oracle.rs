@@ -191,3 +191,23 @@ async fn builtin_dispositions_and_redacted_bytes_match_pinned_sdk_where_represen
     }
     assert_eq!((matched, hardened), (96, 1));
 }
+
+#[test]
+fn public_tool_pattern_helper_matches_pinned_sdk_not_chatloop_globs() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["tool_patterns"].as_array().unwrap();
+    assert_eq!(cases.len(), 120);
+    for case in cases {
+        assert_eq!(
+            adk::guardrails::match_tool_pattern(
+                case["name"].as_str().unwrap(),
+                case["pattern"].as_str().unwrap()
+            ),
+            case["matches"].as_bool().unwrap(),
+            "{case}"
+        );
+    }
+}

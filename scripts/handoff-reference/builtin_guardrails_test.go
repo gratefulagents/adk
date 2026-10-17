@@ -44,6 +44,9 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if len(fixture.Cases) != 97 {
 		t.Fatalf("got %d cases, want 97", len(fixture.Cases))
 	}
+	if len(fixture.ToolPatterns) != 120 {
+		t.Fatalf("got %d tool patterns, want 120", len(fixture.ToolPatterns))
+	}
 	seen := map[string]bool{}
 	for _, c := range fixture.Cases {
 		t.Run(c.Name, func(t *testing.T) {

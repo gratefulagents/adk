@@ -33,12 +33,19 @@ type builtinCase struct {
 	FinalContent *string              `json:"final_content"`
 }
 
+type toolPatternCase struct {
+	Name    string `json:"name"`
+	Pattern string `json:"pattern"`
+	Matches bool   `json:"matches"`
+}
+
 type builtinFixture struct {
-	SchemaVersion    int           `json:"schema_version"`
-	SDKRevision      string        `json:"sdk_revision"`
-	InputGuardNames  []string      `json:"input_guard_names"`
-	OutputGuardNames []string      `json:"output_guard_names"`
-	Cases            []builtinCase `json:"cases"`
+	ToolPatterns     []toolPatternCase `json:"tool_patterns"`
+	SchemaVersion    int               `json:"schema_version"`
+	SDKRevision      string            `json:"sdk_revision"`
+	InputGuardNames  []string          `json:"input_guard_names"`
+	OutputGuardNames []string          `json:"output_guard_names"`
+	Cases            []builtinCase     `json:"cases"`
 }
 
 // Version 1 uses ASCII-only recipes so native implementations can reproduce
@@ -151,6 +158,12 @@ func builtinScenarios() []builtinCase {
 func generateBuiltinGuardrails() ([]byte, error) {
 	inputs, outputs := guardrails.BuiltinToolInputGuardrails(), guardrails.BuiltinToolOutputGuardrails()
 	fixture := builtinFixture{SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios()}
+	for _, name := range []string{"", "write", "read_file", "mcp_sql_db_write", "*write", "foo*bar", "猫-read", "file\nwrite"} {
+		for _, pattern := range []string{"", "*", "write", "wr*", "*ite", "*write", "*sql*_write", "*sql*", "wr*te", "**", "foo*", "foo**", "猫*", "*read", "\n*"} {
+			fixture.ToolPatterns = append(fixture.ToolPatterns, toolPatternCase{Name: name, Pattern: pattern, Matches: guardrails.MatchToolPattern(name, pattern)})
+		}
+	}
+
 	for _, g := range inputs {
 		fixture.InputGuardNames = append(fixture.InputGuardNames, g.Name)
 	}

@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Separate public tool-pattern helper
+
+Added `guardrails::match_tool_pattern` with the public SDK helper's trailing-star
+precedence and literal internal stars, without changing ChatLoop's multi-star
+matcher. All 120 actual-Go pattern observations compare exactly, including empty
+strings, repeated stars, Unicode and newlines. The existing 97 builtin guardrail
+cases still run independently. No unrelated original regression is used to claim
+full rule-helper ledger closure; standalone rule constructors remain outstanding.
+
+Fresh Rust1.88 Linux: **1,702 workspace tests passed /0 failed /30 ignored;
+10 doctests passed**. All-feature and builder-only oracle tests, unchanged host
+rule tests, strict workspace and builder-only lint/typecheck, rustdoc, formatting,
+Go tests/vet/build and twice-exact fixture regeneration passed. Bound evidence,
+51 validators, artifact review, overlay/audit and immutable source locks passed.
+Ledger remains **932 verified /7,959 unresolved /251 excluded**. Full acceptance
+is not complete.
+
 ### Original guardrail hardening regressions
 
 Added literal original destructive/safe command sets, non-shell exclusion, added

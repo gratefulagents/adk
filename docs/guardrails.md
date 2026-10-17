@@ -23,6 +23,13 @@ and is not a claim of unrestricted error-text equivalence. Host configuration
 compilation failures retain their error category and cause with explicit
 `compile guardrail rules` context, before any model dispatch.
 
+With the `builder` feature, `guardrails::match_tool_pattern` exposes the SDK
+public helper's edge-star syntax. A trailing `*` selects a literal prefix before
+a leading `*` can select a literal suffix. Internal stars are literal: `*read*`
+does not mean a substring search. `*` alone matches every name, including empty.
+This is deliberately separate from host rule compilation's multi-star glob.
+Standalone public rule factories/compiler are not yet provided by this helper.
+
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell
 keys are case-insensitive; duplicate string values replace earlier values, while

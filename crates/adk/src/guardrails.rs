@@ -8,6 +8,20 @@ use adk_security::{
 use serde::Deserialize;
 use std::sync::Arc;
 
+/// Match the SDK public helper's edge-star syntax, not ChatLoop's multi-star glob.
+/// A trailing star takes precedence over a leading star; internal stars are literal.
+pub fn match_tool_pattern(name: &str, pattern: &str) -> bool {
+    if pattern == "*" {
+        true
+    } else if let Some(prefix) = pattern.strip_suffix('*') {
+        name.starts_with(prefix)
+    } else if let Some(suffix) = pattern.strip_prefix('*') {
+        name.ends_with(suffix)
+    } else {
+        name == pattern
+    }
+}
+
 pub fn builtin_tool_input_guardrails() -> Vec<Arc<dyn Guardrail>> {
     vec![
         Arc::new(Builtin::Destructive),

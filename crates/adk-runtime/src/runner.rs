@@ -4429,6 +4429,7 @@ impl Runner {
         config.subagents = Some(session.clone());
         config.progress = progress;
         config.force_final_summary_turn = true;
+        config.prompt_cache_key = Some(invocation.task_id.clone());
         struct ChildInstructions {
             provider: Arc<dyn InstructionProvider>,
             suffix: String,

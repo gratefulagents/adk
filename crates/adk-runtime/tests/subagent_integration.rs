@@ -177,6 +177,50 @@ fn parent(model: Arc<FakeModel>, session: Arc<SubagentSession>) -> Runner {
 }
 
 #[tokio::test]
+async fn child_prompt_cache_key_uses_task_identity_not_parent_key() {
+    use sha2::{Digest, Sha256};
+    for parent_key in [None, Some("parent-key-must-not-leak".to_owned())] {
+        let model = FakeModel::new(vec![answer("done"), answer("done")], Duration::ZERO);
+        let child = Runner::new(
+            AgentConfig::new("child", ModelBinding::complete("fake", model.clone())),
+            RunnerConfig {
+                prompt_cache_key: parent_key,
+                prompt_cache_namespace: Some("shared-run".into()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let (owner, _) = session_with_runner(child, None).await;
+        let handle = owner.handle();
+        let mut keys = Vec::new();
+        for task_id in ["task-stable-123", "task-stable-124"] {
+            let mut submission = Submission::new("worker", "go");
+            submission.id = task_id.into();
+            let id = handle.submit(submission).await.unwrap();
+            assert_eq!(id, task_id);
+            let tasks = tokio::time::timeout(
+                Duration::from_secs(2),
+                handle.wait(std::slice::from_ref(&id), WaitMode::All, None),
+            )
+            .await
+            .unwrap()
+            .unwrap();
+            assert_eq!(tasks[0].status, TaskStatus::Completed);
+            keys.push(format!("{:x}", Sha256::digest(format!("shared-run\0{id}"))));
+        }
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            for (request, key) in requests.iter().zip(&keys) {
+                assert_eq!(request.settings["prompt_cache_key"], *key);
+            }
+            assert_ne!(keys[0], keys[1]);
+        }
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn final_summary_waits_for_child_join_before_disabling_tools() {
     struct GatedChild(Arc<tokio::sync::Notify>);
     impl Model for GatedChild {

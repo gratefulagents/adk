@@ -6,6 +6,13 @@ The opt-in `runtime` feature provides a local, explicitly owned child scheduler.
 `SubagentSession` provide runner adapters. Both delegation surfaces submit through
 one `ChildExecutor`; there is no separate unmanaged agent-as-tool execution path.
 
+`RunnerChildExecutor` always uses the stable task ID as the child's logical
+prompt-cache key, replacing any key inherited from the registered runner. An
+explicit `RunnerConfig.prompt_cache_namespace` remains shared; the model receives
+SHA-256 of namespace, a NUL separator, and task ID rather than the raw identifier.
+This child-key override does not imply parity for parent default keys, implicit
+namespace/trace identity, or namespace whitespace normalization.
+
 ## Session ownership
 
 A host registers child `Runner`s in `RunnerChildExecutor`, configures permitted

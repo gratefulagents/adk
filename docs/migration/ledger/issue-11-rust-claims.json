@@ -19345,6 +19345,22 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-4786FF2A05C6CECB": {
+      "source": "internal/agent/prompt_cache_key_test.go",
+      "source_name": "TestRunSubAgentOnceForcesStableTaskPromptCacheKey",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::run_child"
+      ],
+      "rust_test_identifiers": [
+        "child_prompt_cache_key_uses_task_identity_not_parent_key"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunSubAgentOnceForcesStableTaskPromptCacheKey",
+      "rationale": "Native end-to-end counterpart reproduces the original child name, message, task-stable-123 ID, shared-run namespace and inherited parent-key-must-not-leak value; actual model request key must equal SHA256(namespace + NUL + task ID). Additional absent-parent-key and second-task cases prove child identity is forced and separated. Independently executed original Go regression. Does not close parent default cache keys, namespace defaults/trimming, trace identity or the complete test file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

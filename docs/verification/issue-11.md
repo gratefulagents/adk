@@ -2,6 +2,28 @@
 
 ## Current continuation evidence
 
+### Stable child prompt-cache identity
+
+Reproduced a missing child cache key when the registered runner had none. Child
+execution now always replaces the inherited logical key with its stable task ID,
+matching the original Go child helper. End-to-end tests inspect actual model
+requests for the original shared-run/task-stable-123/inherited-parent-key inputs,
+an absent parent key, and a distinct second task. Explicit namespaces remain
+shared; parent default keys and implicit namespace/trace identity remain separate
+unresolved contracts.
+
+The original Go regression was independently executed and added to the bound
+report: **924 pass /5 skip across 38 packages**. Its one exact test record is now
+verified; this is not whole cache-helper/test-file closure. Ledger: **1,062 verified
+/7,829 unresolved /251 excluded**. Full acceptance remains incomplete.
+
+Fresh Rust 1.88 Linux: **1,752 workspace +10 doctests passed; 0 failed, 30 ignored**.
+Strict Clippy/typecheck/rustdoc/format, complete facade feature matrix, standalone
+consumer/purity, independently reproduced bound references, all 55 validators,
+artifact/overlay/audit and source locks passed. All 46 remote checks passed at
+preceding Unicode-fix head `3110d520dfe42a25bb3aaa207885486ddc9f80fd`; that is not a
+current-child-change CI claim.
+
 ### Unicode property grammar in guardrail rules
 
 Reproduced the Go-valid `\P{^adlam}` rejection before changing the shared

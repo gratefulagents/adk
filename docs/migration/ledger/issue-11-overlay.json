@@ -81,8 +81,8 @@
       },
       "tests": {
         "excluded": 12,
-        "unresolved": 1002,
-        "verified": 168
+        "unresolved": 1001,
+        "verified": 169
       },
       "tool_parameters": {
         "unresolved": 174,
@@ -98,8 +98,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 7830,
-    "verified": 1061
+    "unresolved": 7829,
+    "verified": 1062
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -211,11 +211,11 @@
   "module_reference_map_note": "This is an API/test association index, not implementation evidence, a test result, approved divergence, or semantic closure for any acceptance ID.",
   "pinned_reference_execution": {
     "counts": {
-      "pass": 923,
+      "pass": 924,
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "a256f684fb423dd1c0574cd65f7edb7cf8d7325ae5c6c9e66fabfdbc594d6a78",
+    "evidence_sha256": "60b88c7d3b8a2d4220709fa7aa0c1dd2ba29b4761e573785ae2ccb5db2b2171c",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -11203,7 +11203,7 @@
     "SDK-4769C77001D2D573": {"approved_divergence_reference": null, "category": "apis", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Closes only the compatibility routing-result data declaration ModeRoutingResolution.Model. The independent immutable Go oracle records453 actual result inputs (275 accepted,178 rejected), including every field, all298 settings inputs nested at the proper JSON depth, binary64 bits and nil/empty stop state, exact marshal bytes, repeated nested value-object merging, null no-op and hidden slice backing slots. Existing294 direct/top/role routing cases continue to verify computed results after using the lossless settings DTO. The original routing test anchors the source and separately verifies its concrete helper regression; it is not general codec evidence. No identical error wording, partial mutation on error, arbitrary invalid-UTF8 in-memory strings, ordinary Serde in-place parity, pointer identity or provider/runtime execution is claimed.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-codec/src/mode.rs::ModeRoutingResolution::model", "crates/adk-codec/src/payload_decode.rs::from_go_json", "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"], "ledger_record_id": "apis:internal/agent.ModeRoutingResolution.Model@internal/agent/mode_routing.go", "proposed_rust_module": "sdk::mode", "rust_test_identifiers": ["pinned_mode_codec_oracle", "nested_settings_null_is_noop_and_retains_backing_slots", "pinned_mode_and_role_routing_oracle"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/agent/mode_routing.go", "target_features": ["x86_64-unknown-linux-gnu", "compat"], "upstream_regression_reference_group": "verification_groups:sdk::mode", "verification_status": "passed"},
     "SDK-477DA438D131E5E7": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tools/web.FetchTool.IsReadOnly@pkg/agentsdk/tools/web/webfetch.go", "proposed_rust_module": "sdk::tools::web", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/web/webfetch.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::web", "verification_status": "not_run"},
     "SDK-4785AB5042CABD37": {"approved_divergence_reference": null, "category": "files", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "files:internal/anthropic/tool_schema_test.go", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/tool_schema_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
-    "SDK-4786FF2A05C6CECB": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/agent/prompt_cache_key_test.go:TestRunSubAgentOnceForcesStableTaskPromptCacheKey", "proposed_rust_module": "sdk::agent", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/prompt_cache_key_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "not_run"},
+    "SDK-4786FF2A05C6CECB": {"approved_divergence_reference": null, "category": "tests", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Native end-to-end counterpart reproduces the original child name, message, task-stable-123 ID, shared-run namespace and inherited parent-key-must-not-leak value; actual model request key must equal SHA256(namespace + NUL + task ID). Additional absent-parent-key and second-task cases prove child identity is forced and separated. Independently executed original Go regression. Does not close parent default cache keys, namespace defaults/trimming, trace identity or the complete test file.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-runtime/src/runner.rs::run_child"], "ledger_record_id": "tests:internal/agent/prompt_cache_key_test.go:TestRunSubAgentOnceForcesStableTaskPromptCacheKey", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/agent/TestRunSubAgentOnceForcesStableTaskPromptCacheKey"}, "proposed_rust_module": "sdk::agent", "rust_test_identifiers": ["child_prompt_cache_key_uses_task_identity_not_parent_key"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/agent/prompt_cache_key_test.go", "target_features": ["x86_64-unknown-linux-gnu", "runtime"], "upstream_regression_reference_group": "verification_groups:sdk::agent", "verification_status": "passed"},
     "SDK-4791DD6725317C0C": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk.RunErrorHandlerResult@pkg/agentsdk/aliases.go", "proposed_rust_module": "sdk::error", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/aliases.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::error", "verification_status": "not_run"},
     "SDK-479247E7BFEDE72C": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/projectstate.state.project@pkg/agentsdk/projectstate/engine.go", "proposed_rust_module": "sdk::project_state", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/projectstate/engine.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::project_state", "verification_status": "not_run"},
     "SDK-479BD6E563C68938": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:examples/features/observability/observability_test.go:TestObservabilityExample", "proposed_rust_module": "sdk::telemetry::examples", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "examples/features/observability/observability_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::telemetry::examples", "verification_status": "not_run"},

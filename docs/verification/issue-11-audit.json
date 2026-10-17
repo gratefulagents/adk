@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8040,
-    "verified": 851
+    "unresolved": 8039,
+    "verified": 852
   },
   "groups": [
     {
@@ -2063,7 +2063,7 @@
         "apis:unresolved": 12,
         "files:unresolved": 2,
         "packages:unresolved": 1,
-        "tests:unresolved": 1,
+        "tests:verified": 1,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::events::activity",
@@ -2086,11 +2086,12 @@
         "SDK-B71B5B843AE4A070",
         "SDK-BBB39D332FCB6FFE",
         "SDK-CFC143057547288B",
-        "SDK-D0F2EC9B6D5972B5",
         "SDK-F51B42566B9EBDD4",
         "SDK-FE2D7AFF48A0582E"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-D0F2EC9B6D5972B5"
+      ]
     },
     {
       "counts": {
@@ -10940,8 +10941,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "5bd5f729d30bdfc7ab315451d26dbc166fb33f502770cd52b7cf959ef46669bf",
-    "docs/migration/ledger/issue-11-rust-claims.json": "9840690cd3c422e457b5dc0d3b48003b42c252584e1d230bb14050e394b44f3c",
+    "docs/migration/ledger/issue-11-overlay.json": "cec77165fc47126cac63bcf5bb8cb9b4e9400d025dce5a78a3ab788d2b58a84f",
+    "docs/migration/ledger/issue-11-rust-claims.json": "ae6bdfedc5a5e3b08b0e38cb0bca1e1e32699bd1900d3aaf0df41865c857bdb0",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10950,6 +10951,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 849
+    "rust_test": 850
   }
 }

@@ -66,7 +66,25 @@ pub struct GuardrailTripwire {
 
 impl std::fmt::Display for GuardrailTripwire {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
-        write!(f, "{:?} guardrail {:?} triggered", self.phase, self.name)
+        let phase = match self.phase {
+            GuardrailPhase::Input => "input",
+            GuardrailPhase::Output => "output",
+            GuardrailPhase::ToolInput => "tool input",
+            GuardrailPhase::ToolOutput => "tool output",
+        };
+        write!(f, "{phase} guardrail {:?} tripwire triggered", self.name)?;
+        if matches!(
+            self.phase,
+            GuardrailPhase::ToolInput | GuardrailPhase::ToolOutput
+        ) {
+            write!(
+                f,
+                " for tool {:?}",
+                self.tool_name.as_deref().unwrap_or_default()
+            )?;
+        }
+        // Diagnostic output can contain secrets and must not enter serialized ErrorInfo.
+        Ok(())
     }
 }
 impl std::error::Error for GuardrailTripwire {}

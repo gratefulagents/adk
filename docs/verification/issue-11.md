@@ -2,6 +2,28 @@
 
 ## Current continuation evidence
 
+### Original host guardrail regressions and safe failure context
+
+Reproduced two original regression failures: host rule compilation lacked its
+operation context, and model-visible tripwires used enum-debug phase labels.
+Compilation failures now preserve their category/cause with `compile guardrail
+rules` context. Tripwires identify the lowercase phase and tool name without
+copying arbitrary diagnostic Output into serialized errors. A four-phase privacy
+regression verifies that Output remains in the typed cause but not ErrorInfo.
+
+The original callback/configured input/output guardrail cases and invalid-regex
+case now pass in Rust and pinned Go. Five test IDs and the two completely covered
+original ChatLoop test files are closed (seven tests in chatloop_test.go, one in
+chatloop_multi_approval_test.go). This is test coverage, not whole ChatLoop,
+interface, error-formatter or regex-engine equivalence; diagnostic suffixes and
+arbitrary error-label quoting remain outside these claims.
+
+Fresh Rust1.88 Linux: **1,654 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone consumer/
+purity,20 offline scenarios, host-session, all bound references and51 validators,
+artifacts/overlay/audit and immutable source locks passed. Ledger: **877 verified
+/8,014 unresolved /251 excluded**. Full issue11 acceptance remains incomplete.
+
 ### Host input rules retain argument spelling
 
 Reproduced a configured input guardrail allowing a tool that the pinned Go

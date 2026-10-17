@@ -15,6 +15,14 @@ Only a non-tripped tool-output check applies it, preserving tool flags and feedi
 the replacement to later checks before raw-output hooks, traces or model caps.
 Reports remain in successful and partial `RunResult::guardrails` snapshots.
 
+Tripwire messages identify the input/output phase and, for tool checks, the tool
+name. Diagnostic `output` remains in the report and underlying typed cause; it is
+not appended to serialized `ErrorInfo` or model-visible error text, because it
+may contain secrets. This differs from the Go error formatter's diagnostic suffix
+and is not a claim of unrestricted error-text equivalence. Host configuration
+compilation failures retain their error category and cause with explicit
+`compile guardrail rules` context, before any model dispatch.
+
 Durable runs require a nonempty `Guardrail::durable_key` for deterministic checks.
 Ordered names/keys participate in the checkpoint policy fingerprint; changing
 one rejects recovery. Completed recovery retains reports without re-running

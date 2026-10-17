@@ -35,6 +35,61 @@ impl Tool for RecordingTool {
 
 struct BlockingTool(ToolDefinition);
 
+struct SecretGuard(&'static str);
+
+impl adk::runtime::Guardrail for SecretGuard {
+    fn name(&self) -> &str {
+        self.0
+    }
+
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        input: adk::runtime::GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<adk::runtime::GuardrailResult>, Error>> {
+        Box::pin(async move {
+            let (tripwire_triggered, output) = match input {
+                adk::runtime::GuardrailInput::ToolInput(call) => (
+                    call.argument_text() == r#"{"value":"secret"}"#,
+                    json!("blocked"),
+                ),
+                adk::runtime::GuardrailInput::ToolOutput { output, .. } => (
+                    output.content.iter().any(|content| {
+                        matches!(content,
+                        Content::Text { text } if text.contains("secret"))
+                    }),
+                    serde_json::Value::Null,
+                ),
+                _ => panic!("unexpected guardrail input"),
+            };
+            Ok(Some(adk::runtime::GuardrailResult {
+                tripwire_triggered,
+                output,
+                replacement_content: None,
+            }))
+        })
+    }
+}
+
+struct RuleSource(Vec<GuardrailRule>);
+
+impl ConfigSource for RuleSource {
+    fn permission_mode<'a>(
+        &'a self,
+        _: &'a Context,
+    ) -> BoxFuture<'a, Result<PermissionMode, Error>> {
+        Box::pin(async { Ok(PermissionMode::DangerFullAccess) })
+    }
+
+    fn guardrail_rules<'a>(
+        &'a self,
+        _: &'a Context,
+    ) -> BoxFuture<'a, Result<Vec<GuardrailRule>, Error>> {
+        Box::pin(async { Ok(self.0.clone()) })
+    }
+}
+
 impl Tool for BlockingTool {
     fn definition(&self) -> &ToolDefinition {
         &self.0
@@ -155,6 +210,104 @@ async fn approved_tool_uses_runner_timeout_policy() {
         RunItem::ToolResult { output, .. } if output.content.iter().any(|content|
             matches!(content, Content::Text { text } if text.contains("timed out")))
     )));
+}
+
+#[tokio::test]
+async fn runner_and_config_guardrails_survive_host_approval_boundaries() {
+    for from_config in [false, true] {
+        for output in [false, true] {
+            let fixture = Arc::new(Fixture::default());
+            let executed = Arc::new(Mutex::new(vec![]));
+            let mut options = scripted_approval(
+                &fixture,
+                &[(
+                    "mutate_call",
+                    "mutate",
+                    if output {
+                        r#"{"value":"x"}"#
+                    } else {
+                        r#"{"value":"secret"}"#
+                    },
+                )],
+                if output { "secret output" } else { "mutated" },
+                "guardrail handled",
+                &executed,
+            );
+            options.max_turns = NonZeroU32::new(2);
+            if from_config {
+                options.approval_required = Some(false);
+                options.approval_gate = None;
+                options.config_source = Some(Arc::new(RuleSource(vec![GuardrailRule {
+                    name: if output {
+                        "block-secret-output"
+                    } else {
+                        "block-secret"
+                    }
+                    .into(),
+                    rule_type: if output { "tool-output" } else { "tool-input" }.into(),
+                    regex: "secret".into(),
+                    tool_pattern: "mutate".into(),
+                    action: "block".into(),
+                    message: if output {
+                        "blocked output by config rule"
+                    } else {
+                        "blocked by config rule"
+                    }
+                    .into(),
+                }])));
+            } else if output {
+                options
+                    .runner_config
+                    .tool_output_guardrails
+                    .push(Arc::new(SecretGuard("block-output")));
+            } else {
+                options
+                    .runner_config
+                    .tool_input_guardrails
+                    .push(Arc::new(SecretGuard("block-secret")));
+            }
+            let result = ChatLoop::new(options).run(context()).await.unwrap();
+            assert_eq!(executed.lock().unwrap().len(), usize::from(output));
+            assert_eq!(result.result.final_text(), "guardrail handled");
+            assert!(result.result.new_items.len() >= 3);
+            let needle = if output {
+                "tool output guardrail"
+            } else {
+                "tool input guardrail"
+            };
+            assert!(
+                result.result.new_items.iter().any(|item| matches!(item,
+                    RunItem::ToolResult { output, .. } if output.content.iter().any(|content|
+                        matches!(content, Content::Text { text } if text.contains(needle)))
+                )),
+                "from_config={from_config}, output={output}"
+            );
+        }
+    }
+}
+
+#[tokio::test]
+async fn invalid_config_rules_fail_closed_with_compile_context_before_model() {
+    let fixture = Arc::new(Fixture::default());
+    fixture.responses.lock().unwrap().push_back(Ok(response(
+        vec![item("should not run", Role::Assistant)],
+        true,
+    )));
+    let mut options = ChatLoopOptions::new(AgentConfig::new(
+        "loop",
+        ModelBinding::complete("demo", fixture.clone()),
+    ));
+    options.max_turns = NonZeroU32::new(1);
+    options.config_source = Some(Arc::new(RuleSource(vec![GuardrailRule {
+        name: "bad-regex".into(),
+        rule_type: "tool-input".into(),
+        regex: "[".into(),
+        action: "block".into(),
+        ..Default::default()
+    }])));
+    let error = ChatLoop::new(options).run(context()).await.err().unwrap();
+    assert!(error.to_string().contains("compile guardrail rules"));
+    assert!(fixture.requests.lock().unwrap().is_empty());
 }
 
 #[tokio::test]

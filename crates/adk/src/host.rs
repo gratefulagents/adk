@@ -484,7 +484,13 @@ impl ChatLoop {
                 "load guardrail rules",
             )
             .await?;
-            let guards = compile_guardrail_rules(&rules)?;
+            let guards = compile_guardrail_rules(&rules).map_err(|error| {
+                Error::new(
+                    error.info.category,
+                    format!("compile guardrail rules: {error}"),
+                )
+                .with_source(error)
+            })?;
             config.tool_input_guardrails.extend(guards.input);
             config.tool_output_guardrails.extend(guards.output);
             if let Some(snapshot) =

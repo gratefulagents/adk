@@ -3,6 +3,51 @@ use adk_runtime::*;
 use serde_json::json;
 use std::sync::{Arc, Mutex};
 
+#[test]
+fn tripwire_messages_identify_phase_without_serializing_diagnostic_data() {
+    for (phase, expected) in [
+        (
+            GuardrailPhase::Input,
+            "input guardrail \"check\" tripwire triggered",
+        ),
+        (
+            GuardrailPhase::Output,
+            "output guardrail \"check\" tripwire triggered",
+        ),
+        (
+            GuardrailPhase::ToolInput,
+            "tool input guardrail \"check\" tripwire triggered for tool \"mutate\"",
+        ),
+        (
+            GuardrailPhase::ToolOutput,
+            "tool output guardrail \"check\" tripwire triggered for tool \"mutate\"",
+        ),
+    ] {
+        let cause = GuardrailTripwire {
+            phase,
+            name: "check".into(),
+            tool_name: Some("mutate".into()),
+            output: json!({"private": "diagnostic-secret"}),
+        };
+        assert_eq!(cause.to_string(), expected);
+        let error = Error::new(ErrorCategory::Guardrail, cause.to_string()).with_source(cause);
+        assert!(
+            !serde_json::to_string(&error.info)
+                .unwrap()
+                .contains("diagnostic-secret")
+        );
+        assert_eq!(
+            error
+                .source
+                .unwrap()
+                .downcast::<GuardrailTripwire>()
+                .unwrap()
+                .output,
+            json!({"private": "diagnostic-secret"})
+        );
+    }
+}
+
 struct Check {
     name: &'static str,
     seen: Arc<Mutex<Vec<String>>>,

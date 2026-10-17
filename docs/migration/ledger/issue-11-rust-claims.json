@@ -15560,6 +15560,126 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-80F7DE7EEC920475": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopApprovedToolUsesRunnerGuardrails",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::runner_and_config_guardrails_survive_host_approval_boundaries"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopApprovedToolUsesRunnerGuardrails",
+      "rationale": "Only the original regression is closed: callback input guardrail prevents approved execution. Native inputs, two-turn limit, execution disposition, final text and required model-visible phase label reproduce the original assertions. The invalid-regex case uses its original one-turn setup. Arbitrary diagnostic Output is deliberately not copied to serialized errors; this is not full error-text or whole host implementation equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-7954CA26B664C9BB": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopApprovedToolUsesRunnerOutputGuardrails",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::runner_and_config_guardrails_survive_host_approval_boundaries"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopApprovedToolUsesRunnerOutputGuardrails",
+      "rationale": "Only the original regression is closed: callback output guardrail runs after approved execution. Native inputs, two-turn limit, execution disposition, final text and required model-visible phase label reproduce the original assertions. The invalid-regex case uses its original one-turn setup. Arbitrary diagnostic Output is deliberately not copied to serialized errors; this is not full error-text or whole host implementation equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-E89521332E33979E": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopLoadsConfigGuardrailRules",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::runner_and_config_guardrails_survive_host_approval_boundaries"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopLoadsConfigGuardrailRules",
+      "rationale": "Only the original regression is closed: configured input rule prevents execution. Native inputs, two-turn limit, execution disposition, final text and required model-visible phase label reproduce the original assertions. The invalid-regex case uses its original one-turn setup. Arbitrary diagnostic Output is deliberately not copied to serialized errors; this is not full error-text or whole host implementation equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-5587AC191151AB36": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopLoadsConfigToolOutputGuardrailRules",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::runner_and_config_guardrails_survive_host_approval_boundaries"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopLoadsConfigToolOutputGuardrailRules",
+      "rationale": "Only the original regression is closed: configured output rule runs after execution. Native inputs, two-turn limit, execution disposition, final text and required model-visible phase label reproduce the original assertions. The invalid-regex case uses its original one-turn setup. Arbitrary diagnostic Output is deliberately not copied to serialized errors; this is not full error-text or whole host implementation equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-B56186CB8D734274": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopInvalidConfigGuardrailRulesFailClosedBeforeModel",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::invalid_config_rules_fail_closed_with_compile_context_before_model"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopInvalidConfigGuardrailRulesFailClosedBeforeModel",
+      "rationale": "Only the original one-turn invalid configured regex regression is closed. The native test uses bad-regex/tool-input/[ with block action, requires compile guardrail rules error context and verifies zero model requests. Error category and underlying cause are retained. This is not complete regex-engine, error-text or host implementation equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-6F68AB65AB9F3166": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::resolves_tool_approval_and_resumes_with_stable_cache_identity",
+        "approval_regressions::approved_tool_uses_runner_timeout_policy",
+        "approval_regressions::runner_and_config_guardrails_survive_host_approval_boundaries",
+        "approval_regressions::invalid_config_rules_fail_closed_with_compile_context_before_model"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesToolApprovalAndResumes",
+      "rationale": "All seven original tests have native counterparts and individual source-bound claims, including approval cache identity, timeout, callback/configured input/output guardrails and invalid-rule failure before model dispatch. This closes original test coverage only, not the entire ChatLoop implementation, host interfaces or unrestricted error-text equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-26A0A86D1F34A8A1": {
+      "source": "pkg/agentsdk/chatloop_multi_approval_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::resolves_all_parallel_tool_approvals"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesAllParallelToolApprovals",
+      "rationale": "The sole original test has a native counterpart and individual claim: two named calls, two approvals/executions, expected final text and a paired new output for each call ID. This closes original test coverage only, not the entire ChatLoop implementation, host interfaces or unrestricted error-text equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

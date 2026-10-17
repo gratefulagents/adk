@@ -19427,6 +19427,44 @@
       "source_name": null,
       "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheKeyStableForParentRun",
       "rationale": "Reviewed all55 lines: exactly three regression tests, independently executed and individually mapped. Native counterparts cover parent default/shared identity, namespaced stable64-character wire keys including the original long Unicode label, and forced child task identity. The extracted Run-call occurrence is separately mapped. This closes the original test file only, not whole runner, fresh trace identity generation or arbitrary hidden Go task-context semantics."
+    },
+    "SDK-1F9A262FF0A98FA9": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "RunConfig.PromptCacheKey",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::RunnerConfig",
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "prompt_cache_defaults_and_normalization_match_pinned_go_requests",
+        "explicit_empty_cache_options_match_absent_options",
+        "child_prompt_cache_key_uses_task_identity_not_parent_key"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheKeyStableForParentRun",
+      "rationale": "Native logical-key/namespace input fields retain UTF-8 string values and use documented Option absence as the Go empty default. The independently executed216-case/432-request oracle covers exact wire hashing, trimming, empty/default inputs, explicit namespace sharing and differing owner identities, embedded NULs and long Unicode labels, normal and streamed calls. Explicit empty options and absent options are separately compared; child task override is covered. Caller-owned Context.run_id corresponds to a supplied Go Trace.ID. This field mapping does not claim automatic Go trace-object creation, hidden Go context-value metadata, invalid-UTF8 strings, or the entire RunConfig type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4702A23356150C7C": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "RunConfig.PromptCacheNamespace",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::RunnerConfig",
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "prompt_cache_defaults_and_normalization_match_pinned_go_requests",
+        "explicit_empty_cache_options_match_absent_options",
+        "child_prompt_cache_key_uses_task_identity_not_parent_key"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestPromptCacheKeyStableForParentRun",
+      "rationale": "Native logical-key/namespace input fields retain UTF-8 string values and use documented Option absence as the Go empty default. The independently executed216-case/432-request oracle covers exact wire hashing, trimming, empty/default inputs, explicit namespace sharing and differing owner identities, embedded NULs and long Unicode labels, normal and streamed calls. Explicit empty options and absent options are separately compared; child task override is covered. Caller-owned Context.run_id corresponds to a supplied Go Trace.ID. This field mapping does not claim automatic Go trace-object creation, hidden Go context-value metadata, invalid-UTF8 strings, or the entire RunConfig type.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

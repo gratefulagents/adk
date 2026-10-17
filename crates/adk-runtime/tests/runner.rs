@@ -1296,6 +1296,45 @@ async fn prompt_cache_defaults_and_normalization_match_pinned_go_requests() {
 }
 
 #[tokio::test]
+async fn explicit_empty_cache_options_match_absent_options() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-prompt-cache.json"
+    ))
+    .unwrap();
+    let expected = fixture["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| {
+            case["trace_id"] == "run-1"
+                && case["logical"] == ""
+                && case["namespace"] == ""
+                && case["streaming"] == false
+        })
+        .unwrap();
+    for explicit_empty in [false, true] {
+        let model = TestModel::with(vec![Ok(answer("done"))]);
+        let runner = Runner::new(
+            agent(model.clone()),
+            RunnerConfig {
+                prompt_cache_key: explicit_empty.then(String::new),
+                prompt_cache_namespace: explicit_empty.then(String::new),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        runner
+            .run(context(), request(2), Arc::new(TestHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(
+            model.requests.lock().unwrap()[0].settings["prompt_cache_key"],
+            expected["keys"][0]
+        );
+    }
+}
+
+#[tokio::test]
 async fn compaction_replaces_history_and_hints_cache_prefix_are_request_only() {
     let model = TestModel::with(vec![
         Ok(response(

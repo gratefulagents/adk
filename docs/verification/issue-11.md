@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Exported prompt-cache configuration inputs
+
+Mapped the two logical-key/namespace fields to native `RunnerConfig`, with an
+additional regression comparing explicit empty options and absent options against
+the independently executed Go request oracle. These field-level mappings retain
+the caller-owned identity boundary described below; they do not close the entire
+configuration type or imply hidden Go trace/context emulation.
+
+Fresh Rust 1.88 Linux: **1,754 workspace +10 doctests passed; 0 failed, 30 ignored**.
+Formatting and strict all-target/all-feature Clippy/typecheck passed. Independent
+bound-reference reproduction, all 55 validators, artifact/overlay/audit checks and
+immutable source locks passed. Ledger: **1,068 verified /7,823 unresolved /251
+excluded**. Full retained acceptance remains incomplete.
+
 ### Parent cache defaults and normalization
 
 Direct runners now trim explicit logical keys/namespaces, default absent or blank

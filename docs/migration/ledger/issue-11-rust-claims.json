@@ -15920,6 +15920,112 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-76D5572551B4D7CD": {
+      "source": "pkg/agentsdk/autoloop_test.go",
+      "source_name": "TestAutoTrackerDetectsIdenticalCallLoop",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::AutoTracker",
+        "crates/adk-runtime/src/autoloop.rs::build_smart_nudge"
+      ],
+      "rust_test_identifiers": [
+        "tracker_detects_original_identical_call_loop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsIdenticalCallLoop",
+      "rationale": "Ports the original update sequence and assertions verbatim in the named native counterpart; tool inputs retain original JSON and missing input text, and message envelopes preserve the original text. The original Go test passes independently. Closes only this original regression, not the entire tracker API or file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-C2C37225CB064C28": {
+      "source": "pkg/agentsdk/autoloop_test.go",
+      "source_name": "TestAutoTrackerDetectsNoToolStall",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::AutoTracker",
+        "crates/adk-runtime/src/autoloop.rs::build_smart_nudge"
+      ],
+      "rust_test_identifiers": [
+        "tracker_detects_no_tool_stall_at_original_threshold"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall",
+      "rationale": "Ports the original update sequence and assertions verbatim in the named native counterpart; tool inputs retain original JSON and missing input text, and message envelopes preserve the original text. The original Go test passes independently. Closes only this original regression, not the entire tracker API or file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-09A7A6F6B461ED0B": {
+      "source": "pkg/agentsdk/autoloop_test.go",
+      "source_name": "TestAutoTrackerDetectsRepeatedToolCycle",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::AutoTracker",
+        "crates/adk-runtime/src/autoloop.rs::build_smart_nudge"
+      ],
+      "rust_test_identifiers": [
+        "tracker_detects_original_repeated_tool_cycle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsRepeatedToolCycle",
+      "rationale": "Ports the original update sequence and assertions verbatim in the named native counterpart; tool inputs retain original JSON and missing input text, and message envelopes preserve the original text. The original Go test passes independently. Closes only this original regression, not the entire tracker API or file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-BF07C8723641FF92": {
+      "source": "pkg/agentsdk/autoloop_test.go",
+      "source_name": "TestAutoTrackerIgnoresDiverseExploration",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::AutoTracker",
+        "crates/adk-runtime/src/autoloop.rs::build_smart_nudge"
+      ],
+      "rust_test_identifiers": [
+        "tracker_ignores_original_diverse_exploration"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerIgnoresDiverseExploration",
+      "rationale": "Ports the original update sequence and assertions verbatim in the named native counterpart; tool inputs retain original JSON and missing input text, and message envelopes preserve the original text. The original Go test passes independently. Closes only this original regression, not the entire tracker API or file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1FEE869A65525AD6": {
+      "source": "pkg/agentsdk/autoloop_test.go",
+      "source_name": "TestBuildSmartNudgeWarnsOnRepeatedNoToolTurns",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::AutoTracker",
+        "crates/adk-runtime/src/autoloop.rs::build_smart_nudge"
+      ],
+      "rust_test_identifiers": [
+        "smart_nudge_warns_on_original_repeated_no_tool_turns"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSmartNudgeWarnsOnRepeatedNoToolTurns",
+      "rationale": "Ports the original update sequence and assertions verbatim in the named native counterpart; tool inputs retain original JSON and missing input text, and message envelopes preserve the original text. The original Go test passes independently. Closes only this original regression, not the entire tracker API or file.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-13C731FEFDB0EA14": {
+      "source": "pkg/agentsdk/autoloop_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-runtime/src/autoloop.rs::AutoTracker",
+        "crates/adk-runtime/src/autoloop.rs::build_smart_nudge"
+      ],
+      "rust_test_identifiers": [
+        "tracker_detects_no_tool_stall_at_original_threshold",
+        "smart_nudge_warns_on_original_repeated_no_tool_turns",
+        "tracker_detects_original_repeated_tool_cycle",
+        "tracker_ignores_original_diverse_exploration",
+        "tracker_detects_original_identical_call_loop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestAutoTrackerDetectsNoToolStall",
+      "rationale": "Ports the original inputs, update sequence and assertions: five no-tool turns, three-turn warning and finish fragments, three two-tool cycles, ten distinct exploration inputs, and six identical calls. Native message envelopes replace the Go message payload without changing tracked events. All five original Go tests pass independently. Closes all five tests in this complete source test file, not the production file, arbitrary counter overflow or Unicode byte truncation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

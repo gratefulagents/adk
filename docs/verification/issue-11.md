@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Original autonomous-loop regressions
+
+Ported all five original tracker/nudge tests: no-tool threshold, warning and
+finish guidance, repeated two-tool cycle, diverse exploration, identical calls.
+All original Go tests pass independently; native exact inputs and assertions pass
+alongside the existing complete observation oracle. Closed the five originals
+and their complete test file, not unrestricted counter/Unicode behavior.
+
+Fresh Rust1.88 Linux: **1,672 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format, six targeted tracker tests, original Go
+regressions, bound evidence,51 validators, artifacts/overlay/audit and source
+locks passed. The initial native message constructor used incorrect enum fields;
+it was corrected before successful verification. Production behavior is unchanged.
+Ledger: **897 verified /7,994 unresolved /251 excluded**. Full acceptance remains
+incomplete.
+
 ### Original CRD-shaped file configuration regression
 
 Ported the original mode YAML and planner Markdown verbatim, checking every

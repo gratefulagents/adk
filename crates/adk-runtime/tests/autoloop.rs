@@ -62,3 +62,104 @@ fn autonomous_progress_matches_pinned_public_sdk() {
         assert_eq!(json!(states), case["states"], "{}", input["name"]);
     }
 }
+
+fn tool_call(name: &str, input: &str) -> RunItem {
+    RunItem::ToolCall {
+        call: ToolCall {
+            id: "call".into(),
+            name: name.into(),
+            arguments: serde_json::from_str(input).unwrap_or(Value::Null),
+            raw_arguments: Some(input.into()),
+        },
+    }
+}
+
+#[test]
+fn tracker_detects_no_tool_stall_at_original_threshold() {
+    let mut tracker = AutoTracker::default();
+    let thinking = RunItem::Message {
+        message: adk_core::Message {
+            role: adk_core::Role::Assistant,
+            content: vec![Content::Text {
+                text: "thinking".into(),
+            }],
+        },
+    };
+    for _ in 0..4 {
+        tracker.update(std::slice::from_ref(&thinking));
+        assert!(!tracker.check_circuit_breakers().tripped);
+    }
+    tracker.update(&[thinking]);
+    let breaker = tracker.check_circuit_breakers();
+    assert!(breaker.tripped);
+    assert!(breaker.reason.contains("no tool calls"));
+}
+
+#[test]
+fn smart_nudge_warns_on_original_repeated_no_tool_turns() {
+    let mut tracker = AutoTracker::default();
+    for _ in 0..3 {
+        tracker.update(&[RunItem::Message {
+            message: adk_core::Message {
+                role: adk_core::Role::Assistant,
+                content: vec![Content::Text {
+                    text: "done soon".into(),
+                }],
+            },
+        }]);
+    }
+    let nudge = build_smart_nudge(Some(&tracker), "shipping");
+    for expected in [
+        "WARNING",
+        "tool calls",
+        "Finish is a hard stop",
+        "not a progress report",
+        "backlog item",
+        "call a tool for the top item",
+    ] {
+        assert!(nudge.contains(expected), "{expected}: {nudge}");
+    }
+}
+
+#[test]
+fn tracker_detects_original_repeated_tool_cycle() {
+    let mut tracker = AutoTracker::default();
+    for _ in 0..3 {
+        tracker.update(&[tool_call("grep", ""), tool_call("bash", "")]);
+    }
+    let breaker = tracker.check_circuit_breakers();
+    assert!(breaker.tripped);
+    assert!(breaker.reason.contains("tool loop"));
+}
+
+#[test]
+fn tracker_ignores_original_diverse_exploration() {
+    let mut tracker = AutoTracker::default();
+    for (name, input) in [
+        ("grep", r#"{"pattern":"funcA"}"#),
+        ("read_file", r#"{"path":"a.go"}"#),
+        ("read_file", r#"{"path":"b.go"}"#),
+        ("grep", r#"{"pattern":"funcB"}"#),
+        ("read_file", r#"{"path":"c.go"}"#),
+        ("grep", r#"{"pattern":"funcC"}"#),
+        ("read_file", r#"{"path":"d.go"}"#),
+        ("read_file", r#"{"path":"e.go"}"#),
+        ("grep", r#"{"pattern":"funcD"}"#),
+        ("read_file", r#"{"path":"f.go"}"#),
+    ] {
+        tracker.update(&[tool_call(name, input)]);
+        assert!(!tracker.check_circuit_breakers().tripped);
+    }
+    assert!(!build_smart_nudge(Some(&tracker), "plan").contains("stuck in a loop"));
+}
+
+#[test]
+fn tracker_detects_original_identical_call_loop() {
+    let mut tracker = AutoTracker::default();
+    for _ in 0..6 {
+        tracker.update(&[tool_call("read_file", r#"{"path":"same.go"}"#)]);
+    }
+    let breaker = tracker.check_circuit_breakers();
+    assert!(breaker.tripped);
+    assert!(breaker.reason.contains("tool loop"));
+}

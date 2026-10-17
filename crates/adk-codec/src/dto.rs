@@ -377,26 +377,18 @@ pub struct ToolApprovalData {
     pub approved: bool,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct Usage {
-    #[serde(rename = "requests", deserialize_with = "null_default")]
+    #[serde(rename = "requests")]
     pub requests: i64,
-    #[serde(rename = "input_tokens", deserialize_with = "null_default")]
+    #[serde(rename = "input_tokens")]
     pub input_tokens: i64,
-    #[serde(rename = "output_tokens", deserialize_with = "null_default")]
+    #[serde(rename = "output_tokens")]
     pub output_tokens: i64,
-    #[serde(
-        rename = "cache_read_tokens",
-        deserialize_with = "null_default",
-        skip_serializing_if = "is_zero"
-    )]
+    #[serde(rename = "cache_read_tokens", skip_serializing_if = "is_zero")]
     pub cache_read_tokens: i64,
-    #[serde(
-        rename = "cache_create_tokens",
-        deserialize_with = "null_default",
-        skip_serializing_if = "is_zero"
-    )]
+    #[serde(rename = "cache_create_tokens", skip_serializing_if = "is_zero")]
     pub cache_create_tokens: i64,
 }
 

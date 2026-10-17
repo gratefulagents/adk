@@ -118,6 +118,7 @@ macro_rules! target {
 }
 target!(
     Cursor,
+    Usage,
     MessageOutput,
     ImageAttachment,
     ToolOutputData,
@@ -167,6 +168,7 @@ impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
 
 go_object!(Cursor, "message_id" => message_id: integer, "token" => token: scalar);
+go_object!(Usage, "requests" => requests: integer, "input_tokens" => input_tokens: integer, "output_tokens" => output_tokens: integer, "cache_read_tokens" => cache_read_tokens: integer, "cache_create_tokens" => cache_create_tokens: integer);
 go_object!(MessageOutput, "text" => text: scalar, "phase" => phase: scalar; "images" => images);
 go_object!(ImageAttachment, "media_type" => media_type: scalar, "data" => data: scalar, "detail" => detail: scalar);
 go_object!(ToolCallData, "id" => id: scalar, "name" => name: scalar, "input" => input: raw);

@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Usage integer and object decoding
+
+Reproduced ordinary Serde rejecting integer `-0` in usage counters accepted by
+the pinned Go SDK. `codec::dto::Usage` now uses the shared integer/object decoder
+and supports the explicit Go JSON byte APIs. All113 independently generated Go
+cases pass across the five counters: signed limits, overflow, fractions,
+duplicates, null retention, folded keys, unknown values and nesting boundaries.
+Native negative-zero and in-place regressions pass alongside existing arithmetic.
+
+Fresh Rust1.88 Linux workspace tests and doctests, strict workspace Clippy/docs/
+format, full feature matrix, standalone consumer/purity,20 offline scenarios and
+host-session passed. Go oracle vet/build, bound evidence, artifact checks, all51
+validators, overlay/audit and immutable source locks passed. The audit initially
+rejected an incorrect CLI argument; invoking its documented interface succeeded.
+No additional IDs are closed: **867 verified /8,024 unresolved /251 excluded**.
+Full issue11 acceptance remains incomplete.
+
 ### Host cursor persistence and pinned JSON codec
 
 `host::Cursor` now shares the canonical compatibility record, with Serde

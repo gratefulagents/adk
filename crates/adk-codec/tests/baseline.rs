@@ -19,6 +19,70 @@ fn usage_add_and_total_match_original_sdk_example() {
 }
 
 #[test]
+fn usage_integer_negative_zero_is_accepted() {
+    let usage: Usage = serde_json::from_str(r#"{"requests":-0,"input_tokens":-0,"output_tokens":-0,"cache_read_tokens":-0,"cache_create_tokens":-0}"#).unwrap();
+    assert_eq!(usage, Usage::default());
+}
+
+#[test]
+fn usage_decode_matches_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/usage/observations.json")).unwrap();
+    let cases = fixture["decode_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 113);
+    for case in cases {
+        let input: Vec<u8> = case["input_hex"]
+            .as_str()
+            .unwrap()
+            .as_bytes()
+            .chunks_exact(2)
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect();
+        let decoded = adk_codec::from_go_json::<Usage>(&input);
+        assert_eq!(
+            decoded.is_ok(),
+            case["accepted"].as_bool().unwrap(),
+            "{}",
+            case["name"]
+        );
+        if let Ok(usage) = decoded {
+            assert_eq!(
+                adk_codec::to_go_json_bytes(&usage).unwrap(),
+                case["wire_json"].as_str().unwrap().as_bytes(),
+                "{}",
+                case["name"]
+            );
+        }
+    }
+}
+
+#[test]
+fn usage_in_place_updates_keep_null_fields() {
+    use serde::Deserialize;
+    let mut usage = Usage {
+        requests: 9,
+        input_tokens: 7,
+        output_tokens: 8,
+        cache_read_tokens: 2,
+        cache_create_tokens: 3,
+    };
+    let mut decoder = serde_json::Deserializer::from_str(
+        r#"{"REQUESTS":null,"input_tokens":null,"input_tokens":4,"output_tokens":null,"cache_read_tokens":null,"cache_create_tokens":null}"#,
+    );
+    Usage::deserialize_in_place(&mut decoder, &mut usage).unwrap();
+    assert_eq!(
+        usage,
+        Usage {
+            requests: 9,
+            input_tokens: 4,
+            output_tokens: 8,
+            cache_read_tokens: 2,
+            cache_create_tokens: 3
+        }
+    );
+}
+
+#[test]
 fn signed_usage_arithmetic_matches_pinned_go() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/usage/observations.json")).unwrap();

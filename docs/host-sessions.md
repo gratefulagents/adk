@@ -153,7 +153,7 @@ participate in the durable configuration fingerprint.
 Reference: SDK v0.0.115, commit
 `1dc92b73900fac74dc357a938e4b5eee6392b418`,
 [`pkg/agentsdk/chatloop.go`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/chatloop.go).
-`fixtures/host-loop/sdk-chatloop.json` contains 46 independently executed Go
+`fixtures/host-loop/sdk-chatloop.json` contains 50 independently executed Go
 scenarios. Regenerate and check them with `python3 scripts/host-reference/check.py`
 after obtaining the clean pinned SDK and a Go toolchain. Source fixture coverage
 is not a claim that every scenario or SDK capability is verified in Rust.

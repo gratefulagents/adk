@@ -48,7 +48,10 @@ compiler's fail-fast contract or its different glob/message semantics. Both
 compilers accept Go's Unicode action case normalization (for example, the Kelvin
 sign in `blocK` lowercases to `block`). RE2-only
 syntax outside the supported subset remains explicitly unsupported, and native
-regex-parser prose is not a Go byte-parity claim.
+regex-parser prose is not a Go byte-parity claim. The shared subset accepts the
+14 Go POSIX ASCII class names and their negations, including unions and leading
+literal `]` cases. This does not enable arbitrary nested classes or Rust class-set
+operations. In-class Perl escapes remain outside the supported subset.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

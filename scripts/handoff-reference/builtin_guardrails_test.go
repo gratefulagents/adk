@@ -47,6 +47,9 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if len(fixture.ToolPatterns) != 120 {
 		t.Fatalf("got %d tool patterns, want 120", len(fixture.ToolPatterns))
 	}
+	if len(fixture.RegexClasses) != 62 || len(fixture.RegexInputs) != 142 {
+		t.Fatal("missing class observations")
+	}
 	if len(fixture.CompiledRules) != 5 {
 		t.Fatal("missing compiler cases")
 	}

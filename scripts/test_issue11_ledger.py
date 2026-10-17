@@ -231,6 +231,15 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     self.apply()
 
+    def test_role_catalog_oracle_is_required(self):
+        marker = "Pinned role/catalog observations reproduced exactly"
+        original = self.evidence["reference_fixture_check"].replace(marker, "") + marker
+        for replacement in ("", "Role/catalog oracle not executed"):
+            with self.subTest(replacement=replacement):
+                self.evidence["reference_fixture_check"] = original.replace(marker, replacement)
+                with self.assertRaisesRegex(SystemExit, "builder evidence requires"):
+                    self.apply()
+
     def test_excluded_entry_cannot_be_verified(self):
         self.entries[next(iter(self.entries))]["scope"] = "out_of_scope"
         with self.assertRaises(SystemExit):

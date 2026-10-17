@@ -135,3 +135,18 @@ async fn host_rule_action_normalization_uses_go_unicode_lowercase() {
         .unwrap();
     assert!(result.tripwire_triggered);
 }
+
+#[test]
+fn posix_atoms_do_not_admit_nested_or_unknown_class_syntax() {
+    for pattern in [
+        "[[:bogus:]]",
+        "[[:Alpha:]]",
+        "[[:alpha:]&&[:digit:]]",
+        "[[:alpha:][a-z]]",
+        "[[:alpha:]--[:digit:]]",
+    ] {
+        let error = compile_guardrail_rules(&[rule(pattern)]).err().unwrap();
+        assert_eq!(error.info.category, ErrorCategory::Unsupported, "{pattern}");
+    }
+    assert!(compile_guardrail_rules(&[rule("[[:alpha:]")]).is_err());
+}

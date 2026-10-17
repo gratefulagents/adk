@@ -20,7 +20,8 @@ pub struct CompiledGuardrails {
 /// Input rules match original UTF-8 argument text when available.
 /// Compile before any model execution. This is the shared Go/Rust regex subset,
 /// not a claim that Rust's regex parser implements RE2. Quoted `\Q...\E`
-/// literals are translated outside classes. Perl classes/boundaries inside character
+/// literals are translated outside classes. Named POSIX ASCII class atoms and
+/// their negations are accepted. Perl classes/boundaries inside character
 /// classes are rejected; outside classes their ASCII Go semantics are preserved.
 pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardrails, Error> {
     let mut compiled = CompiledGuardrails::default();
@@ -236,9 +237,40 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
             }
             if c == '[' {
                 if in_class {
+                    // POSIX ASCII atoms are shared syntax, unlike arbitrary nested
+                    // classes or Rust set operations. Consume only an exact Go name.
+                    let candidate: String = chars.clone().take(10).collect();
+                    let class = candidate
+                        .strip_prefix(':')
+                        .and_then(|suffix| suffix.split_once(":]").map(|(name, _)| name));
+                    if let Some(class) = class.filter(|class| {
+                        matches!(
+                            class.strip_prefix('^').unwrap_or(class),
+                            "alnum"
+                                | "alpha"
+                                | "ascii"
+                                | "blank"
+                                | "cntrl"
+                                | "digit"
+                                | "graph"
+                                | "lower"
+                                | "print"
+                                | "punct"
+                                | "space"
+                                | "upper"
+                                | "word"
+                                | "xdigit"
+                        )
+                    }) {
+                        pattern.push(c);
+                        pattern.extend(chars.by_ref().take(class.len() + 3));
+                        class_has_atom = true;
+                        class_can_negate = false;
+                        continue;
+                    }
                     return Err(Error::new(
                         ErrorCategory::Unsupported,
-                        "Go/Rust nested character-class syntax differs (including POSIX classes)",
+                        "Go/Rust nested character-class syntax differs outside recognized POSIX atoms",
                     ));
                 }
                 in_class = true;

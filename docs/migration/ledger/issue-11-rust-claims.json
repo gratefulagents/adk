@@ -16715,6 +16715,213 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-1A8F1B220E763017": {
+      "source": "pkg/agentsdk/specialists_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/specialists.rs::filter_tools_by_access",
+        "crates/adk/src/specialists/catalog.rs::build_specialist_tools_from_catalog",
+        "crates/adk/src/specialists/delegation.rs::build_delegation_guide"
+      ],
+      "rust_test_identifiers": [
+        "catalog::catalog_matches_independent_pinned_go_observations",
+        "catalog::original_catalog_applies_access_and_routing",
+        "delegation::delegation_guides_match_pinned_go_exactly",
+        "delegation::original_compact_task_packet_guidance_regression",
+        "oracle::pinned_go_tool_list_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Complete pinned-file review accounts for all three test entry points: adapter selection, every compact task-packet guidance assertion and empty-guide behavior, and the original researcher catalog model/fallback/read-only-tool/wrapper assertions. Native fixtures replace the source test doubles. All three originals have independently verified mappings; this closes the test file only, not the complete specialists implementation or wrapper/runtime API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-CD699B7D73635EAA": {
+      "source": "pkg/agentsdk/guardrails/rules.go",
+      "source_name": "MatchToolPattern",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::match_tool_pattern"
+      ],
+      "rust_test_identifiers": [
+        "public_tool_pattern_helper_matches_pinned_sdk_not_chatloop_globs",
+        "public_rule_callbacks_match_pinned_sdk_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestMakeToolInputGuardrailFn_UnvalidatedUnknownActionBlocks",
+      "rationale": "For native UTF-8 tool names and patterns, maps every source branch directly: star matches all; trailing-star literal prefix takes precedence; otherwise leading-star literal suffix; otherwise exact equality. The actual pinned public function is independently invoked for120 observations, including empty strings, repeated/internal stars, Unicode and newlines; callback observations also verify public tool filtering. The recorded original regression is the associated public-rule callback check, not the sole matcher evidence. This does not conflate ChatLoop multi-star globbing or claim arbitrary non-UTF8 Go byte-string representation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-AB30CCF9BCDC23A5": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleCatalog",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleCatalog",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleCatalog. The compatibility catalog is an optional ordered role slice retaining nil versus allocated empty catalogs, duplicate/empty role names and null elements as zero-valued roles; no catalog preparation or native specialist conversion. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D9A24CFA30C3EF69": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec.Description",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec::description",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec.Description. Scalar description stays verbatim, including empty strings; no native wrapper description defaulting. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3A214245E7FB697A": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec.FallbackModels",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec::fallback_models",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec.FallbackModels. Optional ordered fallback strings retain nil versus allocated empty slices, null elements, duplicate/empty strings and repeated-field backing-slot reuse/reset; no fallback normalization or model binding. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BC630E141913A283": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec.Instructions",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec::instructions",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec.Instructions. Scalar instructions stay verbatim, including whitespace and empty strings; no native instruction augmentation. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-014840AE79F2A88F": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec.ModelOverride",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec::model_override",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec.ModelOverride. Scalar model labels stay verbatim, including empty strings; no alias resolution, provider selection or model binding. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-905CCC41228ECD51": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec.Name",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec::name",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec.Name. Scalar name stays verbatim, including whitespace and empty strings; no native catalog name filtering or deduplication. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-72B95E5F88022415": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec.ToolAccess",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec::tool_access",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec.ToolAccess. Scalar access labels stay verbatim, including typos and unknown values; no access-level normalization or tool authority. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-639C7835D5EF808A": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "RoleSpec",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RoleSpec",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_role_catalog_oracle",
+        "nil_empty_and_null_elements_remain_distinct",
+        "repeated_fallback_slices_reuse_slots_until_reset",
+        "byte_entry_point_replaces_strings_without_normalizing_role_values"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Closes only the bounded compatibility DTO declaration RoleSpec. The six-field compatibility role preserves original field names/order, zero scalar values and nil versus allocated empty fallback slices without native role normalization. The independent pinned Go RoleSpec/RoleCatalog oracle executes 364 byte-input cases covering every field, root/missing/null/wrong-type/duplicate/casefold behavior, Unicode repair, exact HTML/separator escaping and ignored-value nesting boundaries, both directly and as catalog elements. Sealed from_go_json/to_go_json_bytes compare successful decoded fields and exact marshal bytes; rejected inputs compare rejection only. The associated original catalog construction regression is a source anchor, not exhaustive codec evidence. No Go partial-error mutation, identical error text, arbitrary invalid-UTF8 in-memory Go string representation, ordinary Serde byte parity, Agent codec, native conversion or runnable-wrapper/runtime parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

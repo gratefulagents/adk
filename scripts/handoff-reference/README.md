@@ -480,3 +480,10 @@ normalization (including Kelvin-sign K), validation precedence, phase ordering,
 quoted regexes and tool filters. Native comparison checks retained guard names,
 results and ordered errors; invalid-regex parser wording remains native. These
 checks do not assert support for RE2-only syntax outside the documented subset.
+
+The class oracle adds62 patterns over142 inputs (all128 ASCII characters plus
+Unicode, control and multi-character cases). All14 Go POSIX ASCII class names,
+negations and case-insensitive forms are compiled by the actual public SDK rule
+compiler. Ordered `0`/`1` match strings record8804 Go membership decisions; native
+host and public compilers each compare every decision. The Go generator contains
+no copied class matcher. Other nested/set syntax remains explicitly unsupported.

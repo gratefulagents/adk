@@ -117,6 +117,8 @@ macro_rules! target {
     )*};
 }
 target!(
+    RoleSpec,
+    RoleCatalog,
     Cursor,
     Usage,
     MessageOutput,
@@ -166,6 +168,31 @@ impl sealed::Sealed for ToolApprovalData {
 }
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
+
+go_object!(RoleSpec,
+    "name" => name: scalar,
+    "description" => description: scalar,
+    "instructions" => instructions: scalar,
+    "toolaccess" => tool_access: scalar,
+    "modeloverride" => model_override: scalar
+    preserve_nil { "fallbackmodels" => fallback_models }
+);
+
+impl<'de> Deserialize<'de> for RoleCatalog {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        Ok(Self(GoSlice::<RoleSpec>::deserialize(d)?.into_values()))
+    }
+
+    fn deserialize_in_place<D: serde::Deserializer<'de>>(
+        d: D,
+        out: &mut Self,
+    ) -> Result<(), D::Error> {
+        let mut roles = out.0.take().map(GoSlice::from_values).unwrap_or_default();
+        GoSlice::deserialize_in_place(d, &mut roles)?;
+        out.0 = roles.into_values();
+        Ok(())
+    }
+}
 
 go_object!(Cursor, "message_id" => message_id: integer, "token" => token: scalar);
 go_object!(Usage, "requests" => requests: integer, "input_tokens" => input_tokens: integer, "output_tokens" => output_tokens: integer, "cache_read_tokens" => cache_read_tokens: integer, "cache_create_tokens" => cache_create_tokens: integer);

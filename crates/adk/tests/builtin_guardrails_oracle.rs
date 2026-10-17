@@ -396,7 +396,7 @@ async fn public_rule_compiler_retains_valid_rules_and_ordered_errors() {
 #[cfg(feature = "host")]
 #[test]
 fn public_rule_compiler_preserves_explicit_regex_support_limits() {
-    let rules: Vec<_> = ["(?x)danger", "[[:alpha:]]", "danger"]
+    let rules: Vec<_> = ["(?x)danger", "[a[b]]", "danger"]
         .into_iter()
         .map(|pattern| adk::host::GuardrailRule {
             name: pattern.into(),
@@ -414,4 +414,60 @@ fn public_rule_compiler_preserves_explicit_regex_support_limits() {
             .iter()
             .all(|error| error.info.category == ErrorCategory::Unsupported)
     );
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn posix_guardrail_classes_match_actual_go_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_classes"].as_array().unwrap();
+    let inputs = fixture["regex_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 62);
+    assert_eq!(inputs.len(), 142);
+    let context = Context {
+        run_id: "class-oracle".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    for case in cases {
+        assert_eq!(case["error"], "");
+        let pattern = case["pattern"].as_str().unwrap();
+        let rule = adk::host::GuardrailRule {
+            name: "class".into(),
+            regex: pattern.into(),
+            rule_type: "tool-input".into(),
+            ..Default::default()
+        };
+        let host = adk::host::compile_guardrail_rules(std::slice::from_ref(&rule)).unwrap();
+        let (public, errors) = tool_guardrails_from_rules(&[rule]);
+        assert!(errors.is_empty(), "{pattern}: {errors:?}");
+        let matches = case["matches"].as_str().unwrap();
+        assert_eq!(matches.len(), inputs.len());
+        for (expected, input) in matches.bytes().zip(inputs) {
+            assert!(matches!(expected, b'0' | b'1'));
+            let text = input.as_str().unwrap();
+            let call = ToolCall {
+                id: "call".into(),
+                name: "reader".into(),
+                arguments: Value::Null,
+                raw_arguments: Some(text.into()),
+            };
+            for guard in host.input.iter().chain(&public.input) {
+                let actual = guard
+                    .check(&context, "agent", GuardrailInput::ToolInput(&call))
+                    .await
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(
+                    actual.tripwire_triggered,
+                    expected == b'1',
+                    "{pattern} / {text:?} / {}",
+                    guard.name()
+                );
+            }
+        }
+    }
 }

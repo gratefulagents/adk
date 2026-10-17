@@ -306,3 +306,22 @@ instructions, and dispatch by registered name rather than retaining Go live
 agent pointers. Recursive Go wrapper pointer-graph mutation is not represented.
 Native settings remain a JSON map, not a new Go `ModelSettings` codec; Go
 nil-versus-empty slice identity is not represented.
+
+### Compatibility role/catalog DTOs
+
+`adk_codec::dto::{RoleSpec, RoleCatalog}` are compatibility-only data shapes,
+not the native `adk::specialists::SpecialistRoleSpec` or an executable catalog.
+Use the sealed `from_go_json` and `to_go_json_bytes` entry points for Go byte
+compatibility; ordinary Serde is not that contract, notably for invalid UTF-8
+and lone surrogates. `None` retains nil fallback/catalog slices while
+`Some(vec![])` retains allocated empty slices. Names, access labels, model
+labels and fallback strings remain unnormalized; duplicate roles are retained.
+There is no implicit conversion into native specialist construction or execution.
+
+The pinned Go oracle in `scripts/role-catalog-reference/` records 364 cases in
+`fixtures/role-catalog/observations.json`; `crates/adk-codec/tests/roles.rs`
+compares accepted decoded fields and exact marshaled bytes, and rejection for
+invalid inputs. It does not claim Go partial-error mutation, identical error
+text, arbitrary invalid-UTF8 in-memory Go strings, an Agent codec, or native
+wrapper/runtime parity. The native catalog's nil/empty and execution limits
+above are unchanged by these separate compatibility DTOs.

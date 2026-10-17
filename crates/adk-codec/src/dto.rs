@@ -2,6 +2,23 @@ use schemars::JsonSchema;
 use serde::{Deserialize, Deserializer, Serialize};
 use serde_json::Value;
 
+/// Compatibility-only pinned Go role; `None` preserves a nil fallback slice.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(rename_all = "PascalCase")]
+pub struct RoleSpec {
+    pub name: String,
+    pub description: String,
+    pub instructions: String,
+    pub tool_access: String,
+    pub model_override: String,
+    pub fallback_models: Option<Vec<String>>,
+}
+
+/// Compatibility-only Go slice; nil and allocated empty catalogs stay distinct.
+#[derive(Clone, Debug, Default, PartialEq, Eq, Serialize, JsonSchema)]
+#[serde(transparent)]
+pub struct RoleCatalog(pub Option<Vec<RoleSpec>>);
+
 pub(crate) fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
     d: D,
 ) -> Result<T, D::Error> {

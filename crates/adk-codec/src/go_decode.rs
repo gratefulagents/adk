@@ -121,7 +121,7 @@ macro_rules! read_field {
 }
 
 macro_rules! go_object {
-    ($ty:ident, $( $key:literal => $field:ident : $kind:ident ),* $(,)? $(; $( $slice_key:literal => $slice:ident ),* )?) => {
+    ($ty:ident, $( $key:literal => $field:ident : $kind:ident ),* $(,)? $(; $( $slice_key:literal => $slice:ident ),* )? $( preserve_nil { $( $nil_key:literal => $nil_slice:ident ),* } )?) => {
         impl<'de> Deserialize<'de> for $ty {
             fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
                 let mut out = Self::default();
@@ -142,15 +142,18 @@ macro_rules! go_object {
                     fn visit_map<M: serde::de::MapAccess<'de>>(self, mut map: M) -> Result<(), M::Error> {
                         let out = self.0;
                         $($(let mut $slice = GoSlice::from_values(std::mem::take(&mut out.$slice));)*)?
+                        $($(let mut $nil_slice = out.$nil_slice.take().map(GoSlice::from_values).unwrap_or_default();)*)?
                         while let Some(key) = map.next_key::<String>()? {
                             let key = fold_key(&key);
                             match key.as_str() {
                                 $( $key => { read_field!(map, out.$field, $kind); } )*
                                 $($($slice_key => { read_field!(map, $slice, slice); })*)?
+                                $($($nil_key => { read_field!(map, $nil_slice, slice); })*)?
                                 _ => { map.next_value::<serde::de::IgnoredAny>()?; }
                             }
                         }
                         $($(out.$slice = $slice.into_values().unwrap_or_default();)*)?
+                        $($(out.$nil_slice = $nil_slice.into_values();)*)?
                         Ok(())
                     }
                 }

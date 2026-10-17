@@ -2,6 +2,30 @@
 
 ## Current continuation evidence
 
+### Role/catalog wire codecs and POSIX guardrail classes
+
+Compatibility-only `adk_codec::dto::{RoleSpec, RoleCatalog}` now expose sealed
+Go JSON entry points. The 364-case independently reproduced pinned-Go oracle
+checks unnormalized decoded state and exact encoded bytes, preserving nil versus
+empty slices, duplicate-field slot reuse, scalar null no-ops, key folding and
+Unicode repair. Failed inputs compare rejection, not error text or partial
+mutation. Native specialist conversion and executable wrapper parity remain
+separate unresolved contracts.
+
+The shared guardrail regex translator now accepts precisely the fourteen Go
+POSIX ASCII class atoms and their negations, while still rejecting arbitrary
+nested classes and Rust set operations. Both public and host compilers match
+62 actual-Go patterns across 142 inputs. This is not full RE2 parser parity.
+
+Fresh Rust1.88 Linux verification: **1,717 workspace tests passed /0 failed /
+30 ignored;10 doctests passed**. Strict direct-driver workspace lint/typecheck,
+full feature matrix, standalone consumer and platform-purity checks passed.
+All pinned evidence regeneration, **53 ledger validators**, artifact review,
+overlay/audit and immutable source locks passed. Ten narrowly scoped declaration
+and original-test claims bring the ledger to **947 verified /7,944 unresolved /
+251 excluded**. Full acceptance remains incomplete; remote current-head CI and
+credential-dependent live services are not claimed verified.
+
 ### Public compilation and standalone catalog composition
 
 The public rule compiler now retains valid rules while reporting rejected rules

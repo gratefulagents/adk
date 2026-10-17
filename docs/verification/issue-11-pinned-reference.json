@@ -42,11 +42,11 @@
       "-json",
       "./internal/anthropic",
       "-run",
-      "^(TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem|TestStreamAssemblerPreservesEndTurnFalse|TestToSDKParamsSendsOutputFormatForOutputSchema)$"
+      "^(TestStreamAssemblerAssemblesCompactionBlocks|TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem|TestStreamAssemblerPreservesEndTurnFalse|TestToSDKParamsSendsOutputFormatForOutputSchema)$"
     ]
   ],
   "counts": {
-    "pass": 920,
+    "pass": 921,
     "skip": 5
   },
   "exit_code": 0,
@@ -196,6 +196,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestTruncateBytes": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestTruncateMiddle": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestUsageAddAndTotal": "pass",
+    "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerAssemblesCompactionBlocks": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerPreservesEndTurnFalse": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestToSDKParamsSendsOutputFormatForOutputSchema": "pass",

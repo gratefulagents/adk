@@ -15395,6 +15395,22 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-4DC430C8E6252408": {
+      "source": "internal/anthropic/audit_fixes_test.go",
+      "source_name": "TestStreamAssemblerAssemblesCompactionBlocks",
+      "implementation_symbols": [
+        "crates/adk-providers/src/client.rs::StreamState::anthropic"
+      ],
+      "rust_test_identifiers": [
+        "client::tests::anthropic_partial_compaction_matches_original_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerAssemblesCompactionBlocks",
+      "rationale": "Only the original partial compaction assembly regression is closed. The native test feeds the identical message start, compaction start, two content deltas and block stop, then checks one compaction block, concatenated summary and retained opaque ciphertext without adding a terminal event. This does not claim the entire assembler API, source file, final response acceptance, or the separate encrypted-content regression that omits message_start (rejected by the native lifecycle).",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

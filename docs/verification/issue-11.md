@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Original Anthropic partial compaction assembly regression
+
+The literal native counterpart of `TestStreamAssemblerAssemblesCompactionBlocks`
+feeds message start, compaction start, two content deltas and block stop, then
+checks one block, concatenated summary and opaque ciphertext. No terminal event
+is invented. Only this test ID is closed. The separate encrypted-content test
+omits message start and remains unresolved because native stream lifecycle
+validation rejects that sequence.
+
+Fresh Rust1.88 Linux workspace verification: **1,637 passed /0 failed /30 ignored;
+10 doctests passed**. All three partial-state tests and strict provider
+Clippy/format passed. Refreshed bound evidence, artifact checks, all51 validators,
+overlay/audit and immutable source locks passed. Original pinned Go report:
+**921 passed /5 skipped across38 packages**. Ledger: **862 verified /8,029
+unresolved /251 excluded**. These changes add tests/evidence only; full retained
+acceptance is still incomplete.
+
 ### Two original Anthropic partial-state regressions
 
 Literal native counterparts now verify the original omitted-input/cache usage and

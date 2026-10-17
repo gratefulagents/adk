@@ -79,8 +79,8 @@
       },
       "tests": {
         "excluded": 12,
-        "unresolved": 1062,
-        "verified": 108
+        "unresolved": 1061,
+        "verified": 109
       },
       "tool_parameters": {
         "unresolved": 174,
@@ -96,8 +96,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 8030,
-    "verified": 861
+    "unresolved": 8029,
+    "verified": 862
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -209,11 +209,11 @@
   "module_reference_map_note": "This is an API/test association index, not implementation evidence, a test result, approved divergence, or semantic closure for any acceptance ID.",
   "pinned_reference_execution": {
     "counts": {
-      "pass": 920,
+      "pass": 921,
       "skip": 5
     },
     "evidence_path": "docs/verification/issue-11-pinned-reference.json",
-    "evidence_sha256": "b4f43d6914778c67d7a08243854a158fd286543839fc3e412508cbbaa9404678",
+    "evidence_sha256": "46ec0ca2b37b815aecdf12d72e24bcc9bb2ed07a4311be77024e798c0a0f91fe",
     "rust_semantic_closure": false,
     "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418"
   },
@@ -11447,7 +11447,7 @@
     "SDK-4DB9F635EB856D95": {"approved_divergence_reference": null, "category": "files", "command_log": [], "disposition": "excluded", "disposition_rationale": "evaluation and automation adapters are outside issue #11 scope", "implementation_symbols": [], "ledger_record_id": "files:scripts/analyze-terminal-bench-results.py", "proposed_rust_module": "sdk_evals::automation", "rust_test_identifiers": [], "scope": "out_of_scope", "semantic_closure": "excluded", "source": "scripts/analyze-terminal-bench-results.py", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk_evals::automation", "verification_status": "not_run"},
     "SDK-4DC082DC2E5A54E9": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tools/shell.ReadOnlyBashTool.IsEnabled@pkg/agentsdk/tools/shell/bash.go", "proposed_rust_module": "sdk::tools::shell", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/shell/bash.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::shell", "verification_status": "not_run"},
     "SDK-4DC3832FF01A2E7C": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:examples/features/policy/policy_test.go:TestPolicyExample", "proposed_rust_module": "sdk::policy::examples", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "examples/features/policy/policy_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::policy::examples", "verification_status": "not_run"},
-    "SDK-4DC430C8E6252408": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:internal/anthropic/audit_fixes_test.go:TestStreamAssemblerAssemblesCompactionBlocks", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/audit_fixes_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
+    "SDK-4DC430C8E6252408": {"approved_divergence_reference": null, "category": "tests", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Only the original partial compaction assembly regression is closed. The native test feeds the identical message start, compaction start, two content deltas and block stop, then checks one compaction block, concatenated summary and retained opaque ciphertext without adding a terminal event. This does not claim the entire assembler API, source file, final response acceptance, or the separate encrypted-content regression that omits message_start (rejected by the native lifecycle).", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-providers/src/client.rs::StreamState::anthropic"], "ledger_record_id": "tests:internal/anthropic/audit_fixes_test.go:TestStreamAssemblerAssemblesCompactionBlocks", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerAssemblesCompactionBlocks"}, "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": ["client::tests::anthropic_partial_compaction_matches_original_regression"], "scope": "in_scope", "semantic_closure": "verified", "source": "internal/anthropic/audit_fixes_test.go", "target_features": ["x86_64-unknown-linux-gnu", "providers"], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "passed"},
     "SDK-4DC540C0FCE8A0A2": {"approved_divergence_reference": null, "category": "tests", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tests:pkg/agentsdk/tools/fs/patch_test.go:TestApplyPatchRejectsSymlink", "pinned_reference_verification": {"evidence_path": "docs/verification/issue-11-pinned-reference.json", "rust_semantic_closure": false, "status": "pass", "test": "github.com/gratefulagents/sdk/pkg/agentsdk/tools/fs/TestApplyPatchRejectsSymlink"}, "proposed_rust_module": "sdk::tools::fs", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/fs/patch_test.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::fs", "verification_status": "not_run"},
     "SDK-4DCC26505AF0F315": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/anthropic.StreamEventType@internal/anthropic/messages.go", "proposed_rust_module": "sdk::providers::anthropic", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/anthropic/messages.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::anthropic", "verification_status": "not_run"},
     "SDK-4DDEEA62297E3FAE": {"approved_divergence_reference": null, "category": "apis", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Each of all eight independent pinned public-builder flag combinations is compared against actual native tool registration, disabled output and host prerequisite failures. A separate exact-name policy matrix proves enabled tools cannot bypass host grants. This is individual selection-field closure, not whole scheduler or automatic initialization equivalence.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk/src/builder.rs::SubagentFeatures::task"], "ledger_record_id": "apis:pkg/agentsdk/runtime.AsyncSubAgentFeatures.Task@pkg/agentsdk/runtime/features.go", "proposed_rust_module": "sdk::runtime", "rust_test_identifiers": ["managed_subagent_feature_matrix_matches_pinned_public_builder", "managed_subagent_selection_never_bypasses_host_name_policy"], "scope": "in_scope", "semantic_closure": "verified", "source": "pkg/agentsdk/runtime/features.go", "target_features": ["x86_64-unknown-linux-gnu", "builder", "mcp", "project-state"], "upstream_regression_reference_group": "verification_groups:sdk::runtime", "verification_status": "passed"},

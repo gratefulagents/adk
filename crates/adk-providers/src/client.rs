@@ -1486,6 +1486,25 @@ mod tests {
         );
     }
 
+    #[test]
+    fn anthropic_partial_compaction_matches_original_regression() {
+        let mut state = StreamState::new(Protocol::Anthropic);
+        for event in [
+            json!({"type":"message_start","message":{"id":"msg_1"}}),
+            json!({"type":"content_block_start","index":0,"content_block":{"type":"compaction"}}),
+            json!({"type":"content_block_delta","index":0,"delta":{"type":"compaction_delta","content":"summary part 1 "}}),
+            json!({"type":"content_block_delta","index":0,"delta":{"type":"compaction_delta","content":"and part 2","encrypted_content":"opaque-blob"}}),
+            json!({"type":"content_block_stop","index":0}),
+        ] {
+            state.event(&event.to_string()).unwrap();
+        }
+        assert_eq!(state.tools.len(), 1);
+        let block = &state.tools[&0];
+        assert_eq!(block["type"], "compaction");
+        assert_eq!(block["content"], "summary part 1 and part 2");
+        assert_eq!(block["encrypted_content"], "opaque-blob");
+    }
+
     #[tokio::test]
     async fn body_read_activity_matches_original_sdk_test() {
         use std::sync::atomic::{AtomicUsize, Ordering};

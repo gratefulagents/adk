@@ -16332,6 +16332,166 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-56A8FB798AE595AD": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestPartialSecretSignatureNamesExist",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_paired_aws_credentials_block_without_leak",
+        "original_gcp_service_account_marker_blocks_whole_output"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestPartialSecretSignatureNamesExist",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. The source partial-signature set and native sanitizer hardcode only AWS access key and GCP service-account key; both native cases must match a registered signature to produce the asserted hard block and exact safe signature label, verifying the original name-membership invariant. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-268930A66A67E819": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_BlocksGCPServiceAccountJSON",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_gcp_service_account_marker_blocks_whole_output"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_BlocksGCPServiceAccountJSON",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-D85A2146E19C6F98": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_BlocksPairedAWSCredentialBlock",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_paired_aws_credentials_block_without_leak"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_BlocksPairedAWSCredentialBlock",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-A24B1DA7A9A0FDC4": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_CorpusAllDetected",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_secret_corpus_is_detected_by_output_guardrail"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_CorpusAllDetected",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-0E9E54DF5CC5F03E": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_NegativeCorpus",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_secret_negative_corpus_is_unchanged"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_NegativeCorpus",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-91EF9C5F23E9219E": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_RedactsGitHubToken",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_github_token_is_redacted_with_surroundings_and_notice"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_RedactsGitHubToken",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-D06CD65EFD7D6683": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_RedactsPEMBlockFully",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_complete_pem_block_is_redacted"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_RedactsPEMBlockFully",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-A60BEB54E6218AFD": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": "TestSecretOutputGuardrail_UnterminatedPEMRedactedToEnd",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_unterminated_pem_is_redacted_to_end"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_UnterminatedPEMRedactedToEnd",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. Closes this original regression only, not generic secret-normalization equivalence or the whole builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
+    },
+    "SDK-5735EA30ADDA667D": {
+      "source": "pkg/agentsdk/guardrails/builtin_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails",
+        "crates/adk-security/src/secrets.rs::sanitize_tool_output"
+      ],
+      "rust_test_identifiers": [
+        "original_complete_pem_block_is_redacted",
+        "original_gcp_service_account_marker_blocks_whole_output",
+        "original_github_token_is_redacted_with_surroundings_and_notice",
+        "original_paired_aws_credentials_block_without_leak",
+        "original_secret_corpus_is_detected_by_output_guardrail",
+        "original_secret_negative_corpus_is_unchanged",
+        "original_unterminated_pem_is_redacted_to_end"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretOutputGuardrail_CorpusAllDetected",
+      "rationale": "Ports the original corpus/input values and assertions through the native public builtin output guardrail. Rust Option replacement content represents the Go ContentReplaced flag without exposing a contradictory state. Corpus bytes match the pinned SDK fixture. The source partial-signature set and native sanitizer hardcode only AWS access key and GCP service-account key; both native cases must match a registered signature to produce the asserted hard block and exact safe signature label, verifying the original name-membership invariant. All eight source tests and their helper behavior are covered; this closes the test file only, not generic secret-normalization equivalence or the full builtin API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder"
+      ]
     }
   }
 }

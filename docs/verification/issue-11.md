@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Original builtin secret-output regressions
+
+Ported original GitHub/PEM/AWS/GCP and positive/negative corpus assertions through
+the actual public builtin output guardrail. The existing corpus is byte-identical
+to the pinned SDK fixture. Both partial signature names must resolve to registered
+patterns to produce their asserted block/name outputs, covering the original
+membership invariant without duplicating a production signature list. All eight
+original test records and the complete source test file are closed; generic
+normalization differences and whole builtin API parity are not inferred.
+
+Fresh Rust1.88 Linux: **1,693 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format,12 builder-only and all-feature builtin
+tests, original Go guardrail tests, bound evidence,51 validators, artifacts/
+overlay/audit and source locks passed. Initial test compilation assumed Go's
+separate replacement flag; corrected assertions use native Option replacement
+content. Production behavior is unchanged. Ledger: **924 verified /7,967 unresolved
+/251 excluded**; full acceptance remains incomplete.
+
 ### Original event adapter and critic regressions
 
 Ported the three original line-writer cases with exact JSON/chunks and every

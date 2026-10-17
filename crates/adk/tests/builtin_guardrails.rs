@@ -630,3 +630,165 @@ async fn runner_blocks_multipart_credentials_before_model_history_and_observatio
         }
     }
 }
+
+async fn original_secret_output(content: &str) -> Option<GuardrailResult> {
+    builtin_tool_output_guardrails()[0]
+        .check(
+            &context(),
+            "a",
+            GuardrailInput::ToolOutput {
+                call: &call("stub", json!({})),
+                output: &output(content.into()),
+            },
+        )
+        .await
+        .unwrap()
+}
+
+#[tokio::test]
+async fn original_secret_negative_corpus_is_unchanged() {
+    for text in [
+        "This documentation describes how AWS access keys are formatted.",
+        "The ghp_ prefix is used by GitHub for personal access tokens.",
+        "Authorization for the bearer of this letter is granted by the council.",
+        "Please bear with us while we investigate the issue.",
+        "Set api_key in your config file before running the program.",
+        "sk-ate boards are popular among teenagers in California.",
+        "The npm registry hosts JavaScript packages such as lodash and react.",
+        "Bearer bonds were once a common financial instrument.",
+    ] {
+        assert!(original_secret_output(text).await.is_none(), "{text}");
+    }
+}
+
+#[tokio::test]
+async fn original_secret_corpus_is_detected_by_output_guardrail() {
+    let mut count = 0;
+    for line in include_str!("../../adk-security/tests/fixtures/secret_obfuscation.txt").lines() {
+        let text = line
+            .split_once(". ")
+            .filter(|(prefix, _)| prefix.len() <= 4)
+            .map_or(line, |(_, text)| text)
+            .trim();
+        if text.is_empty() {
+            continue;
+        }
+        count += 1;
+        let result = original_secret_output(text).await.unwrap();
+        assert!(result.tripwire_triggered || result.replacement_content.is_some());
+    }
+    assert!(count > 0);
+}
+
+#[tokio::test]
+async fn original_github_token_is_redacted_with_surroundings_and_notice() {
+    let token = ["ghp", "_", &"a1B2".repeat(9)].concat();
+    let result = original_secret_output(&format!("config before\ntoken={token}\nconfig after"))
+        .await
+        .unwrap();
+    assert!(!result.tripwire_triggered);
+    assert!(result.replacement_content.is_some());
+    assert!(
+        !result
+            .replacement_content
+            .as_ref()
+            .unwrap()
+            .contains(&token)
+    );
+    for expected in [
+        "token=[REDACTED:GitHub token]",
+        "config before",
+        "config after",
+        "[guardrail detect-secret-in-output: redacted 1 potential secret(s): GitHub token.",
+    ] {
+        assert!(
+            result
+                .replacement_content
+                .as_ref()
+                .unwrap()
+                .contains(expected)
+        );
+    }
+}
+
+#[tokio::test]
+async fn original_complete_pem_block_is_redacted() {
+    let body = "MIIEpAIBAAKCAQEAfakekeymaterial";
+    let pem = [
+        "-----BEGIN RSA PRIVATE ",
+        "KEY-----\n",
+        body,
+        "\n-----END RSA PRIVATE ",
+        "KEY-----",
+    ]
+    .concat();
+    let result = original_secret_output(&format!("before\n{pem}\nafter"))
+        .await
+        .unwrap();
+    assert!(!result.tripwire_triggered);
+    assert!(result.replacement_content.is_some());
+    assert!(!result.replacement_content.as_ref().unwrap().contains(body));
+    assert!(
+        !result
+            .replacement_content
+            .as_ref()
+            .unwrap()
+            .contains("-----END")
+    );
+    assert!(
+        result
+            .replacement_content
+            .as_ref()
+            .unwrap()
+            .contains("before\n[REDACTED:private key]\nafter")
+    );
+    assert!(
+        result
+            .replacement_content
+            .as_ref()
+            .unwrap()
+            .contains("private key. If these are placeholders")
+    );
+}
+
+#[tokio::test]
+async fn original_unterminated_pem_is_redacted_to_end() {
+    let body = "MIIEpAIBAAKCAQEAfakekeymaterial";
+    let text = ["before\n-----BEGIN OPENSSH PRIVATE ", "KEY-----\n", body].concat();
+    let result = original_secret_output(&text).await.unwrap();
+    assert!(result.replacement_content.is_some());
+    assert!(!result.replacement_content.as_ref().unwrap().contains(body));
+}
+
+#[tokio::test]
+async fn original_paired_aws_credentials_block_without_leak() {
+    let key = ["AKIA", "IOSFODNN7EXAMPLE"].concat();
+    let secret = ["wJalrXUtnFEMI/K7MDENG/bPxRfiCY", "EXAMPLEKEY"].concat();
+    let text = format!("AWS_ACCESS_KEY_ID={key}\nAWS_SECRET_ACCESS_KEY={secret}\n");
+    let result = original_secret_output(&text).await.unwrap();
+    assert!(result.tripwire_triggered);
+    assert!(result.replacement_content.is_none());
+    let diagnostic = result.output.as_str().unwrap();
+    assert!(diagnostic.contains("AWS access key"));
+    assert!(!diagnostic.contains(&key));
+    assert!(!diagnostic.contains(&secret));
+}
+
+#[tokio::test]
+async fn original_gcp_service_account_marker_blocks_whole_output() {
+    let text = [
+        r#"{"type""#,
+        r#": "service_account", "project_id": "acme", "private_key_id": "abc123"}"#,
+    ]
+    .concat();
+    let result = original_secret_output(&text).await.unwrap();
+    assert!(result.tripwire_triggered);
+    assert!(result.replacement_content.is_none());
+    assert!(
+        result
+            .output
+            .as_str()
+            .unwrap()
+            .contains("GCP service-account key")
+    );
+}

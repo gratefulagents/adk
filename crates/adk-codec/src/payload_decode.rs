@@ -152,6 +152,8 @@ impl sealed::Sealed for ToolCallData {
 }
 impl GoJsonDecode for ToolCallData {}
 impl GoJsonEncode for ToolCallData {}
+impl sealed::Sealed for crate::mode::ModeRoutingResolution {}
+impl GoJsonEncode for crate::mode::ModeRoutingResolution {}
 impl sealed::Sealed for ToolApprovalData {
     const RAW_INPUT: bool = true;
     fn restore_raw(&mut self, raw: RawJson) {

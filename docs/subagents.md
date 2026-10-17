@@ -339,6 +339,16 @@ independently owned. Six actual-Go cases compare exact bytes and source-mutation
 isolation without normalizing nil/empty containers; 993 independent codec cases
 cover the data boundary. Neither API binds models or creates runtime sessions.
 
+`adk::codec::mode::{resolve_mode_routing, resolve_role_mode_routing}` then resolve
+provider aliases, ordered fallbacks, reasoning and verbosity without creating
+executable models. Role lookup is case- and whitespace-sensitive. An explicit
+`none` reasoning override clears the inherited thinking budget; a nonempty
+all-blank role fallback list clears inherited fallbacks, while an empty list
+inherits them. `ModeRoutingResolution` supports `to_go_json_bytes`, but is not a
+Go decoding target. The independent oracle compares 1,764 results and exact
+bytes; the standalone consumer exercises decode → conversion → role resolution
+→ encoding. Provider request clamping and execution policy remain separate.
+
 ### Compatibility role/catalog DTOs
 
 `adk_codec::dto::{RoleSpec, RoleCatalog}` are compatibility-only data shapes,

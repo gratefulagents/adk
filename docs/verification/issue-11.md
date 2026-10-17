@@ -2,6 +2,31 @@
 
 ## Current continuation evidence
 
+### Pure top-level and per-role routing resolution
+
+Added compatibility `resolve_mode_routing` and `resolve_role_mode_routing`,
+with an owned `ModeRoutingResolution` supporting the sealed Go encoder (not
+a Go decoder target). An immutable-SDK oracle executes 294 input groups and
+1,764 resolutions, comparing unnormalized state and exact bytes. Coverage
+includes aliases/defaults, unknown providers, all reasoning tiers, Unicode
+case/whitespace, exact role keys, fallback inheritance/clearing and explicit
+`none` clearing a prior thinking budget. Input immutability and independent
+result/source fallback ownership are tested.
+
+The standalone consumer now exercises byte decode → template conversion →
+role resolution → exact byte encode without platform dependencies. This closes
+only four pure helper API/alias records, not result DTO decoding, executable
+provider construction, native arbitrary settings merging or runtime policy.
+
+Fresh Rust 1.88 Linux: **1,734 workspace tests and 10 doctests passed;
+0 failed, 30 ignored**. Strict workspace lint/typecheck/rustdoc and formatting
+passed; the full feature matrix and standalone consumer/purity passed, including
+strict lint for the independent consumer. Independent reference reproduction,
+bound evidence, 55 ledger/audit validators, artifacts/overlay/audit and source
+locks passed. Ledger: **993 verified /7,898 unresolved /251 excluded**; full
+retained acceptance remains incomplete.
+
+
 ### Exact compatibility mode-routing conversion
 
 Added `adk::codec::mode::mode_routing_from_template_spec` independently of the

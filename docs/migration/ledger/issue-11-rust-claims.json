@@ -17843,6 +17843,86 @@
         "compat"
       ],
       "rationale": "Closes the complete pure template-to-runner routing conversion using compatibility DTOs, not the separate native builder adapter. Missing template/routing returns None; present routing copies all raw labels and role keys without normalization or model binding. Empty fallback slices and empty role maps become nil exactly as Go append-to-nil and conditional map allocation dictate; nonempty ordered fallback entries and role values are deeply owned. Six independently executed pinned-Go conversion cases compare unnormalized output and exact marshalled bytes, including nil, empty, raw/duplicate/unknown labels, Unicode and per-role empty slices. Both reference and Rust mutate source containers after conversion to prove ownership; Rust also checks the input is unchanged. The 993-case typed codec oracle independently verifies the data boundary. The original specialist construction regression is an upstream anchor, not the conversion oracle. No runtime specialist construction, routing resolution, arbitrary native settings transfer or lifecycle behavior is inferred."
+    },
+    "SDK-7D2DFB57B62DC4F9": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ResolveModeRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_mode_routing",
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance",
+        "routing_results_own_fallbacks_and_do_not_share_mutations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the pure ResolveModeRouting helper using compatibility routing data. Actual immutable Go execution supplies294 input groups and1764 exact top-level/per-role result observations, comparing unnormalized output and exact marshal bytes. Covers model/provider alias and empty defaults, unknown providers, Unicode simple lowercase/whitespace, exact role keys, every reasoning tier, verbosity normalization, inheritance, nil/empty/all-blank/duplicate fallback lists, role model override and explicit none clearing inherited thinking budget. Go and Rust verify input immutability; native ownership regression verifies separate results and source fallback containers do not share mutation. The result exposes the complete computed data and a sealed Go encoder, not a Go decoder target. No additional ModeRoutingResolution declaration/codec, provider construction, native arbitrary settings merge, request clamping or execution-policy acceptance is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DA7ECD34B5CE5C65": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": "ResolveRoleModeRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing",
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance",
+        "routing_results_own_fallbacks_and_do_not_share_mutations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the pure ResolveRoleModeRouting helper using compatibility routing data. Actual immutable Go execution supplies294 input groups and1764 exact top-level/per-role result observations, comparing unnormalized output and exact marshal bytes. Covers model/provider alias and empty defaults, unknown providers, Unicode simple lowercase/whitespace, exact role keys, every reasoning tier, verbosity normalization, inheritance, nil/empty/all-blank/duplicate fallback lists, role model override and explicit none clearing inherited thinking budget. Go and Rust verify input immutability; native ownership regression verifies separate results and source fallback containers do not share mutation. The result exposes the complete computed data and a sealed Go encoder, not a Go decoder target. No additional ModeRoutingResolution declaration/codec, provider construction, native arbitrary settings merge, request clamping or execution-policy acceptance is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2188E92A60CEE8EA": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ResolveModeRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_mode_routing",
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance",
+        "routing_results_own_fallbacks_and_do_not_share_mutations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the pure ResolveModeRouting helper using compatibility routing data. Actual immutable Go execution supplies294 input groups and1764 exact top-level/per-role result observations, comparing unnormalized output and exact marshal bytes. Covers model/provider alias and empty defaults, unknown providers, Unicode simple lowercase/whitespace, exact role keys, every reasoning tier, verbosity normalization, inheritance, nil/empty/all-blank/duplicate fallback lists, role model override and explicit none clearing inherited thinking budget. Go and Rust verify input immutability; native ownership regression verifies separate results and source fallback containers do not share mutation. The result exposes the complete computed data and a sealed Go encoder, not a Go decoder target. No additional ModeRoutingResolution declaration/codec, provider construction, native arbitrary settings merge, request clamping or execution-policy acceptance is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A9EE8893F38F5122": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "ResolveRoleModeRouting",
+      "implementation_symbols": [
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing",
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_and_role_routing_oracle",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance",
+        "routing_results_own_fallbacks_and_do_not_share_mutations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Closes the pure ResolveRoleModeRouting helper using compatibility routing data. Actual immutable Go execution supplies294 input groups and1764 exact top-level/per-role result observations, comparing unnormalized output and exact marshal bytes. Covers model/provider alias and empty defaults, unknown providers, Unicode simple lowercase/whitespace, exact role keys, every reasoning tier, verbosity normalization, inheritance, nil/empty/all-blank/duplicate fallback lists, role model override and explicit none clearing inherited thinking budget. Go and Rust verify input immutability; native ownership regression verifies separate results and source fallback containers do not share mutation. The result exposes the complete computed data and a sealed Go encoder, not a Go decoder target. No additional ModeRoutingResolution declaration/codec, provider construction, native arbitrary settings merge, request clamping or execution-policy acceptance is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

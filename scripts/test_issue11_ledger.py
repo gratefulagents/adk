@@ -221,6 +221,16 @@ class EvidenceTests(unittest.TestCase):
                 with self.assertRaises(SystemExit):
                     self.apply()
 
+    def test_specialist_catalog_oracle_is_required(self):
+        original = copy.deepcopy(self.evidence)
+        for replacement in ("", "Specialist catalog not executed"):
+            with self.subTest(replacement=replacement):
+                self.evidence = copy.deepcopy(original)
+                self.evidence["reference_fixture_check"] = self.evidence["reference_fixture_check"].replace(
+                    "Pinned specialist catalog observations reproduced exactly", replacement)
+                with self.assertRaises(SystemExit):
+                    self.apply()
+
     def test_excluded_entry_cannot_be_verified(self):
         self.entries[next(iter(self.entries))]["scope"] = "out_of_scope"
         with self.assertRaises(SystemExit):

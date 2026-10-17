@@ -199,5 +199,12 @@ func scenarios() []scenario {
 		s.Responses = []response{reply(item), reply(message("done"))}
 		out = append(out, s)
 	}
+	s = baseline("raw-input-rule-unicode-action")
+	s.RawInput = `{"value":"secret"}`
+	s.Rules = []sdk.GuardrailRule{{Name: "raw", Type: "tool-input", Regex: "secret", Action: " \tblocK\u0085", ToolPattern: "write"}}
+	item := call("raw-call", "write")
+	item.ToolCall.Input = json.RawMessage(s.RawInput)
+	s.Responses = []response{reply(item), reply(message("done"))}
+	out = append(out, s)
 	return out
 }

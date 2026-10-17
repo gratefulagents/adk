@@ -111,3 +111,27 @@ async fn original_empty_rule_action_defaults_to_block() {
         .unwrap();
     assert!(result.tripwire_triggered);
 }
+
+#[tokio::test]
+async fn host_rule_action_normalization_uses_go_unicode_lowercase() {
+    let context = Context {
+        run_id: "unicode-action".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    let mut input = rule("danger");
+    input.action = " \tblocK\u{0085}".into();
+    let compiled = compile_guardrail_rules(&[input]).unwrap();
+    let call = ToolCall {
+        id: "call".into(),
+        name: "shell".into(),
+        arguments: serde_json::json!({"x":"danger"}),
+        raw_arguments: None,
+    };
+    let result = compiled.input[0]
+        .check(&context, "agent", GuardrailInput::ToolInput(&call))
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(result.tripwire_triggered);
+}

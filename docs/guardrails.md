@@ -36,8 +36,19 @@ preserve message whitespace, and block for every action except exact `warn` and
 names use SDK quoting. Input checks inspect original argument text; output checks
 match newline-joined text parts, ignoring non-text parts. A guard ignores the
 opposite phase. They do not supply durable identities or claim Go RE2 syntax;
-callers explicitly own Rust regex compilation. The standalone public compiler
-that collects errors while retaining good rules is still outstanding.
+callers explicitly own Rust regex compilation.
+
+`guardrails::tool_guardrails_from_rules` (with the `host` feature) compiles the shared Go/Rust
+regex subset and returns `(CompiledGuardrails, Vec<Error>)`. It retains valid
+rules in source order within each phase while collecting rejected-rule errors in
+source order. Callers must handle errors before using a partial rule set. Regex
+validation precedes action and type validation. Actions are Unicode-lowercased
+and trimmed; empty means `block`. This public compiler does not change the host
+compiler's fail-fast contract or its different glob/message semantics. Both
+compilers accept Go's Unicode action case normalization (for example, the Kelvin
+sign in `blocK` lowercases to `block`). RE2-only
+syntax outside the supported subset remains explicitly unsupported, and native
+regex-parser prose is not a Go byte-parity claim.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

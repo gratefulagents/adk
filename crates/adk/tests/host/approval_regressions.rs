@@ -359,7 +359,7 @@ async fn input_rules_match_original_argument_text_in_pinned_host_runs() {
                 .starts_with("raw-input-rule-")
         })
         .collect();
-    assert_eq!(cases.len(), 11);
+    assert_eq!(cases.len(), 12);
     for case in cases {
         let fixture = Arc::new(Fixture::default());
         let executed = Arc::new(Mutex::new(vec![]));
@@ -367,7 +367,7 @@ async fn input_rules_match_original_argument_text_in_pinned_host_runs() {
         fixture.rules.lock().unwrap().push(GuardrailRule {
             name: "raw".into(),
             regex: case["spec"]["Rules"][0]["Regex"].as_str().unwrap().into(),
-            action: "block".into(),
+            action: case["spec"]["Rules"][0]["Action"].as_str().unwrap().into(),
             rule_type: "tool-input".into(),
             tool_pattern: "write".into(),
             ..Default::default()

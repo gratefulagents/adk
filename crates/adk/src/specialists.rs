@@ -6,6 +6,11 @@
 //! `Vec`s: Go's nil versus non-nil empty slice identity is not represented.
 
 #[cfg(feature = "runtime")]
+mod catalog;
+#[cfg(feature = "runtime")]
+pub use catalog::*;
+
+#[cfg(feature = "runtime")]
 mod delegation;
 #[cfg(feature = "runtime")]
 pub use delegation::build_delegation_guide;

@@ -26,6 +26,7 @@ pub mod fileconfig;
 pub use fileconfig::build_mode_directive;
 
 mod rules;
+pub(crate) use rules::compile_rule_regex;
 pub use rules::{CompiledGuardrails, GuardrailRule, compile_guardrail_rules};
 
 pub use adk_codec::dto::Cursor;

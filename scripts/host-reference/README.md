@@ -31,7 +31,7 @@ claim of complete SDK parity or acceptance closure**.
 - `check.py`: checks clean pin and local module replacement, regenerates all three modes twice
   in memory, compares **exact bytes**, and rechecks SDK cleanliness. It never
   rewrites the fixture or SDK.
-- `../../fixtures/host-loop/sdk-chatloop.json`: 61 scenario records, 62 Run calls
+- `../../fixtures/host-loop/sdk-chatloop.json`: 62 scenario records, 63 Run calls
   (one scenario calls the same loop twice). Eleven input-rule cases distinguish
   original whitespace, duplicate keys and escapes from parsed JSON, and exercise
   quoted regex literals, Unicode, empty/unterminated quotes, following regex

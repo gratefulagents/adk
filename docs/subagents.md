@@ -251,3 +251,58 @@ from GPL-3.0-only SDK `pkg/agentsdk/specialists.go` at the pinned source revisio
 Six independently executed Go cases compare complete guide output, including
 empty catalogs, Unicode/whitespace labels, description defaults, handoff-only
 and combined catalogs. Native strings are UTF-8 and agent handles are nonnull.
+
+## Standalone specialist catalog API
+
+With `runtime`, `adk::specialists` exposes catalog composition independently of
+`builder`:
+
+- `SpecialistRoleSpec` and `build_specialists_from_catalog` produce unbound
+  `SpecialistAgentSpec` values. Blank names are skipped, but accepted names,
+  duplicates, order, instructions, model overrides and fallback strings are
+  preserved verbatim. Raw conversion adds no tools, settings or model defaults.
+- `prepare_specialist_catalog` accepts `SpecialistCatalogOptions`, trims names,
+  keeps the first case-sensitive occurrence, and accepts empty instructions.
+  It applies base → catalog → mode-default → mode-role model precedence.
+  `routing: None` does not resolve aliases; `Some(Default::default())` does.
+  Only OpenAI (including an empty provider label) and Anthropic resolve size
+  aliases. Empty OpenAI models remain empty; other provider IDs stay opaque.
+- Nonempty catalog fallbacks replace the base verbatim. Nonempty resolved mode
+  fallbacks replace those. Empty lists do not clear fallbacks; an all-blank role
+  routing list suppresses mode fallbacks but retains catalog/base fallbacks.
+  Routing settings merge over base settings. Role reasoning `none` clears the
+  *mode* budget, not a nonzero base budget. Access adaptation precedes signal
+  stripping; tools retain shared `Arc` identity. This is selection, not authority.
+- `bind_specialist_catalog` takes the unmodified **prepared** output and a
+  caller-supplied `FnMut(&str) -> Result<ModelBinding, Error>`. Bind exactly those
+  names, including raw fallback strings; do not add resolver defaults here.
+  The returned `SpecialistCatalog::agents()` exposes registration snapshots.
+- Register runners built from those exact snapshots with `RunnerChildExecutor`,
+  using matching names in the caller-owned `SchedulerConfig::agents`. Then call
+  `catalog.attach_tools(Arc<SubagentSession>)`. The caller supplies host, model
+  implementations, runner configuration, scheduler security and lifecycle, and
+  must await `Scheduler::shutdown()`. Optional output extractors belong on
+  `RunnerChildExecutor::with_output_extractor`; empty extraction falls back to
+  final text. No global runtime or implicit registration is created.
+- `build_specialist_tools_from_catalog` is a convenience for an already
+  registered session. `None` returns empty agents/tools **before** any adapters
+  or binding callbacks. The staged API is preferable when registering a new
+  session. Registration and attachment must use the same immutable snapshots;
+  changing a source spec requires rebinding and re-registration.
+
+Named wrappers retain catalog order and SDK name sanitization, including
+collisions. Description is copied exactly, approval defaults to false, and the
+wrapper is read-only when all selected tools are read-only (including no tools).
+Catalog assembly does not reject collisions, install guardrails, set parallel
+execution settings, or impose the builder's authorization ceilings.
+
+**Bounded support:** prepared-agent fields and wrapper metadata are compared
+against 54 independently executed pinned-Go cases in
+`fixtures/specialist-catalog/observations.json`. Native integration tests cover
+caller-owned registration, successful execution, custom/empty extraction and
+shutdown. This is not full Go wrapper/runtime parity: native wrappers use the
+existing child engine, schema and error/timeout delivery, add native child
+instructions, and dispatch by registered name rather than retaining Go live
+agent pointers. Recursive Go wrapper pointer-graph mutation is not represented.
+Native settings remain a JSON map, not a new Go `ModelSettings` codec; Go
+nil-versus-empty slice identity is not represented.

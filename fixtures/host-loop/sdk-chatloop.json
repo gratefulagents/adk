@@ -44297,6 +44297,742 @@
         "AdditionalInstructions": "",
         "WorkingStateContext": ""
       }
+    },
+    {
+      "name": "raw-input-rule-unicode-action",
+      "original_agent_tools_after": [
+        {
+          "name": "read",
+          "input_schema": {
+            "type": "object"
+          },
+          "read_only": true,
+          "needs_approval": false
+        }
+      ],
+      "runs": [
+        {
+          "calls": [
+            {
+              "args": null,
+              "op": "config.permission"
+            },
+            {
+              "args": null,
+              "op": "config.directive"
+            },
+            {
+              "args": null,
+              "op": "config.guardrails"
+            },
+            {
+              "args": null,
+              "op": "config.mode"
+            },
+            {
+              "args": null,
+              "op": "session.state"
+            },
+            {
+              "args": [
+                {
+                  "name": "read",
+                  "input_schema": {
+                    "type": "object"
+                  },
+                  "read_only": true,
+                  "needs_approval": false
+                }
+              ],
+              "op": "factory.build"
+            },
+            {
+              "args": null,
+              "op": "config.handoff"
+            },
+            {
+              "args": {
+                "cursor": {},
+                "limit": 50
+              },
+              "op": "session.load"
+            },
+            {
+              "args": {
+                "access": "full",
+                "additional_instructions": "",
+                "agent": "host-agent",
+                "input_guardrails": [
+                  "config:raw"
+                ],
+                "max_turns": 3,
+                "output_guardrails": [],
+                "policy": null,
+                "subagent_max_turns": 0,
+                "tools": [
+                  {
+                    "name": "read",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": true,
+                    "needs_approval": false
+                  },
+                  {
+                    "name": "write",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": false,
+                    "needs_approval": false
+                  }
+                ],
+                "working_state_context": ""
+              },
+              "op": "runner.start"
+            },
+            {
+              "args": {
+                "input": [
+                  {
+                    "type": "message",
+                    "message_text": "  user run_id=user-run-123 timestamp=2024-01-02T03:04:05Z  "
+                  }
+                ],
+                "instructions": "base instructions",
+                "model": "fixture-model",
+                "prompt_cache_key": "009f37ee9db0b7fab1dece3d824b1e2154c5c354b01f407639816e20e5d35120",
+                "tools": [
+                  {
+                    "name": "read",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": true,
+                    "needs_approval": false
+                  },
+                  {
+                    "name": "write",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": false,
+                    "needs_approval": false
+                  }
+                ]
+              },
+              "op": "model.response"
+            },
+            {
+              "args": {
+                "access": "full",
+                "additional_instructions": "",
+                "agent": "host-agent",
+                "input_guardrails": [
+                  "config:raw"
+                ],
+                "max_turns": 3,
+                "output_guardrails": [],
+                "policy": null,
+                "subagent_max_turns": 0,
+                "tools": [
+                  {
+                    "name": "read",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": true,
+                    "needs_approval": false
+                  },
+                  {
+                    "name": "write",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": false,
+                    "needs_approval": false
+                  }
+                ],
+                "working_state_context": ""
+              },
+              "op": "runner.start"
+            },
+            {
+              "args": {
+                "input": [
+                  {
+                    "type": "message",
+                    "message_text": "  user run_id=user-run-123 timestamp=2024-01-02T03:04:05Z  "
+                  },
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  },
+                  {
+                    "type": "tool_output",
+                    "agent_name": "host-agent",
+                    "tool_output": {
+                      "call_id": "raw-call",
+                      "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"\nEND UNTRUSTED TOOL OUTPUT",
+                      "is_error": true
+                    }
+                  }
+                ],
+                "instructions": "base instructions",
+                "model": "fixture-model",
+                "prompt_cache_key": "009f37ee9db0b7fab1dece3d824b1e2154c5c354b01f407639816e20e5d35120",
+                "tools": [
+                  {
+                    "name": "read",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": true,
+                    "needs_approval": false
+                  },
+                  {
+                    "name": "write",
+                    "input_schema": {
+                      "type": "object"
+                    },
+                    "read_only": false,
+                    "needs_approval": false
+                  }
+                ]
+              },
+              "op": "model.response"
+            },
+            {
+              "args": {
+                "count": 3,
+                "items": [
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  },
+                  {
+                    "type": "tool_output",
+                    "agent_name": "host-agent",
+                    "tool_output": {
+                      "call_id": "raw-call",
+                      "content": "tool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"",
+                      "is_error": true
+                    }
+                  },
+                  {
+                    "type": "message",
+                    "agent_name": "host-agent",
+                    "message_text": "done"
+                  }
+                ]
+              },
+              "op": "session.append"
+            },
+            {
+              "args": {
+                "final_history": [
+                  {
+                    "type": "message",
+                    "message_text": "  user run_id=user-run-123 timestamp=2024-01-02T03:04:05Z  "
+                  },
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  },
+                  {
+                    "type": "tool_output",
+                    "agent_name": "host-agent",
+                    "tool_output": {
+                      "call_id": "raw-call",
+                      "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"\nEND UNTRUSTED TOOL OUTPUT",
+                      "is_error": true
+                    }
+                  },
+                  {
+                    "type": "message",
+                    "agent_name": "host-agent",
+                    "message_text": "done"
+                  }
+                ],
+                "final_output": "done",
+                "final_text": "done",
+                "interrupted": false,
+                "interruption": null,
+                "interruptions": null,
+                "last_agent": "host-agent",
+                "last_response_id": "",
+                "new_items": [
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  },
+                  {
+                    "type": "tool_output",
+                    "agent_name": "host-agent",
+                    "tool_output": {
+                      "call_id": "raw-call",
+                      "content": "tool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"",
+                      "is_error": true
+                    }
+                  },
+                  {
+                    "type": "message",
+                    "agent_name": "host-agent",
+                    "message_text": "done"
+                  }
+                ],
+                "responses": [
+                  {
+                    "context_tokens": 7,
+                    "end_turn": null,
+                    "items": [
+                      {
+                        "type": "tool_call",
+                        "agent_name": "host-agent",
+                        "tool_call": {
+                          "id": "raw-call",
+                          "name": "write",
+                          "input": {
+                            "value": "secret"
+                          }
+                        }
+                      }
+                    ],
+                    "usage": {
+                      "requests": 1,
+                      "input_tokens": 7,
+                      "output_tokens": 3
+                    }
+                  },
+                  {
+                    "context_tokens": 7,
+                    "end_turn": null,
+                    "items": [
+                      {
+                        "type": "message",
+                        "agent_name": "host-agent",
+                        "message_text": "done"
+                      }
+                    ],
+                    "usage": {
+                      "requests": 1,
+                      "input_tokens": 7,
+                      "output_tokens": 3
+                    }
+                  }
+                ],
+                "tool_input_guardrails": [
+                  {
+                    "GuardrailName": "config:raw",
+                    "ToolName": "write",
+                    "Output": "Guardrail \"raw\" triggered on tool \"write\"",
+                    "TripwireTriggered": true
+                  }
+                ],
+                "tool_output_guardrails": null,
+                "usage": {
+                  "requests": 2,
+                  "input_tokens": 14,
+                  "output_tokens": 6
+                }
+              },
+              "op": "trace.final"
+            },
+            {
+              "args": {
+                "final_history": [
+                  {
+                    "type": "message",
+                    "message_text": "  user run_id=user-run-123 timestamp=2024-01-02T03:04:05Z  "
+                  },
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  },
+                  {
+                    "type": "tool_output",
+                    "agent_name": "host-agent",
+                    "tool_output": {
+                      "call_id": "raw-call",
+                      "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"\nEND UNTRUSTED TOOL OUTPUT",
+                      "is_error": true
+                    }
+                  },
+                  {
+                    "type": "message",
+                    "agent_name": "host-agent",
+                    "message_text": "done"
+                  }
+                ],
+                "final_output": "done",
+                "final_text": "done",
+                "interrupted": false,
+                "interruption": null,
+                "interruptions": null,
+                "last_agent": "host-agent",
+                "last_response_id": "",
+                "new_items": [
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  },
+                  {
+                    "type": "tool_output",
+                    "agent_name": "host-agent",
+                    "tool_output": {
+                      "call_id": "raw-call",
+                      "content": "tool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"",
+                      "is_error": true
+                    }
+                  },
+                  {
+                    "type": "message",
+                    "agent_name": "host-agent",
+                    "message_text": "done"
+                  }
+                ],
+                "responses": [
+                  {
+                    "context_tokens": 7,
+                    "end_turn": null,
+                    "items": [
+                      {
+                        "type": "tool_call",
+                        "agent_name": "host-agent",
+                        "tool_call": {
+                          "id": "raw-call",
+                          "name": "write",
+                          "input": {
+                            "value": "secret"
+                          }
+                        }
+                      }
+                    ],
+                    "usage": {
+                      "requests": 1,
+                      "input_tokens": 7,
+                      "output_tokens": 3
+                    }
+                  },
+                  {
+                    "context_tokens": 7,
+                    "end_turn": null,
+                    "items": [
+                      {
+                        "type": "message",
+                        "agent_name": "host-agent",
+                        "message_text": "done"
+                      }
+                    ],
+                    "usage": {
+                      "requests": 1,
+                      "input_tokens": 7,
+                      "output_tokens": 3
+                    }
+                  }
+                ],
+                "tool_input_guardrails": [
+                  {
+                    "GuardrailName": "config:raw",
+                    "ToolName": "write",
+                    "Output": "Guardrail \"raw\" triggered on tool \"write\"",
+                    "TripwireTriggered": true
+                  }
+                ],
+                "tool_output_guardrails": null,
+                "usage": {
+                  "requests": 2,
+                  "input_tokens": 14,
+                  "output_tokens": 6
+                }
+              },
+              "op": "status.final"
+            }
+          ],
+          "cursor_after": {
+            "message_id": 1,
+            "token": "page-1"
+          },
+          "cursor_before": {},
+          "error": null,
+          "result": {
+            "final_history": [
+              {
+                "type": "message",
+                "message_text": "  user run_id=user-run-123 timestamp=2024-01-02T03:04:05Z  "
+              },
+              {
+                "type": "tool_call",
+                "agent_name": "host-agent",
+                "tool_call": {
+                  "id": "raw-call",
+                  "name": "write",
+                  "input": {
+                    "value": "secret"
+                  }
+                }
+              },
+              {
+                "type": "tool_output",
+                "agent_name": "host-agent",
+                "tool_output": {
+                  "call_id": "raw-call",
+                  "content": "BEGIN UNTRUSTED TOOL OUTPUT\ntool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"\nEND UNTRUSTED TOOL OUTPUT",
+                  "is_error": true
+                }
+              },
+              {
+                "type": "message",
+                "agent_name": "host-agent",
+                "message_text": "done"
+              }
+            ],
+            "final_output": "done",
+            "final_text": "done",
+            "interrupted": false,
+            "interruption": null,
+            "interruptions": null,
+            "last_agent": "host-agent",
+            "last_response_id": "",
+            "new_items": [
+              {
+                "type": "tool_call",
+                "agent_name": "host-agent",
+                "tool_call": {
+                  "id": "raw-call",
+                  "name": "write",
+                  "input": {
+                    "value": "secret"
+                  }
+                }
+              },
+              {
+                "type": "tool_output",
+                "agent_name": "host-agent",
+                "tool_output": {
+                  "call_id": "raw-call",
+                  "content": "tool input guardrail \"config:raw\" tripwire triggered for tool \"write\": Guardrail \"raw\" triggered on tool \"write\"",
+                  "is_error": true
+                }
+              },
+              {
+                "type": "message",
+                "agent_name": "host-agent",
+                "message_text": "done"
+              }
+            ],
+            "responses": [
+              {
+                "context_tokens": 7,
+                "end_turn": null,
+                "items": [
+                  {
+                    "type": "tool_call",
+                    "agent_name": "host-agent",
+                    "tool_call": {
+                      "id": "raw-call",
+                      "name": "write",
+                      "input": {
+                        "value": "secret"
+                      }
+                    }
+                  }
+                ],
+                "usage": {
+                  "requests": 1,
+                  "input_tokens": 7,
+                  "output_tokens": 3
+                }
+              },
+              {
+                "context_tokens": 7,
+                "end_turn": null,
+                "items": [
+                  {
+                    "type": "message",
+                    "agent_name": "host-agent",
+                    "message_text": "done"
+                  }
+                ],
+                "usage": {
+                  "requests": 1,
+                  "input_tokens": 7,
+                  "output_tokens": 3
+                }
+              }
+            ],
+            "tool_input_guardrails": [
+              {
+                "GuardrailName": "config:raw",
+                "ToolName": "write",
+                "Output": "Guardrail \"raw\" triggered on tool \"write\"",
+                "TripwireTriggered": true
+              }
+            ],
+            "tool_output_guardrails": null,
+            "usage": {
+              "requests": 2,
+              "input_tokens": 14,
+              "output_tokens": 6
+            }
+          }
+        }
+      ],
+      "spec": {
+        "Name": "raw-input-rule-unicode-action",
+        "Runs": 1,
+        "Cursor": {},
+        "MessageLimit": 0,
+        "MaxResumes": 0,
+        "Permission": "danger-full-access",
+        "Directive": "",
+        "Rules": [
+          {
+            "Name": "raw",
+            "Type": "tool-input",
+            "Regex": "secret",
+            "ToolPattern": "write",
+            "Action": " \tblocK",
+            "Message": ""
+          }
+        ],
+        "RawInput": "{\"value\":\"secret\"}",
+        "Snapshot": null,
+        "State": {
+          "Goal": "",
+          "CurrentMode": "",
+          "CurrentStep": "",
+          "LastUserMessage": "",
+          "LastAssistantSummary": "",
+          "RecentTurnSummaries": null,
+          "HistoryFloorMessageID": 0,
+          "LastResponseID": "",
+          "Data": null
+        },
+        "Handoff": null,
+        "Pages": [
+          {
+            "Messages": [
+              {
+                "ID": 1,
+                "Content": "  user run_id=user-run-123 timestamp=2024-01-02T03:04:05Z  ",
+                "Mode": "",
+                "CreatedAt": "0001-01-01T00:00:00Z",
+                "Images": null
+              }
+            ],
+            "Next": {
+              "message_id": 1,
+              "token": "page-1"
+            }
+          }
+        ],
+        "Responses": [
+          {
+            "Items": [
+              {
+                "type": "tool_call",
+                "tool_call": {
+                  "id": "raw-call",
+                  "name": "write",
+                  "input": {
+                    "value": "secret"
+                  }
+                }
+              }
+            ],
+            "EndTurn": null,
+            "Error": "",
+            "Usage": {
+              "requests": 1,
+              "input_tokens": 7,
+              "output_tokens": 3
+            }
+          },
+          {
+            "Items": [
+              {
+                "type": "message",
+                "message_text": "done"
+              }
+            ],
+            "EndTurn": null,
+            "Error": "",
+            "Usage": {
+              "requests": 1,
+              "input_tokens": 7,
+              "output_tokens": 3
+            }
+          }
+        ],
+        "BaseTools": [
+          {
+            "Name": "read",
+            "ReadOnly": true,
+            "Pause": false,
+            "Output": "read result"
+          }
+        ],
+        "FactoryTools": [
+          {
+            "Name": "write",
+            "ReadOnly": false,
+            "Pause": false,
+            "Output": "secret output"
+          }
+        ],
+        "Gate": false,
+        "Decisions": null,
+        "Fail": null,
+        "MaxTurns": 3,
+        "SubAgentMaxTurns": 0,
+        "Access": "",
+        "Policy": null,
+        "AdditionalInstructions": "",
+        "WorkingStateContext": ""
+      }
     }
   ],
   "schema_version": 1,

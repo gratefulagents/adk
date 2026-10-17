@@ -1,6 +1,9 @@
 use super::match_tool_pattern;
-use crate::{content_logger::quote, host::GuardrailRule};
-use adk_core::{BoxFuture, Content, Context, Error};
+use crate::{
+    content_logger::quote,
+    host::{CompiledGuardrails, GuardrailRule, compile_rule_regex},
+};
+use adk_core::{BoxFuture, Content, Context, Error, ErrorCategory};
 use adk_runtime::{Guardrail, GuardrailInput, GuardrailResult};
 use regex::Regex;
 use std::sync::Arc;
@@ -106,4 +109,55 @@ impl Guardrail for PublicRule {
             }))
         })
     }
+}
+
+/// Compile public SDK-style rules, retaining valid rules and collecting errors in
+/// source order. Callers must handle the errors before using a partial rule set.
+/// Uses the host compiler's explicit shared Go/Rust regex subset, not full RE2.
+/// Unlike direct constructors, this normalizes action case and whitespace.
+#[must_use]
+pub fn tool_guardrails_from_rules(rules: &[GuardrailRule]) -> (CompiledGuardrails, Vec<Error>) {
+    let mut compiled = CompiledGuardrails::default();
+    let mut errors = Vec::new();
+    for rule in rules {
+        let regex = match compile_rule_regex(rule) {
+            Ok(regex) => regex,
+            Err(error) => {
+                errors.push(error);
+                continue;
+            }
+        };
+        let mut rule = rule.clone();
+        let action = rule.action.trim().to_lowercase();
+        rule.action = match action.as_str() {
+            "" => "block".into(),
+            "block" | "warn" | "log" => action,
+            _ => {
+                errors.push(Error::new(
+                    ErrorCategory::InvalidInput,
+                    format!(
+                        "unknown action {} in guardrail rule {} (valid: block, warn, log)",
+                        quote(rule.action.as_bytes()),
+                        quote(rule.name.as_bytes())
+                    ),
+                ));
+                continue;
+            }
+        };
+        match rule.rule_type.as_str() {
+            "tool-input" => compiled.input.push(make_tool_input_guardrail(rule, regex)),
+            "tool-output" => compiled
+                .output
+                .push(make_tool_output_guardrail(rule, regex)),
+            _ => errors.push(Error::new(
+                ErrorCategory::InvalidInput,
+                format!(
+                    "unknown guardrail rule type {} for rule {} (valid: tool-input, tool-output)",
+                    quote(rule.rule_type.as_bytes()),
+                    quote(rule.name.as_bytes())
+                ),
+            )),
+        }
+    }
+    (compiled, errors)
 }

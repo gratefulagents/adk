@@ -228,14 +228,7 @@ async fn public_rule_callbacks_match_pinned_sdk_observations() {
     };
     for case in cases {
         let source = &case["rule"];
-        let rule = adk::host::GuardrailRule {
-            name: source["Name"].as_str().unwrap().into(),
-            regex: source["Regex"].as_str().unwrap().into(),
-            action: source["Action"].as_str().unwrap().into(),
-            rule_type: source["Type"].as_str().unwrap().into(),
-            tool_pattern: source["ToolPattern"].as_str().unwrap().into(),
-            message: source["Message"].as_str().unwrap().into(),
-        };
+        let rule = public_rule(source);
         let regex = regex::Regex::new(case["regex"].as_str().unwrap()).unwrap();
         let is_input = case["phase"] == "input";
         let guard = if is_input {
@@ -298,4 +291,127 @@ async fn public_rule_callbacks_match_pinned_sdk_observations() {
         );
         assert!(guard.durable_key().is_none());
     }
+}
+
+#[cfg(feature = "host")]
+fn public_rule(source: &Value) -> adk::host::GuardrailRule {
+    adk::host::GuardrailRule {
+        name: source["Name"].as_str().unwrap().into(),
+        regex: source["Regex"].as_str().unwrap().into(),
+        action: source["Action"].as_str().unwrap().into(),
+        rule_type: source["Type"].as_str().unwrap().into(),
+        tool_pattern: source["ToolPattern"].as_str().unwrap().into(),
+        message: source["Message"].as_str().unwrap().into(),
+    }
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn public_rule_compiler_retains_valid_rules_and_ordered_errors() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["compiled_rules"].as_array().unwrap();
+    assert_eq!(cases.len(), 5);
+    let context = Context {
+        run_id: "compiled-rule-oracle".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    let call = ToolCall {
+        id: "call".into(),
+        name: "reader".into(),
+        arguments: Value::Null,
+        raw_arguments: Some("danger [a&&b]".into()),
+    };
+    let output = ToolOutput {
+        content: vec![Content::Text {
+            text: "danger [a&&b]".into(),
+        }],
+        is_error: false,
+        should_pause: false,
+    };
+    for case in cases {
+        let rules: Vec<_> = case["rules"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(public_rule)
+            .collect();
+        let (compiled, errors) = tool_guardrails_from_rules(&rules);
+        let expected_errors = case["errors"].as_array().map_or(&[][..], Vec::as_slice);
+        assert_eq!(errors.len(), expected_errors.len(), "{case}");
+        for (actual, expected) in errors.iter().zip(expected_errors) {
+            assert_eq!(actual.info.category, ErrorCategory::InvalidInput);
+            let expected = expected.as_str().unwrap();
+            if expected.starts_with("invalid regex") {
+                // Native parser prose is deliberately not claimed as RE2 parity.
+                assert!(actual.info.message.contains("invalid-regex"));
+                assert!(
+                    actual
+                        .info
+                        .message
+                        .starts_with("invalid or unsupported Go/Rust regex")
+                );
+            } else {
+                assert_eq!(actual.info.message, expected);
+            }
+        }
+        if case["name"] == "mixed" {
+            assert!(adk::host::compile_guardrail_rules(&rules).is_err());
+        }
+        for (phase, guards) in [("input", compiled.input), ("output", compiled.output)] {
+            let expected = case[phase].as_array().map_or(&[][..], Vec::as_slice);
+            assert_eq!(guards.len(), expected.len(), "{case}");
+            for (guard, expected) in guards.iter().zip(expected) {
+                assert_eq!(guard.name(), expected["name"].as_str().unwrap());
+                assert_eq!(expected["error"], "");
+                let input = if phase == "input" {
+                    GuardrailInput::ToolInput(&call)
+                } else {
+                    GuardrailInput::ToolOutput {
+                        call: &call,
+                        output: &output,
+                    }
+                };
+                let actual = guard
+                    .check(&context, "agent", input)
+                    .await
+                    .unwrap()
+                    .unwrap();
+                assert_eq!(actual.output, expected["result"]["Output"], "{case}");
+                assert_eq!(
+                    actual.tripwire_triggered,
+                    expected["result"]["TripwireTriggered"].as_bool().unwrap(),
+                    "{case}"
+                );
+                assert!(actual.replacement_content.is_none());
+                assert_eq!(expected["result"]["ContentReplaced"], false);
+            }
+        }
+    }
+}
+
+#[cfg(feature = "host")]
+#[test]
+fn public_rule_compiler_preserves_explicit_regex_support_limits() {
+    let rules: Vec<_> = ["(?x)danger", "[[:alpha:]]", "danger"]
+        .into_iter()
+        .map(|pattern| adk::host::GuardrailRule {
+            name: pattern.into(),
+            regex: pattern.into(),
+            rule_type: "tool-input".into(),
+            ..Default::default()
+        })
+        .collect();
+    let (compiled, errors) = tool_guardrails_from_rules(&rules);
+    assert_eq!(compiled.input.len(), 1);
+    assert!(compiled.output.is_empty());
+    assert_eq!(errors.len(), 2);
+    assert!(
+        errors
+            .iter()
+            .all(|error| error.info.category == ErrorCategory::Unsupported)
+    );
 }

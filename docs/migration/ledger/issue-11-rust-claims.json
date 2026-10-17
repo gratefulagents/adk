@@ -16666,6 +16666,55 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-19DC012687285D25": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "BuildSpecialistsFromCatalog",
+      "implementation_symbols": [
+        "crates/adk/src/specialists/catalog.rs::build_specialists_from_catalog"
+      ],
+      "rust_test_identifiers": [
+        "catalog::catalog_matches_independent_pinned_go_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "The raw catalog conversion is directly compared with actual pinned Go BuildSpecialistsFromCatalog projections across all54 catalog cases: skip whitespace-only names, preserve accepted names/order/duplicates and instructions/description/model overrides/fallback strings verbatim, add no tools/settings/routing defaults. The idiomatic Rust result is an unbound owned SpecialistAgentSpec, with separate binding/attachment APIs; this is not a claim of the full Go Agent codec, live pointer identity, nil/empty slice identity or runnable-wrapper behavior. The associated original catalog regression remains passing; direct raw-helper oracle execution is separately mandatory and hash-bound. Independent scoped review confirmed this narrow conversion mapping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-86BF38F31EF2EB9F": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "BuildSpecialistsFromCatalog",
+      "implementation_symbols": [
+        "crates/adk/src/specialists/catalog.rs::build_specialists_from_catalog"
+      ],
+      "rust_test_identifiers": [
+        "catalog::catalog_matches_independent_pinned_go_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "The raw catalog conversion is directly compared with actual pinned Go BuildSpecialistsFromCatalog projections across all54 catalog cases: skip whitespace-only names, preserve accepted names/order/duplicates and instructions/description/model overrides/fallback strings verbatim, add no tools/settings/routing defaults. The idiomatic Rust result is an unbound owned SpecialistAgentSpec, with separate binding/attachment APIs; this is not a claim of the full Go Agent codec, live pointer identity, nil/empty slice identity or runnable-wrapper behavior. The associated original catalog regression remains passing; direct raw-helper oracle execution is separately mandatory and hash-bound. Independent scoped review confirmed this narrow conversion mapping.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-36A62EAAE537C2F8": {
+      "source": "pkg/agentsdk/specialists_test.go",
+      "source_name": "TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "implementation_symbols": [
+        "crates/adk/src/specialists/catalog.rs::build_specialist_tools_from_catalog"
+      ],
+      "rust_test_identifiers": [
+        "catalog::original_catalog_applies_access_and_routing",
+        "catalog::catalog_matches_independent_pinned_go_observations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildSpecialistToolsFromCatalogAppliesAccessAndRouting",
+      "rationale": "Ports the literal researcher catalog, analysis tool access, Write/Read/finish tool set, base/role model and mode/role fallback lists. Asserts the selected role-model, single copilot fallback, only Read tool and agent_researcher wrapper name, matching every original assertion. Runtime ownership is explicit and the native metadata-only scheduler is shut down. This closes only the original regression, not complete runnable-wrapper/schema/error or live-agent mutation parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

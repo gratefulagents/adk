@@ -2,6 +2,37 @@
 
 ## Current continuation evidence
 
+### Public compilation and standalone catalog composition
+
+The public rule compiler now retains valid rules while reporting rejected rules
+in source order, with regex/action/type validation precedence. Five actual-Go
+compiler observations cover partial success, normalization and filtering; native
+parser diagnostics and unsupported RE2 syntax remain explicit limits. Extracted
+regex translation is shared with the host without conflating their glob/message
+policies. A reproduced host bug rejected Go-valid `blocK` actions due to ASCII-only
+lowercasing; Unicode normalization fixes it. The new actual-Go host case and
+native integration pass (62 scenarios/63 runs,12 raw-input rule cases).
+
+Standalone runtime-gated specialist APIs now separate raw conversion, routed
+preparation, model binding and caller-owned session attachment. All54 actual-Go
+catalog observations compare fields, access adaptation, routing/fallback settings,
+wrapper names/flags and ordering. Native execution tests cover explicit snapshot
+registration, output extraction/fallback and owner shutdown. Raw conversion's two
+API/configuration records and the literal original access/routing regression are
+closed; full wrapper schema/error behavior, live pointers and Agent codec parity
+are not claimed. Independent scoped reviews found no behavioral blockers; an
+ambiguous feature-doc phrase was corrected.
+
+Fresh Rust1.88 Linux: **1,710 workspace tests passed /0 failed /30 ignored;
+10 doctests passed**. Strict workspace/runtime/host lint/typechecks, rustdoc,
+formatting, full facade matrix, external consumer and dependency purity passed.
+The examples script's `cargo clippy` launcher hit this worker's missing
+`/proc/self/exe`; equivalent direct-driver strict checks, offline build, host
+session and all20 offline scenarios then passed. Go tests/vet/build, bound
+independent oracles, **52 validators**, artifact review, overlay/audit and immutable
+source locks passed. Ledger: **937 verified /7,954 unresolved /251 excluded**.
+Full issue11 acceptance is still incomplete; remote current-head CI is not claimed.
+
 ### Direct public rule constructors
 
 Added host-gated public input/output rule constructors, separate from ChatLoop

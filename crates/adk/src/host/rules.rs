@@ -1,7 +1,7 @@
 use adk_core::{BoxFuture, Content, Context, Error, ErrorCategory};
 use adk_runtime::{Guardrail, GuardrailInput, GuardrailResult};
 use regex::Regex;
-use std::sync::Arc;
+use std::sync::{Arc, LazyLock};
 
 #[derive(Clone, Debug, Default)]
 pub struct GuardrailRule {
@@ -24,118 +24,9 @@ pub struct CompiledGuardrails {
 /// classes are rejected; outside classes their ASCII Go semantics are preserved.
 pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardrails, Error> {
     let mut compiled = CompiledGuardrails::default();
-    let rust_only_flags = Regex::new(r"^\(\?[a-zA-Z-]*[xuR]").expect("static regex");
     for rule in rules {
-        let mut pattern = String::new();
-        let mut chars = rule.regex.chars().peekable();
-        let mut in_class = false;
-        let mut class_has_atom = false;
-        let mut class_can_negate = false;
-        while let Some(c) = chars.next() {
-            if c == '\\' {
-                if in_class {
-                    class_has_atom = true;
-                    class_can_negate = false;
-                }
-                let Some(escaped) = chars.next() else {
-                    pattern.push(c);
-                    break;
-                };
-                if escaped == 'Q' && !in_class {
-                    let mut literal = String::new();
-                    while let Some(quoted) = chars.next() {
-                        if quoted == '\\' && chars.peek() == Some(&'E') {
-                            chars.next();
-                            break;
-                        }
-                        literal.push(quoted);
-                    }
-                    pattern.push_str(&regex::escape(&literal));
-                    continue;
-                }
-                if "dDsSwWbB".contains(escaped) {
-                    if in_class {
-                        return Err(Error::new(
-                            ErrorCategory::Unsupported,
-                            format!(
-                                "guardrail {:?}: Go/Rust regex syntax gap: Perl classes inside character classes",
-                                rule.name
-                            ),
-                        ));
-                    }
-                    pattern.push_str(match escaped {
-                        'd' => "[0-9]",
-                        'D' => "[^0-9]",
-                        's' => "[\\t\\n\\f\\r ]",
-                        'S' => "[^\\t\\n\\f\\r ]",
-                        'w' => "[A-Za-z0-9_]",
-                        'W' => "[^A-Za-z0-9_]",
-                        'b' => "(?-u:\\b)",
-                        'B' => "(?-u:\\B)",
-                        _ => unreachable!(),
-                    });
-                } else {
-                    pattern.push(c);
-                    pattern.push(escaped);
-                }
-            } else {
-                if c == '('
-                    && !in_class
-                    && rust_only_flags.is_match(&format!(
-                        "({}",
-                        chars
-                            .clone()
-                            .take_while(|c| c.is_ascii_alphabetic() || matches!(c, '?' | '-'))
-                            .collect::<String>()
-                    ))
-                {
-                    return Err(Error::new(
-                        ErrorCategory::Unsupported,
-                        format!(
-                            "guardrail {:?}: Rust-only regex flags are not Go compatible",
-                            rule.name
-                        ),
-                    ));
-                }
-                if c == '[' {
-                    if in_class {
-                        return Err(Error::new(
-                            ErrorCategory::Unsupported,
-                            "Go/Rust nested character-class syntax differs (including POSIX classes)",
-                        ));
-                    }
-                    in_class = true;
-                    class_has_atom = false;
-                    class_can_negate = true;
-                } else if in_class {
-                    if matches!(c, '&' | '~' | '-' | '|') && chars.peek() == Some(&c) {
-                        return Err(Error::new(
-                            ErrorCategory::Unsupported,
-                            "Go/Rust regex character-class set syntax differs",
-                        ));
-                    }
-                    if c == ']' && class_has_atom {
-                        in_class = false;
-                    } else if c == '^' && class_can_negate {
-                        class_can_negate = false;
-                    } else {
-                        class_has_atom = true;
-                        class_can_negate = false;
-                    }
-                }
-                pattern.push(c);
-            }
-        }
-        let regex = Regex::new(&pattern).map_err(|error| {
-            Error::new(
-                ErrorCategory::InvalidInput,
-                format!(
-                    "invalid or unsupported Go/Rust regex in guardrail {:?}: {error}",
-                    rule.name
-                ),
-            )
-        })?;
-        let action = rule.action.trim().to_ascii_lowercase();
+        let regex = compile_rule_regex(rule)?;
+        let action = rule.action.trim().to_lowercase();
         let action = if action.is_empty() {
             "block".into()
         } else {
@@ -267,4 +158,118 @@ fn matches_tool(name: &str, pattern: &str) -> bool {
         rest = &rest[index + segment.len()..];
     }
     rest.ends_with(segments[segments.len() - 1])
+}
+
+pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
+    static RUST_ONLY_FLAGS: LazyLock<Regex> =
+        LazyLock::new(|| Regex::new(r"^\(\?[a-zA-Z-]*[xuR]").expect("static regex"));
+    let mut pattern = String::new();
+    let mut chars = rule.regex.chars().peekable();
+    let mut in_class = false;
+    let mut class_has_atom = false;
+    let mut class_can_negate = false;
+    while let Some(c) = chars.next() {
+        if c == '\\' {
+            if in_class {
+                class_has_atom = true;
+                class_can_negate = false;
+            }
+            let Some(escaped) = chars.next() else {
+                pattern.push(c);
+                break;
+            };
+            if escaped == 'Q' && !in_class {
+                let mut literal = String::new();
+                while let Some(quoted) = chars.next() {
+                    if quoted == '\\' && chars.peek() == Some(&'E') {
+                        chars.next();
+                        break;
+                    }
+                    literal.push(quoted);
+                }
+                pattern.push_str(&regex::escape(&literal));
+                continue;
+            }
+            if "dDsSwWbB".contains(escaped) {
+                if in_class {
+                    return Err(Error::new(
+                        ErrorCategory::Unsupported,
+                        format!(
+                            "guardrail {:?}: Go/Rust regex syntax gap: Perl classes inside character classes",
+                            rule.name
+                        ),
+                    ));
+                }
+                pattern.push_str(match escaped {
+                    'd' => "[0-9]",
+                    'D' => "[^0-9]",
+                    's' => "[\\t\\n\\f\\r ]",
+                    'S' => "[^\\t\\n\\f\\r ]",
+                    'w' => "[A-Za-z0-9_]",
+                    'W' => "[^A-Za-z0-9_]",
+                    'b' => "(?-u:\\b)",
+                    'B' => "(?-u:\\B)",
+                    _ => unreachable!(),
+                });
+            } else {
+                pattern.push(c);
+                pattern.push(escaped);
+            }
+        } else {
+            if c == '('
+                && !in_class
+                && RUST_ONLY_FLAGS.is_match(&format!(
+                    "({}",
+                    chars
+                        .clone()
+                        .take_while(|c| c.is_ascii_alphabetic() || matches!(c, '?' | '-'))
+                        .collect::<String>()
+                ))
+            {
+                return Err(Error::new(
+                    ErrorCategory::Unsupported,
+                    format!(
+                        "guardrail {:?}: Rust-only regex flags are not Go compatible",
+                        rule.name
+                    ),
+                ));
+            }
+            if c == '[' {
+                if in_class {
+                    return Err(Error::new(
+                        ErrorCategory::Unsupported,
+                        "Go/Rust nested character-class syntax differs (including POSIX classes)",
+                    ));
+                }
+                in_class = true;
+                class_has_atom = false;
+                class_can_negate = true;
+            } else if in_class {
+                if matches!(c, '&' | '~' | '-' | '|') && chars.peek() == Some(&c) {
+                    return Err(Error::new(
+                        ErrorCategory::Unsupported,
+                        "Go/Rust regex character-class set syntax differs",
+                    ));
+                }
+                if c == ']' && class_has_atom {
+                    in_class = false;
+                } else if c == '^' && class_can_negate {
+                    class_can_negate = false;
+                } else {
+                    class_has_atom = true;
+                    class_can_negate = false;
+                }
+            }
+            pattern.push(c);
+        }
+    }
+    Regex::new(&pattern).map_err(|error| {
+        Error::new(
+            ErrorCategory::InvalidInput,
+            format!(
+                "invalid or unsupported Go/Rust regex in guardrail {:?}: {error}",
+                rule.name
+            ),
+        )
+    })
 }

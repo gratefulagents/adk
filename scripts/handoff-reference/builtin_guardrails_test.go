@@ -47,6 +47,9 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if len(fixture.ToolPatterns) != 120 {
 		t.Fatalf("got %d tool patterns, want 120", len(fixture.ToolPatterns))
 	}
+	if len(fixture.CompiledRules) != 5 {
+		t.Fatal("missing compiler cases")
+	}
 	if len(fixture.PublicRules) != 124 {
 		t.Fatalf("got %d public rule cases, want 124", len(fixture.PublicRules))
 	}

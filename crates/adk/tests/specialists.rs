@@ -1,4 +1,8 @@
 #[cfg(feature = "runtime")]
+#[path = "specialists/catalog.rs"]
+mod catalog;
+
+#[cfg(feature = "runtime")]
 #[path = "specialists/delegation.rs"]
 mod delegation;
 

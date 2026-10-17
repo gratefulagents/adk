@@ -474,3 +474,9 @@ arguments, all action branches (including unvalidated values), exact default
 quoted diagnostics, message whitespace, edge-star filters and no-match/empty
 text. Native comparison checks result output, tripwire and replacement state.
 This does not assert Go/Rust regex parser equivalence or partial-error compilation.
+
+Five public compiler observations cover empty/all-invalid/mixed collections,
+normalization (including Kelvin-sign K), validation precedence, phase ordering,
+quoted regexes and tool filters. Native comparison checks retained guard names,
+results and ordered errors; invalid-regex parser wording remains native. These
+checks do not assert support for RE2-only syntax outside the documented subset.

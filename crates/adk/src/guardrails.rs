@@ -11,7 +11,9 @@ use std::sync::Arc;
 #[cfg(feature = "host")]
 mod rules;
 #[cfg(feature = "host")]
-pub use rules::{make_tool_input_guardrail, make_tool_output_guardrail};
+pub use rules::{
+    make_tool_input_guardrail, make_tool_output_guardrail, tool_guardrails_from_rules,
+};
 
 /// Match the SDK public helper's edge-star syntax, not ChatLoop's multi-star glob.
 /// A trailing star takes precedence over a leading star; internal stars are literal.

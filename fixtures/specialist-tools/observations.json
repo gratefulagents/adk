@@ -684,7 +684,7 @@
     "harnessSHA256": {
       "scripts/specialist-tools-reference/delegation_test.go": "ee8aef6efc66df24d8288ca3077ec021f3d57a0aec43da747fd69c6df5b6eed2",
       "scripts/specialist-tools-reference/reference_test.go": "978308b79a145e91192e1cdb6f096538b80c79d6d23f9dfffb5ef1ca46ccf13a",
-      "scripts/specialist-tools-reference/run.py": "e4ddff6eea6720c4c0fca54dce7b154547f3e0c5643d54a6f6db25a4991a76c6"
+      "scripts/specialist-tools-reference/run.py": "3f030fbb927384a08fab9ce0d37079a8b72f2d2777f8a65ff32bdda8bae1659b"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",

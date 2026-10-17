@@ -1,4 +1,341 @@
 {
+  "compiled_rules": [
+    {
+      "name": "empty",
+      "rules": [],
+      "input": null,
+      "output": null,
+      "errors": null
+    },
+    {
+      "name": "all-invalid",
+      "rules": [
+        {
+          "Name": "invalid-regex",
+          "Type": "agent-input",
+          "Regex": "[",
+          "ToolPattern": "",
+          "Action": "deny",
+          "Message": ""
+        },
+        {
+          "Name": "invalid-action",
+          "Type": "agent-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "deny",
+          "Message": ""
+        },
+        {
+          "Name": "invalid-type",
+          "Type": "agent-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "block",
+          "Message": ""
+        }
+      ],
+      "input": null,
+      "output": null,
+      "errors": [
+        "invalid regex in guardrail rule \"invalid-regex\": error parsing regexp: missing closing ]: `[`",
+        "unknown action \"deny\" in guardrail rule \"invalid-action\" (valid: block, warn, log)",
+        "unknown guardrail rule type \"agent-input\" for rule \"invalid-type\" (valid: tool-input, tool-output)"
+      ]
+    },
+    {
+      "name": "mixed",
+      "rules": [
+        {
+          "Name": "first",
+          "Type": "tool-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "",
+          "Message": ""
+        },
+        {
+          "Name": "invalid-regex",
+          "Type": "agent-input",
+          "Regex": "[",
+          "ToolPattern": "",
+          "Action": "deny",
+          "Message": ""
+        },
+        {
+          "Name": "output-warn",
+          "Type": "tool-output",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "warn",
+          "Message": "  "
+        },
+        {
+          "Name": "invalid-action",
+          "Type": "agent-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "deny",
+          "Message": ""
+        },
+        {
+          "Name": "input-log",
+          "Type": "tool-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "log",
+          "Message": ""
+        },
+        {
+          "Name": "invalid-type",
+          "Type": "agent-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "block",
+          "Message": ""
+        },
+        {
+          "Name": "last",
+          "Type": "tool-output",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "block",
+          "Message": ""
+        }
+      ],
+      "input": [
+        {
+          "name": "crd:first",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"first\" triggered on tool \"reader\"",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:input-log",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "crd:output-warn",
+          "error": "",
+          "result": {
+            "Output": "  ",
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:last",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"last\" triggered on tool \"reader\" output",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "errors": [
+        "invalid regex in guardrail rule \"invalid-regex\": error parsing regexp: missing closing ]: `[`",
+        "unknown action \"deny\" in guardrail rule \"invalid-action\" (valid: block, warn, log)",
+        "unknown guardrail rule type \"agent-input\" for rule \"invalid-type\" (valid: tool-input, tool-output)"
+      ]
+    },
+    {
+      "name": "normalized",
+      "rules": [
+        {
+          "Name": "normalize-0",
+          "Type": "tool-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": " \tWaRN",
+          "Message": ""
+        },
+        {
+          "Name": "normalize-1",
+          "Type": "tool-output",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": "blocK",
+          "Message": ""
+        },
+        {
+          "Name": "normalize-2",
+          "Type": "tool-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": " \n ",
+          "Message": ""
+        },
+        {
+          "Name": "normalize-3",
+          "Type": "tool-output",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": " LOG ",
+          "Message": ""
+        },
+        {
+          "Name": "normalize-4",
+          "Type": "tool-input",
+          "Regex": "danger",
+          "ToolPattern": "",
+          "Action": " BLOCK ",
+          "Message": ""
+        }
+      ],
+      "input": [
+        {
+          "name": "crd:normalize-0",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"normalize-0\" triggered on tool \"reader\"",
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:normalize-2",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"normalize-2\" triggered on tool \"reader\"",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:normalize-4",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"normalize-4\" triggered on tool \"reader\"",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "crd:normalize-1",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"normalize-1\" triggered on tool \"reader\" output",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:normalize-3",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "errors": null
+    },
+    {
+      "name": "patterns",
+      "rules": [
+        {
+          "Name": "quoted",
+          "Type": "tool-input",
+          "Regex": "\\Q[a\u0026\u0026b]\\E",
+          "ToolPattern": "",
+          "Action": "",
+          "Message": ""
+        },
+        {
+          "Name": "ascii-word",
+          "Type": "tool-output",
+          "Regex": "\\w+",
+          "ToolPattern": "",
+          "Action": "",
+          "Message": ""
+        },
+        {
+          "Name": "literal-star",
+          "Type": "tool-input",
+          "Regex": "danger",
+          "ToolPattern": "*read*",
+          "Action": "",
+          "Message": ""
+        },
+        {
+          "Name": "suffix",
+          "Type": "tool-output",
+          "Regex": "danger",
+          "ToolPattern": "*reader",
+          "Action": "",
+          "Message": ""
+        }
+      ],
+      "input": [
+        {
+          "name": "crd:quoted",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"quoted\" triggered on tool \"reader\"",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:literal-star",
+          "error": "",
+          "result": {
+            "Output": null,
+            "TripwireTriggered": false,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "output": [
+        {
+          "name": "crd:ascii-word",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"ascii-word\" triggered on tool \"reader\" output",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        },
+        {
+          "name": "crd:suffix",
+          "error": "",
+          "result": {
+            "Output": "Guardrail \"suffix\" triggered on tool \"reader\" output",
+            "TripwireTriggered": true,
+            "ReplacementContent": "",
+            "ContentReplaced": false
+          }
+        }
+      ],
+      "errors": null
+    }
+  ],
   "public_rules": [
     {
       "phase": "input",

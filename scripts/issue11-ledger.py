@@ -88,7 +88,7 @@ RUST_INPUTS = ["scripts/providers/generate.sh", "scripts/providers/continuation_
                "crates/adk-providers/src/anthropic_compaction_union.json",
                "crates/adk-providers/src/client.rs", "crates/adk-providers/src/lib.rs",
                "crates/adk-providers/src/routing.rs", "crates/adk-providers/src/copilot.rs",
-               "crates/adk-providers/tests/http.rs", "crates/adk-providers/tests/http/activity.rs",
+               "crates/adk-providers/tests/http.rs", "crates/adk-providers/tests/http/activity.rs", "crates/adk-providers/tests/http/reasoning.rs",
                "crates/adk-runtime/tests/runner/activity.rs",
                "crates/adk-providers/Cargo.toml", "crates/adk-providers/tests/snapshots.rs",
                "crates/adk-codec/tests/native_snapshot.rs", "crates/adk-codec/tests/projected_snapshot.rs",

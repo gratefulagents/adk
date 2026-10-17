@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Reasoning callable type evidence
+
+The reasoning callback type alone is now verified, with retained capture, ordered
+borrowed UTF-8 inputs (including empty and Unicode strings), and reuse after the
+original callable is dropped. Provider tests bind inline delivery, empty filtering,
+final response retention and wrapper forwarding. Context installation/extraction,
+automatic propagation and whole-package closure are not inferred.
+
+Fresh core targets: **29 passed /0 failed**; strict core Clippy, formatting, bound
+Go/native oracles and regressions,51 validators, artifact/audit/source-lock checks
+passed. The selected original Go report now includes the sink regression:
+**917 passed /5 skipped**,37 packages. No production code changed after3b3827c2's
+full **1,623-test /9-doctest** verification. Ledger: **858 verified /8,033 unresolved
+/251 excluded**. Issue11 remains incomplete.
+
 ### Direct completion reasoning observers
 
 Added `ModelReasoningSink` and optional `Model::complete_with_observers` for

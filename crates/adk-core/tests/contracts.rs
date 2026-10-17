@@ -15,6 +15,27 @@ impl Cancellation for NeverCancelled {
 }
 
 #[test]
+fn model_reasoning_sink_retains_capture_and_ordered_borrowed_text() {
+    let chunks = Arc::new(std::sync::Mutex::new(Vec::new()));
+    let observed = chunks.clone();
+    let sink: ModelReasoningSink = Arc::new(move |text| {
+        observed.lock().unwrap().push(text.to_owned());
+    });
+    for text in ["", "step one, ", "step two", "思考"] {
+        let mut input = text.to_owned();
+        sink(&input);
+        input.clear();
+    }
+    let retained = sink.clone();
+    drop(sink);
+    retained("after");
+    assert_eq!(
+        *chunks.lock().unwrap(),
+        ["", "step one, ", "step two", "思考", "after"]
+    );
+}
+
+#[test]
 fn model_activity_sink_retains_shared_capture_across_concurrent_calls() {
     use std::sync::atomic::{AtomicUsize, Ordering};
     let calls = Arc::new(AtomicUsize::new(0));

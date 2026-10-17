@@ -15326,6 +15326,27 @@
         "x86_64-unknown-linux-gnu",
         "observability"
       ]
+    },
+    "SDK-28171AA2B400B97F": {
+      "source": "internal/modeldelta/modeldelta.go",
+      "source_name": "ReasoningSink",
+      "implementation_symbols": [
+        "crates/adk-core/src/contracts.rs::ModelReasoningSink",
+        "crates/adk-providers/src/client.rs::Provider"
+      ],
+      "rust_test_identifiers": [
+        "model_reasoning_sink_retains_capture_and_ordered_borrowed_text",
+        "reasoning::completion_reasoning_is_live_ordered_and_forwarded",
+        "reasoning::completion_reasoning_survives_sse_and_buffered_protocol_paths",
+        "reasoning::completion_does_not_replay_buffered_json_reasoning_as_live_deltas"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/openai/TestDrainStreamFeedsReasoningSink",
+      "rationale": "Only the string-input/no-result reasoning callable type is closed. The owned shared native sink retains its captured state and ordered UTF-8 text observations, including empty and Unicode inputs, independently of the borrowed input lifetime. HTTP tests prove inline delivery before completion, ordered forwarding through Routes/Copilot, final reasoning retention and no replay from ordinary JSON. Transport delivery filters empty deltas as in the pinned SDK. Optional absence is represented by Option; Rust Send+Sync bounds support the native asynchronous contract. Context-key installation/extraction, automatic propagation, retry reconciliation, invalid-UTF8 Go strings and the complete modeldelta package are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "core",
+        "providers"
+      ]
     }
   }
 }

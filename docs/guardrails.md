@@ -62,7 +62,10 @@ semantics inside and outside classes, including under case-insensitive flags.
 In-class word-boundary escapes remain invalid, as in Go. Go octal escapes are
 translated to Unicode hex atoms; single nonzero digits remain invalid
 backreferences. Braces belonging to hex escapes or Unicode properties are not
-interpreted as repetition delimiters.
+interpreted as repetition delimiters. Named captures validate Go's ASCII
+alphanumeric/underscore grammar, including digit-leading and duplicate names.
+Since rule guards expose membership only, validated named groups compile as
+noncapturing groups; no capture-extraction API is implied.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

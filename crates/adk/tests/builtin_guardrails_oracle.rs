@@ -564,3 +564,17 @@ async fn octal_escapes_match_actual_go_membership() {
     assert_eq!(inputs.len(), 141);
     assert_regex_membership(cases, inputs).await;
 }
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn capture_groups_match_actual_go_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_captures"].as_array().unwrap();
+    let inputs = fixture["regex_capture_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 22);
+    assert_eq!(inputs.len(), 12);
+    assert_regex_membership(cases, inputs).await;
+}

@@ -88,6 +88,12 @@ func regexOctalScenarios() ([]regexClassCase, []string) {
 	return regexMembership(patterns, inputs), inputs
 }
 
+func regexCaptureScenarios() ([]regexClassCase, []string) {
+	inputs := []string{"", "a", "b", "ab", "aa", "aaa", "A", "k", "K", "K", "猫", "(?P<x>a)"}
+	patterns := []string{`^(?P<name>a)$`, `^(?<name>a)$`, `^(?P<0>a)$`, `^(?<1a>a)$`, `^(?P<_>a)$`, `^(?P<abc_123>a)$`, `^(?P<x>a)(?P<x>b)$`, `^(?<x>a)|(?<x>b)$`, `^(?P<x>(?P<x>a))$`, `^(?P<x>a){2}$`, `(?i)^(?P<x>k)$`, `^\Q(?P<x>a)\E$`, `(?P<>a)`, `(?<>a)`, `(?P<a-b>a)`, `(?P<猫>a)`, `(?<a.b>a)`, `(?P<name`, `(?'name'a)`, `(?=a)`, `(?P<x>a)\k<x>`, `(?P<x>a)\1`}
+	return regexMembership(patterns, inputs), inputs
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

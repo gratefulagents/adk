@@ -246,6 +246,43 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 pattern.push(escaped);
             }
         } else {
+            if c == '(' && !in_class {
+                let prefix: String = chars.clone().take(3).collect();
+                let prefix_len = if prefix.starts_with("?P<") {
+                    3
+                } else if prefix.starts_with("?<") {
+                    2
+                } else {
+                    0
+                };
+                if prefix_len > 0 {
+                    for _ in 0..prefix_len {
+                        chars.next();
+                    }
+                    let mut name = String::new();
+                    let mut closed = false;
+                    for character in chars.by_ref() {
+                        if character == '>' {
+                            closed = true;
+                            break;
+                        }
+                        name.push(character);
+                    }
+                    if !closed
+                        || name.is_empty()
+                        || !name.chars().all(|c| c.is_ascii_alphanumeric() || c == '_')
+                    {
+                        return Err(Error::new(
+                            ErrorCategory::InvalidInput,
+                            format!("invalid Go capture name in guardrail {:?}", rule.name),
+                        ));
+                    }
+                    // Guardrails expose only membership, not captures. Erasing the
+                    // validated name permits Go's digit-leading and duplicate names.
+                    pattern.push_str("(?:");
+                    continue;
+                }
+            }
             if c == '{'
                 && !in_class
                 && !GO_REPEAT.is_match(

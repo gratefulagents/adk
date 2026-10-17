@@ -50,6 +50,9 @@ func TestBuiltinGuardrailsFixture(t *testing.T) {
 	if len(fixture.RegexClasses) != 62 || len(fixture.RegexInputs) != 142 {
 		t.Fatal("missing class observations")
 	}
+	if len(fixture.RegexCaptures) != 22 || len(fixture.RegexCaptureInputs) != 12 {
+		t.Fatal("missing capture-group observations")
+	}
 	if len(fixture.RegexOctal) != 45 || len(fixture.RegexOctalInputs) != 141 {
 		t.Fatal("missing numeric escape observations")
 	}

@@ -518,3 +518,9 @@ rejected backreference/escape forms. It exercises Go's one-to-three-digit octal
 rules, NUL, values above255, digit termination, class ranges, escaped backslashes
 and quoting. Braced hex/Unicode-property controls protect their delimiters from
 malformed-count translation (5,781 actual Go match decisions per native compiler).
+
+Capture-group coverage adds22 patterns over12 inputs:12 accepted and10 rejected.
+Both named-group spellings, digit-leading names, duplicate names, nested groups,
+repetition, flags and quoted literals are compared through actual SDK matching.
+Empty/non-ASCII/punctuated names, malformed delimiters, lookahead and backreferences
+remain rejected. These are membership-only guards, not a capture-extraction API.

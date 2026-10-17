@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Named regex groups
+
+Rule compilation validates Go's capture-name grammar and compiles validated
+named groups as noncapturing groups, because rule guards expose only membership.
+This permits Go-valid digit-leading and duplicate names without accepting
+Rust-only non-ASCII names. The22-pattern actual-Go oracle compares12 accepted
+forms over12 inputs plus10 rejected forms, covering both spellings, nesting,
+repetition, flags, quoting, malformed names and unsupported backreferences.
+Digit-leading-name rejection was reproduced before the fix. This does not add
+a capture-extraction API or assert full RE2 parser parity.
+
+Fresh Rust1.88 Linux: **1,723 workspace tests /0 failed /30 ignored;10 doctests
+passed**. Strict lint/typecheck/rustdoc, formatting, full feature matrix and
+standalone consumer/purity, Go test/vet/build, bound pinned evidence,
+53 validators, artifacts/overlay/audit and source locks passed. Ledger remains
+**947 verified /7,944 unresolved /251 excluded**; full acceptance is incomplete.
+
 ### Octal escapes and braced escape delimiters
 
 Go octal escapes now translate to Unicode hex atoms, including NUL, two-digit

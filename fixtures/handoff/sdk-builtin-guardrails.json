@@ -1,4 +1,130 @@
 {
+  "regex_captures": [
+    {
+      "pattern": "^(?P\u003cname\u003ea)$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?\u003cname\u003ea)$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?P\u003c0\u003ea)$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?\u003c1a\u003ea)$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?P\u003c_\u003ea)$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?P\u003cabc_123\u003ea)$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?P\u003cx\u003ea)(?P\u003cx\u003eb)$",
+      "error": "",
+      "matches": "000100000000"
+    },
+    {
+      "pattern": "^(?\u003cx\u003ea)|(?\u003cx\u003eb)$",
+      "error": "",
+      "matches": "011111000000"
+    },
+    {
+      "pattern": "^(?P\u003cx\u003e(?P\u003cx\u003ea))$",
+      "error": "",
+      "matches": "010000000000"
+    },
+    {
+      "pattern": "^(?P\u003cx\u003ea){2}$",
+      "error": "",
+      "matches": "000010000000"
+    },
+    {
+      "pattern": "(?i)^(?P\u003cx\u003ek)$",
+      "error": "",
+      "matches": "000000011100"
+    },
+    {
+      "pattern": "^\\Q(?P\u003cx\u003ea)\\E$",
+      "error": "",
+      "matches": "000000000001"
+    },
+    {
+      "pattern": "(?P\u003c\u003ea)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid named capture: `(?P\u003c\u003e`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?\u003c\u003ea)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid named capture: `(?\u003c\u003e`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?P\u003ca-b\u003ea)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid named capture: `(?P\u003ca-b\u003e`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?P\u003c猫\u003ea)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid named capture: `(?P\u003c猫\u003e`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?\u003ca.b\u003ea)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid named capture: `(?\u003ca.b\u003e`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?P\u003cname",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid named capture: `(?P\u003cname`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?'name'a)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid or unsupported Perl syntax: `(?'`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?=a)",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid or unsupported Perl syntax: `(?=`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?P\u003cx\u003ea)\\k\u003cx\u003e",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid escape sequence: `\\k`",
+      "matches": ""
+    },
+    {
+      "pattern": "(?P\u003cx\u003ea)\\1",
+      "error": "invalid regex in guardrail rule \"class\": error parsing regexp: invalid escape sequence: `\\1`",
+      "matches": ""
+    }
+  ],
+  "regex_capture_inputs": [
+    "",
+    "a",
+    "b",
+    "ab",
+    "aa",
+    "aaa",
+    "A",
+    "k",
+    "K",
+    "K",
+    "猫",
+    "(?P\u003cx\u003ea)"
+  ],
   "regex_octal": [
     {
       "pattern": "^\\0$",

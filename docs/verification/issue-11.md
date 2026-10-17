@@ -4,6 +4,13 @@
 
 ### Completion-only runtime reasoning
 
+A following HTTP integration regression exercises the actual provider through a
+completion-only runner. The server waits for each observer acknowledgement before
+sending the next chunk or final answer. This proves inline end-to-end delivery,
+shared generation identity, no reasoning run events and preserved final reasoning
+and answer. All four provider reasoning tests pass; no production code changed
+from the full verification below.
+
 Blocking completion-only bindings now pass a call-scoped reasoning observer when
 `blocking_reasoning` is enabled and a generation observer exists. Nonempty chunks
 retain the generation identity and delivery order without becoming streamed run

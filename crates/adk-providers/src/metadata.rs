@@ -20,14 +20,44 @@ pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error>
             host,
             "api.githubcopilot.com" | "api.individual.githubcopilot.com"
         );
-    let path = url.path().trim_end_matches('/');
-    let path = path.strip_suffix("/chat/completions").unwrap_or(path);
-    let path = path.strip_suffix("/responses").unwrap_or(path);
-    let mut base = path.to_owned();
-    if (base.is_empty() && !copilot) || (!chatgpt && !copilot && !base.contains("/v1")) {
-        base = format!("{}/v1", base.trim_end_matches('/'));
+    let decoded: Vec<u8> = percent_encoding::percent_decode_str(url.path()).collect();
+    // Replacement characters only locate Unicode whitespace boundaries; path bytes
+    // themselves must survive even when Go's decoded path is not valid UTF-8.
+    let text = String::from_utf8_lossy(&decoded);
+    let start = text.len() - text.trim_start().len();
+    let end = decoded.len() - (text.len() - text.trim_end().len());
+    let path = &decoded[start..end];
+    let path = path.strip_suffix(b"/").unwrap_or(path);
+    let path = path.strip_suffix(b"/chat/completions").unwrap_or(path);
+    let path = path.strip_suffix(b"/responses").unwrap_or(path);
+    let mut base = path.to_vec();
+    if (base.is_empty() && !copilot)
+        || (!chatgpt && !copilot && !base.windows(3).any(|part| part == b"/v1"))
+    {
+        if base.last() == Some(&b'/') {
+            base.pop();
+        }
+        base.extend_from_slice(b"/v1");
     }
-    url.set_path(&format!("{}/models", base.trim_end_matches('/')));
+    if base.last() == Some(&b'/') {
+        base.pop();
+    }
+    base.extend_from_slice(b"/models");
+    const PATH_ENCODING: &percent_encoding::AsciiSet = &percent_encoding::NON_ALPHANUMERIC
+        .remove(b'-')
+        .remove(b'_')
+        .remove(b'.')
+        .remove(b'~')
+        .remove(b'$')
+        .remove(b'&')
+        .remove(b'+')
+        .remove(b',')
+        .remove(b'/')
+        .remove(b':')
+        .remove(b';')
+        .remove(b'=')
+        .remove(b'@');
+    url.set_path(&percent_encoding::percent_encode(&base, PATH_ENCODING).to_string());
     crate::auth::decorate_codex_url(&mut url, session);
     Ok(url)
 }

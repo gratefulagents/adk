@@ -736,7 +736,7 @@ async fn explicit_metadata_get_refreshes_once_and_normalizes_endpoint() {
         }
     });
     let session = session(
-        &format!("http://{address}/v1/responses"),
+        &format!("http://{address}/%76%31%2Fresponses"),
         AuthMode::OpenAiOAuth,
     );
     let models = fetch_model_metadata(&context(), &session).await.unwrap();

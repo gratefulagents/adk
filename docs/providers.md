@@ -122,7 +122,11 @@ Store and refresh trait errors must be sanitized by the host.
 
 Endpoint construction trims surrounding Unicode whitespace before URL parsing,
 matching Go `strings.TrimSpace`; padding does not create a different credential
-or prompt-cache scope. This does not change path unescaping or dot-segment rules.
+or prompt-cache scope. Metadata discovery percent-decodes the path before trimming
+Unicode whitespace, removing inference suffixes and detecting `/v1`, then escapes
+it with Go path rules. Encoded non-UTF-8 bytes remain bytes rather than replacement
+characters. Scope and transport dot-segment canonicalization remain unchanged;
+this does not claim full raw URL parity.
 
 Canonical scopes retain explicit default and empty ports (`:443`, `:00443`, `:`)
 rather than merging them with an omitted port. Their credential and prompt-cache

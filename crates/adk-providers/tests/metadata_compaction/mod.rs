@@ -397,7 +397,7 @@ fn metadata_nondefault_port_classification_matches_pinned_sdk() {
 fn metadata_endpoint_paths_match_pinned_sdk_with_nondefault_ports() {
     let fixture = fixture();
     let cases = fixture["endpoint_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 180);
+    assert_eq!(cases.len(), 252);
     for case in cases {
         let session = session(case["raw"].as_str().unwrap(), AuthMode::ApiKey);
         assert_eq!(

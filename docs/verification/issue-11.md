@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Metadata discovery decodes paths before normalization
+
+Reproduced a pinned-SDK mismatch: `/%76%31` incorrectly requested
+`/%76%31/v1/models` instead of `/v1/models`. Metadata discovery now decodes path
+bytes before Unicode-whitespace trimming, inference-suffix removal and `/v1`
+detection, then escapes with Go path rules. Non-UTF-8 decoded bytes are preserved.
+The independent oracle now compares **252 endpoints**, adding72 encoded-path
+cases across standard, ChatGPT, Copilot and explicit-port hosts. The actual HTTP
+401-refresh test uses an encoded `/v1/responses` endpoint and verifies both
+requests reach `/v1/models`. Scope/transport dot-segment canonicalization and
+malformed-escape parity are not claimed; no additional ledger IDs are closed.
+
+Fresh Rust1.88 Linux: **1,637 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full facade feature matrix, standalone
+consumer/purity,20 offline scenarios, host-session, refreshed bound evidence,
+all51 validators, artifact/overlay/audit and source locks passed. The examples
+script's `cargo clippy` launcher failed because this environment lacks
+`/proc/self/exe`; the same strict check passed with the direct Clippy driver,
+followed by successful example builds and executions. Ledger remains
+**862 verified /8,029 unresolved /251 excluded**; issue11 remains incomplete.
+
 ### Original Anthropic partial compaction assembly regression
 
 The literal native counterpart of `TestStreamAssemblerAssemblesCompactionBlocks`

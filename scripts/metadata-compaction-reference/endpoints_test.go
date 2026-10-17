@@ -21,6 +21,12 @@ func TestNativeMetadataEndpoints(t *testing.T) {
 			out = append(out, map[string]string{"raw": raw, "endpoint": modelMetadataEndpoint(raw, nil)})
 		}
 	}
+	for _, host := range []string{"example.test", "chatgpt.com", "api.githubcopilot.com", "chatgpt.com:443"} {
+		for _, path := range []string{"/%76%31", "/custom%2Fresponses", "/custom%2fchat%2fcompletions", "/v1%2Fresponses", "/%E2%80%83", "/custom%20", "/custom%09", "/custom%2F%20", "/custom%3F%23", "/custom%25", "/%FF", "/%FF%E2%80%83", "/%E2%80%83%FF", "/%00", "/%5C", "/%21%27%28%29%2A", "/%24%26%2B%2C%3A%3B%3D%40", "/%CE%B2"} {
+			raw := "https://" + host + path
+			out = append(out, map[string]string{"raw": raw, "endpoint": modelMetadataEndpoint(raw, nil)})
+		}
+	}
 	data, err := json.Marshal(out)
 	if err != nil {
 		t.Fatal(err)

@@ -151,6 +151,7 @@ dependencies = [
  "futures-util",
  "http",
  "httpdate",
+ "percent-encoding",
  "reqwest",
  "serde",
  "serde_json",

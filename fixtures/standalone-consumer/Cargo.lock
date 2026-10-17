@@ -117,6 +117,7 @@ dependencies = [
  "adk-runtime",
  "base64",
  "httpdate",
+ "percent-encoding",
  "reqwest",
  "serde",
  "serde_json",

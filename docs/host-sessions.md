@@ -84,6 +84,12 @@ then working state, then invokes the tool factory. Handoff history and paged
 messages are loaded afterward. `role_catalog` is available to application/tool
 assembly but is not called by the loop.
 
+`PermissionMode::parse` follows the SDK host's Unicode whitespace trimming and
+simple lowercase normalization (including `K` → `k` and `İ` → `i`). Empty input
+selects workspace-write; unrecognized nonempty input remains read-only. This is
+the ChatLoop host contract, not the SDK's separate case-sensitive internal policy
+normalizer.
+
 Successful runner batches are persisted, including an empty batch. Approval
 resolution is sequential; resolved items and markers are persisted **before**
 another model call. If a later gate fails, already resolved records are still

@@ -257,6 +257,53 @@ fn page(id: i64, token: &str, texts: &[&str]) -> Result<(Vec<UserMessage>, Curso
         },
     ))
 }
+#[test]
+fn permission_mode_parsing_matches_pinned_host_normalization() {
+    let oracle: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/host-loop/sdk-chatloop.json"
+    ))
+    .unwrap();
+    let mut count = 0;
+    for case in oracle["cases"].as_array().unwrap() {
+        let Some(input) = case["name"].as_str().unwrap().strip_prefix("permission-") else {
+            continue;
+        };
+        let input: String = serde_json::from_str(input).unwrap();
+        let started = &case["runs"][0]["calls"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .find(|call| call["op"] == "runner.start")
+            .unwrap()["args"];
+        let expected = if started["access"] == "read-only" {
+            PermissionMode::ReadOnly
+        } else if started["policy"].is_null() {
+            PermissionMode::DangerFullAccess
+        } else {
+            PermissionMode::WorkspaceWrite
+        };
+        assert_eq!(PermissionMode::parse(&input), expected, "{input}");
+        count += 1;
+    }
+    assert_eq!(count, 9);
+}
+
+#[test]
+fn permission_mode_fails_closed_like_original_regression() {
+    for (input, expected) in [
+        ("", PermissionMode::WorkspaceWrite),
+        ("workspace-write", PermissionMode::WorkspaceWrite),
+        ("read-only", PermissionMode::ReadOnly),
+        ("danger-full-access", PermissionMode::DangerFullAccess),
+        ("  Read-Only  ", PermissionMode::ReadOnly),
+        ("workspace-wrte", PermissionMode::ReadOnly),
+        ("full", PermissionMode::ReadOnly),
+        ("danger_full_access", PermissionMode::ReadOnly),
+    ] {
+        assert_eq!(PermissionMode::parse(input), expected, "{input}");
+    }
+}
+
 #[tokio::test]
 async fn order_matches_real_go_oracle() {
     let fixture = Arc::new(Fixture::default());

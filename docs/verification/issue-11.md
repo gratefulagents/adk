@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Host permission normalization uses simple Unicode lowercase
+
+Reproduced the native host parser rejecting `worKspace-write` while the pinned
+Go ChatLoop selected workspace-write. The parser now follows simple Unicode
+lowercase, including `İ` → `i` rather than Rust's expanded lowercase form.
+Unknown nonempty values still fail closed. Nine actual Go ChatLoop observations
+and the original eight-input normalization regression pass. Only the original
+test ID is closed, not the separate case-sensitive internal policy normalizer,
+all host types or whole-file equivalence. Host oracle:50 scenarios/51 runs.
+
+Fresh Rust1.88 Linux: **1,639 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone
+consumer/purity,20 offline scenarios, host-session, all bound evidence and51
+validators, artifacts/overlay/audit and immutable source locks pass. Ledger:
+**863 verified /8,028 unresolved /251 excluded**. Full issue11 acceptance remains
+incomplete.
+
 ### Metadata discovery decodes paths before normalization
 
 Reproduced a pinned-SDK mismatch: `/%76%31` incorrectly requested

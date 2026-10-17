@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8029,
-    "verified": 862
+    "unresolved": 8028,
+    "verified": 863
   },
   "groups": [
     {
@@ -3931,7 +3931,8 @@
         "files:unresolved": 14,
         "packages:unresolved": 2,
         "subtests:unresolved": 9,
-        "tests:unresolved": 25,
+        "tests:unresolved": 24,
+        "tests:verified": 1,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::policy",
@@ -3978,7 +3979,6 @@
         "SDK-21CF21B4BBDD3874",
         "SDK-236170134CC51A2A",
         "SDK-2B25160AD38B97D0",
-        "SDK-2C255A1EB816710C",
         "SDK-32503DE7EB35EC56",
         "SDK-327BE064906EDFCE",
         "SDK-33E7765E9E15B1B1",
@@ -4077,7 +4077,9 @@
         "SDK-FD7DA76EA2D0E473",
         "SDK-FFF7260E5951DB67"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-2C255A1EB816710C"
+      ]
     },
     {
       "counts": {
@@ -10949,8 +10951,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "a69a5de31403d112df147117525eaba5e5dd26bc3b4560bf774db272b9161afa",
-    "docs/migration/ledger/issue-11-rust-claims.json": "4b22be5e3ba1c8e28724228f6eed8a7aff9b8432490de40671e4a66762fe68be",
+    "docs/migration/ledger/issue-11-overlay.json": "a3f65c80d686b8e361a78f8473af229fc08d7fe95bfec1653060add4891309ef",
+    "docs/migration/ledger/issue-11-rust-claims.json": "1cc65e5cf8176d4d461f21690921eb034915a517122f9c2fb377e11686c2443e",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10959,6 +10961,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 860
+    "rust_test": 861
   }
 }

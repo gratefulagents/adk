@@ -93,7 +93,13 @@ pub enum PermissionMode {
 }
 impl PermissionMode {
     pub fn parse(value: &str) -> Self {
-        match value.trim().to_ascii_lowercase().as_str() {
+        // Go uses simple lowercase: İ maps to i, not Rust's expanded i + dot.
+        let normalized: String = value
+            .trim()
+            .chars()
+            .map(|character| character.to_lowercase().next().unwrap())
+            .collect();
+        match normalized.as_str() {
             "" | "workspace-write" => Self::WorkspaceWrite,
             "danger-full-access" => Self::DangerFullAccess,
             _ => Self::ReadOnly,

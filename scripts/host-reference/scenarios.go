@@ -52,7 +52,7 @@ func scenarios() []scenario {
 	s.WorkingStateContext = "retained host state"
 	s.Responses = []response{reply(call("c1", "write")), reply(message("done"))}
 	out = append(out, s)
-	for _, p := range []sdk.PermissionMode{sdk.PermissionModeReadOnly, "typo", "", "  DANGER-FULL-ACCESS  ", sdk.PermissionModeWorkspaceWrite} {
+	for _, p := range []sdk.PermissionMode{sdk.PermissionModeReadOnly, "typo", "", "  DANGER-FULL-ACCESS  ", sdk.PermissionModeWorkspaceWrite, "worKspace-write", "\u2003WORKSPACE-WRITE\u00a0", "worKspace-wrte", "workspace-wrİte"} {
 		s = baseline("permission-" + fmt.Sprintf("%q", p))
 		s.Permission = p
 		s.Responses = []response{reply(call("c1", "write")), reply(message("done"))}

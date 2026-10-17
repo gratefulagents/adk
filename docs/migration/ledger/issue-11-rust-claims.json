@@ -15411,6 +15411,23 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-2C255A1EB816710C": {
+      "source": "pkg/agentsdk/permission_mode_test.go",
+      "source_name": "TestNormalizePermissionModeFailsClosed",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::PermissionMode::parse"
+      ],
+      "rust_test_identifiers": [
+        "permission_mode_fails_closed_like_original_regression",
+        "permission_mode_parsing_matches_pinned_host_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNormalizePermissionModeFailsClosed",
+      "rationale": "Only the original eight-input host permission normalization regression is closed. The native test asserts identical empty/default, known, padded mixed-case, typo and wrong-separator cases. Nine independent actual Go ChatLoop observations additionally compare parsed modes with observed access/approval policy, including Kelvin sign and dotted capital I simple-lowercase behavior. This does not claim internal/agent/policy normalization (which is case-sensitive), all host aliases or whole-file/package equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

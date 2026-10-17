@@ -201,7 +201,7 @@ RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-re
                "crates/adk-core/src/policy.rs", "crates/adk-runtime/src/compat.rs",
                "crates/adk-runtime/tests/compat.rs", "crates/adk-runtime/tests/host_config.rs",
                "crates/adk-runtime/src/subagent.rs", "crates/adk-runtime/src/subagent_tools.rs",
-               "crates/adk/src/host.rs", "crates/adk/src/host/rules.rs", "crates/adk/tests/host.rs",
+               "crates/adk/src/host.rs", "crates/adk/src/host/rules.rs", "crates/adk/src/host/go_unicode_names.txt", "crates/adk/tests/host.rs",
                "fixtures/host-loop/sdk-chatloop.json", "scripts/host-reference/check.py",
                "fixtures/host-loop/sdk-cursor.json", "scripts/host-reference/cursor.go",
                "crates/adk/tests/host_cursor.rs",

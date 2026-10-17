@@ -3,6 +3,9 @@ package main
 import (
 	"encoding/json"
 	"fmt"
+	"sort"
+	"strings"
+	"unicode"
 
 	sdk "github.com/gratefulagents/sdk/pkg/agentsdk"
 	"github.com/gratefulagents/sdk/pkg/agentsdk/guardrails"
@@ -12,6 +15,63 @@ type regexClassCase struct {
 	Pattern string `json:"pattern"`
 	Error   string `json:"error"`
 	Matches string `json:"matches"`
+}
+
+func regexUnicodeNameScenarios() ([]regexClassCase, []string) {
+	names := map[string]bool{"any": true, "assigned": true, "ascii": true}
+	for _, table := range []map[string]*unicode.RangeTable{unicode.Categories, unicode.Scripts} {
+		for name := range table {
+			names[strings.ToLower(strings.NewReplacer("_", "", "-", "", " ", "").Replace(name))] = true
+		}
+	}
+	for name := range unicode.CategoryAliases {
+		names[strings.ToLower(strings.NewReplacer("_", "", "-", "", " ", "").Replace(name))] = true
+	}
+	ordered := []string{}
+	for name := range names {
+		ordered = append(ordered, name)
+	}
+	sort.Strings(ordered)
+	patterns := []string{}
+	for _, name := range ordered {
+		patterns = append(patterns, `\p{`+name+`}`, `\P{^`+name+`}`)
+	}
+	for _, name := range []string{"White_Space", "Alphabetic", "Emoji", "Script=Latin", "sc:Latin", "General_Category=Letter", "gc:L", "Age=3.0", "InBasicLatin", "Grek", "Latn", "", "Unknown", "L\t", "L\n", "__UPPER case-Letter", "a s_c-i i", "^Latin", "^^Latin"} {
+		for _, format := range []string{`\p{%s}`, `\P{%s}`, `[\p{%s}]`, `[^\P{%s}]`} {
+			patterns = append(patterns, fmt.Sprintf(format, name))
+		}
+	}
+	cases := []regexClassCase{}
+	for _, pattern := range patterns {
+		observed := regexClassCase{Pattern: pattern}
+		_, _, errors := guardrails.ToolGuardrailsFromRules([]sdk.GuardrailRule{{Name: "unicode-name", Type: "tool-input", Regex: pattern}})
+		if len(errors) != 0 {
+			observed.Error = errors[0].Error()
+		}
+		cases = append(cases, observed)
+	}
+	accepted := []string{}
+	for i, name := range ordered {
+		if cases[2*i].Error == "" {
+			accepted = append(accepted, name)
+		}
+	}
+	return cases, accepted
+}
+
+func regexUnicodeMembershipScenarios(inputs []string) []regexClassCase {
+	patterns := []string{}
+	for _, name := range []string{"L", "Cs", "Surrogate", "Greek", "ASCII", "Any", "Assigned"} {
+		for _, escape := range []string{"p", "P"} {
+			for _, negate := range []string{"", "^"} {
+				atom := `\` + escape + `{` + negate + name + `}`
+				for _, format := range []string{"^%s$", "^[%s]$", "^[^%s]$"} {
+					patterns = append(patterns, fmt.Sprintf(format, atom))
+				}
+			}
+		}
+	}
+	return regexMembership(patterns, inputs)
 }
 
 func regexRepeatScenarios() []regexClassCase {

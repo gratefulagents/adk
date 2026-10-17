@@ -1,4 +1,3470 @@
 {
+  "regex_unicode_membership": [
+    {
+      "pattern": "^\\p{L}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111000000111111111111111111111111110000011001100000000"
+    },
+    {
+      "pattern": "^[\\p{L}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111000000111111111111111111111111110000011001100000000"
+    },
+    {
+      "pattern": "^[^\\p{L}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000111111000000000000000000000000001111100110011000001"
+    },
+    {
+      "pattern": "^\\p{^L}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000111111000000000000000000000000001111100110011000001"
+    },
+    {
+      "pattern": "^[\\p{^L}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000111111000000000000000000000000001111100110011000001"
+    },
+    {
+      "pattern": "^[^\\p{^L}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111000000111111111111111111111111110000011001100000000"
+    },
+    {
+      "pattern": "^\\P{L}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000111111000000000000000000000000001111100110011000001"
+    },
+    {
+      "pattern": "^[\\P{L}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000111111000000000000000000000000001111100110011000001"
+    },
+    {
+      "pattern": "^[^\\P{L}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111000000111111111111111111111111110000011001100000000"
+    },
+    {
+      "pattern": "^\\P{^L}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111000000111111111111111111111111110000011001100000000"
+    },
+    {
+      "pattern": "^[\\P{^L}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000011111111111111111111111111000000111111111111111111111111110000011001100000000"
+    },
+    {
+      "pattern": "^[^\\P{^L}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111100000000000000000000000000111111000000000000000000000000001111100110011000001"
+    },
+    {
+      "pattern": "^\\p{Cs}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\p{Cs}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\p{Cs}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\p{^Cs}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\p{^Cs}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\p{^Cs}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\P{Cs}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\P{Cs}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\P{Cs}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\P{^Cs}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\P{^Cs}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\P{^Cs}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\p{Surrogate}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\p{Surrogate}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\p{Surrogate}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\p{^Surrogate}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\p{^Surrogate}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\p{^Surrogate}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\P{Surrogate}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\P{Surrogate}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\P{Surrogate}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\P{^Surrogate}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\P{^Surrogate}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\P{^Surrogate}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\p{Greek}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\p{Greek}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\p{Greek}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\p{^Greek}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\p{^Greek}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\p{^Greek}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\P{Greek}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\P{Greek}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\P{Greek}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\P{^Greek}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\P{^Greek}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\P{^Greek}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\p{ASCII}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000001000001"
+    },
+    {
+      "pattern": "^[\\p{ASCII}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000001000001"
+    },
+    {
+      "pattern": "^[^\\p{ASCII}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111110000000"
+    },
+    {
+      "pattern": "^\\p{^ASCII}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111110000000"
+    },
+    {
+      "pattern": "^[\\p{^ASCII}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111110000000"
+    },
+    {
+      "pattern": "^[^\\p{^ASCII}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000001000001"
+    },
+    {
+      "pattern": "^\\P{ASCII}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111110000000"
+    },
+    {
+      "pattern": "^[\\P{ASCII}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111110000000"
+    },
+    {
+      "pattern": "^[^\\P{ASCII}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000001000001"
+    },
+    {
+      "pattern": "^\\P{^ASCII}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000001000001"
+    },
+    {
+      "pattern": "^[\\P{^ASCII}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111100000001000001"
+    },
+    {
+      "pattern": "^[^\\P{^ASCII}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000011111110000000"
+    },
+    {
+      "pattern": "^\\p{Any}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\p{Any}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\p{Any}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\p{^Any}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\p{^Any}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\p{^Any}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\P{Any}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\P{Any}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\P{Any}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\P{^Any}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\P{^Any}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\P{^Any}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\p{Assigned}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\p{Assigned}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\p{Assigned}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^\\p{^Assigned}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\p{^Assigned}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\p{^Assigned}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\P{Assigned}$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[\\P{Assigned}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    },
+    {
+      "pattern": "^[^\\P{Assigned}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^\\P{^Assigned}$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[\\P{^Assigned}]$",
+      "error": "",
+      "matches": "1111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111111000001"
+    },
+    {
+      "pattern": "^[^\\P{^Assigned}]$",
+      "error": "",
+      "matches": "0000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000000"
+    }
+  ],
+  "regex_unicode_names": [
+    {
+      "pattern": "\\p{adlam}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^adlam}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ahom}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ahom}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{anatolianhieroglyphs}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{anatolianhieroglyphs}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^anatolianhieroglyphs}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^anatolianhieroglyphs}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{any}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^any}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{arabic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^arabic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{armenian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^armenian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ascii}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ascii}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{assigned}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^assigned}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{avestan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^avestan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{balinese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^balinese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{bamum}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^bamum}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{bassavah}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{bassavah}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^bassavah}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^bassavah}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{batak}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^batak}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{bengali}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^bengali}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{bhaiksuki}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^bhaiksuki}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{bopomofo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^bopomofo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{brahmi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^brahmi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{braille}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^braille}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{buginese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^buginese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{buhid}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^buhid}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{c}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^c}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{canadianaboriginal}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{canadianaboriginal}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^canadianaboriginal}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^canadianaboriginal}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{carian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^carian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{casedletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^casedletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{caucasianalbanian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{caucasianalbanian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^caucasianalbanian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^caucasianalbanian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cf}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cf}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{chakma}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^chakma}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cham}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cham}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cherokee}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cherokee}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{chorasmian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^chorasmian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{closepunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^closepunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cn}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cn}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cntrl}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cntrl}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{co}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^co}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{combiningmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^combiningmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{common}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^common}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{connectorpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^connectorpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{control}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^control}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{coptic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^coptic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cs}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cs}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cuneiform}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cuneiform}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{currencysymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^currencysymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cypriot}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cypriot}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cyprominoan}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{cyprominoan}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cyprominoan}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^cyprominoan}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{cyrillic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^cyrillic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{dashpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^dashpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{decimalnumber}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^decimalnumber}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{deseret}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^deseret}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{devanagari}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^devanagari}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{digit}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^digit}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{divesakuru}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{divesakuru}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^divesakuru}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^divesakuru}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{dogra}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^dogra}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{duployan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^duployan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{egyptianhieroglyphs}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{egyptianhieroglyphs}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^egyptianhieroglyphs}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^egyptianhieroglyphs}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{elbasan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^elbasan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{elymaic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^elymaic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{enclosingmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^enclosingmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ethiopic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ethiopic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{finalpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^finalpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{format}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^format}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{georgian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^georgian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{glagolitic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^glagolitic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{gothic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^gothic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{grantha}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^grantha}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{greek}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^greek}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{gujarati}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^gujarati}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{gunjalagondi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{gunjalagondi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^gunjalagondi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^gunjalagondi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{gurmukhi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^gurmukhi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{han}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^han}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{hangul}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^hangul}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{hanifirohingya}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{hanifirohingya}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^hanifirohingya}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^hanifirohingya}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{hanunoo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^hanunoo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{hatran}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^hatran}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{hebrew}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^hebrew}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{hiragana}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^hiragana}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{imperialaramaic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{imperialaramaic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^imperialaramaic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^imperialaramaic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{inherited}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^inherited}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{initialpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^initialpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{inscriptionalpahlavi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{inscriptionalpahlavi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^inscriptionalpahlavi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^inscriptionalpahlavi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{inscriptionalparthian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{inscriptionalparthian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^inscriptionalparthian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^inscriptionalparthian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{javanese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^javanese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{kaithi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^kaithi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{kannada}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^kannada}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{katakana}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^katakana}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{kawi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^kawi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{kayahli}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{kayahli}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^kayahli}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^kayahli}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{kharoshthi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^kharoshthi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{khitansmallscript}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{khitansmallscript}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^khitansmallscript}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^khitansmallscript}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{khmer}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^khmer}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{khojki}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^khojki}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{khudawadi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^khudawadi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{l}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^l}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lao}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lao}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{latin}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^latin}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lepcha}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lepcha}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{letter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^letter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{letternumber}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^letternumber}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{limbu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^limbu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lineara}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{lineara}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lineara}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^lineara}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{linearb}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{linearb}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^linearb}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^linearb}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lineseparator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lineseparator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lisu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lisu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ll}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ll}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lm}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lm}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lowercaseletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lowercaseletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lt}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lt}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lycian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lycian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{lydian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^lydian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{m}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^m}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mahajani}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mahajani}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{makasar}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^makasar}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{malayalam}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^malayalam}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mandaic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mandaic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{manichaean}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^manichaean}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{marchen}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^marchen}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{masaramgondi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{masaramgondi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^masaramgondi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^masaramgondi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mathsymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mathsymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{me}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^me}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{medefaidrin}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^medefaidrin}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{meeteimayek}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{meeteimayek}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^meeteimayek}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^meeteimayek}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mendekikakui}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{mendekikakui}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mendekikakui}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^mendekikakui}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{meroiticcursive}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{meroiticcursive}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^meroiticcursive}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^meroiticcursive}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{meroitichieroglyphs}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{meroitichieroglyphs}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^meroitichieroglyphs}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^meroitichieroglyphs}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{miao}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^miao}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mn}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mn}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{modi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^modi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{modifierletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^modifierletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{modifiersymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^modifiersymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mongolian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mongolian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{mro}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^mro}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{multani}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^multani}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{myanmar}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^myanmar}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{n}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^n}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nabataean}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nabataean}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nagmundari}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{nagmundari}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nagmundari}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^nagmundari}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nandinagari}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nandinagari}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nd}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nd}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{newa}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^newa}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{newtailue}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{newtailue}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^newtailue}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^newtailue}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nko}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nko}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nl}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nl}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{no}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^no}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nonspacingmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nonspacingmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{number}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^number}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nushu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nushu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{nyiakengpuachuehmong}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{nyiakengpuachuehmong}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^nyiakengpuachuehmong}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^nyiakengpuachuehmong}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ogham}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ogham}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{olchiki}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{olchiki}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^olchiki}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^olchiki}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldhungarian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldhungarian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldhungarian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldhungarian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{olditalic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{olditalic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^olditalic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^olditalic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldnortharabian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldnortharabian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldnortharabian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldnortharabian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldpermic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldpermic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldpermic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldpermic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldpersian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldpersian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldpersian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldpersian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldsogdian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldsogdian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldsogdian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldsogdian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldsoutharabian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldsoutharabian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldsoutharabian}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldsoutharabian}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oldturkic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{oldturkic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oldturkic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^oldturkic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{olduyghur}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{olduyghur}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^olduyghur}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^olduyghur}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{openpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^openpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{oriya}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^oriya}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{osage}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^osage}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{osmanya}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^osmanya}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{other}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^other}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{otherletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^otherletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{othernumber}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^othernumber}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{otherpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^otherpunctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{othersymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^othersymbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{p}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^p}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{pahawhhmong}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{pahawhhmong}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^pahawhhmong}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^pahawhhmong}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{palmyrene}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^palmyrene}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{paragraphseparator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^paragraphseparator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{paucinhau}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{paucinhau}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^paucinhau}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^paucinhau}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{pc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^pc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{pd}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^pd}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{pe}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^pe}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{pf}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^pf}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{phagspa}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{phagspa}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^phagspa}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^phagspa}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{phoenician}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^phoenician}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{pi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^pi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{po}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^po}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{privateuse}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^privateuse}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ps}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ps}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{psalterpahlavi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{psalterpahlavi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^psalterpahlavi}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^psalterpahlavi}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{punct}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^punct}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{punctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^punctuation}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{rejang}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^rejang}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{runic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^runic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{s}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^s}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{samaritan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^samaritan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{saurashtra}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^saurashtra}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sc}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{separator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^separator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sharada}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sharada}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{shavian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^shavian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{siddham}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^siddham}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{signwriting}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{signwriting}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^signwriting}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^signwriting}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sinhala}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sinhala}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sk}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sk}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sm}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sm}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{so}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^so}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sogdian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sogdian}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sorasompeng}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{sorasompeng}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sorasompeng}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^sorasompeng}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{soyombo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^soyombo}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{spaceseparator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^spaceseparator}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{spacingmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^spacingmark}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sundanese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sundanese}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{surrogate}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^surrogate}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sylotinagri}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{sylotinagri}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^sylotinagri}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^sylotinagri}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{symbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^symbol}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{syriac}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^syriac}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tagalog}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tagalog}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tagbanwa}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tagbanwa}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{taile}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{taile}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^taile}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^taile}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{taitham}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{taitham}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^taitham}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^taitham}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{taiviet}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{taiviet}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^taiviet}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^taiviet}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{takri}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^takri}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tamil}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tamil}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tangsa}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tangsa}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tangut}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tangut}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{telugu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^telugu}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{thaana}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^thaana}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{thai}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^thai}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tibetan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tibetan}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tifinagh}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tifinagh}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{tirhuta}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^tirhuta}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{titlecaseletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^titlecaseletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{toto}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^toto}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{ugaritic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^ugaritic}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{unassigned}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^unassigned}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{uppercaseletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^uppercaseletter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{vai}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^vai}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{vithkuqi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^vithkuqi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{wancho}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^wancho}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{warangciti}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{warangciti}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^warangciti}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^warangciti}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{yezidi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^yezidi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{yi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^yi}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{z}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^z}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{zanabazarsquare}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{zanabazarsquare}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^zanabazarsquare}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^zanabazarsquare}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{zl}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^zl}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{zp}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^zp}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{zs}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^zs}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{White_Space}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{White_Space}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{White_Space}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{White_Space}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{White_Space}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{White_Space}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{White_Space}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{White_Space}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Alphabetic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Alphabetic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Alphabetic}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Alphabetic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Alphabetic}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Alphabetic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Alphabetic}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Alphabetic}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Emoji}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Emoji}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Emoji}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Emoji}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Emoji}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Emoji}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Emoji}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Emoji}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Script=Latin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Script=Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Script=Latin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Script=Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Script=Latin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Script=Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Script=Latin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Script=Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{sc:Latin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{sc:Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{sc:Latin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{sc:Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{sc:Latin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{sc:Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{sc:Latin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{sc:Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{General_Category=Letter}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{General_Category=Letter}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{General_Category=Letter}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{General_Category=Letter}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{General_Category=Letter}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{General_Category=Letter}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{General_Category=Letter}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{General_Category=Letter}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{gc:L}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{gc:L}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{gc:L}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{gc:L}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{gc:L}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{gc:L}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{gc:L}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{gc:L}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Age=3.0}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Age=3.0}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Age=3.0}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Age=3.0}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Age=3.0}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Age=3.0}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Age=3.0}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Age=3.0}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{InBasicLatin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{InBasicLatin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{InBasicLatin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{InBasicLatin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{InBasicLatin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{InBasicLatin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{InBasicLatin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{InBasicLatin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Grek}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Grek}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Grek}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Grek}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Grek}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Grek}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Grek}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Grek}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Latn}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Latn}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Latn}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Latn}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Latn}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Latn}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Latn}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Latn}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{Unknown}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Unknown}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{Unknown}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Unknown}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{Unknown}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{Unknown}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{Unknown}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{Unknown}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{L\t}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{L\t}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{L\t}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{L\t}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{L\t}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{L\t}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{L\t}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{L\t}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{L\n}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{L\n}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{L\n}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{L\n}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{L\n}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{L\n}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{L\n}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{L\n}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{__UPPER case-Letter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{__UPPER case-Letter}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{__UPPER case-Letter}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{__UPPER case-Letter}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{a s_c-i i}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{a s_c-i i}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{a s_c-i i}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{a s_c-i i}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{^Latin}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^Latin}",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{^Latin}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{^Latin}]",
+      "error": "",
+      "matches": ""
+    },
+    {
+      "pattern": "\\p{^^Latin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{^^Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "\\P{^^Latin}",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^^Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[\\p{^^Latin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\p{^^Latin}`",
+      "matches": ""
+    },
+    {
+      "pattern": "[^\\P{^^Latin}]",
+      "error": "invalid regex in guardrail rule \"unicode-name\": error parsing regexp: invalid character class range: `\\P{^^Latin}`",
+      "matches": ""
+    }
+  ],
+  "unicode_class_names": [
+    "adlam",
+    "ahom",
+    "any",
+    "arabic",
+    "armenian",
+    "ascii",
+    "assigned",
+    "avestan",
+    "balinese",
+    "bamum",
+    "batak",
+    "bengali",
+    "bhaiksuki",
+    "bopomofo",
+    "brahmi",
+    "braille",
+    "buginese",
+    "buhid",
+    "c",
+    "carian",
+    "casedletter",
+    "cc",
+    "cf",
+    "chakma",
+    "cham",
+    "cherokee",
+    "chorasmian",
+    "closepunctuation",
+    "cn",
+    "cntrl",
+    "co",
+    "combiningmark",
+    "common",
+    "connectorpunctuation",
+    "control",
+    "coptic",
+    "cs",
+    "cuneiform",
+    "currencysymbol",
+    "cypriot",
+    "cyrillic",
+    "dashpunctuation",
+    "decimalnumber",
+    "deseret",
+    "devanagari",
+    "digit",
+    "dogra",
+    "duployan",
+    "elbasan",
+    "elymaic",
+    "enclosingmark",
+    "ethiopic",
+    "finalpunctuation",
+    "format",
+    "georgian",
+    "glagolitic",
+    "gothic",
+    "grantha",
+    "greek",
+    "gujarati",
+    "gurmukhi",
+    "han",
+    "hangul",
+    "hanunoo",
+    "hatran",
+    "hebrew",
+    "hiragana",
+    "inherited",
+    "initialpunctuation",
+    "javanese",
+    "kaithi",
+    "kannada",
+    "katakana",
+    "kawi",
+    "kharoshthi",
+    "khmer",
+    "khojki",
+    "khudawadi",
+    "l",
+    "lao",
+    "latin",
+    "lc",
+    "lepcha",
+    "letter",
+    "letternumber",
+    "limbu",
+    "lineseparator",
+    "lisu",
+    "ll",
+    "lm",
+    "lo",
+    "lowercaseletter",
+    "lt",
+    "lu",
+    "lycian",
+    "lydian",
+    "m",
+    "mahajani",
+    "makasar",
+    "malayalam",
+    "mandaic",
+    "manichaean",
+    "marchen",
+    "mark",
+    "mathsymbol",
+    "mc",
+    "me",
+    "medefaidrin",
+    "miao",
+    "mn",
+    "modi",
+    "modifierletter",
+    "modifiersymbol",
+    "mongolian",
+    "mro",
+    "multani",
+    "myanmar",
+    "n",
+    "nabataean",
+    "nandinagari",
+    "nd",
+    "newa",
+    "nko",
+    "nl",
+    "no",
+    "nonspacingmark",
+    "number",
+    "nushu",
+    "ogham",
+    "openpunctuation",
+    "oriya",
+    "osage",
+    "osmanya",
+    "other",
+    "otherletter",
+    "othernumber",
+    "otherpunctuation",
+    "othersymbol",
+    "p",
+    "palmyrene",
+    "paragraphseparator",
+    "pc",
+    "pd",
+    "pe",
+    "pf",
+    "phoenician",
+    "pi",
+    "po",
+    "privateuse",
+    "ps",
+    "punct",
+    "punctuation",
+    "rejang",
+    "runic",
+    "s",
+    "samaritan",
+    "saurashtra",
+    "sc",
+    "separator",
+    "sharada",
+    "shavian",
+    "siddham",
+    "sinhala",
+    "sk",
+    "sm",
+    "so",
+    "sogdian",
+    "soyombo",
+    "spaceseparator",
+    "spacingmark",
+    "sundanese",
+    "surrogate",
+    "symbol",
+    "syriac",
+    "tagalog",
+    "tagbanwa",
+    "takri",
+    "tamil",
+    "tangsa",
+    "tangut",
+    "telugu",
+    "thaana",
+    "thai",
+    "tibetan",
+    "tifinagh",
+    "tirhuta",
+    "titlecaseletter",
+    "toto",
+    "ugaritic",
+    "unassigned",
+    "uppercaseletter",
+    "vai",
+    "vithkuqi",
+    "wancho",
+    "yezidi",
+    "yi",
+    "z",
+    "zl",
+    "zp",
+    "zs"
+  ],
   "regex_hyphens": [
     {
       "pattern": "^[-]$",

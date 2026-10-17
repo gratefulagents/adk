@@ -40,29 +40,32 @@ type toolPatternCase struct {
 }
 
 type builtinFixture struct {
-	RegexHyphens       []regexClassCase   `json:"regex_hyphens"`
-	RegexHyphenInputs  []string           `json:"regex_hyphen_inputs"`
-	RegexBrackets      []regexClassCase   `json:"regex_brackets"`
-	RegexBracketInputs []string           `json:"regex_bracket_inputs"`
-	RegexCaptures      []regexClassCase   `json:"regex_captures"`
-	RegexCaptureInputs []string           `json:"regex_capture_inputs"`
-	RegexOctal         []regexClassCase   `json:"regex_octal"`
-	RegexOctalInputs   []string           `json:"regex_octal_inputs"`
-	RegexSetLiterals   []regexClassCase   `json:"regex_set_literals"`
-	RegexPerlClasses   []regexClassCase   `json:"regex_perl_classes"`
-	RegexLiterals      []regexClassCase   `json:"regex_literals"`
-	RegexLiteralInputs []string           `json:"regex_literal_inputs"`
-	RegexRepeats       []regexClassCase   `json:"regex_repeats"`
-	RegexClasses       []regexClassCase   `json:"regex_classes"`
-	RegexInputs        []string           `json:"regex_inputs"`
-	CompiledRules      []compiledRuleCase `json:"compiled_rules"`
-	PublicRules        []publicRuleCase   `json:"public_rules"`
-	ToolPatterns       []toolPatternCase  `json:"tool_patterns"`
-	SchemaVersion      int                `json:"schema_version"`
-	SDKRevision        string             `json:"sdk_revision"`
-	InputGuardNames    []string           `json:"input_guard_names"`
-	OutputGuardNames   []string           `json:"output_guard_names"`
-	Cases              []builtinCase      `json:"cases"`
+	RegexUnicodeMembership []regexClassCase   `json:"regex_unicode_membership"`
+	RegexUnicodeNames      []regexClassCase   `json:"regex_unicode_names"`
+	UnicodeClassNames      []string           `json:"unicode_class_names"`
+	RegexHyphens           []regexClassCase   `json:"regex_hyphens"`
+	RegexHyphenInputs      []string           `json:"regex_hyphen_inputs"`
+	RegexBrackets          []regexClassCase   `json:"regex_brackets"`
+	RegexBracketInputs     []string           `json:"regex_bracket_inputs"`
+	RegexCaptures          []regexClassCase   `json:"regex_captures"`
+	RegexCaptureInputs     []string           `json:"regex_capture_inputs"`
+	RegexOctal             []regexClassCase   `json:"regex_octal"`
+	RegexOctalInputs       []string           `json:"regex_octal_inputs"`
+	RegexSetLiterals       []regexClassCase   `json:"regex_set_literals"`
+	RegexPerlClasses       []regexClassCase   `json:"regex_perl_classes"`
+	RegexLiterals          []regexClassCase   `json:"regex_literals"`
+	RegexLiteralInputs     []string           `json:"regex_literal_inputs"`
+	RegexRepeats           []regexClassCase   `json:"regex_repeats"`
+	RegexClasses           []regexClassCase   `json:"regex_classes"`
+	RegexInputs            []string           `json:"regex_inputs"`
+	CompiledRules          []compiledRuleCase `json:"compiled_rules"`
+	PublicRules            []publicRuleCase   `json:"public_rules"`
+	ToolPatterns           []toolPatternCase  `json:"tool_patterns"`
+	SchemaVersion          int                `json:"schema_version"`
+	SDKRevision            string             `json:"sdk_revision"`
+	InputGuardNames        []string           `json:"input_guard_names"`
+	OutputGuardNames       []string           `json:"output_guard_names"`
+	Cases                  []builtinCase      `json:"cases"`
 }
 
 // Version 1 uses ASCII-only recipes so native implementations can reproduce
@@ -180,7 +183,8 @@ func generateBuiltinGuardrails() ([]byte, error) {
 	captureCases, captureInputs := regexCaptureScenarios()
 	bracketCases, bracketInputs := regexBracketScenarios()
 	hyphenCases, hyphenInputs := regexHyphenScenarios()
-	fixture := builtinFixture{RegexHyphens: hyphenCases, RegexHyphenInputs: hyphenInputs, RegexBrackets: bracketCases, RegexBracketInputs: bracketInputs, RegexCaptures: captureCases, RegexCaptureInputs: captureInputs, RegexOctal: octalCases, RegexOctalInputs: octalInputs, RegexSetLiterals: regexSetLiteralScenarios(regexInputs), RegexPerlClasses: regexPerlClassScenarios(regexInputs), RegexLiterals: literalCases, RegexLiteralInputs: literalInputs, RegexRepeats: regexRepeatScenarios(), RegexClasses: regexCases, RegexInputs: regexInputs, SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios(), PublicRules: publicRuleScenarios(), CompiledRules: compiledRuleScenarios()}
+	unicodeCases, unicodeNames := regexUnicodeNameScenarios()
+	fixture := builtinFixture{RegexUnicodeMembership: regexUnicodeMembershipScenarios(regexInputs), RegexUnicodeNames: unicodeCases, UnicodeClassNames: unicodeNames, RegexHyphens: hyphenCases, RegexHyphenInputs: hyphenInputs, RegexBrackets: bracketCases, RegexBracketInputs: bracketInputs, RegexCaptures: captureCases, RegexCaptureInputs: captureInputs, RegexOctal: octalCases, RegexOctalInputs: octalInputs, RegexSetLiterals: regexSetLiteralScenarios(regexInputs), RegexPerlClasses: regexPerlClassScenarios(regexInputs), RegexLiterals: literalCases, RegexLiteralInputs: literalInputs, RegexRepeats: regexRepeatScenarios(), RegexClasses: regexCases, RegexInputs: regexInputs, SchemaVersion: 1, SDKRevision: sdkRevision, Cases: builtinScenarios(), PublicRules: publicRuleScenarios(), CompiledRules: compiledRuleScenarios()}
 	for _, name := range []string{"", "write", "read_file", "mcp_sql_db_write", "*write", "foo*bar", "猫-read", "file\nwrite"} {
 		for _, pattern := range []string{"", "*", "write", "wr*", "*ite", "*write", "*sql*_write", "*sql*", "wr*te", "**", "foo*", "foo**", "猫*", "*read", "\n*"} {
 			fixture.ToolPatterns = append(fixture.ToolPatterns, toolPatternCase{Name: name, Pattern: pattern, Matches: guardrails.MatchToolPattern(name, pattern)})

@@ -1,5 +1,28 @@
 # Independent pinned Go handoff oracles
 
+## Unicode property compiler observations
+
+The builtin-guardrail fixture includes 568 actual SDK Unicode-name compilation
+cases (412 accepted, 156 rejected), plus 84 property-negation patterns over the
+existing 142 inputs (11,928 membership decisions per native compiler). The name
+candidates come from the reference Go categories, scripts and category aliases,
+plus Any/Assigned/ASCII. The fixture records actual acceptance rather than
+assuming every Unicode table key is accepted after normalization. Only the 200
+accepted normalized names form `unicode_class_names`.
+
+`crates/adk/src/host/go_unicode_names.txt` is that accepted catalog, one name per
+line, and the native regression checks exact equality before comparing all
+compilation outcomes. Regenerate the builtin fixture with the command below,
+then copy its `unicode_class_names` array to that file in order. The ledger binds
+both inputs. The native comparator also checks outer/class/caret negation and
+surrogate-category behavior. These are grammar and bounded membership checks,
+not full Unicode range-version/case-fold parity.
+
+```sh
+(cd scripts/handoff-reference && go run -mod=readonly . builtin-guardrails) \
+  > fixtures/handoff/sdk-builtin-guardrails.json
+```
+
 `fixtures/handoff/sdk-handoff-filter.json` executes the actual exported
 `agentsdk.RemoveAllToolsHandoffInputFilter(input, newItems)`. No filtering logic
 is reimplemented by the generator; no Rust expected values or worker CLI are

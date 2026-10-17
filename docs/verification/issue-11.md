@@ -2,6 +2,34 @@
 
 ## Current continuation evidence
 
+### Unicode property grammar in guardrail rules
+
+Reproduced the Go-valid `\P{^adlam}` rejection before changing the shared
+host/public compiler. Property caret negation now toggles the outer sign, and
+names are normalized/validated against 200 names accepted by the actual pinned
+Go compiler. Rust-only binary properties, property assignments and script
+abbreviations no longer bypass Go validation. A second reproduced mismatch,
+`Cs`, is translated to an empty UTF-8 class (or its complement); Rust has no
+surrogate category table.
+
+The independently executed SDK corpus adds **568 compilation cases (412 accepted,
+156 rejected)** and **84 patterns /142 inputs**, or **11,928 membership decisions
+per compiler**. The checked-in name catalog is compared exactly to the Go output.
+Candidates come from categories/scripts/aliases but acceptance is not inferred
+from map membership: this toolchain rejects some normalized script keys. The
+scope is name grammar/negation and bounded membership, not Unicode range-table,
+case-fold version, or full RE2 equivalence. Ledger unchanged: **1,061 verified
+/7,830 unresolved /251 excluded**; full issue acceptance remains incomplete.
+
+Fresh Rust 1.88 Linux: **1,751 workspace +10 doctests passed; 0 failed, 30 ignored**.
+Strict workspace Clippy/typecheck/rustdoc, formatting, full facade matrix and
+standalone consumer/purity passed. Go test/vet/build, independently reproduced
+bound references, all 55 validators, refreshed artifact evidence and source locks
+passed. The ordinary example script failed in the Clippy launcher because this
+worker lacks `/proc/self/exe`; equivalent direct-driver strict Clippy, build and
+execution passed, including the host-session example and **all 20 offline feature
+scenarios**. No failed application check was suppressed.
+
 ### Legacy final-summary selection
 
 Added the missing legacy `Config::force_final_summary_turn` input, defaulting off,

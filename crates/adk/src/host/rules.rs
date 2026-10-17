@@ -212,15 +212,65 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 }
                 class_has_char = false;
             }
-            if matches!(escaped, 'x' | 'p' | 'P') && chars.peek() != Some(&'{') {
+            if matches!(escaped, 'p' | 'P') {
+                let mut name = String::new();
+                if chars.peek() == Some(&'{') {
+                    chars.next();
+                    let mut closed = false;
+                    for operand in chars.by_ref() {
+                        if operand == '}' {
+                            closed = true;
+                            break;
+                        }
+                        name.push(operand);
+                    }
+                    if !closed {
+                        return Err(Error::new(
+                            ErrorCategory::InvalidInput,
+                            "unclosed Unicode class",
+                        ));
+                    }
+                } else if let Some(operand) = chars.next() {
+                    name.push(operand);
+                }
+                let negated = (escaped == 'P') ^ name.starts_with('^');
+                let name: String = name
+                    .strip_prefix('^')
+                    .unwrap_or(&name)
+                    .chars()
+                    .filter(|c| !matches!(c, '_' | '-' | ' '))
+                    .map(|c| c.to_ascii_lowercase())
+                    .collect();
+                // Rust also accepts binary properties and property=value syntax
+                // that the pinned Go compiler rejects.
+                if !include_str!("go_unicode_names.txt")
+                    .lines()
+                    .any(|n| n == name)
+                {
+                    return Err(Error::new(
+                        ErrorCategory::InvalidInput,
+                        "invalid Go Unicode class",
+                    ));
+                }
+                // Surrogates cannot occur in UTF-8 input; Rust has no Cs table.
+                if matches!(name.as_str(), "cs" | "surrogate") {
+                    pattern.push_str(if negated { r"[\s\S]" } else { r"[^\s\S]" });
+                    continue;
+                }
+                pattern.push_str(if negated { r"\P{" } else { r"\p{" });
+                pattern.push_str(&name);
+                pattern.push('}');
+                continue;
+            }
+            if escaped == 'x' && chars.peek() != Some(&'{') {
                 pattern.push(c);
                 pattern.push(escaped);
-                for operand in chars.by_ref().take(if escaped == 'x' { 2 } else { 1 }) {
+                for operand in chars.by_ref().take(2) {
                     pattern.push(operand);
                 }
                 continue;
             }
-            if matches!(escaped, 'x' | 'p' | 'P') && chars.peek() == Some(&'{') {
+            if escaped == 'x' && chars.peek() == Some(&'{') {
                 pattern.push(c);
                 pattern.push(escaped);
                 for argument in chars.by_ref() {

@@ -522,6 +522,59 @@ fn guardrail_repeat_limits_match_actual_go_compilation() {
 
 #[cfg(feature = "host")]
 #[tokio::test]
+async fn unicode_property_names_match_actual_go_compilation() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_unicode_names"].as_array().unwrap();
+    assert_eq!(cases.len(), 568);
+    let names: Vec<_> = fixture["unicode_class_names"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .map(|name| name.as_str().unwrap())
+        .collect();
+    assert_eq!(names.len(), 200);
+    assert_eq!(
+        include_str!("../src/host/go_unicode_names.txt")
+            .lines()
+            .collect::<Vec<_>>(),
+        names
+    );
+    for case in cases {
+        let pattern = case["pattern"].as_str().unwrap();
+        let rule = adk::host::GuardrailRule {
+            name: "unicode-name".into(),
+            regex: pattern.into(),
+            rule_type: "tool-input".into(),
+            ..Default::default()
+        };
+        let accepted = case["error"] == "";
+        let host = adk::host::compile_guardrail_rules(std::slice::from_ref(&rule));
+        assert_eq!(host.is_ok(), accepted, "host: {pattern}");
+        let (public, errors) = tool_guardrails_from_rules(&[rule]);
+        assert_eq!(errors.is_empty(), accepted, "public: {pattern}");
+        assert_eq!(public.input.len(), usize::from(accepted));
+    }
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn unicode_property_negation_matches_actual_go_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_unicode_membership"].as_array().unwrap();
+    let inputs = fixture["regex_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 84);
+    assert_eq!(inputs.len(), 142);
+    assert_regex_membership(cases, inputs).await;
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
 async fn perl_class_atoms_match_actual_go_membership() {
     let fixture: Value = serde_json::from_str(include_str!(
         "../../../fixtures/handoff/sdk-builtin-guardrails.json"

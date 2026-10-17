@@ -54,7 +54,8 @@ literal `]` cases. Ampersands, tildes and pipes in classes remain Go literals,
 including repeated forms that Rust otherwise interprets as class-set operations.
 An inner opening bracket that does not begin a complete POSIX atom is a literal,
 as in Go, not Rust nested-class syntax. Unknown complete POSIX names are rejected.
-Double-hyphen syntax remains explicitly unsupported.
+Hyphens follow Go's literal/range-endpoint grammar rather than Rust set subtraction;
+descending ranges remain invalid.
 Counted repetitions enforce Go's 1,000-copy bound, including nested
 products; zero maximums shield inner products but do not permit independently
 invalid inner counts. Malformed count forms, including leading-zero numbers,
@@ -68,6 +69,16 @@ interpreted as repetition delimiters. Named captures validate Go's ASCII
 alphanumeric/underscore grammar, including digit-leading and duplicate names.
 Since rule guards expose membership only, validated named groups compile as
 noncapturing groups; no capture-extraction API is implied.
+
+Unicode property names are restricted to the independently observed pinned-Go
+catalog, including its category aliases and ASCII space/hyphen/underscore name
+normalization. Rust-only binary properties, property-value assignments and script
+abbreviations are rejected. A leading caret inside a property toggles the outer
+`p`/`P` sign. `Cs`/`Surrogate` denotes an empty set for valid UTF-8 inputs, including
+inside complemented classes. This is name/negation compatibility, not a claim
+that Rust and Go use identical Unicode range or case-fold tables. The checked-in
+catalog deliberately follows the reference toolchain's actual acceptance, not
+all names theoretically present in the Unicode standard.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

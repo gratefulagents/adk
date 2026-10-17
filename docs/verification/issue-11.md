@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Complete pure routing-file review
+
+Reviewed all 235 lines of `internal/agent/mode_routing.go`: five data types,
+ten constants, fourteen fields, five exported helpers and three private helpers.
+Its 34 API records and twelve branch-conditioned defaults were already verified;
+the complete file is now mapped to the data codecs, pure resolvers and native
+settings helpers. Exact role keys, fallback order/duplicates, empty-list behavior,
+normalization and explicit-none budget clearing are independently covered.
+
+The native label boundary is explicit strings, not Go `any`/`fmt.Sprint` or
+arbitrary formatting callbacks. Hosts render domain labels before invoking the
+helper; this preserves all label values without reproducing Go reflection.
+Provider construction/clamping, runtime enforcement and the containing agent
+package are not closed by this file review.
+
+Fresh independent reference reproduction, all claimed Rust regressions,
+55 validators, artifact/overlay/audit, source locks and formatting passed.
+No implementation changed after the **1,746 workspace +10 doctest** passing run.
+Ledger: **1,056 verified /7,835 unresolved /251 excluded**. Full issue acceptance
+remains incomplete.
+
 ### Settings merge and signed retry-advice data
 
 The lossless settings DTO now supports the original nonzero/non-nil merge value

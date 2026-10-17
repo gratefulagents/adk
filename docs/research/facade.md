@@ -322,6 +322,23 @@ and transcript boundaries, where accepting opaque labels would fabricate state.
 These fixtures close field representation claims, not every decoder behavior or
 provider response profile.
 
+## Mode routing and label inputs
+
+The [pinned routing file](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/internal/agent/mode_routing.go)
+(GPL-3.0-only) contains only routing data, constants and pure value helpers.
+Preserve exact role lookup, alias selection, fallback order/duplicates, normalized
+labels, budgets and explicit-none clearing. Owned result vectors avoid sharing
+mutable routing inputs. Model construction and provider clamping remain outside
+these helpers.
+
+Native settings helpers accept explicit string labels rather than Go's
+`any`/`fmt.Sprint` boundary. Hosts with domain values render their label before
+calling the helper; the SDK does not invoke arbitrary formatting callbacks or
+reproduce Go reflection. This retains the complete label-value domain while
+making the input contract explicit. Open compatibility labels borrow as strings,
+including unknown labels and the empty default. Arbitrary invalid-UTF8 in-memory
+Go strings and Go formatting/type identity are not native API contracts.
+
 ## Settings merge helper
 
 Expose value composition on the existing typed compatibility settings record,

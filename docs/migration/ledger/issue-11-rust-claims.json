@@ -19219,6 +19219,41 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-CA165EFB262C9B31": {
+      "source": "internal/agent/mode_routing.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel",
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity",
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/mode.rs::resolve_mode_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing",
+        "crates/adk-codec/src/mode.rs::resolve_fallbacks",
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::verbosity_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pinned_mode_and_role_routing_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance",
+        "routing_results_own_fallbacks_and_do_not_share_mutations"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Reviewed all235 source lines at SHA256006c8ba7edafa2ce916782e553ed6608205f04cc11dfe955da53808487012fde: five data types, ten constants, fourteen fields, five exported helpers and three private normalization/fallback helpers, with no host resources or initialization. All34 API declarations and12 branch-conditioned defaults already have individual verified mappings. Independent actual-Go evidence covers the data/constant byte contracts,294 routing inputs with1764 top/role results,72 settings combinations and both original regression counterparts. Trimming, simple lowercase, exact role keys, fallback order/duplicates, nil/empty override precedence and explicit-none budget clearing are covered. Native helper inputs are explicit label strings rather than Go any/fmt.Sprint; hosts render domain values before calling, as documented in docs/research/facade.md. This closes the complete pure data/routing file under the established owned UTF-8 Rust boundary, not Go reflection/formatting callbacks, invalid-UTF8 in-memory strings, provider construction/clamping, runtime constraints or the containing agent package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime"
+      ]
     }
   }
 }

@@ -16130,6 +16130,110 @@
         "x86_64-unknown-linux-gnu",
         "host"
       ]
+    },
+    "SDK-F93F80A73096FD0B": {
+      "source": "pkg/agentsdk/userinput_test.go",
+      "source_name": "TestBuildAutoTurnCapPrompt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::build_auto_turn_cap_prompt"
+      ],
+      "rust_test_identifiers": [
+        "original_auto_turn_cap_prompt"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildAutoTurnCapPrompt",
+      "rationale": "Ports literal original inputs and all assertions in the named native counterpart. Closes only this original regression, not the complete userinput API or generic raw-record codec.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-FF411E44E248C880": {
+      "source": "pkg/agentsdk/userinput_test.go",
+      "source_name": "TestDetectUserInputPause",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::detect_user_input_pause"
+      ],
+      "rust_test_identifiers": [
+        "original_user_input_pause_detects_question_plan_and_fallback"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestDetectUserInputPause",
+      "rationale": "Ports literal original inputs and all assertions in the named native counterpart. Closes only this original regression, not the complete userinput API or generic raw-record codec.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-4D34B57FF93F1970": {
+      "source": "pkg/agentsdk/userinput_test.go",
+      "source_name": "TestExtractAskUserChoices",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::extract_ask_user_choices"
+      ],
+      "rust_test_identifiers": [
+        "original_ask_user_choices_receive_ids_and_styles"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestExtractAskUserChoices",
+      "rationale": "Ports literal original inputs and all assertions in the named native counterpart. Closes only this original regression, not the complete userinput API or generic raw-record codec.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-95714A2D6155C6E2": {
+      "source": "pkg/agentsdk/userinput_test.go",
+      "source_name": "TestExtractPresentPlanData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::extract_present_plan_data"
+      ],
+      "rust_test_identifiers": [
+        "original_present_plan_data_drops_legacy_mode"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestExtractPresentPlanData",
+      "rationale": "Ports literal original inputs and all assertions in the named native counterpart. Closes only this original regression, not the complete userinput API or generic raw-record codec.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-F5E18BE6FA5C3BEE": {
+      "source": "pkg/agentsdk/userinput_test.go",
+      "source_name": "TestQuickActionHelpers",
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::marshal_quick_actions"
+      ],
+      "rust_test_identifiers": [
+        "original_quick_actions_omit_legacy_value_key"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestQuickActionHelpers",
+      "rationale": "Ports literal original inputs and all assertions in the named native counterpart. Closes only this original regression, not the complete userinput API or generic raw-record codec.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
+    },
+    "SDK-FB89F031BF4E6BA0": {
+      "source": "pkg/agentsdk/userinput_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/userinput.rs::marshal_quick_actions",
+        "crates/adk-codec/src/userinput.rs::extract_ask_user_choices",
+        "crates/adk-codec/src/userinput.rs::extract_present_plan_data",
+        "crates/adk-codec/src/userinput.rs::detect_user_input_pause",
+        "crates/adk-codec/src/userinput.rs::build_auto_turn_cap_prompt"
+      ],
+      "rust_test_identifiers": [
+        "original_quick_actions_omit_legacy_value_key",
+        "original_ask_user_choices_receive_ids_and_styles",
+        "original_present_plan_data_drops_legacy_mode",
+        "original_user_input_pause_detects_question_plan_and_fallback",
+        "original_auto_turn_cap_prompt"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestQuickActionHelpers",
+      "rationale": "Ports all five originals: action IDs and no legacy value, choice defaults and missing choices, plan action legacy-mode removal, question/plan/fallback pauses, and exact123-turn prompt. Closes the complete five-test source file only, not the entire userinput implementation or unrestricted raw record codec.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "codec"
+      ]
     }
   }
 }

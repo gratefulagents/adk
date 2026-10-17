@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Original user-input helper regressions
+
+Ported all five original user-input tests: quick-action identity/legacy-key
+omission, choice defaults, plan legacy-mode removal, question/plan/fallback
+pause detection, and exact turn-cap text. Every original assertion passes;
+original Go tests pass independently. Closed five originals and their complete
+test file, not unrestricted raw-record codecs or the whole implementation.
+
+Fresh Rust1.88 Linux: **1,682 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format, eight targeted userinput tests, original
+Go tests, bound evidence,51 validators, artifacts/overlay/audit and immutable
+source locks passed. Production behavior is unchanged. Ledger: **909 verified
+/7,982 unresolved /251 excluded**; full acceptance remains incomplete.
+
 ### Original conversation helper regressions
 
 Ported all five original conversation tests with their literal message IDs,

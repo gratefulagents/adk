@@ -137,3 +137,114 @@ fn first_matching_call_wins_and_missing_call_is_ignored() {
         UserInputPause::default()
     );
 }
+
+#[test]
+fn original_quick_actions_omit_legacy_value_key() {
+    let bytes = marshal_quick_actions(Some(&[
+        QuickAction {
+            id: "approve".into(),
+            label: "Approve".into(),
+            style: "primary".into(),
+        },
+        QuickAction {
+            id: "request_changes".into(),
+            label: "Request Changes".into(),
+            ..Default::default()
+        },
+    ]));
+    let actions: Vec<std::collections::BTreeMap<String, String>> =
+        serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(actions.len(), 2);
+    assert_eq!(actions[0]["id"], "approve");
+    assert_eq!(actions[1]["id"], "request_changes");
+    assert!(!actions[0].contains_key("value"));
+}
+
+#[test]
+fn original_ask_user_choices_receive_ids_and_styles() {
+    let bytes = extract_ask_user_choices(br#"{"choices":["Ship it","Revise"]}"#).unwrap();
+    assert!(!bytes.is_empty());
+    let actions: Vec<QuickAction> = serde_json::from_slice(&bytes).unwrap();
+    assert_eq!(actions.len(), 2);
+    assert_eq!(
+        actions[0],
+        QuickAction {
+            id: "choice_0".into(),
+            label: "Ship it".into(),
+            style: "primary".into()
+        }
+    );
+    assert_eq!(actions[1].style, "secondary");
+    assert!(extract_ask_user_choices(br#"{"question":"Continue?"}"#).is_none());
+}
+
+#[test]
+fn original_present_plan_data_drops_legacy_mode() {
+    let (summary, actions) = extract_present_plan_data(br#"{"summary":"Do the thing","actions":[{"id":"approve","label":"Approve","mode":"build"}],"recommended":"approve"}"#);
+    assert_eq!(summary, "Do the thing");
+    let actions = actions.unwrap();
+    let parsed: Vec<QuickAction> = serde_json::from_slice(&actions).unwrap();
+    assert_eq!(parsed.len(), 1);
+    assert_eq!(parsed[0].id, "approve");
+    let text = String::from_utf8(actions).unwrap();
+    assert!(!text.contains("\"mode\""));
+    assert!(!text.contains("\"build\""));
+}
+
+#[test]
+fn original_user_input_pause_detects_question_plan_and_fallback() {
+    for (name, input, final_text, plan, question) in [
+        (
+            "AskUserQuestion",
+            r#"{"question":"Continue?","choices":["Yes","No"]}"#,
+            "",
+            false,
+            "Continue?",
+        ),
+        (
+            "present_plan",
+            r#"{"summary":"Review this plan","actions":[{"id":"approve","label":"Approve"}]}"#,
+            "",
+            true,
+            "Review this plan",
+        ),
+        (
+            "AskUserQuestion",
+            "{}",
+            "fallback text",
+            false,
+            "fallback text",
+        ),
+    ] {
+        let pause = detect_user_input_pause(
+            &[RunItem {
+                kind: RunItemType(1),
+                tool_call: Some(ToolCallData {
+                    name: name.into(),
+                    input: RawJson::Encoded(serde_json::from_str(input).unwrap()),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }],
+            final_text,
+        );
+        assert!(pause.requested);
+        assert_eq!(pause.plan_review, plan);
+        assert_eq!(pause.question, question);
+        if question == "Continue?" {
+            assert!(
+                String::from_utf8(pause.actions.unwrap())
+                    .unwrap()
+                    .contains("\"label\":\"Yes\"")
+            );
+        }
+    }
+}
+
+#[test]
+fn original_auto_turn_cap_prompt() {
+    assert_eq!(
+        build_auto_turn_cap_prompt(123),
+        "Auto mode global turn cap (123) reached."
+    );
+}

@@ -164,6 +164,9 @@ fn matches_tool(name: &str, pattern: &str) -> bool {
 pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
     static RUST_ONLY_FLAGS: LazyLock<Regex> =
         LazyLock::new(|| Regex::new(r"^\(\?[a-zA-Z-]*[xuR]").expect("static regex"));
+    static GO_REPEAT: LazyLock<Regex> = LazyLock::new(|| {
+        Regex::new(r"^(?:0|[1-9][0-9]*)(?:,(?:0|[1-9][0-9]*)?)?\}").expect("static regex")
+    });
     let mut pattern = String::new();
     let mut chars = rule.regex.chars().peekable();
     let mut in_class = false;
@@ -217,6 +220,18 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 pattern.push(escaped);
             }
         } else {
+            if c == '{'
+                && !in_class
+                && !GO_REPEAT.is_match(
+                    &chars
+                        .clone()
+                        .take_while(|c| c.is_ascii_digit() || matches!(c, ',' | '}'))
+                        .collect::<String>(),
+                )
+            {
+                // Go parses malformed counts (including leading zeros) as literals.
+                pattern.push('\\');
+            }
             if c == '('
                 && !in_class
                 && RUST_ONLY_FLAGS.is_match(&format!(

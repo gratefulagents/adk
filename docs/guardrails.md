@@ -53,7 +53,9 @@ regex-parser prose is not a Go byte-parity claim. The shared subset accepts the
 literal `]` cases. This does not enable arbitrary nested classes or Rust class-set
 operations. Counted repetitions enforce Go's 1,000-copy bound, including nested
 products; zero maximums shield inner products but do not permit independently
-invalid inner counts. In-class Perl escapes remain outside the supported subset.
+invalid inner counts. Malformed count forms, including leading-zero numbers,
+remain literal text as in Go rather than acquiring Rust repetition semantics.
+In-class Perl escapes remain outside the supported subset.
 
 Builtin destructive-command checks inspect `ToolCall::argument_text()`, so an
 original malformed input cannot be hidden by a null parsed projection. Shell

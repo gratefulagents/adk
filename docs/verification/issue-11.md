@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Literal malformed repetition syntax
+
+The actual Go oracle reproduced a semantic mismatch: `^a{01}$` matched `a` in
+native compilation instead of literal `a{01}`. The shared translator now escapes
+an unquoted opening brace unless it begins Go's counted-repetition grammar,
+including the no-leading-zero rule. Twenty-three patterns across23 inputs check
+529 actual-Go membership decisions in each native compiler, with valid counts
+and escaped/quoted strings as controls.
+
+Fresh Rust1.88 Linux full rerun: **1,719 workspace tests /0 failed /30 ignored;
+10 doctests passed**. Strict lint/typecheck, formatting, feature matrix and
+standalone consumer/purity, Go tests/vet/build, bound evidence,53 validators and
+source locks passed. The first full run hit an unchanged 1ms timeout regression:
+`nested_tool_policy_timeout_resumes_without_cancelling_children` observed one
+instead of two tasks (`specialist, slots=1`). Ten isolated reruns and the complete
+workspace rerun passed without runtime/test edits; the initial failure is not
+silently discarded. Ledger unchanged: **947/7,944/251 verified/unresolved/excluded**.
+
 ### Counted regex repetition boundary
 
 A fresh regression reproduced native acceptance of `a{1001}`, rejected by the

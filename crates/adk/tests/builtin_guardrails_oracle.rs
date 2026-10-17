@@ -427,6 +427,25 @@ async fn posix_guardrail_classes_match_actual_go_membership() {
     let inputs = fixture["regex_inputs"].as_array().unwrap();
     assert_eq!(cases.len(), 62);
     assert_eq!(inputs.len(), 142);
+    assert_regex_membership(cases, inputs).await;
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn literal_count_syntax_matches_actual_go_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_literals"].as_array().unwrap();
+    let inputs = fixture["regex_literal_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 23);
+    assert_eq!(inputs.len(), 23);
+    assert_regex_membership(cases, inputs).await;
+}
+
+#[cfg(feature = "host")]
+async fn assert_regex_membership(cases: &[Value], inputs: &[Value]) {
     let context = Context {
         run_id: "class-oracle".into(),
         cancellation: Arc::new(CancellationToken::new()),

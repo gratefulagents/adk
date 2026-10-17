@@ -42,6 +42,12 @@ func regexRepeatScenarios() []regexClassCase {
 	return cases
 }
 
+func regexLiteralScenarios() ([]regexClassCase, []string) {
+	inputs := []string{"", "a", "aa", "aaa", "a{", "a{1", "a{01}", "a{1,02}", "a{00,2}", "a{1,}", "a{}", "a{,2}", "a{1, 2}", "a{1,2", "a{١}", "a{-1}", "{01}", "{01}{01}", "a{{", "a{01}}", "a{999999999999x}", "a{1,,2}", "a}b"}
+	patterns := []string{`^a{01}$`, `^a{1,02}$`, `^a{00,2}$`, `^a{}$`, `^a{,2}$`, `^a{1, 2}$`, `^a{1,2$`, `^a{1$`, `^a{$`, `^a{١}$`, `^a{-1}$`, `^{01}+$`, `^a{{2}$`, `^a{01}+$`, `^a{999999999999x}$`, `^a{1,,2}$`, `^a}b$`, `^a{0}$`, `^a{1}$`, `^a{1,2}$`, `^a{1,}$`, `^a\{01\}$`, `^\Qa{01}\E$`}
+	return regexMembership(patterns, inputs), inputs
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {
@@ -57,6 +63,10 @@ func regexClassScenarios() ([]regexClassCase, []string) {
 		}
 	}
 	patterns = append(patterns, `^[[:alpha:][:digit:]_]+$`, `^[^][:digit:]]$`, `^[][:alpha:]]$`, `^[:alpha:]$`, `^[[:space:]x]$`, `^[[:alpha:]-_]$`)
+	return regexMembership(patterns, inputs), inputs
+}
+
+func regexMembership(patterns, inputs []string) []regexClassCase {
 	cases := []regexClassCase{}
 	tool := &sdk.FunctionTool{ToolName: "reader"}
 	for _, pattern := range patterns {
@@ -79,5 +89,5 @@ func regexClassScenarios() ([]regexClassCase, []string) {
 		}
 		cases = append(cases, observed)
 	}
-	return cases, inputs
+	return cases
 }

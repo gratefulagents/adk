@@ -493,3 +493,10 @@ The repeat oracle records40 actual SDK compilation decisions at and beyond Go's
 concatenations, noncapturing/flag groups, lazy repetitions, zero maxima, and
 quoted/escaped/class literals. Both native compilers compare acceptance, not Go
 parser error wording. This does not broaden the claim to complete RE2 syntax.
+
+Another23 patterns ×23 inputs exercise Go's literal malformed-count grammar:
+leading zeros, missing bounds/delimiters, signs, spaces, Unicode digits and
+oversized numbers followed by non-count text. Valid count forms and escaped or
+quoted literals are controls. All529 actual Go match decisions are compared by
+both native compilers, so accepting a pattern with different semantics is a
+failure even when both implementations compile it.

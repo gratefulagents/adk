@@ -15835,6 +15835,57 @@
         "host",
         "x86_64-unknown-linux-gnu"
       ]
+    },
+    "SDK-BF679A2CDAF45C55": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "BuildDelegationGuide",
+      "implementation_symbols": [
+        "crates/adk/src/specialists/delegation.rs::build_delegation_guide"
+      ],
+      "rust_test_identifiers": [
+        "delegation::delegation_guides_match_pinned_go_exactly",
+        "delegation::original_compact_task_packet_guidance_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildDelegationGuideIncludesCompactTaskPacketGuidance",
+      "rationale": "Caller-owned UTF8 native guide formatting preserves sorted specialist keys, blank-key filtering, raw descriptions/defaults, handoff order/custom labels/default target descriptions, exact task-packet guidance and signal suffix. Six independently executed pinned-Go cases compare full output bytes, and all original guidance assertions are ported. Rust references/Arc replace nullable agent pointers; no model/tool is invoked. This does not claim automatic Builder insertion or the whole specialists API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-EF0D835EAC6F7BD0": {
+      "source": "pkg/agentsdk/specialists.go",
+      "source_name": "BuildDelegationGuide",
+      "implementation_symbols": [
+        "crates/adk/src/specialists/delegation.rs::build_delegation_guide"
+      ],
+      "rust_test_identifiers": [
+        "delegation::delegation_guides_match_pinned_go_exactly",
+        "delegation::original_compact_task_packet_guidance_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildDelegationGuideIncludesCompactTaskPacketGuidance",
+      "rationale": "Caller-owned UTF8 native guide formatting preserves sorted specialist keys, blank-key filtering, raw descriptions/defaults, handoff order/custom labels/default target descriptions, exact task-packet guidance and signal suffix. Six independently executed pinned-Go cases compare full output bytes, and all original guidance assertions are ported. Rust references/Arc replace nullable agent pointers; no model/tool is invoked. This does not claim automatic Builder insertion or the whole specialists API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-FEBD99C514990D0B": {
+      "source": "pkg/agentsdk/specialists_test.go",
+      "source_name": "TestBuildDelegationGuideIncludesCompactTaskPacketGuidance",
+      "implementation_symbols": [
+        "crates/adk/src/specialists/delegation.rs::build_delegation_guide"
+      ],
+      "rust_test_identifiers": [
+        "delegation::delegation_guides_match_pinned_go_exactly",
+        "delegation::original_compact_task_packet_guidance_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestBuildDelegationGuideIncludesCompactTaskPacketGuidance",
+      "rationale": "Caller-owned UTF8 native guide formatting preserves sorted specialist keys, blank-key filtering, raw descriptions/defaults, handoff order/custom labels/default target descriptions, exact task-packet guidance and signal suffix. Six independently executed pinned-Go cases compare full output bytes, and all original guidance assertions are ported. Rust references/Arc replace nullable agent pointers; no model/tool is invoked. This does not claim automatic Builder insertion or the whole specialists API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

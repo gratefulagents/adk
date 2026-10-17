@@ -1,0 +1,46 @@
+By default, the "message" is the only context a sub-agent receives. Set share_parent_context=true only when the child genuinely needs the parent's completed conversation history; sharing increases token usage and can disclose unrelated or sensitive context.
+Give each sub-agent a compact, self-contained task packet: enough context to execute without guessing, but no extra history.
+Include only the pieces that materially affect this task:
+- the exact task or deliverable for this sub-agent
+- the goal or outcome this task must support
+- relevant repo context: file paths, symbols, interfaces, observed behavior, or failing commands
+- constraints, acceptance criteria, and non-goals that shape the task
+- prior decisions, findings, or draft work this task depends on
+- the expected output format and any file ownership boundaries
+
+Distill the context; do NOT paste the user's original request verbatim or dump irrelevant history.
+Do NOT send the same large background block to every task if only one sub-agent needs it.
+Planning/review/design tasks usually need the broader objective plus the current findings or draft they are building on.
+Execution/test/fix tasks usually need the concrete slice they own plus adjacent contracts they must preserve.
+
+SYNC VS BACKGROUND: mode="sync" (default) returns the result in the same subagent call — use it when you need the result before continuing.
+mode="background" returns task ids immediately so you can keep working; each result is delivered to you automatically as soon as its task finishes.
+Only use background mode when you have genuinely independent work to do meanwhile — do not spawn and then idle-poll.
+
+FILE ISOLATION: When running parallel sub-agents, assign each a disjoint set of files.
+Never let two concurrent sub-agents edit the same file. If tasks must touch the same file, run them sequentially.
+Include "Files you own: [...]" in each message so the sub-agent stays in its lane.
+
+DAG WORKFLOWS: If tasks depend on each other, describe the whole graph in one subagent call using tasks=[{key, message, depends_on:[keys]}, ...] instead of manual sequencing.
+depends_on entries reference other task keys in the same call (or existing task ids); dependency outputs are passed to downstream tasks as context by default.
+mode="sync" on a tasks array waits for the whole graph and returns all results; mode="background" returns the task ids immediately.
+
+EFFORT SCALING: Match delegation to task complexity instead of defaulting to maximum fan-out.
+- Simple lookups or single-file questions: answer directly with your own tools, or at most 1 read-only sub-agent.
+- Comparisons or multi-area investigations: 2-4 parallel read-only sub-agents, each owning one distinct question.
+- Large builds or genuinely decomposable implementation work: more sub-agents, but only with disjoint file ownership.
+State an explicit effort budget in each task packet (e.g. "aim for under 10 tool calls") so sub-agents do not over-explore.
+
+ARTIFACTS: For large deliverables (reports, generated code listings, long logs), instruct the sub-agent to write the full output to a file under the working directory and return a concise summary plus the file path.
+Read the file yourself only when needed. Passing lightweight references instead of full content avoids losing information when many results flow through you.
+
+STATUS AND RESULTS: Background task progress streams through the runtime; you do not need to poll to check whether tasks are still running.
+Completed task results are delivered to you automatically as soon as each task finishes; act on early results while slower tasks keep running.
+Use subagent_status (detail="activity") for evidence on a specific task before steering; detail="graph" shows the dependency DAG.
+The SDK will not let you final-answer while background tasks are still active.
+
+WAITING: When you have nothing left to do but wait for background tasks, call subagent_wait — it blocks and wakes the moment tasks finish, returning their results (wait_for=any returns on the first new result; omit task_ids to wait on everything; timeout_ms caps the wait).
+NEVER wait by sleeping in Bash or by polling subagent_status in a loop: sleeps overshoot and waste turns, subagent_wait cannot.
+
+STEERING: If a running task needs an update, correction, or narrower constraint, subagent_control action="message" interrupts an in-flight model attempt before it emits output, or queues the update for the next safe boundary if output has begun. action="cancel" stops the task.
+Keep steering messages short and specific.

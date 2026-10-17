@@ -233,3 +233,18 @@ available subtotal is retained with unknown certainty. Native context-size
 metadata is not included in residual pricing inputs.
 
 See `fixtures/costs/README.md` for the independently generated pinned-Go cases.
+
+## Caller-owned delegation guide
+
+With `runtime`, `adk::specialists::build_delegation_guide(&agent, &specialists)`
+formats the SDK task-packet instructions and the supplied specialist/handoff
+catalog. Specialists use a `BTreeMap<String, Arc<AgentConfig>>`; map keys are
+listed in sorted order, blank keys are omitted, and handoffs retain agent order.
+It performs no model/tool execution and does not mutate or automatically inject
+instructions. Automatic builder integration is not claimed by this helper.
+
+The exact reusable text in `crates/adk/src/specialists/delegation.txt` is derived
+from GPL-3.0-only SDK `pkg/agentsdk/specialists.go` at the pinned source revision.
+Six independently executed Go cases compare complete guide output, including
+empty catalogs, Unicode/whitespace labels, description defaults, handoff-only
+and combined catalogs. Native strings are UTF-8 and agent handles are nonnull.

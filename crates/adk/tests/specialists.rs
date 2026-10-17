@@ -1,3 +1,7 @@
+#[cfg(feature = "runtime")]
+#[path = "specialists/delegation.rs"]
+mod delegation;
+
 use adk::{core::*, specialists::*};
 use std::{
     collections::BTreeMap,

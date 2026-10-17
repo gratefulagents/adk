@@ -34,14 +34,15 @@ def main():
                       'license': 'GPL-3.0-only',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
                       'sourceSHA256': {p: hashlib.sha256((source / p).read_bytes()).hexdigest() for p in paths},
-                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/specialist-tools-reference/run.py', 'scripts/specialist-tools-reference/reference_test.go']}}
+                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/specialist-tools-reference/run.py', 'scripts/specialist-tools-reference/reference_test.go', 'scripts/specialist-tools-reference/delegation_test.go']}}
         shutil.copyfile(ROOT / 'scripts/specialist-tools-reference/reference_test.go', source / 'pkg/agentsdk/native_specialist_tools_test.go')
+        shutil.copyfile(ROOT / 'scripts/specialist-tools-reference/delegation_test.go', source / 'pkg/agentsdk/native_delegation_test.go')
         output = source / 'observations.json'
         env['METADATA_OUTPUT'] = str(output)
         execution = subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeSpecialistToolsReference)$', './pkg/agentsdk'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(execution.stdout.decode('utf-8', errors='backslashreplace'), end='')
         execution.check_returncode()
-        regression = subprocess.run([go, 'test', '-count=1', '-v', './pkg/agentsdk', '-run', '^TestFilterToolsByAccessUsesAdapterForReadOnly$'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
+        regression = subprocess.run([go, 'test', '-count=1', '-v', './pkg/agentsdk', '-run', '^(TestFilterToolsByAccessUsesAdapterForReadOnly|TestBuildDelegationGuideIncludesCompactTaskPacketGuidance)$'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)
         print(regression.stdout.decode('utf-8', errors='backslashreplace'), end='')
         regression.check_returncode()
         result = dict(provenance=provenance, **json.loads(output.read_text()))

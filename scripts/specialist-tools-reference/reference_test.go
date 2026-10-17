@@ -92,7 +92,7 @@ func TestNativeSpecialistToolsReference(t *testing.T) {
 	if !DefaultSignalToolNames()["finish"] {
 		t.Fatal("defaults are shared")
 	}
-	result := map[string]any{"specs": specs, "inputIDs": ids, "accessCases": cases, "stripCases": strips, "defaultNames": DefaultSignalToolNames(), "defaultStrip": project(StripSignalTools(input))}
+	result := map[string]any{"guideCases": nativeDelegationGuides(), "specs": specs, "inputIDs": ids, "accessCases": cases, "stripCases": strips, "defaultNames": DefaultSignalToolNames(), "defaultStrip": project(StripSignalTools(input))}
 	data, err := json.Marshal(result)
 	if err != nil {
 		t.Fatal(err)

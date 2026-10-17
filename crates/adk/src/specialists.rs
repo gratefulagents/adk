@@ -5,6 +5,11 @@
 //! still apply their execution authorization policy. Empty results are empty
 //! `Vec`s: Go's nil versus non-nil empty slice identity is not represented.
 
+#[cfg(feature = "runtime")]
+mod delegation;
+#[cfg(feature = "runtime")]
+pub use delegation::build_delegation_guide;
+
 use adk_core::{AccessMode, Tool};
 use std::{collections::BTreeMap, sync::Arc};
 

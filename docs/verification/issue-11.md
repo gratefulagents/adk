@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Caller-owned delegation-guide formatter
+
+Added runtime-gated `specialists::build_delegation_guide`, preserving sorted
+specialist keys, blank-key omission, raw descriptions/defaults, handoff order
+and labels, exact task-packet guidance and the signal suffix. Six independently
+executed Go cases compare entire output strings; the literal original compact
+task-packet assertions pass. Model execution is forbidden by the test double.
+The helper does not mutate agents or automatically inject builder instructions.
+Its API/configuration records and original test are closed, not the whole
+specialist builder or automatic guide integration.
+
+Fresh Rust1.88 Linux: **1,665 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full matrix/consumer/purity,20 scenarios,
+host-session, default/runtime/all-feature specialist tests, exact Go fixture
+regeneration, bound evidence,51 validators, artifacts/overlay/audit and locks
+passed. Ledger: **889 verified /8,002 unresolved /251 excluded**. Full issue11
+acceptance remains incomplete.
+
 ### Original permission-access and OTel truncation regressions
 
 Added the original typo/empty-default permission-access cases through actual

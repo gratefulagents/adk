@@ -56,6 +56,7 @@ impl Scope {
         account: Option<String>,
         mode: AuthMode,
     ) -> Result<Self, Error> {
+        let endpoint = endpoint.trim();
         let mut url =
             Url::parse(endpoint).map_err(|_| crate::invalid("invalid provider endpoint"))?;
         if !url.username().is_empty()

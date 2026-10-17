@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Unicode endpoint padding preserves scope identity
+
+Provider scopes trim surrounding Unicode whitespace before URL parsing, matching
+Go `strings.TrimSpace`. The pinned metadata oracle now contains180 endpoint
+cases, including all25 whitespace characters for API-key/OAuth routes. A native
+regression checks credential and prompt-cache identity across all five auth modes
+and four endpoints, including an explicit default port. The pre-fix comparator
+failed with `invalid provider endpoint`; the corrected comparator passes. Path
+unescaping, dot segments and exact transport URL bytes remain unclaimed.
+
+Fresh Rust1.88: **1,620 passed /0 failed /30 ignored**, **9 doctests**; strict
+whole-workspace Clippy/rustdoc/format, facade matrix, standalone consumer/purity,
+all20 offline scenarios and host-session passed. Independent Go reproduction,
+source-bound evidence,51 validators, artifact review, audit and immutable source
+locks passed. Ledger remains **857 verified /8,034 unresolved /251 excluded**;
+this bounded fix does not establish whole-SDK acceptance or live-provider parity.
+
 ### Reviewed callback type and complete regression files
 
 Five additional exact obligations are verified: the modelactivity Sink callable

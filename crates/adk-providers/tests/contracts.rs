@@ -64,6 +64,37 @@ fn request() -> ModelRequest {
 }
 
 #[test]
+fn endpoint_whitespace_does_not_change_credential_or_cache_scope() {
+    let whitespace = "\t\n\u{b}\u{c}\r \u{85}\u{a0}\u{1680}\u{2000}\u{2001}\u{2002}\u{2003}\u{2004}\u{2005}\u{2006}\u{2007}\u{2008}\u{2009}\u{200a}\u{2028}\u{2029}\u{202f}\u{205f}\u{3000}";
+    assert_eq!(whitespace.chars().count(), 25);
+    for mode in [
+        AuthMode::ApiKey,
+        AuthMode::OpenAiOAuth,
+        AuthMode::AnthropicOAuth,
+        AuthMode::CopilotOAuth,
+        AuthMode::Anonymous,
+    ] {
+        for endpoint in [
+            "https://example.test/custom",
+            "https://chatgpt.com/backend-api/responses",
+            "https://chatgpt.com:443/custom/chat/completions",
+            "https://api.githubcopilot.com/custom",
+        ] {
+            let expected = Scope::new("route", endpoint, None, mode).unwrap();
+            for space in whitespace.chars() {
+                let input = format!("{space}{endpoint}{space}");
+                let actual = Scope::new("route", &input, None, mode).unwrap();
+                assert_eq!(actual, expected);
+                assert_eq!(
+                    cache_scope(&actual, &material(), "prompt"),
+                    cache_scope(&expected, &material(), "prompt")
+                );
+            }
+        }
+    }
+}
+
+#[test]
 fn explicit_default_ports_remain_distinct_idempotent_credential_scopes() {
     for (input, expected) in [
         ("HTTPS://CHATGPT.COM:443/", "https://chatgpt.com:443"),

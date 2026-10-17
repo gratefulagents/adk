@@ -2081,6 +2081,406 @@
     {
       "endpoint": "https://example.test/v1/models",
       "raw": "https://example.test/v1"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\thttps://example.test/custom\t"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\thttps://chatgpt.com/backend-api/responses\t"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\thttps://chatgpt.com:443/custom/chat/completions\t"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\thttps://api.githubcopilot.com/custom\t"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\nhttps://example.test/custom\n"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\nhttps://chatgpt.com/backend-api/responses\n"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\nhttps://chatgpt.com:443/custom/chat/completions\n"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\nhttps://api.githubcopilot.com/custom\n"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u000bhttps://example.test/custom\u000b"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u000bhttps://chatgpt.com/backend-api/responses\u000b"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u000bhttps://chatgpt.com:443/custom/chat/completions\u000b"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u000bhttps://api.githubcopilot.com/custom\u000b"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\fhttps://example.test/custom\f"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\fhttps://chatgpt.com/backend-api/responses\f"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\fhttps://chatgpt.com:443/custom/chat/completions\f"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\fhttps://api.githubcopilot.com/custom\f"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\rhttps://example.test/custom\r"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\rhttps://chatgpt.com/backend-api/responses\r"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\rhttps://chatgpt.com:443/custom/chat/completions\r"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\rhttps://api.githubcopilot.com/custom\r"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": " https://example.test/custom "
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": " https://chatgpt.com/backend-api/responses "
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": " https://chatgpt.com:443/custom/chat/completions "
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": " https://api.githubcopilot.com/custom "
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u0085https://example.test/custom\u0085"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u0085https://chatgpt.com/backend-api/responses\u0085"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u0085https://chatgpt.com:443/custom/chat/completions\u0085"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u0085https://api.githubcopilot.com/custom\u0085"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u00a0https://example.test/custom\u00a0"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u00a0https://chatgpt.com/backend-api/responses\u00a0"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u00a0https://chatgpt.com:443/custom/chat/completions\u00a0"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u00a0https://api.githubcopilot.com/custom\u00a0"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u1680https://example.test/custom\u1680"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u1680https://chatgpt.com/backend-api/responses\u1680"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u1680https://chatgpt.com:443/custom/chat/completions\u1680"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u1680https://api.githubcopilot.com/custom\u1680"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2000https://example.test/custom\u2000"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2000https://chatgpt.com/backend-api/responses\u2000"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2000https://chatgpt.com:443/custom/chat/completions\u2000"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2000https://api.githubcopilot.com/custom\u2000"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2001https://example.test/custom\u2001"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2001https://chatgpt.com/backend-api/responses\u2001"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2001https://chatgpt.com:443/custom/chat/completions\u2001"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2001https://api.githubcopilot.com/custom\u2001"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2002https://example.test/custom\u2002"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2002https://chatgpt.com/backend-api/responses\u2002"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2002https://chatgpt.com:443/custom/chat/completions\u2002"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2002https://api.githubcopilot.com/custom\u2002"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2003https://example.test/custom\u2003"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2003https://chatgpt.com/backend-api/responses\u2003"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2003https://chatgpt.com:443/custom/chat/completions\u2003"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2003https://api.githubcopilot.com/custom\u2003"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2004https://example.test/custom\u2004"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2004https://chatgpt.com/backend-api/responses\u2004"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2004https://chatgpt.com:443/custom/chat/completions\u2004"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2004https://api.githubcopilot.com/custom\u2004"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2005https://example.test/custom\u2005"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2005https://chatgpt.com/backend-api/responses\u2005"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2005https://chatgpt.com:443/custom/chat/completions\u2005"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2005https://api.githubcopilot.com/custom\u2005"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2006https://example.test/custom\u2006"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2006https://chatgpt.com/backend-api/responses\u2006"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2006https://chatgpt.com:443/custom/chat/completions\u2006"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2006https://api.githubcopilot.com/custom\u2006"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2007https://example.test/custom\u2007"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2007https://chatgpt.com/backend-api/responses\u2007"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2007https://chatgpt.com:443/custom/chat/completions\u2007"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2007https://api.githubcopilot.com/custom\u2007"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2008https://example.test/custom\u2008"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2008https://chatgpt.com/backend-api/responses\u2008"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2008https://chatgpt.com:443/custom/chat/completions\u2008"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2008https://api.githubcopilot.com/custom\u2008"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2009https://example.test/custom\u2009"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2009https://chatgpt.com/backend-api/responses\u2009"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2009https://chatgpt.com:443/custom/chat/completions\u2009"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2009https://api.githubcopilot.com/custom\u2009"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u200ahttps://example.test/custom\u200a"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u200ahttps://chatgpt.com/backend-api/responses\u200a"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u200ahttps://chatgpt.com:443/custom/chat/completions\u200a"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u200ahttps://api.githubcopilot.com/custom\u200a"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2028https://example.test/custom\u2028"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2028https://chatgpt.com/backend-api/responses\u2028"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2028https://chatgpt.com:443/custom/chat/completions\u2028"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2028https://api.githubcopilot.com/custom\u2028"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u2029https://example.test/custom\u2029"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u2029https://chatgpt.com/backend-api/responses\u2029"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u2029https://chatgpt.com:443/custom/chat/completions\u2029"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u2029https://api.githubcopilot.com/custom\u2029"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u202fhttps://example.test/custom\u202f"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u202fhttps://chatgpt.com/backend-api/responses\u202f"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u202fhttps://chatgpt.com:443/custom/chat/completions\u202f"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u202fhttps://api.githubcopilot.com/custom\u202f"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u205fhttps://example.test/custom\u205f"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u205fhttps://chatgpt.com/backend-api/responses\u205f"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u205fhttps://chatgpt.com:443/custom/chat/completions\u205f"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u205fhttps://api.githubcopilot.com/custom\u205f"
+    },
+    {
+      "endpoint": "https://example.test/custom/v1/models",
+      "raw": "\u3000https://example.test/custom\u3000"
+    },
+    {
+      "endpoint": "https://chatgpt.com/backend-api/models",
+      "raw": "\u3000https://chatgpt.com/backend-api/responses\u3000"
+    },
+    {
+      "endpoint": "https://chatgpt.com:443/custom/v1/models",
+      "raw": "\u3000https://chatgpt.com:443/custom/chat/completions\u3000"
+    },
+    {
+      "endpoint": "https://api.githubcopilot.com/custom/models",
+      "raw": "\u3000https://api.githubcopilot.com/custom\u3000"
     }
   ],
   "lifecycle_cases": [
@@ -8688,7 +9088,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/metadata-compaction-reference/endpoints_test.go": "6af5b8d08210306e7fdd9888b2a0c79326548119557c40526db70ac4ce055690",
+      "scripts/metadata-compaction-reference/endpoints_test.go": "95f375b76a6d20b929542813498daae5c1e43ebe52db74d88c0d51f3369c4595",
       "scripts/metadata-compaction-reference/reference_test.go": "3b8a17edc3a282a4219951271446403c49a05a5cfe093b3d0f1df195e3cb2984",
       "scripts/metadata-compaction-reference/run.py": "c9f57daed23de9b434d3d01549e3708261b5967859835a08274157e2d0dafdaa"
     },

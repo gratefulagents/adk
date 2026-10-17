@@ -106,6 +106,10 @@ for one rotating refresh token are **not** a distributed refresh lock. Storage
 implementations must enforce their own cross-process single-flight semantics.
 Store and refresh trait errors must be sanitized by the host.
 
+Endpoint construction trims surrounding Unicode whitespace before URL parsing,
+matching Go `strings.TrimSpace`; padding does not create a different credential
+or prompt-cache scope. This does not change path unescaping or dot-segment rules.
+
 Canonical scopes retain explicit default and empty ports (`:443`, `:00443`, `:`)
 rather than merging them with an omitted port. Their credential and prompt-cache
 keys remain distinct, including after session reconstruction. This distinction is

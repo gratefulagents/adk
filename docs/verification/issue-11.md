@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Go hyphen/range parsing in guardrail classes
+
+Removed the blanket rejection of consecutive hyphens. The shared host/public
+compiler now distinguishes simple characters, range operators/endpoints and
+standalone Perl/Unicode/POSIX class atoms. Literal hyphens are escaped so Rust
+cannot interpret them as set subtraction. Escape operands remain one atom;
+a leading literal closing bracket is encoded explicitly so it can be a range
+endpoint. A bracket used as a range endpoint is not mistaken for a POSIX atom.
+
+The actual SDK oracle adds **490 patterns /261 inputs: 384 accepted, 106 rejected**,
+with **100,224 membership decisions per native compiler**. The original rejection
+was reproduced before editing. The first implementation exposed an incorrectly
+escaped generated literal and Rust's special treatment of leading closing brackets;
+both were corrected against the independent oracle. Obsolete unsupported-category
+assertions now require invalid-input rejection for descending ranges instead.
+All 14 guardrail oracle tests and seven host-rule tests pass. This removes the
+specific hyphen gap, not all remaining Go/Rust regex syntax differences; no new
+whole-compiler or ledger closure is inferred.
+
+Fresh Rust 1.88 Linux: **1,743 workspace tests +10 doctests passed; 0 failed,
+30 ignored**. Strict all-feature lint/typecheck/rustdoc, formatting, facade matrix
+and standalone consumer/purity, Go test/vet/build and byte reproduction, all bound
+references, 55 validators, artifact/overlay/audit and source locks pass. Ledger
+remains **1,049 verified /7,842 unresolved /251 excluded**; full acceptance is
+incomplete.
+
 ### Lossless nested routing-result decoding
 
 `mode::ModeRoutingResolution` now supports both sealed byte entrypoints and uses

@@ -486,8 +486,10 @@ Unicode, control and multi-character cases). All14 Go POSIX ASCII class names,
 negations and case-insensitive forms are compiled by the actual public SDK rule
 compiler. Ordered `0`/`1` match strings record8804 Go membership decisions; native
 host and public compilers each compare every decision. The Go generator contains
-no copied class matcher. Double-hyphen syntax remains explicitly unsupported;
-inner brackets, ampersands, tildes and pipes retain Go literal semantics.
+no copied class matcher. Hyphen runs use Go literal/range parsing rather than
+Rust set subtraction; inner brackets, ampersands, tildes and pipes retain Go
+literal semantics. This remains a bounded compatibility compiler, not a blanket
+claim of full RE2 syntax parity.
 
 The repeat oracle records40 actual SDK compilation decisions at and beyond Go's
 1,000-count boundary: bounded/unbounded counts, nested products, alternatives,
@@ -530,3 +532,11 @@ strings that distinguish Go literal brackets from Rust nested classes. Complete
 POSIX names, incomplete POSIX-like text, ordinary brackets, ranges, Perl atoms,
 case folding and malformed/unclosed classes are checked against actual SDK
 compilation and membership rather than normalized class sets.
+
+Hyphen coverage adds490 actual SDK patterns over261 inputs (384 accepted and106
+rejected), comparing100224 membership decisions per native compiler. Literal
+hyphens, range operators/endpoints, completed ranges, leading literal brackets,
+Perl/Unicode/POSIX atoms and escaped hex/octal characters are distinguished.
+Two-character inputs expose literal brackets used as range endpoints rather than
+incorrectly recognized POSIX atoms. Descending ranges reject as invalid input;
+valid consecutive-hyphen expressions no longer fail as unsupported set syntax.

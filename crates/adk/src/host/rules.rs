@@ -23,6 +23,7 @@ pub struct CompiledGuardrails {
 /// literals are translated outside classes. Named POSIX ASCII class atoms and
 /// their negations are accepted. Perl class atoms retain ASCII Go semantics
 /// inside and outside character classes; in-class word boundaries are rejected.
+/// Hyphen runs follow Go character ranges, not Rust class-set subtraction.
 pub fn compile_guardrail_rules(rules: &[GuardrailRule]) -> Result<CompiledGuardrails, Error> {
     let mut compiled = CompiledGuardrails::default();
     for rule in rules {
@@ -172,9 +173,14 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
     let mut in_class = false;
     let mut class_has_atom = false;
     let mut class_can_negate = false;
+    let mut class_has_char = false;
+    let mut class_range_end = false;
     while let Some(c) = chars.next() {
         if c == '\\' {
+            let range_end = in_class && class_range_end;
             if in_class {
+                class_has_char = !class_range_end;
+                class_range_end = false;
                 class_has_atom = true;
                 class_can_negate = false;
             }
@@ -195,6 +201,23 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                     }
                 }
                 pattern.push_str(&format!(r"\x{{{value:x}}}"));
+                continue;
+            }
+            if in_class && matches!(escaped, 'p' | 'P' | 'd' | 'D' | 's' | 'S' | 'w' | 'W') {
+                if range_end {
+                    return Err(Error::new(
+                        ErrorCategory::InvalidInput,
+                        "Go character-class range endpoints must be single characters",
+                    ));
+                }
+                class_has_char = false;
+            }
+            if matches!(escaped, 'x' | 'p' | 'P') && chars.peek() != Some(&'{') {
+                pattern.push(c);
+                pattern.push(escaped);
+                for operand in chars.by_ref().take(if escaped == 'x' { 2 } else { 1 }) {
+                    pattern.push(operand);
+                }
                 continue;
             }
             if matches!(escaped, 'x' | 'p' | 'P') && chars.peek() == Some(&'{') {
@@ -317,44 +340,49 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 if in_class {
                     // POSIX ASCII atoms are shared syntax, unlike arbitrary nested
                     // classes or Rust set operations. Consume only an exact Go name.
-                    let candidate: String = chars.clone().take(10).collect();
-                    let class = candidate
-                        .strip_prefix(':')
-                        .and_then(|suffix| suffix.split_once(":]").map(|(name, _)| name));
-                    if let Some(class) = class.filter(|class| {
-                        matches!(
-                            class.strip_prefix('^').unwrap_or(class),
-                            "alnum"
-                                | "alpha"
-                                | "ascii"
-                                | "blank"
-                                | "cntrl"
-                                | "digit"
-                                | "graph"
-                                | "lower"
-                                | "print"
-                                | "punct"
-                                | "space"
-                                | "upper"
-                                | "word"
-                                | "xdigit"
-                        )
-                    }) {
-                        pattern.push(c);
-                        pattern.extend(chars.by_ref().take(class.len() + 3));
-                        class_has_atom = true;
-                        class_can_negate = false;
-                        continue;
-                    }
-                    if chars.peek() == Some(&':')
-                        && chars.clone().skip(1).collect::<String>().contains(":]")
-                    {
-                        return Err(Error::new(
-                            ErrorCategory::InvalidInput,
-                            "invalid Go POSIX character-class name",
-                        ));
+                    if !class_range_end {
+                        let candidate: String = chars.clone().take(10).collect();
+                        let class = candidate
+                            .strip_prefix(':')
+                            .and_then(|suffix| suffix.split_once(":]").map(|(name, _)| name));
+                        if let Some(class) = class.filter(|class| {
+                            matches!(
+                                class.strip_prefix('^').unwrap_or(class),
+                                "alnum"
+                                    | "alpha"
+                                    | "ascii"
+                                    | "blank"
+                                    | "cntrl"
+                                    | "digit"
+                                    | "graph"
+                                    | "lower"
+                                    | "print"
+                                    | "punct"
+                                    | "space"
+                                    | "upper"
+                                    | "word"
+                                    | "xdigit"
+                            )
+                        }) {
+                            pattern.push(c);
+                            pattern.extend(chars.by_ref().take(class.len() + 3));
+                            class_has_char = false;
+                            class_has_atom = true;
+                            class_can_negate = false;
+                            continue;
+                        }
+                        if chars.peek() == Some(&':')
+                            && chars.clone().skip(1).collect::<String>().contains(":]")
+                        {
+                            return Err(Error::new(
+                                ErrorCategory::InvalidInput,
+                                "invalid Go POSIX character-class name",
+                            ));
+                        }
                     }
                     pattern.push_str(r"\[");
+                    class_has_char = !class_range_end;
+                    class_range_end = false;
                     class_has_atom = true;
                     class_can_negate = false;
                     continue;
@@ -362,21 +390,41 @@ pub(crate) fn compile_rule_regex(rule: &GuardrailRule) -> Result<Regex, Error> {
                 in_class = true;
                 class_has_atom = false;
                 class_can_negate = true;
+                class_has_char = false;
+                class_range_end = false;
             } else if in_class {
+                if c == ']' && !class_has_atom {
+                    pattern.push_str(r"\x5d");
+                    class_has_char = true;
+                    class_has_atom = true;
+                    class_can_negate = false;
+                    continue;
+                }
                 if matches!(c, '&' | '~' | '|') {
                     pattern.push('\\');
                 }
-                if c == '-' && chars.peek() == Some(&c) {
-                    return Err(Error::new(
-                        ErrorCategory::Unsupported,
-                        "Go/Rust regex character-class set syntax differs",
-                    ));
+                if c == '-' {
+                    if class_has_char && chars.peek() != Some(&']') {
+                        pattern.push('-');
+                        class_has_char = false;
+                        class_range_end = true;
+                    } else {
+                        // Go treats this as a character, not Rust set subtraction.
+                        pattern.push_str(r"\x2d");
+                        class_has_char = !class_range_end;
+                        class_range_end = false;
+                    }
+                    class_has_atom = true;
+                    class_can_negate = false;
+                    continue;
                 }
                 if c == ']' && class_has_atom {
                     in_class = false;
                 } else if c == '^' && class_can_negate {
                     class_can_negate = false;
                 } else {
+                    class_has_char = !class_range_end;
+                    class_range_end = false;
                     class_has_atom = true;
                     class_can_negate = false;
                 }

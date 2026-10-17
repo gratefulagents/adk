@@ -104,6 +104,25 @@ func regexBracketScenarios() ([]regexClassCase, []string) {
 	return regexMembership(patterns, inputs), inputs
 }
 
+func regexHyphenScenarios() ([]regexClassCase, []string) {
+	inputs := []string{"", "猫", "K", "ſ", "猫]"}
+	for r := rune(0); r < 128; r++ {
+		inputs = append(inputs, string(r), string(r)+"]")
+	}
+	patterns := []string{}
+	for _, prefix := range []string{"", "a", "a-b", `\x00`, `\x00-\x2d`, `\055`, `\d`, `\pL`, "[:alpha:]", "]"} {
+		for _, suffix := range []string{"", "a", `\x7f`, `\d`, "[:digit:]", "["} {
+			for _, hyphens := range []string{"-", "--", "---", "----"} {
+				for _, flags := range []string{"", "(?i)"} {
+					patterns = append(patterns, flags+"^["+prefix+hyphens+suffix+"]$")
+				}
+			}
+		}
+	}
+	patterns = append(patterns, `^[^--a]$`, `^[^a-b--c]$`, `^[a-\pL]$`, `^[\x00-[:digit:]]$`, `^[\x00-[]$`, `^[\x00-\x2d--a]$`, `^[a-z]$`, `^[\-]$`, `^[a-\-]$`, `^[\p{Han}--a]$`)
+	return regexMembership(patterns, inputs), inputs
+}
+
 func regexClassScenarios() ([]regexClassCase, []string) {
 	inputs := []string{}
 	for r := rune(0); r < 128; r++ {

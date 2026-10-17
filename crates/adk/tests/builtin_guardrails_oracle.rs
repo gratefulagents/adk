@@ -409,11 +409,8 @@ fn public_rule_compiler_preserves_explicit_regex_support_limits() {
     assert_eq!(compiled.input.len(), 1);
     assert!(compiled.output.is_empty());
     assert_eq!(errors.len(), 2);
-    assert!(
-        errors
-            .iter()
-            .all(|error| error.info.category == ErrorCategory::Unsupported)
-    );
+    assert_eq!(errors[0].info.category, ErrorCategory::Unsupported);
+    assert_eq!(errors[1].info.category, ErrorCategory::InvalidInput);
 }
 
 #[cfg(feature = "host")]
@@ -590,5 +587,19 @@ async fn inner_brackets_match_actual_go_literal_membership() {
     let inputs = fixture["regex_bracket_inputs"].as_array().unwrap();
     assert_eq!(cases.len(), 21);
     assert_eq!(inputs.len(), 140);
+    assert_regex_membership(cases, inputs).await;
+}
+
+#[cfg(feature = "host")]
+#[tokio::test]
+async fn hyphens_match_actual_go_range_membership() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-builtin-guardrails.json"
+    ))
+    .unwrap();
+    let cases = fixture["regex_hyphens"].as_array().unwrap();
+    let inputs = fixture["regex_hyphen_inputs"].as_array().unwrap();
+    assert_eq!(cases.len(), 490);
+    assert_eq!(inputs.len(), 261);
     assert_regex_membership(cases, inputs).await;
 }

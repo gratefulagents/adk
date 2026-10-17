@@ -63,13 +63,17 @@ fn quoting_does_not_enable_rust_only_flags_or_class_escapes() {
 }
 
 #[test]
-fn double_hyphen_class_syntax_remains_explicitly_unsupported() {
+fn double_hyphen_descending_ranges_are_invalid() {
     for pattern in ["[a--b]", "[]a--b]", "[^]a--b]"] {
         let error = match compile_guardrail_rules(&[rule(pattern)]) {
-            Ok(_) => panic!("unexpected set syntax accepted: {pattern}"),
+            Ok(_) => panic!("descending Go range accepted: {pattern}"),
             Err(error) => error,
         };
-        assert_eq!(error.info.category, ErrorCategory::Unsupported, "{pattern}");
+        assert_eq!(
+            error.info.category,
+            ErrorCategory::InvalidInput,
+            "{pattern}"
+        );
     }
 }
 
@@ -145,8 +149,5 @@ fn invalid_posix_names_and_unclosed_classes_remain_rejected() {
         );
     }
     assert!(compile_guardrail_rules(&[rule("[[:alpha:]")]).is_err());
-    let error = compile_guardrail_rules(&[rule("[[:alpha:]--[:digit:]]")])
-        .err()
-        .unwrap();
-    assert_eq!(error.info.category, ErrorCategory::Unsupported);
+    assert!(compile_guardrail_rules(&[rule("[[:alpha:]--[:digit:]]")]).is_ok());
 }

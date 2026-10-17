@@ -158,6 +158,75 @@ async fn approved_tool_uses_runner_timeout_policy() {
 }
 
 #[tokio::test]
+async fn input_rules_match_original_argument_text_in_pinned_host_runs() {
+    let oracle: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../../fixtures/host-loop/sdk-chatloop.json"
+    ))
+    .unwrap();
+    let cases: Vec<_> = oracle["cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .filter(|case| {
+            case["name"]
+                .as_str()
+                .unwrap()
+                .starts_with("raw-input-rule-")
+        })
+        .collect();
+    assert_eq!(cases.len(), 4);
+    for case in cases {
+        let fixture = Arc::new(Fixture::default());
+        let executed = Arc::new(Mutex::new(vec![]));
+        let raw = case["spec"]["RawInput"].as_str().unwrap();
+        fixture.rules.lock().unwrap().push(GuardrailRule {
+            name: "raw".into(),
+            regex: case["spec"]["Rules"][0]["Regex"].as_str().unwrap().into(),
+            action: "block".into(),
+            rule_type: "tool-input".into(),
+            tool_pattern: "write".into(),
+            ..Default::default()
+        });
+        let mut options = scripted_approval(
+            &fixture,
+            &[("raw-call", "write", raw)],
+            "secret output",
+            "done",
+            &executed,
+        );
+        options.approval_required = Some(false);
+        options.config_source = Some(fixture.clone());
+        let result = ChatLoop::new(options).run(context()).await.unwrap();
+        let expected = &case["runs"][0];
+        assert!(expected["error"].is_null());
+        assert_eq!(
+            result.result.final_text(),
+            expected["result"]["final_text"].as_str().unwrap()
+        );
+        assert_eq!(
+            executed.lock().unwrap().len(),
+            expected["calls"]
+                .as_array()
+                .unwrap()
+                .iter()
+                .filter(|call| call["op"] == "tool.execute")
+                .count(),
+            "{}",
+            case["name"]
+        );
+        assert_eq!(result.result.guardrails.len(), 1);
+        assert_eq!(
+            result.result.guardrails[0].tripwire_triggered,
+            expected["result"]["tool_input_guardrails"][0]["TripwireTriggered"]
+                .as_bool()
+                .unwrap(),
+            "{}",
+            case["name"]
+        );
+    }
+}
+
+#[tokio::test]
 async fn cache_namespace_is_per_invocation_unless_explicitly_shared() {
     let oracle: serde_json::Value = serde_json::from_str(include_str!(
         "../../../../fixtures/host-loop/sdk-chatloop.json"

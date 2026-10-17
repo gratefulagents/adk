@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Host input rules retain argument spelling
+
+Reproduced a configured input guardrail allowing a tool that the pinned Go
+ChatLoop blocks: canonicalizing `{"value": "secret"}` removed the whitespace
+matched by the rule. Input rules now use original UTF-8 argument text when
+available, with the existing serialized-value fallback. Four independent actual
+Go runs cover whitespace, duplicate keys, escaped spelling and a literal
+nonmatch. Native runs compare tool execution, tripwire disposition and final
+text; the fixture retains lexical input as a string because RawMessage JSON
+encoding compacts it. The host oracle now contains54 scenarios/55 Run calls.
+No arbitrary non-UTF-8, full regex-engine or error-text equivalence is inferred.
+
+Fresh Rust1.88 Linux: **1,651 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone consumer/
+purity,20 offline scenarios, host-session, Go harness tests/vet/build, twice-exact
+host fixture regeneration, all bound evidence,51 validators, artifacts/overlay/
+audit and immutable source locks passed. An initial Cow/String compile mismatch
+was corrected before final verification. Ledger remains **870 verified /8,021
+unresolved /251 excluded**; issue11 remains incomplete.
+
 ### ChatLoop approval regressions and default cache identity
 
 The original single-approval regression reproduced a missing default model

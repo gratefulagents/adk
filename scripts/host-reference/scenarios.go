@@ -178,5 +178,19 @@ func scenarios() []scenario {
 		}
 		out = append(out, s)
 	}
+	for index, input := range []struct{ raw, pattern string }{
+		{`{"value": "secret"}`, `"value": "secret"`},
+		{`{"value":"secret","value":"public"}`, `secret`},
+		{`{"value":"\u0073ecret"}`, `\\u0073ecret`},
+		{`{"value":"\u0073ecret"}`, `secret`},
+	} {
+		s = baseline(fmt.Sprintf("raw-input-rule-%d", index))
+		s.RawInput = input.raw
+		s.Rules = []sdk.GuardrailRule{{Name: "raw", Type: "tool-input", Regex: input.pattern, Action: "block", ToolPattern: "write"}}
+		item := call("raw-call", "write")
+		item.ToolCall.Input = json.RawMessage(input.raw)
+		s.Responses = []response{reply(item), reply(message("done"))}
+		out = append(out, s)
+	}
 	return out
 }

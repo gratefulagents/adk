@@ -46,6 +46,7 @@ type scenario struct {
 	Permission                                  sdk.PermissionMode
 	Directive                                   string
 	Rules                                       []sdk.GuardrailRule
+	RawInput                                    string `json:",omitempty"`
 	Snapshot                                    *mode.TemplateSpec
 	State                                       sdk.WorkingState
 	Handoff                                     []sdk.LLMRunItemSnapshot

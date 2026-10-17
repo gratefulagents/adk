@@ -161,14 +161,16 @@ participate in the durable configuration fingerprint.
 Reference: SDK v0.0.115, commit
 `1dc92b73900fac74dc357a938e4b5eee6392b418`,
 [`pkg/agentsdk/chatloop.go`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/chatloop.go).
-`fixtures/host-loop/sdk-chatloop.json` contains 50 independently executed Go
+`fixtures/host-loop/sdk-chatloop.json` contains 54 independently executed Go
 scenarios. Regenerate and check them with `python3 scripts/host-reference/check.py`
 after obtaining the clean pinned SDK and a Go toolchain. Source fixture coverage
 is not a claim that every scenario or SDK capability is verified in Rust.
 
 Dynamic guardrail regular expressions use Rust's regex engine; unsupported
-syntax is rejected explicitly. Native tool arguments are structured JSON, so
-raw Go input-byte spelling is not preserved in regex checks. Store durability,
+syntax is rejected explicitly. Input rules match original UTF-8 argument text
+when present, retaining whitespace, duplicate keys and escapes; value-only native
+calls use their serialized JSON. Arbitrary non-UTF-8 Go input bytes are not
+represented by this native boundary. Store durability,
 transactionality, provider credentials, and live services remain application
 responsibilities. The full SDK capability ledger remains authoritative for
 unresolved parity; this feature is not blanket ledger closure.

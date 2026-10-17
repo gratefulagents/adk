@@ -17,7 +17,7 @@ pub struct CompiledGuardrails {
     pub input: Vec<Arc<dyn Guardrail>>,
     pub output: Vec<Arc<dyn Guardrail>>,
 }
-/// Native tool input is canonical JSON, not the source raw JSON byte spelling.
+/// Input rules match original UTF-8 argument text when available.
 /// Compile before any model execution. This is the shared Go/Rust regex subset,
 /// not a claim that Rust's regex parser implements RE2. Go-only escapes (e.g.
 /// `\Q...\E`, `\C`) fail explicitly. Perl classes/boundaries inside character
@@ -176,7 +176,7 @@ impl Guardrail for Rule {
     ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
         Box::pin(async move {
             let (name, text) = match input {
-                GuardrailInput::ToolInput(call) => (&call.name, call.arguments.to_string()),
+                GuardrailInput::ToolInput(call) => (&call.name, call.argument_text()),
                 GuardrailInput::ToolOutput { call, output } => (
                     &call.name,
                     output
@@ -187,7 +187,8 @@ impl Guardrail for Rule {
                             _ => None,
                         })
                         .collect::<Vec<_>>()
-                        .join("\n"),
+                        .join("\n")
+                        .into(),
                 ),
                 _ => return Ok(None),
             };

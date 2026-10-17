@@ -14,6 +14,9 @@ use std::{
 
 type MessagePage = Result<(Vec<UserMessage>, Cursor), Error>;
 
+#[path = "host/approval_regressions.rs"]
+mod approval_regressions;
+
 #[derive(Default)]
 struct Fixture {
     events: Mutex<Vec<String>>,

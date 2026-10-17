@@ -15512,6 +15512,54 @@
       ],
       "source": "pkg/agentsdk/host/host.go",
       "source_name": "Cursor"
+    },
+    "SDK-E3FA029E221A988D": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopResolvesToolApprovalAndResumes",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::resolves_tool_approval_and_resumes_with_stable_cache_identity"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesToolApprovalAndResumes",
+      "rationale": "The literal single-tool approval regression executes mutate, resumes to approved done, makes exactly two model calls and preserves one nonempty64-character cache identity. Default namespace isolation and explicit sharing are separately tested against the fixed pinned-Go host fixture. Only this original test is closed, not whole ChatLoop or host interface parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-2F84BB7267CF035E": {
+      "source": "pkg/agentsdk/chatloop_multi_approval_test.go",
+      "source_name": "TestChatLoopResolvesAllParallelToolApprovals",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::resolves_all_parallel_tool_approvals"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopResolvesAllParallelToolApprovals",
+      "rationale": "The literal two-tool approval regression checks both gate calls and executions, final text, and a new tool output paired with each original call ID. Only this original test is closed, not whole ChatLoop or host interface parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-7973BF19F44052D8": {
+      "source": "pkg/agentsdk/chatloop_test.go",
+      "source_name": "TestChatLoopApprovedToolUsesRunnerTimeoutPolicy",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::run"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::approved_tool_uses_runner_timeout_policy"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestChatLoopApprovedToolUsesRunnerTimeoutPolicy",
+      "rationale": "The literal approved blocking-tool regression applies the one-second runner timeout, completes within three seconds, preserves a timed-out tool output and resumes to the original final text. Only this original test is closed, not whole ChatLoop or host interface parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

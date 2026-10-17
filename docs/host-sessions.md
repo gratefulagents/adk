@@ -31,6 +31,14 @@ closing a borrowed loop does not close its owner. Caller cancellation and the
 session cancellation signal are both respected, and caller deadlines remain
 in force during collaborator calls.
 
+Each invocation defaults the logical prompt-cache key to `run` and generates a
+fresh namespace when none is supplied. Approval resumes share that invocation's
+64-character hashed wire key. To deliberately share a cache across invocations,
+set `RunnerConfig::prompt_cache_namespace`; this is also how a host supplies a
+shared trace identity for caching. Logical keys and namespaces are trimmed, with
+blank values treated as absent. This default is specific to ChatLoop, not the
+lower-level native Runner's opt-in cache configuration.
+
 The loop does not create a store session, implement a transaction, or persist
 its cursor automatically. `cursor()` exposes the signed message ID **and**
 opaque token. Save both if the application needs restartable ingestion.

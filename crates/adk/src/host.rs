@@ -295,6 +295,24 @@ impl ChatLoop {
         context.check_active()?;
         let (agent, mut config, policy) = self.prepare(&context).await?;
         let input = self.load(&context).await?;
+        config.prompt_cache_key = Some(
+            config
+                .prompt_cache_key
+                .as_deref()
+                .map(str::trim)
+                .filter(|key| !key.is_empty())
+                .unwrap_or("run")
+                .to_owned(),
+        );
+        config.prompt_cache_namespace = Some(
+            config
+                .prompt_cache_namespace
+                .as_deref()
+                .map(str::trim)
+                .filter(|namespace| !namespace.is_empty())
+                .map(str::to_owned)
+                .unwrap_or_else(|| uuid::Uuid::new_v4().simple().to_string()),
+        );
         let collector = Arc::new(Collector::default());
         let mut hooks = vec![collector.clone() as Arc<dyn RunHooks>];
         if let Some(hook) = config.hooks.take() {

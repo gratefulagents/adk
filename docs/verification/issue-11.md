@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### ChatLoop approval regressions and default cache identity
+
+The original single-approval regression reproduced a missing default model
+prompt-cache key. ChatLoop now resolves a trimmed logical key (`run` by default)
+and a per-invocation namespace before constructing the runner. Approval resumes
+retain that identity; separate invocations do not share it unless explicitly
+configured. The fixed-namespace key matches the pinned Go host fixture. Hosts
+must explicitly supply a shared trace namespace; no implicit Go Trace object
+mapping or lower-level Runner default equivalence is inferred.
+
+Literal native counterparts of the original single-approval, parallel-approval
+and approved-tool timeout regressions pass, as do the original pinned Go tests.
+Only those three test IDs are closed. The timeout test uses the original real
+one-second timeout/three-second upper bound; Tokio virtual-time support is not
+enabled in this crate.
+
+Fresh Rust1.88 Linux: **1,650 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace Clippy/rustdoc/format, full feature matrix, standalone consumer/
+purity,20 offline scenarios, host-session, all bound reference evidence,
+artifacts/overlay/audit,51 validators and immutable source locks passed. Ledger:
+**870 verified /8,021 unresolved /251 excluded**. All46 remote CI checks passed
+on prior dfdad2c7; new-head CI is not yet claimed. Issue11 remains incomplete.
+
 ### Usage integer and object decoding
 
 Reproduced ordinary Serde rejecting integer `-0` in usage counters accepted by

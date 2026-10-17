@@ -117,7 +117,7 @@ impl Provider {
             thinking_overrides: Mutex::default(),
         };
         let response = transport
-            .send_body(context, "/responses", body, None)
+            .send_body(context, "/responses", body, None, None)
             .await?;
         let mut state = StreamState::new(Protocol::Responses);
         state.snapshot_profile = if codex {
@@ -226,7 +226,7 @@ impl Provider {
             }
         }
         let response = self
-            .send_body(context, "/responses/compact", body, None)
+            .send_body(context, "/responses/compact", body, None, None)
             .await?;
         let result = wire::response(&read_json(context, response).await?, self.protocol)?;
         if !result.items.iter().any(|item| matches!(item, adk_core::RunItem::Compaction { compaction } if !compaction.encrypted_content.trim().is_empty())) {
@@ -241,7 +241,19 @@ impl Provider {
         stream: bool,
         activity: Option<&ModelActivitySink>,
     ) -> Result<reqwest::Response, Error> {
-        let mut body = wire::request(request, self.protocol, stream)?;
+        let schema = request
+            .output_schema
+            .as_ref()
+            .filter(|_| self.protocol == Protocol::Anthropic);
+        let mut projected;
+        let wire_request = if schema.is_some() {
+            projected = request.clone();
+            projected.output_schema = None;
+            &projected
+        } else {
+            request
+        };
+        let mut body = wire::request(wire_request, self.protocol, stream)?;
         let scope = self.session.scope();
         if scope.mode == AuthMode::OpenAiOAuth {
             crate::openai::codex(&mut body);
@@ -252,7 +264,7 @@ impl Provider {
         if self.protocol == Protocol::Anthropic {
             crate::anthropic::shape(&mut body, request, scope.mode);
         }
-        self.send_body(context, self.protocol.path(), body, activity)
+        self.send_body(context, self.protocol.path(), body, activity, schema)
             .await
     }
     async fn send_body(
@@ -261,6 +273,7 @@ impl Provider {
         path: &str,
         body: Value,
         activity: Option<&ModelActivitySink>,
+        schema: Option<&adk_core::JsonDocument>,
     ) -> Result<reqwest::Response, Error> {
         let scope = self.session.scope();
         let mut body = body;
@@ -299,7 +312,7 @@ impl Provider {
             }
             let response = crate::active(
                 context,
-                self.prepare_request(&resolved, &material, path, &body)?
+                self.prepare_request(&resolved, &material, path, &body, schema)?
                     .send(),
             )
             .await?
@@ -362,6 +375,7 @@ impl Provider {
         material: &crate::auth::Material,
         path: &str,
         body: &Value,
+        schema: Option<&adk_core::JsonDocument>,
     ) -> Result<reqwest::RequestBuilder, Error> {
         let mut endpoint = reqwest::Url::parse(&format!("{}{path}", scope.endpoint))
             .map_err(|_| crate::invalid("invalid provider request endpoint"))?;
@@ -388,7 +402,46 @@ impl Provider {
                     .map_err(|_| crate::invalid("invalid beta header"))?,
             );
         }
-        Ok(self.client.post(endpoint).headers(headers).json(&outgoing))
+        let builder = self.client.post(endpoint).headers(headers);
+        if let Some(schema) = schema {
+            #[derive(serde::Serialize)]
+            struct Format<'a> {
+                #[serde(rename = "type")]
+                kind: &'static str,
+                schema: &'a serde_json::value::RawValue,
+            }
+            #[derive(serde::Serialize)]
+            struct Body<'a> {
+                #[serde(flatten)]
+                fields: &'a Value,
+                output_format: &'a serde_json::value::RawValue,
+            }
+            let raw: &serde_json::value::RawValue = serde_json::from_str(schema.as_str())
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let compact = adk_codec::snapshots::to_go_json(&raw)
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let compact = serde_json::from_slice(&compact)
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let format = serde_json::to_vec(&Format {
+                kind: "json_schema",
+                schema: compact,
+            })
+            .map_err(|_| crate::invalid("invalid output schema"))?;
+            // The SDK validates this marshaler envelope independently of the root request.
+            adk_codec::value::validate(&format)
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let encoded = serde_json::to_vec(&Body {
+                fields: &outgoing,
+                output_format: serde_json::from_slice(&format)
+                    .map_err(|_| crate::invalid("invalid output schema"))?,
+            })
+            .map_err(|_| crate::invalid("invalid output schema"))?;
+            Ok(builder
+                .header(reqwest::header::CONTENT_TYPE, "application/json")
+                .body(encoded))
+        } else {
+            Ok(builder.json(&outgoing))
+        }
     }
 }
 impl Model for Provider {
@@ -1577,6 +1630,7 @@ mod tests {
                             &store.0.lock().unwrap(),
                             path,
                             &json!({}),
+                            None,
                         )
                         .unwrap()
                         .build()
@@ -1643,7 +1697,7 @@ mod tests {
                 for path in [Protocol::Responses.path(), "/responses/compact"] {
                     let body = json!({"model":"gpt-5.6", "prompt_cache_key":"prompt"});
                     let request = provider
-                        .prepare_request(session.scope(), &material, path, &body)
+                        .prepare_request(session.scope(), &material, path, &body, None)
                         .unwrap()
                         .build()
                         .unwrap();

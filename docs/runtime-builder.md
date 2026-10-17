@@ -578,9 +578,14 @@ JSON `null` to `{"type":"object"}`. Their object values use Go-compatible string
 replacement and finite-float64 number semantics; scalar/array roots and overflowing
 numbers are rejected locally. Anthropic retains scalar/array/null forwarding.
 Tool schemas retain their existing typed validation. Tool-only construction does
-not inspect output schemas. `JsonDocument` requires valid JSON syntax; malformed raw schema bytes are
-not accepted. Provider request shaping still projects schemas through `Value`,
-so arbitrary raw Unicode/depth and exact wire-token fidelity are not claimed.
+not inspect output schemas. `JsonDocument` requires valid JSON syntax; malformed
+raw schema bytes are not accepted. Anthropic HTTP requests preserve duplicate
+keys, numeric spelling and escaped surrogate text while compacting whitespace and
+escaping HTML as in the SDK. The output-format envelope enforces Go's 10,000-level
+depth bound (9,999 levels inside the schema). The public `wire::request` inspection
+API still returns a bounded `Value` projection; it is not a lossless raw-schema
+encoder. OpenAI's untyped-value depth limit and whole-provider fidelity remain
+separate limitations.
 
 Validation remains observational, not fail-closed: invalid JSON or parser failure
 retains the original text and emits `OutputValidationFailed`. Without a custom

@@ -2,6 +2,8 @@
 mod activity;
 #[path = "http/reasoning.rs"]
 mod reasoning;
+#[path = "http/schemas.rs"]
+mod schemas;
 
 use adk_core::{BoxFuture, Context, Error, Model, ModelEvent, ModelRequest, StreamingModel};
 use adk_providers::{auth::*, client::Provider, wire::Protocol};

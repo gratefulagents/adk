@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Raw Anthropic output schemas on the HTTP boundary
+
+Anthropic transport now carries the original schema separately from the bounded
+request `Value`, through completion/streaming and request-repair attempts. It
+preserves duplicate keys, numeric spelling (including overflow-sized literals),
+escaped surrogate text and explicit null. Whitespace compaction and HTML/separator
+escaping follow the pinned SDK. Public `wire::request` remains a bounded inspection
+projection, not a lossless raw encoder; OpenAI schema semantics are unchanged.
+
+Seventeen independently executed pinned-Go marshaler cases include the 9,999-level
+schema boundary. The SDK validates the output-format envelope independently of the
+root request; applying the limit to the entire request would reject a supported
+case. The captured HTTP regression first reproduced duplicate-key loss. It now
+matches all cases through both model APIs and bounded effort repair, with excessive
+depth rejected before model transport. An intermediate test incorrectly expected
+non-streaming Anthropic completion; the corrected test retains the existing
+streaming transport default.
+
+Fresh Rust1.88: **1,633 passed /0 failed /30 ignored**, **10 doctests**. Strict
+workspace Clippy/rustdoc/format, full facade matrix, standalone consumer/purity,
+all20 offline scenarios, host-session and script syntax checks pass. Source-bound
+evidence,51 validators, artifact/overlay/audit and immutable source locks pass after
+restoring the generator's required continuation marker. All46 CI checks passed on
+preceding `e5443b08`; this is not remote verification of the new transport change.
+No new ledger closure is inferred: **859 verified /8,032 unresolved /251 excluded**.
+
 ### Exact Anthropic output-format regression
 
 The original `TestToSDKParamsSendsOutputFormatForOutputSchema` now has a literal

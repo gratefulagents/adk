@@ -74,3 +74,40 @@ fn unescaped_class_set_operators_remain_explicitly_unsupported() {
         assert_eq!(error.info.category, ErrorCategory::Unsupported, "{pattern}");
     }
 }
+
+#[test]
+fn original_rule_compilation_rejects_unknown_type_and_action() {
+    for (rule_type, action) in [("tool-inptu", "block"), ("tool-input", "deny")] {
+        let mut rule = rule("x");
+        rule.name = "r1".into();
+        rule.rule_type = rule_type.into();
+        rule.action = action.into();
+        assert!(compile_guardrail_rules(&[rule]).is_err());
+    }
+}
+
+#[tokio::test]
+async fn original_empty_rule_action_defaults_to_block() {
+    let mut rule = rule("danger");
+    rule.name = "r1".into();
+    rule.action.clear();
+    let guards = compile_guardrail_rules(&[rule]).unwrap();
+    assert_eq!(guards.input.len(), 1);
+    let context = Context {
+        run_id: "rules".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    };
+    let call = ToolCall {
+        id: "call".into(),
+        name: "stub".into(),
+        raw_arguments: None,
+        arguments: serde_json::json!({"x":"danger"}),
+    };
+    let result = guards.input[0]
+        .check(&context, "agent", GuardrailInput::ToolInput(&call))
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(result.tripwire_triggered);
+}

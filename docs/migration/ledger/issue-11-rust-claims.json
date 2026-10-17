@@ -16509,6 +16509,118 @@
         "x86_64-unknown-linux-gnu",
         "builder"
       ]
+    },
+    "SDK-F71526B367CD43B0": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestDestructiveCommandGuardrail_AllowsSafeCommands",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_input_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "original_safe_commands_are_not_destructive"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestDestructiveCommandGuardrail_AllowsSafeCommands",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-E7CC240B71288357": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestDestructiveCommandGuardrail_BlocksVariants",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_input_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "original_destructive_command_variants_are_blocked"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestDestructiveCommandGuardrail_BlocksVariants",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-CC48E41BF65B81E8": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestDestructiveCommandGuardrail_IgnoresNonShellTools",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_input_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "original_destructive_guard_ignores_non_shell_tools"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestDestructiveCommandGuardrail_IgnoresNonShellTools",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-6AB13D66CDB4EC6B": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestSecretSignatures_NewPatterns",
+      "implementation_symbols": [
+        "crates/adk/src/guardrails.rs::builtin_tool_output_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "original_added_secret_signatures_are_detected"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestSecretSignatures_NewPatterns",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-9873C9980834CBD3": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestToolGuardrailsFromRules_EmptyActionDefaultsToBlock",
+      "implementation_symbols": [
+        "crates/adk/src/host/rules.rs::compile_guardrail_rules"
+      ],
+      "rust_test_identifiers": [
+        "original_empty_rule_action_defaults_to_block"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestToolGuardrailsFromRules_EmptyActionDefaultsToBlock",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-2CB65644A7975768": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestToolGuardrailsFromRules_UnknownActionIsError",
+      "implementation_symbols": [
+        "crates/adk/src/host/rules.rs::compile_guardrail_rules"
+      ],
+      "rust_test_identifiers": [
+        "original_rule_compilation_rejects_unknown_type_and_action"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestToolGuardrailsFromRules_UnknownActionIsError",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-5194D43D8CA53A75": {
+      "source": "pkg/agentsdk/guardrails/hardening_test.go",
+      "source_name": "TestToolGuardrailsFromRules_UnknownTypeIsError",
+      "implementation_symbols": [
+        "crates/adk/src/host/rules.rs::compile_guardrail_rules"
+      ],
+      "rust_test_identifiers": [
+        "original_rule_compilation_rejects_unknown_type_and_action"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/guardrails/TestToolGuardrailsFromRules_UnknownTypeIsError",
+      "rationale": "Ports original inputs and tripwire/detection/error assertions through native public guards or rule compilation. The single-rule compile errors map to one Rust Error rather than a Go one-element error slice; no parser-error wording or aggregate partial-success claim. Commands are classified, never executed. This closes only the named original regression, not the entire hardening file or unrestricted shell/regex parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
     }
   }
 }

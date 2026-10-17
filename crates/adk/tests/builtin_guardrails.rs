@@ -896,3 +896,68 @@ async fn raw_argument_guardrails_trip_before_tool_execution() {
         );
     }
 }
+
+#[tokio::test]
+async fn original_destructive_command_variants_are_blocked() {
+    for command in [
+        "rm -rf /",
+        "rm -fr /",
+        "rm -r -f /",
+        "sudo rm -rf /",
+        "env rm -rf /etc",
+        r"\rm -rf /",
+        r#""rm" -rf /"#,
+        r#"bash -c "rm -rf /""#,
+        "echo hi && rm -rf /",
+        "true; rm -rf /usr",
+        "mkfs.ext4 /dev/sda1",
+        "dd if=/dev/zero of=/dev/sda",
+    ] {
+        let call = call("Bash", json!({"command":command}));
+        let result = builtin_tool_input_guardrails()[0]
+            .check(&context(), "a", GuardrailInput::ToolInput(&call))
+            .await
+            .unwrap()
+            .unwrap();
+        assert!(result.tripwire_triggered, "{command}");
+    }
+}
+
+#[tokio::test]
+async fn original_safe_commands_are_not_destructive() {
+    for command in [
+        "ls -la",
+        "rm -rf ./build",
+        "go test ./...",
+        "git status",
+        r#"grep -r "rm -rf /" docs/"#,
+    ] {
+        let call = call("Bash", json!({"command":command}));
+        let result = builtin_tool_input_guardrails()[0]
+            .check(&context(), "a", GuardrailInput::ToolInput(&call))
+            .await
+            .unwrap();
+        assert!(!result.is_some_and(|r| r.tripwire_triggered), "{command}");
+    }
+}
+
+#[tokio::test]
+async fn original_destructive_guard_ignores_non_shell_tools() {
+    let call = call("stub", json!({"command":"rm -rf /"}));
+    let result = builtin_tool_input_guardrails()[0]
+        .check(&context(), "a", GuardrailInput::ToolInput(&call))
+        .await
+        .unwrap();
+    assert!(!result.is_some_and(|r| r.tripwire_triggered));
+}
+
+#[tokio::test]
+async fn original_added_secret_signatures_are_detected() {
+    for text in [
+        ["token=github_pat_11ABCDEFG0123456789_", &"a".repeat(60)].concat(),
+        ["OPENAI_API_KEY=sk-", &"A".repeat(48)].concat(),
+    ] {
+        let result = original_secret_output(&text).await.unwrap();
+        assert!(result.tripwire_triggered || result.replacement_content.is_some());
+    }
+}

@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Original guardrail hardening regressions
+
+Added literal original destructive/safe command sets, non-shell exclusion, added
+secret signatures, invalid rule type/action and empty-action block cases. Seven
+original test records are closed. The unvalidated direct public rule-function
+constructor remains unported, so the complete hardening file is not closed.
+The SDK's public guardrail-rule helper differs from ChatLoop: public helpers use
+crd: names, raw messages and single-edge-star matching; ChatLoop uses config:
+names, trimmed messages and multi-star globs. Existing native host behavior
+correctly follows ChatLoop and was not changed. These narrow regression claims
+do not imply public-helper equivalence across those differing contracts.
+
+Fresh Rust1.88 Linux: **1,701 passed /0 failed /30 ignored;10 doctests passed**.
+Strict workspace lint/typecheck/format,18 builtin+5 rule tests under all features
+and host-only, original Go guardrail tests, bound evidence,51 validators,
+artifacts/overlay/audit and source locks passed. Production behavior is unchanged.
+Ledger: **932 verified /7,959 unresolved /251 excluded**; full acceptance remains
+incomplete.
+
 ### Secret-input original-text guardrail fix
 
 The expanded actual-Go oracle reproduced a second raw-input bypass: opaque

@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Original permission-access and OTel truncation regressions
+
+Added the original typo/empty-default permission-access cases through actual
+ChatLoop tool visibility and mutation attempts, with approvals disabled to isolate
+access enforcement. Added the literal original OTel short/long ASCII truncation
+assertions. Both tests and their now-completely-covered source test files are
+closed (two permission tests and eleven OTel tests). No whole helper/package
+equivalence or arbitrary UTF-8 byte splitting is inferred. Production behavior
+did not change.
+
+Fresh Rust1.88 Linux: **1,663 passed /0 failed /30 ignored;10 doctests passed**;
+strict workspace lint/typecheck/format, bound references,51 validators, artifacts/
+overlay/audit and source locks passed. Ledger: **886 verified /8,005 unresolved
+/251 excluded**. Full acceptance remains incomplete.
+
 ### Original Anthropic compaction-origin regression file
 
 Ported both original compaction-origin tests with identical native/legacy/foreign

@@ -35,6 +35,17 @@ impl Tool for RecordingTool {
 
 struct BlockingTool(ToolDefinition);
 
+struct PermissionSource(&'static str);
+
+impl ConfigSource for PermissionSource {
+    fn permission_mode<'a>(
+        &'a self,
+        _: &'a Context,
+    ) -> BoxFuture<'a, Result<PermissionMode, Error>> {
+        Box::pin(async { Ok(PermissionMode::parse(self.0)) })
+    }
+}
+
 struct SecretGuard(&'static str);
 
 impl adk::runtime::Guardrail for SecretGuard {
@@ -144,6 +155,27 @@ fn scripted_approval(
     options.approval_required = Some(true);
     options.approval_gate = Some(fixture.clone());
     options
+}
+
+#[tokio::test]
+async fn tool_access_from_unknown_permission_fails_closed_but_empty_keeps_full_access() {
+    for (permission, executions) in [("workspace-wrte", 0), ("", 1)] {
+        let fixture = Arc::new(Fixture::default());
+        let executed = Arc::new(Mutex::new(vec![]));
+        let mut options = scripted_approval(
+            &fixture,
+            &[("call", "mutate", "{}")],
+            "mutated",
+            "done",
+            &executed,
+        );
+        options.config_source = Some(Arc::new(PermissionSource(permission)));
+        options.approval_required = Some(false);
+        let result = ChatLoop::new(options).run(context()).await.unwrap();
+        assert_eq!(result.result.final_text(), "done");
+        assert_eq!(executed.lock().unwrap().len(), executions, "{permission}");
+        assert_eq!(fixture.requests.lock().unwrap()[0].tools.len(), executions);
+    }
 }
 
 #[tokio::test]

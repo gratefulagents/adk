@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 8009,
-    "verified": 882
+    "unresolved": 8005,
+    "verified": 886
   },
   "groups": [
     {
@@ -3928,11 +3928,12 @@
     {
       "counts": {
         "apis:unresolved": 72,
-        "files:unresolved": 14,
+        "files:unresolved": 13,
+        "files:verified": 1,
         "packages:unresolved": 2,
         "subtests:unresolved": 9,
-        "tests:unresolved": 24,
-        "tests:verified": 1,
+        "tests:unresolved": 23,
+        "tests:verified": 2,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::policy",
@@ -3992,7 +3993,6 @@
         "SDK-486BA0AC69404833",
         "SDK-4BE2674ECEC5D41F",
         "SDK-4E5CC6AE0F7C80DC",
-        "SDK-52D1EF1D6935C743",
         "SDK-53E694C0CFB22B93",
         "SDK-553B03ABA8801690",
         "SDK-5836FFA4DCACFA74",
@@ -4023,7 +4023,6 @@
         "SDK-8669CE8BA9658E3A",
         "SDK-88511F76B94D47EB",
         "SDK-8943477A26FBE57B",
-        "SDK-8D421D64195D189E",
         "SDK-8D7E13A5BA385477",
         "SDK-90C35E1C3DA104F5",
         "SDK-93985E10BB81C973",
@@ -4078,7 +4077,9 @@
         "SDK-FFF7260E5951DB67"
       ],
       "verified_ids": [
-        "SDK-2C255A1EB816710C"
+        "SDK-2C255A1EB816710C",
+        "SDK-52D1EF1D6935C743",
+        "SDK-8D421D64195D189E"
       ]
     },
     {
@@ -7729,11 +7730,12 @@
         "apis:verified": 33,
         "defaults:unresolved": 1,
         "environment:unresolved": 1,
-        "files:unresolved": 9,
+        "files:unresolved": 8,
+        "files:verified": 1,
         "packages:unresolved": 1,
         "subtests:unresolved": 1,
-        "tests:unresolved": 11,
-        "tests:verified": 10,
+        "tests:unresolved": 10,
+        "tests:verified": 11,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::telemetry",
@@ -7773,7 +7775,6 @@
         "SDK-18126A887470E891",
         "SDK-182E9D830F5440E6",
         "SDK-18A7997C080B3265",
-        "SDK-18A8CE47B2C7C829",
         "SDK-18D69B35B64C1BFF",
         "SDK-1968D19A15F0A700",
         "SDK-1ACFDD4449FA24E9",
@@ -7837,7 +7838,6 @@
         "SDK-69D453414C3A0BD7",
         "SDK-6AC07F26141CE456",
         "SDK-6B32FBE22DCDDBB7",
-        "SDK-6B6976C6D9FE5C36",
         "SDK-6D66ABEEE090ABF4",
         "SDK-6DBFB4A690C1BFF4",
         "SDK-6DEBC85EA5C53B7F",
@@ -7965,6 +7965,7 @@
         "SDK-01642B611F6FCF57",
         "SDK-0C4FBAE6F18DE91C",
         "SDK-12FDD98E3C8FA169",
+        "SDK-18A8CE47B2C7C829",
         "SDK-22E9E485975B9A0D",
         "SDK-23E95B8347D5FAF4",
         "SDK-262E9849321A9A57",
@@ -7974,6 +7975,7 @@
         "SDK-63A2FA637013DDDA",
         "SDK-67DE0A5E5DD0C5B4",
         "SDK-6A4E40FBBEBC06EF",
+        "SDK-6B6976C6D9FE5C36",
         "SDK-6B9B667988470CA3",
         "SDK-72C4A41E63FC0489",
         "SDK-78D941E676F560BF",
@@ -10954,8 +10956,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "0dbb6147e94a58ad52baa7a6468cd6cad7707f2ed83ebec5c923ea0117f72c6f",
-    "docs/migration/ledger/issue-11-rust-claims.json": "fd3679cbb3401cf1264af98880cb3aee6cae965a71858d0d0779b923e062fa60",
+    "docs/migration/ledger/issue-11-overlay.json": "30f3bd7fc566e6185af37e7c2720d698e61cdb7dffce856e599976d1040f9f09",
+    "docs/migration/ledger/issue-11-rust-claims.json": "61ea7c834a325db832e0ad1c1d3f722e5fcbbe8fb07320cfc9b4ac592feea438",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10964,6 +10966,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 880
+    "rust_test": 884
   }
 }

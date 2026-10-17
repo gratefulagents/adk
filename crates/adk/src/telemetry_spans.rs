@@ -361,3 +361,15 @@ impl adk_runtime::tracing::GenerationObserver for SpanProcessor {
         self.on_span_end(&generation_span(context, record));
     }
 }
+
+#[cfg(test)]
+mod tests {
+    #[test]
+    fn original_otel_truncate_regression() {
+        assert_eq!(super::truncate("hello", 10), "hello");
+        assert_eq!(
+            super::truncate("hello world this is a long string", 10),
+            "hello worl..."
+        );
+    }
+}

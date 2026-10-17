@@ -15764,6 +15764,77 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-52D1EF1D6935C743": {
+      "source": "pkg/agentsdk/permission_mode_test.go",
+      "source_name": "TestToolAccessLevelFromPermissionModeFailsClosed",
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::prepare"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::tool_access_from_unknown_permission_fails_closed_but_empty_keeps_full_access"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestToolAccessLevelFromPermissionModeFailsClosed",
+      "rationale": "Original typo and empty-default access regression, exercised through actual ChatLoop preparation/model tool visibility and attempted mutation. Approval is disabled to isolate access enforcement. This closes the original two-case test, not every permission helper or override.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "host"
+      ]
+    },
+    "SDK-18A8CE47B2C7C829": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": "TestOTelTruncate",
+      "implementation_symbols": [
+        "crates/adk/src/telemetry_spans.rs::truncate"
+      ],
+      "rust_test_identifiers": [
+        "telemetry::spans::tests::original_otel_truncate_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestOTelTruncate",
+      "rationale": "Literal original short and long ASCII truncation inputs and outputs. No arbitrary UTF8 byte-splitting equivalence or full truncation helper claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "otel"
+      ]
+    },
+    "SDK-6B6976C6D9FE5C36": {
+      "source": "pkg/agentsdk/otel/processor_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/telemetry.rs::Destination::resolve",
+        "crates/adk/src/telemetry_spans.rs::map_span",
+        "crates/adk/src/telemetry_spans.rs::truncate"
+      ],
+      "rust_test_identifiers": [
+        "every_span_kind_matches_independent_pinned_go_export",
+        "pinned_endpoint_normalization_cases",
+        "telemetry::spans::tests::original_otel_truncate_regression"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/otel/TestMapSpanData_Agent",
+      "rationale": "All 11 original test entry points in this source file have explicit native counterparts and passing pinned Go references. This is complete original regression-file coverage, not whole package/API equivalence; the individual claims retain their bounded semantics and documented limits.",
+      "target_features": [
+        "otel",
+        "x86_64-unknown-linux-gnu"
+      ]
+    },
+    "SDK-8D421D64195D189E": {
+      "source": "pkg/agentsdk/permission_mode_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/src/host.rs::ChatLoop::prepare",
+        "crates/adk/src/host.rs::PermissionMode::parse"
+      ],
+      "rust_test_identifiers": [
+        "approval_regressions::tool_access_from_unknown_permission_fails_closed_but_empty_keeps_full_access",
+        "permission_mode_fails_closed_like_original_regression",
+        "permission_mode_parsing_matches_pinned_host_normalization"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/TestNormalizePermissionModeFailsClosed",
+      "rationale": "All 2 original test entry points in this source file have explicit native counterparts and passing pinned Go references. This is complete original regression-file coverage, not whole package/API equivalence; the individual claims retain their bounded semantics and documented limits.",
+      "target_features": [
+        "host",
+        "x86_64-unknown-linux-gnu"
+      ]
     }
   }
 }

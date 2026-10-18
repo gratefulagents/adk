@@ -3481,7 +3481,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "d7fd7130d14ab3ec9948cf5c642a4e7fbc58d1b716bb53e399a2b311fdd37e06",
+      "scripts/handoff-input-type-reference/reference_test.go": "f347a9c9d625ff7617a76f24ce7983054940b1a28b8765bbe32bdd2b06bae1d7",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",
@@ -3501,5 +3501,187 @@
       "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
       "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894"
     }
-  }
+  },
+  "schema_metadata": [
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "",
+      "request_name": "",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "",
+      "request_name": "",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "",
+      "request_name": "",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "",
+      "request_name": "",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " \u0085\t ",
+      "request_name": " \u0085\t ",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " \u0085\t ",
+      "request_name": " \u0085\t ",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " \u0085\t ",
+      "request_name": " \u0085\t ",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " \u0085\t ",
+      "request_name": " \u0085\t ",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " final ",
+      "request_name": " final ",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " final ",
+      "request_name": " final ",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " final ",
+      "request_name": " final ",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": " final ",
+      "request_name": " final ",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: \u754c\ud83d\ude00\u0000\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "\u754c\ud83d\ude00\u0000",
+      "request_name": "\u754c\ud83d\ude00\u0000",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: \u754c\ud83d\ude00\u0000\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "\u754c\ud83d\ude00\u0000",
+      "request_name": "\u754c\ud83d\ude00\u0000",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: \u754c\ud83d\ude00\u0000\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "\u754c\ud83d\ude00\u0000",
+      "request_name": "\u754c\ud83d\ude00\u0000",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: \u754c\ud83d\ude00\u0000\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "\u754c\ud83d\ude00\u0000",
+      "request_name": "\u754c\ud83d\ude00\u0000",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: x\n\"<&>\\y\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "x\n\"<&>\\y",
+      "request_name": "x\n\"<&>\\y",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: x\n\"<&>\\y\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "x\n\"<&>\\y",
+      "request_name": "x\n\"<&>\\y",
+      "request_strict": false,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": false
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: x\n\"<&>\\y\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "x\n\"<&>\\y",
+      "request_name": "x\n\"<&>\\y",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": false,
+      "strict": true
+    },
+    {
+      "instructions": "<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: x\n\"<&>\\y\nStrict mode: do not include prose, markdown fences, or fields outside the schema.\nJSON schema:\n{\"type\":\"object\"}\n</structured_output>",
+      "name": "x\n\"<&>\\y",
+      "request_name": "x\n\"<&>\\y",
+      "request_strict": true,
+      "schema_json": "{\"type\":\"object\"}",
+      "streamed": true,
+      "strict": true
+    }
+  ]
 }

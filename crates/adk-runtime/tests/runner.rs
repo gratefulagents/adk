@@ -4950,3 +4950,59 @@ async fn invalid_response_prices_keep_consumed_usage_and_finite_frozen_subtotals
         assert!(costs.0.lock().unwrap().is_empty());
     }
 }
+
+#[tokio::test]
+async fn schema_name_and_strictness_match_pinned_normal_and_streamed_requests() {
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-input-type/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["schema_metadata"].as_array().unwrap();
+    assert_eq!(cases.len(), 20);
+    for case in cases {
+        let model = TestModel::with(vec![Ok(answer("{}"))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer("{}"),
+        })]]
+        .into();
+        let mut a = agent(model.clone());
+        a.output_schema = Some(
+            adk_core::JsonDocument::new(case["schema_json"].as_str().unwrap().into()).unwrap(),
+        );
+        a.output_schema_name = case["name"].as_str().unwrap().into();
+        a.output_schema_strict = case["strict"].as_bool().unwrap();
+        let runner = Runner::new(a, RunnerConfig::default()).unwrap();
+        if case["streamed"].as_bool().unwrap() {
+            runner
+                .stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+                .unwrap();
+        } else {
+            runner
+                .run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+                .unwrap();
+        }
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests.len(), 1);
+        let request = &requests[0];
+        assert_eq!(
+            request.output_schema_name,
+            case["request_name"].as_str().unwrap()
+        );
+        assert_eq!(
+            request.output_schema_strict,
+            case["request_strict"].as_bool().unwrap()
+        );
+        assert_eq!(
+            request.output_schema.as_ref().unwrap().as_str(),
+            case["schema_json"].as_str().unwrap()
+        );
+        assert_eq!(
+            request.instructions,
+            case["instructions"].as_str().unwrap(),
+            "{case}"
+        );
+    }
+}

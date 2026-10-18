@@ -20018,6 +20018,42 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-274E4C3E1CAE9216": {
+      "source": "internal/agent/output_schema.go",
+      "source_name": "OutputSchema.Name",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::output_schema_name",
+        "crates/adk-runtime/src/runner.rs::Engine::build_instructions"
+      ],
+      "rust_test_identifiers": [
+        "schema_name_and_strictness_match_pinned_normal_and_streamed_requests",
+        "structured_output_validation_preserves_baseline_result"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestOutputSchemaNew",
+      "rationale": "Only this enabled-schema name/strictness metadata field is mapped to the corresponding owned AgentConfig field.20 independently executed pinned normal/streamed requests separate supplied input names/booleans from observed raw request metadata and composed instructions, covering empty/whitespace/Unicode/control labels and both strictness values. Existing240 output cases retain syntax-only (not schema-conformance) validation behavior. This does not close OutputSchema construction/type/ParseFn/Validate, nil or malformed raw schema values, invalid-UTF8 Go names, arbitrary deep JSON or whole provider serialization. Native AgentConfig defaults are not claimed as Go zero-value OutputSchema defaults.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-8F72B99259BE40BC": {
+      "source": "internal/agent/output_schema.go",
+      "source_name": "OutputSchema.Strict",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::output_schema_strict",
+        "crates/adk-runtime/src/runner.rs::Engine::build_instructions"
+      ],
+      "rust_test_identifiers": [
+        "schema_name_and_strictness_match_pinned_normal_and_streamed_requests",
+        "structured_output_validation_preserves_baseline_result"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestOutputSchemaNew",
+      "rationale": "Only this enabled-schema name/strictness metadata field is mapped to the corresponding owned AgentConfig field.20 independently executed pinned normal/streamed requests separate supplied input names/booleans from observed raw request metadata and composed instructions, covering empty/whitespace/Unicode/control labels and both strictness values. Existing240 output cases retain syntax-only (not schema-conformance) validation behavior. This does not close OutputSchema construction/type/ParseFn/Validate, nil or malformed raw schema values, invalid-UTF8 Go names, arbitrary deep JSON or whole provider serialization. Native AgentConfig defaults are not claimed as Go zero-value OutputSchema defaults.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Structured-output name and strictness metadata
+
+Mapped only `OutputSchema.Name` and `Strict` to the corresponding owned native
+agent fields.20 new independently executed normal/streamed requests compare
+supplied names/booleans separately from observed raw metadata and composed
+instructions. Cases include empty/whitespace/Unicode/control labels and both
+strictness values. The existing240 validation cases remain unchanged. No runtime
+implementation change was needed.
+
+These are enabled-schema metadata claims, not constructor/zero-value/type,
+ParseFn/Validate, malformed/nil raw schemas, arbitrary depth or whole provider
+serialization closure. Native AgentConfig defaults are not Go zero-value
+OutputSchema defaults.
+
+Fresh Rust1.88 Linux: **1,763 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**. Focused comparator, strict Clippy/typecheck/format, independent
+bound references, all56 validators, artifact/overlay/audit and immutable source
+locks passed. Full facade matrix/consumer/purity, strict rustdoc and all20 offline
+examples/host session passed at preceding `6d7a1f`; production code is unchanged.
+Ledger: **1,099 verified /7,792 unresolved /251 excluded**. Full retained acceptance
+remains incomplete.
+
+
 ### Public raw instruction resolution
 
 Added `InstructionContext::resolve().await` as the native direct counterpart to

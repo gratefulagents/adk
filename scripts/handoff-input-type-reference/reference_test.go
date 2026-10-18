@@ -123,7 +123,32 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 			}
 		}
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": cases, "output_cases": outputCases}, "", "  ")
+	metadata := []map[string]any{}
+	for _, name := range []string{"", " \u0085\t ", " final ", "界😀\x00", "x\n\"<&>\\y"} {
+		for _, strict := range []bool{false, true} {
+			for _, streamed := range []bool{false, true} {
+				source := &Agent{Name: "output", OutputType: &OutputSchema{Name: name, Schema: json.RawMessage(`{"type":"object"}`), Strict: strict}}
+				model := &subagentToolMockModel{responses: []*ModelResponse{{Items: []RunItem{{Type: RunItemMessage, Message: &MessageOutput{Text: "{}"}}}}}}
+				runner := NewRunnerWithModel(model)
+				if streamed {
+					stream := runner.RunStreamed(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+					for range stream.Events {
+					}
+					if err := stream.Err(); err != nil {
+						t.Fatal(err)
+					}
+				} else if _, err := runner.Run(context.Background(), source, nil, RunConfig{MaxTurns: 1}); err != nil {
+					t.Fatal(err)
+				}
+				if len(model.requests) != 1 {
+					t.Fatal("unexpected request count")
+				}
+				req := model.requests[0]
+				metadata = append(metadata, map[string]any{"name": name, "strict": strict, "request_name": req.OutputSchema.Name, "request_strict": req.OutputSchema.Strict, "streamed": streamed, "schema_json": string(req.OutputSchema.Schema), "instructions": req.Instructions})
+			}
+		}
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": cases, "output_cases": outputCases, "schema_metadata": metadata}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

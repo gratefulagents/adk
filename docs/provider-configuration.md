@@ -6,6 +6,11 @@ existing scoped `routing::Routes`. Through the facade it is available as
 with `Builder::routes(...)` requires `builder`. It does not change production
 provider defaults, the existing `RouteSpec` API, or runtime fallback policy.
 
+`adk::providers::factory::DEFAULT_PROVIDER_*` exposes the eight canonical routing
+names as public static strings (OPENAI, ANTHROPIC, OPENROUTER, GEMINI, GROQ, XAI,
+LOCAL, COPILOT). `Kind::name` reuses these constants. Reading a name does not
+construct a registry or acquire credentials.
+
 ## Resolve, bind, use
 
 `Config` and `NamedRoute` support programmatic construction and strict serde

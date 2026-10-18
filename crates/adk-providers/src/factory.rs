@@ -11,6 +11,16 @@ use std::sync::Arc;
 pub const DEFAULT_CHAT_MODEL: &str = "gpt-5.6-sol";
 pub const DEFAULT_CHAT_MINI_MODEL: &str = "gpt-5.3-codex-spark";
 
+// Canonical routing names do not install credentials or register providers.
+pub const DEFAULT_PROVIDER_OPENAI: &str = "openai";
+pub const DEFAULT_PROVIDER_ANTHROPIC: &str = "anthropic";
+pub const DEFAULT_PROVIDER_OPENROUTER: &str = "openrouter";
+pub const DEFAULT_PROVIDER_GEMINI: &str = "gemini";
+pub const DEFAULT_PROVIDER_GROQ: &str = "groq";
+pub const DEFAULT_PROVIDER_XAI: &str = "xai";
+pub const DEFAULT_PROVIDER_LOCAL: &str = "local";
+pub const DEFAULT_PROVIDER_COPILOT: &str = "copilot";
+
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
     OpenAi,
@@ -41,14 +51,14 @@ impl Kind {
     }
     pub fn name(self) -> &'static str {
         match self {
-            Self::OpenAi => "openai",
-            Self::Anthropic => "anthropic",
-            Self::OpenRouter => "openrouter",
-            Self::Gemini => "gemini",
-            Self::Groq => "groq",
-            Self::Xai => "xai",
-            Self::Local => "local",
-            Self::Copilot => "copilot",
+            Self::OpenAi => DEFAULT_PROVIDER_OPENAI,
+            Self::Anthropic => DEFAULT_PROVIDER_ANTHROPIC,
+            Self::OpenRouter => DEFAULT_PROVIDER_OPENROUTER,
+            Self::Gemini => DEFAULT_PROVIDER_GEMINI,
+            Self::Groq => DEFAULT_PROVIDER_GROQ,
+            Self::Xai => DEFAULT_PROVIDER_XAI,
+            Self::Local => DEFAULT_PROVIDER_LOCAL,
+            Self::Copilot => DEFAULT_PROVIDER_COPILOT,
         }
     }
     pub fn endpoint(self, mode: AuthMode) -> &'static str {

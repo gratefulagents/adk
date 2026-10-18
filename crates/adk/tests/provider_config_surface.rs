@@ -74,3 +74,51 @@ fn public_configuration_refuses_ambiguous_secret_fanout() {
     };
     assert!(config.resolve().is_err());
 }
+
+#[test]
+fn canonical_provider_name_constants_match_pinned_go() {
+    use adk::providers::factory::*;
+    let reference: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/provider-config/observations.json"
+    ))
+    .unwrap();
+    let names: [(&str, &'static str, Kind); 8] = [
+        (
+            "DefaultProviderOpenAI",
+            DEFAULT_PROVIDER_OPENAI,
+            Kind::OpenAi,
+        ),
+        (
+            "DefaultProviderAnthropic",
+            DEFAULT_PROVIDER_ANTHROPIC,
+            Kind::Anthropic,
+        ),
+        (
+            "DefaultProviderOpenRouter",
+            DEFAULT_PROVIDER_OPENROUTER,
+            Kind::OpenRouter,
+        ),
+        (
+            "DefaultProviderGemini",
+            DEFAULT_PROVIDER_GEMINI,
+            Kind::Gemini,
+        ),
+        ("DefaultProviderGroq", DEFAULT_PROVIDER_GROQ, Kind::Groq),
+        ("DefaultProviderXAI", DEFAULT_PROVIDER_XAI, Kind::Xai),
+        ("DefaultProviderLocal", DEFAULT_PROVIDER_LOCAL, Kind::Local),
+        (
+            "DefaultProviderCopilot",
+            DEFAULT_PROVIDER_COPILOT,
+            Kind::Copilot,
+        ),
+    ];
+    assert_eq!(
+        reference["provider_names"].as_object().unwrap().len(),
+        names.len()
+    );
+    for (source_name, native, kind) in names {
+        assert_eq!(reference["provider_names"][source_name], native);
+        assert_eq!(kind.name(), native);
+        assert_eq!(native.parse::<Kind>().unwrap(), kind);
+    }
+}

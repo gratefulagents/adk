@@ -10,7 +10,8 @@ extraction. No production Go source
 is rewritten. Go dependencies must already be available for readonly module mode.
 
 The output is `fixtures/provider-config/observations.json`, with archive, source,
-harness and Go-toolchain provenance. Its cases observe source default selection,
+harness and Go-toolchain provenance. Its `provider_names` table records all eight
+actual exported constants from `providers/default.go`. Its cases observe source default selection,
 key/URL/API/auth override precedence, whitespace and blank overrides, supported
 canonical endpoints/protocols, Local's fallback seed, route promotion,
 last-registration replacement and non-inheritance. The harness invokes the real

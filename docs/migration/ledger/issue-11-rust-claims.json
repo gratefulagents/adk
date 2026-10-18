@@ -24804,7 +24804,7 @@
         "sandbox_configuration_names_match_pinned_go_and_are_owned"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
-      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle. Reviewed the configuration-constructor/registration facet: it covers exactly executor.go lines93\u2013104, the same pure name-list declaration, not configuration parsing or installation.",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle. Reviewed the configuration-constructor/registration facet: it covers exactly executor.go lines93–104, the same pure name-list declaration, not configuration parsing or installation.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -24857,6 +24857,134 @@
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "execution"
+      ]
+    },
+    "SDK-2A94093CCEFC5E2D": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderAnthropic",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_ANTHROPIC"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-00A2FF3F52326AF3": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderCopilot",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_COPILOT"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-FF10240CCB1ED934": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderGemini",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_GEMINI"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-EE2BFC2B4926AC2E": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderGroq",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_GROQ"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-7639816522D7A151": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderLocal",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_LOCAL"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-F97FA7F7C30DB4CD": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderOpenAI",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_OPENAI"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-22B296A4DAAE04D2": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderOpenRouter",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_OPENROUTER"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
+    },
+    "SDK-6B02AF2350AAE346": {
+      "source": "pkg/agentsdk/providers/default.go",
+      "source_name": "DefaultProviderXAI",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_PROVIDER_XAI"
+      ],
+      "rust_test_identifiers": [
+        "canonical_provider_name_constants_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported routing-name constant, represented as a public Rust static string. The immutable SDK oracle reads all eight actual Go constants; the providers-only public facade regression compares every exact value, static availability, Kind::name reuse and kind parsing. The original Local factory test is supplemental pinned reference evidence; direct constant observations are source/harness-bound in provider-config/observations.json. This closes only the constant API, not NewDefaultMultiProvider, NewRunner, registrations, credential acquisition, environment behavior or whole default.go/factory parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
       ]
     }
   }

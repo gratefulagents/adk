@@ -2,6 +2,16 @@
 
 ## Current continuation evidence
 
+### Canonical provider-name constants
+
+Eight pure API records from `pkg/agentsdk/providers/default.go` map to the public
+`factory::DEFAULT_PROVIDER_*` string constants. The immutable Go oracle records
+the actual eight source constants; the providers-only public facade compares all
+values and checks `Kind::name` reuse and parsing round trips. Only these constants
+are promoted: no default registry, runner construction, credential acquisition,
+registration or whole-file obligation is implied. The resulting ledger is
+**1,322 verified /7,569 unresolved /251 excluded** after source-bound regeneration.
+
 ### Explicit provider configuration composition (partial factory evidence)
 
 `providers::factory::config` resolves a supported declarative configuration subset

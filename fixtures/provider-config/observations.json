@@ -1354,8 +1354,8 @@
       "scripts/provider-config-reference/copilot_test.go": "8ea5dbd61b3e6cc0ef9061953c60a8bc4767893388f3efde82f3fea27615065b",
       "scripts/provider-config-reference/fallback_test.go": "a00dca2bd5655f6ae15a7c58172c953e3d7a02047ebd7273cd9f58e659de4cc4",
       "scripts/provider-config-reference/openai_oauth_test.go": "c539d6523fe4f2bf09d46427b234f981c873da54769efd880ce43481fe49f287",
-      "scripts/provider-config-reference/reference_test.go": "630f0775d91ca0df463d44aa7b69eec1fbe979ac8f5fece681660ef0a1f38c43",
-      "scripts/provider-config-reference/run.py": "aa94e877550aa301886039cb1fb75deecad3d392aae8ed7fa586f101913db534"
+      "scripts/provider-config-reference/reference_test.go": "837276200c5940d8106456c1659893e449c0692dad7bc33e24bbf5a7d02ce396",
+      "scripts/provider-config-reference/run.py": "32143bf164699cb22bdefa6e73b64ecd996bba69a5d7093a57fd0ca83fa2e4f6"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",
@@ -1366,11 +1366,22 @@
       "internal/openai/auth_session.go": "7ab20ec8d4ca09e319f0e8d6904f0b1eb370a6e586629c94d45fce5d6f6a7193",
       "internal/openai/client.go": "a306feeaad2929f44bd63700b41931e2ecf05d794f64b12a4e8172c843c0f68a",
       "pkg/agentsdk/providers/audit_fixes_test.go": "c8942ecc70a539c0586b29eb1a105f594f788fcd140ee307163724aaccc80f03",
+      "pkg/agentsdk/providers/default.go": "f474fd354f7adde1367f642a7dc529f7bd409f81ff807a64240e45de66336a03",
       "pkg/agentsdk/providers/factory.go": "3cff648f22544444882583b0134fb4c7da1f3582310457b4fb9ac764fd009b79",
       "pkg/agentsdk/providers/factory_copilot_test.go": "a5dfc7d211db95800ed77f8d6bd230d804030bf2e8d83e7a4941db10cd1f16e3",
       "pkg/agentsdk/providers/factory_test.go": "b0da0d150f03dae84ee8e688a357504e3c0bbbd40ddfa42f6850d293d0f5a580",
       "pkg/agentsdk/providers/openai/model.go": "55031b55d8a18bc645e32562befad9e842e742650bd7a7e7aa11bd0c78b1b0b8"
     }
+  },
+  "provider_names": {
+    "DefaultProviderAnthropic": "anthropic",
+    "DefaultProviderCopilot": "copilot",
+    "DefaultProviderGemini": "gemini",
+    "DefaultProviderGroq": "groq",
+    "DefaultProviderLocal": "local",
+    "DefaultProviderOpenAI": "openai",
+    "DefaultProviderOpenRouter": "openrouter",
+    "DefaultProviderXAI": "xai"
   },
   "schema_version": 1,
   "wire": [

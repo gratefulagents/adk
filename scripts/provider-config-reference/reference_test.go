@@ -190,6 +190,16 @@ func TestNativeProviderConfigReference(t *testing.T) {
 		errors[name] = err != nil
 	}
 	result := map[string]any{"schema_version": 1, "cases": cases, "wire": wire, "errors": errors, "fallbacks": nativeFallbackObservations(t), "copilot": nativeCopilotObservations(t), "openai_oauth": nativeOpenAiOAuthObservation(t)}
+	result["provider_names"] = map[string]string{
+		"DefaultProviderOpenAI":     DefaultProviderOpenAI,
+		"DefaultProviderAnthropic":  DefaultProviderAnthropic,
+		"DefaultProviderOpenRouter": DefaultProviderOpenRouter,
+		"DefaultProviderGemini":     DefaultProviderGemini,
+		"DefaultProviderGroq":       DefaultProviderGroq,
+		"DefaultProviderXAI":        DefaultProviderXAI,
+		"DefaultProviderLocal":      DefaultProviderLocal,
+		"DefaultProviderCopilot":    DefaultProviderCopilot,
+	}
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

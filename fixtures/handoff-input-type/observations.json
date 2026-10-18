@@ -3477,11 +3477,1063 @@
       "warning": false
     }
   ],
+  "parsed_output": [
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"not json\"}",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"not json\"}",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"{\\\"n\\\":1}\"}",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"{\\\"n\\\":1}\"}",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"null\"}",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"null\"}",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\" \\t \"}",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\" \\t \"}",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\" \\\"\u00e9\ud83d\ude00\\\" \"}",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\" \\\"\u00e9\ud83d\ude00\\\" \"}",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"a\\u0000b\\n\"}",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "object",
+      "output_json": "{\"code\":23,\"parsed\":\"a\\u0000b\\n\"}",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"not json\"",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "not json",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"not json\"",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "not json",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"{\\\"n\\\":1}\"",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "{\"n\":1}",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"{\\\"n\\\":1}\"",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "{\"n\":1}",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"null\"",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "null",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"null\"",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "null",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\" \\t \"",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": " \t ",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\" \\t \"",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": " \t ",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\" \\\"\u00e9\ud83d\ude00\\\" \"",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": " \"\u00e9\ud83d\ude00\" ",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\" \\\"\u00e9\ud83d\ude00\\\" \"",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": " \"\u00e9\ud83d\ude00\" ",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"a\\u0000b\\n\"",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "a\u0000b\n",
+      "warning": false
+    },
+    {
+      "mode": "string",
+      "output_json": "\"a\\u0000b\\n\"",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "a\u0000b\n",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "null",
+      "output_json": "null",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"not json\",true,23]",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"not json\",true,23]",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"{\\\"n\\\":1}\",true,23]",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"{\\\"n\\\":1}\",true,23]",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"null\",true,23]",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"null\",true,23]",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\" \\t \",true,23]",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\" \\t \",true,23]",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\" \\\"\u00e9\ud83d\ude00\\\" \",true,23]",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\" \\\"\u00e9\ud83d\ude00\\\" \",true,23]",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"a\\u0000b\\n\",true,23]",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "array",
+      "output_json": "[\"a\\u0000b\\n\",true,23]",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "boolean",
+      "output_json": "true",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "number",
+      "output_json": "23",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"not json\"",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": false,
+      "text": "not json",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"not json\"",
+      "parser_inputs": [
+        "not json"
+      ],
+      "raw": "not json",
+      "streamed": true,
+      "text": "not json",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"{\\\"n\\\":1}\"",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": false,
+      "text": "{\"n\":1}",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"{\\\"n\\\":1}\"",
+      "parser_inputs": [
+        "{\"n\":1}"
+      ],
+      "raw": "{\"n\":1}",
+      "streamed": true,
+      "text": "{\"n\":1}",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": false,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"\"",
+      "parser_inputs": [],
+      "raw": "",
+      "streamed": true,
+      "text": "",
+      "warning": false
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"null\"",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": false,
+      "text": "null",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"null\"",
+      "parser_inputs": [
+        "null"
+      ],
+      "raw": "null",
+      "streamed": true,
+      "text": "null",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\" \\t \"",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": false,
+      "text": " \t ",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\" \\t \"",
+      "parser_inputs": [
+        " \t "
+      ],
+      "raw": " \t ",
+      "streamed": true,
+      "text": " \t ",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\" \\\"\u00e9\ud83d\ude00\\\" \"",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": false,
+      "text": " \"\u00e9\ud83d\ude00\" ",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\" \\\"\u00e9\ud83d\ude00\\\" \"",
+      "parser_inputs": [
+        " \"\u00e9\ud83d\ude00\" "
+      ],
+      "raw": " \"\u00e9\ud83d\ude00\" ",
+      "streamed": true,
+      "text": " \"\u00e9\ud83d\ude00\" ",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"a\\u0000b\\n\"",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": false,
+      "text": "a\u0000b\n",
+      "warning": true
+    },
+    {
+      "mode": "reject",
+      "output_json": "\"a\\u0000b\\n\"",
+      "parser_inputs": [
+        "a\u0000b\n"
+      ],
+      "raw": "a\u0000b\n",
+      "streamed": true,
+      "text": "a\u0000b\n",
+      "warning": true
+    }
+  ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/handoff-input-type-reference/reference_test.go": "f347a9c9d625ff7617a76f24ce7983054940b1a28b8765bbe32bdd2b06bae1d7",
+      "scripts/handoff-input-type-reference/reference_test.go": "aed2fc90dc11448768d8082b5b7c399b8ef9a64d4305d57bf08642bc5c8c7574",
       "scripts/handoff-input-type-reference/run.py": "f384bc0d9cb48afd316e67257bfbfdabbb0d25f8986191b169f85888b9071226"
     },
     "license": "GPL-3.0-only",

@@ -5006,3 +5006,99 @@ async fn schema_name_and_strictness_match_pinned_normal_and_streamed_requests() 
         );
     }
 }
+
+#[tokio::test]
+async fn custom_output_parser_matches_pinned_results_inputs_and_rejection() {
+    struct Parser {
+        mode: String,
+        inputs: Mutex<Vec<String>>,
+    }
+    impl OutputParser for Parser {
+        fn parse(&self, raw: &str) -> Result<Value, Error> {
+            self.inputs.lock().unwrap().push(raw.into());
+            match self.mode.as_str() {
+                "object" => Ok(json!({"parsed": raw, "code": 23})),
+                "string" => Ok(Value::String(raw.into())),
+                "null" => Ok(Value::Null),
+                "array" => Ok(json!([raw, true, 23])),
+                "boolean" => Ok(Value::Bool(true)),
+                "number" => Ok(json!(23)),
+                "reject" => Err(Error::new(ErrorCategory::ModelBehavior, "custom rejection")),
+                other => panic!("unknown parser mode {other}"),
+            }
+        }
+    }
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff-input-type/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["parsed_output"].as_array().unwrap();
+    assert_eq!(cases.len(), 98);
+    for case in cases {
+        let raw = case["raw"].as_str().unwrap();
+        let model = TestModel::with(vec![Ok(answer(raw))]);
+        *model.streams.lock().unwrap() = vec![vec![StreamStep::Event(ModelEvent::Complete {
+            response: answer(raw),
+        })]]
+        .into();
+        let parser = Arc::new(Parser {
+            mode: case["mode"].as_str().unwrap().into(),
+            inputs: Mutex::new(vec![]),
+        });
+        let mut a = agent(model);
+        a.output_schema = Some(adk_core::JsonDocument::new("true".into()).unwrap());
+        a.output_schema_name = "custom".into();
+        a.output_parser = Some(parser.clone());
+        let hooks = Arc::new(Observations::default());
+        let runner = Runner::new(
+            a,
+            RunnerConfig {
+                hooks: Some(hooks.clone()),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        let outcome = if case["streamed"].as_bool().unwrap() {
+            runner
+                .stream(context(), request(1), Arc::new(TestHost::default()))
+                .finish()
+                .await
+                .unwrap()
+        } else {
+            runner
+                .run(context(), request(1), Arc::new(TestHost::default()))
+                .await
+                .unwrap()
+        };
+        assert_eq!(
+            String::from_utf8(
+                adk_codec::snapshots::to_go_json(outcome.result.final_output.as_ref().unwrap())
+                    .unwrap()
+            )
+            .unwrap(),
+            case["output_json"].as_str().unwrap(),
+            "{case}"
+        );
+        assert_eq!(
+            outcome.result.final_text(),
+            case["text"].as_str().unwrap(),
+            "{case}"
+        );
+        assert_eq!(
+            serde_json::to_value(&*parser.inputs.lock().unwrap()).unwrap(),
+            case["parser_inputs"],
+            "{case}"
+        );
+        assert_eq!(
+            hooks
+                .seen
+                .lock()
+                .unwrap()
+                .iter()
+                .filter(|event| matches!(event, Observation::OutputValidationFailed { .. }))
+                .count(),
+            usize::from(case["warning"].as_bool().unwrap()),
+            "{case}"
+        );
+    }
+}

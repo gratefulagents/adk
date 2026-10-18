@@ -148,7 +148,60 @@ func TestNativeHandoffInputTypeReference(t *testing.T) {
 			}
 		}
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": cases, "output_cases": outputCases, "schema_metadata": metadata}, "", "  ")
+	parsed := []map[string]any{}
+	for _, mode := range []string{"object", "string", "null", "array", "boolean", "number", "reject"} {
+		for _, raw := range []string{"not json", `{"n":1}`, "", "null", " \t ", ` "é😀" `, "a\x00b\n"} {
+			for _, streamed := range []bool{false, true} {
+				var logs bytes.Buffer
+				log.SetOutput(&logs)
+				inputs := []string{}
+				schema := NewOutputSchema("custom", json.RawMessage(`true`))
+				schema.ParseFn = func(value string) (any, error) {
+					inputs = append(inputs, value)
+					switch mode {
+					case "object":
+						return map[string]any{"parsed": value, "code": 23}, nil
+					case "string":
+						return value, nil
+					case "null":
+						return nil, nil
+					case "array":
+						return []any{value, true, 23}, nil
+					case "boolean":
+						return true, nil
+					case "number":
+						return 23, nil
+					case "reject":
+						return nil, fmt.Errorf("custom rejection")
+					default:
+						panic(mode)
+					}
+				}
+				source := &Agent{Name: "output", OutputType: schema}
+				model := &subagentToolMockModel{responses: []*ModelResponse{{Items: []RunItem{{Type: RunItemMessage, Message: &MessageOutput{Text: raw}}}}}}
+				runner := NewRunnerWithModel(model)
+				var result *RunResult
+				var err error
+				if streamed {
+					stream := runner.RunStreamed(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+					for range stream.Events {
+					}
+					result, err = stream.FinalResult(), stream.Err()
+				} else {
+					result, err = runner.Run(context.Background(), source, nil, RunConfig{MaxTurns: 1})
+				}
+				if err != nil {
+					t.Fatal(err)
+				}
+				encoded, err := json.Marshal(result.FinalOutput)
+				if err != nil {
+					t.Fatal(err)
+				}
+				parsed = append(parsed, map[string]any{"mode": mode, "raw": raw, "streamed": streamed, "parser_inputs": inputs, "output_json": string(encoded), "text": result.FinalText(), "warning": strings.Contains(logs.String(), "output schema validation failed")})
+			}
+		}
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": cases, "output_cases": outputCases, "schema_metadata": metadata, "parsed_output": parsed}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

@@ -20054,6 +20054,25 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-C31744CF85A788DC": {
+      "source": "internal/agent/output_schema.go",
+      "source_name": "OutputSchema.ParseFn",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::OutputParser",
+        "crates/adk-runtime/src/runner.rs::AgentConfig::output_parser",
+        "crates/adk-runtime/src/runner.rs::Engine::validate_output"
+      ],
+      "rust_test_identifiers": [
+        "custom_output_parser_matches_pinned_results_inputs_and_rejection",
+        "structured_output_validation_preserves_baseline_result"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestOutputSchemaNew",
+      "rationale": "Only the host-owned parsing callback capability for UTF-8 raw input and JSON-valued outputs is mapped to OutputParser::parse.98 independently executed original SDK normal/streamed cases compare exact callback input/count, all six JSON value kinds, final text, rejection fallback and warning presence. Empty model output skips parsing while whitespace/NUL/non-JSON/Unicode input reaches the custom parser unchanged; successful callbacks bypass default JSON validation. Existing240 cases cover no-callback fallback. Native owned traits/Result/Value replace nullable Go function/any/error values. Arbitrary Go any identity, mutable callback pointer identity, textual log formatting, whole OutputSchema/Validate, deep JSON or callback liveness/panic handling are not inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Custom structured-output parsing
+
+Mapped only the ParseFn capability to native OutputParser.98 independently
+executed pinned normal/streamed cases compare exact callback inputs/counts,
+all six JSON result kinds, final text, rejection fallback and warning presence.
+Empty model text skips parsing, while whitespace, NUL/newline, non-JSON and
+Unicode text reach the custom parser unchanged. Successful custom parsing bypasses
+the default JSON validator; the existing240 no-callback cases remain unchanged.
+No runtime implementation change was needed.
+
+The native boundary uses owned traits, Result and JSON Value, not arbitrary Go
+any/function/pointer identity. Textual log formatting, callback liveness/panics,
+whole OutputSchema/Validate and deep fallback JSON are not closed by this mapping.
+
+Fresh Rust1.88 Linux: **1,764 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**. Focused comparator, strict Clippy/typecheck/format, independent bound
+references, all56 validators, artifact/overlay/audit and immutable source locks
+passed. Production code remains unchanged from `6d7a1f`, whose full matrix,
+standalone consumer/purity, strict rustdoc and all20 offline examples/host session
+passed. Ledger: **1,100 verified /7,791 unresolved /251 excluded**. Full retained
+acceptance remains incomplete.
+
+
 ### Structured-output name and strictness metadata
 
 Mapped only `OutputSchema.Name` and `Strict` to the corresponding owned native

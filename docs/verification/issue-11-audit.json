@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7705,
-    "verified": 1186
+    "unresolved": 7689,
+    "verified": 1202
   },
   "groups": [
     {
@@ -6031,19 +6031,20 @@
     },
     {
       "counts": {
-        "artifacts:unresolved": 1,
-        "examples:unresolved": 2,
-        "files:unresolved": 2,
-        "packages:unresolved": 1,
-        "tests:unresolved": 1,
-        "verification_groups:unresolved": 1
+        "artifacts:verified": 1,
+        "examples:verified": 2,
+        "files:verified": 2,
+        "packages:verified": 1,
+        "tests:verified": 1,
+        "verification_groups:verified": 1
       },
       "group": "verification_groups:sdk::routing::examples",
       "source_files": [
         "examples/features/settings_routing/README.md",
         "examples/features/settings_routing/settings_routing_test.go"
       ],
-      "unresolved_ids": [
+      "unresolved_ids": [],
+      "verified_ids": [
         "SDK-5D6122FB8E923C88",
         "SDK-70FC3D1D0E9D3771",
         "SDK-84541FFF17BDEFBF",
@@ -6052,8 +6053,7 @@
         "SDK-A55970ACCD3C6BB4",
         "SDK-ACC6AB0C51418135",
         "SDK-E9956D5A27BCF2CA"
-      ],
-      "verified_ids": []
+      ]
     },
     {
       "counts": {
@@ -9659,19 +9659,20 @@
     },
     {
       "counts": {
-        "artifacts:unresolved": 1,
-        "examples:unresolved": 2,
-        "files:unresolved": 2,
-        "packages:unresolved": 1,
-        "tests:unresolved": 1,
-        "verification_groups:unresolved": 1
+        "artifacts:verified": 1,
+        "examples:verified": 2,
+        "files:verified": 2,
+        "packages:verified": 1,
+        "tests:verified": 1,
+        "verification_groups:verified": 1
       },
       "group": "verification_groups:sdk::tools::registry::examples",
       "source_files": [
         "examples/features/tools_registry/README.md",
         "examples/features/tools_registry/tools_registry_test.go"
       ],
-      "unresolved_ids": [
+      "unresolved_ids": [],
+      "verified_ids": [
         "SDK-216FEC2A84B1505F",
         "SDK-661D8B0E1271FF08",
         "SDK-6B4AFEB6B9003379",
@@ -9680,8 +9681,7 @@
         "SDK-D08752B29D90EE22",
         "SDK-DE802C830208055D",
         "SDK-FE8E1C583EE465AF"
-      ],
-      "verified_ids": []
+      ]
     },
     {
       "counts": {
@@ -10957,8 +10957,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "e6eb3348f3b2abe198e6fb4cdea77d378598a28dea3146765bbca5260419d0da",
-    "docs/migration/ledger/issue-11-rust-claims.json": "5dd8c1e8b9cfd1175586a75f3328ffc4bb5e829873a8c8dee51fa625d5eefe34",
+    "docs/migration/ledger/issue-11-overlay.json": "dc1643e7eb74ab43625f1259b312d81d4a47f1c19a555707c8649566b0ddef7d",
+    "docs/migration/ledger/issue-11-rust-claims.json": "1c87b6fd880763193872e9287a28b993f0871e75b727a38945731823d52207c1",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10967,6 +10967,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1184
+    "rust_test": 1200
   }
 }

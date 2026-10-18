@@ -22346,6 +22346,342 @@
         "project-state",
         "observability"
       ]
+    },
+    "SDK-888680A7421B3845": {
+      "source": "examples/features/settings_routing/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed artifacts record artifacts:examples/features/settings_routing/README.md. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-216FEC2A84B1505F": {
+      "source": "examples/features/tools_registry/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed artifacts record artifacts:examples/features/tools_registry/README.md. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-A55970ACCD3C6BB4": {
+      "source": "examples/features/settings_routing/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed examples record examples:examples/features/settings_routing/README.md. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-84541FFF17BDEFBF": {
+      "source": "examples/features/settings_routing/settings_routing_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed examples record examples:examples/features/settings_routing/settings_routing_test.go. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-661D8B0E1271FF08": {
+      "source": "examples/features/tools_registry/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed examples record examples:examples/features/tools_registry/README.md. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-936B2974C941BB04": {
+      "source": "examples/features/tools_registry/tools_registry_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed examples record examples:examples/features/tools_registry/tools_registry_test.go. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-E9956D5A27BCF2CA": {
+      "source": "examples/features/settings_routing/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed files record files:examples/features/settings_routing/README.md. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-9842057C3831063C": {
+      "source": "examples/features/settings_routing/settings_routing_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed files record files:examples/features/settings_routing/settings_routing_test.go. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-6B4AFEB6B9003379": {
+      "source": "examples/features/tools_registry/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed files record files:examples/features/tools_registry/README.md. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-6F008ED60DD6580E": {
+      "source": "examples/features/tools_registry/tools_registry_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed files record files:examples/features/tools_registry/tools_registry_test.go. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-ACC6AB0C51418135": {
+      "source": null,
+      "source_name": "settings_routing_test",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed packages record settings_routing_test. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-FE8E1C583EE465AF": {
+      "source": null,
+      "source_name": "tools_registry_test",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed packages record tools_registry_test. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-5D6122FB8E923C88": {
+      "source": "examples/features/settings_routing/settings_routing_test.go",
+      "source_name": "TestSettingsAndModeRoutingExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed tests record TestSettingsAndModeRoutingExample. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-D08752B29D90EE22": {
+      "source": "examples/features/tools_registry/tools_registry_test.go",
+      "source_name": "TestSDKToolRegistryExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed tests record TestSDKToolRegistryExample. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-70FC3D1D0E9D3771": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::settings_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_settings_routing_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+      "rationale": "Reviewed verification_groups record verification_groups:sdk::routing::examples. The original source test has six assertions, all now reproduced: medium/Anthropic maps to claude-sonnet-4-6 with high reasoning/low verbosity and writer small maps to claude-haiku-4-5 with low reasoning/high verbosity. The native example also retains settings merging, mock builder requests and explicit session shutdown. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-DE802C830208055D": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools_registry",
+        "crates/adk-tools/src/lib.rs::Registry"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tools_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
+      "rationale": "Reviewed verification_groups record verification_groups:sdk::tools::registry::examples. The original source test constructs a workspace-write canonical registry, requires Write to exist and be enabled, executes notes.txt/hello, requires no error and reads back exact bytes. The native example reproduces these assertions with Registry::build/get, explicit Write feature and WorkspaceWrite access, host ToolContext and exact file bytes. Construction-time eligibility replaces the separate IsEnabled callback; registration is not execution authorization. Existing ReadFile and bundle-close rejection checks remain. Exact pinned Go example package/test is independently executed and the native test calls the runnable scenario. Hash-bound docs/feature-examples.md maps the complete source README usage and run command. All eight records in this example group were reviewed; this is runnable-documentation migration, not byte-identical Markdown, whole underlying helper/registry closure, Go callback identity or live provider verification.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
     }
   }
 }

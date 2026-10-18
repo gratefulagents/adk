@@ -22,7 +22,7 @@
     "scripts/issue11-audit.py": "40b93a05675697851de53f00d84f29862b19c35a41cc7ea6e0c84b1920d1d269",
     "scripts/issue11-ledger.py": "22ccd4290504f8bd505e531b957245de2889cfe40e02f0663f8c0c95a4f0555d",
     "scripts/test_issue11_audit.py": "f7ee812e8d924149c1cad68b7f25ff75e3c008fc148c89dc8bf10ff33b81f93a",
-    "scripts/test_issue11_ledger.py": "78a4eedde6ac734f53723c7e8f182982485c93dc75f9db7405333467c192e77a"
+    "scripts/test_issue11_ledger.py": "e4a3cdc507c7285b16e1d8f015ae814f0620909c95f95afea40c32ddbf4a34aa"
   },
   "platform": "Linux-6.12.90+deb13.1-amd64-x86_64-with-glibc2.41",
   "profile": "sdk-license-only-v1",

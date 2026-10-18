@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Original settings-routing and tool-registry examples
+
+The settings scenario now checks all six original Anthropic top-level/writer
+resolution assertions. The registry scenario constructs the canonical Write tool
+under workspace-write access, executes notes.txt/hello and verifies exact bytes.
+Existing builder/session, ReadFile and closed-bundle assertions remain. Added two
+explicit test entrypoints, complete README usage mapping and exact Go package
+selection. Sixteen individually reviewed example records are verified.
+
+Fresh Rust1.88 Linux: **1,793 workspace +10 doctests +3 explicit example tests
+passed;0 failed,30 ignored**. Strict workspace lint/typecheck/docs/format, full
+facade matrix/standalone consumer/purity,20 offline scenarios and host session,
+bound native/Go references,56 validators and source locks pass. Pinned Go reference
+has940 passing records,5 skips across42 packages. Initial format check required
+one assertion wrap; reference command initially omitted required --output, corrected
+before final successful checks. Ledger: **1,202 verified /7,689 unresolved /
+251 excluded**. Full retained acceptance remains incomplete.
+
 ### Original context-compaction example and cache-write completion
 
 The native runnable scenario now checks the pinned Go example's exact24-message

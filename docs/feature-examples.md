@@ -129,3 +129,38 @@ These types/functions are available through `adk::runtime` and its `compaction`
 module. This is a reviewed runnable-documentation counterpart, not byte-identical
 Go Markdown or a claim of live LLM/provider compaction execution. Native runner
 regressions separately verify proactive compaction and failure observations.
+
+## Settings-routing and canonical tool-registry examples
+
+Run either original-example counterpart independently:
+
+```sh
+cargo run --offline --locked -p adk \
+  --features builder,execution,mcp,project-state,observability \
+  --example features -- settings_routing
+cargo run --offline --locked -p adk \
+  --features builder,execution,mcp,project-state,observability \
+  --example features -- tools_registry
+```
+
+`settings_routing` uses `adk::codec::dto::ModeRouting` and `ModeRoleRouting` with
+`adk::codec::mode::{resolve_mode_routing, resolve_role_mode_routing}`. It reproduces
+all six original assertions: Anthropic medium resolves to claude-sonnet-4-6 with
+high reasoning/low verbosity, while the writer's small override resolves to
+claude-haiku-4-5 with low reasoning/high verbosity. No network call is made.
+The resolution's `model_settings` supplies provider settings from mode labels,
+replacing the README's separate ModeReasoningSettings/ModeTextVerbositySettings/
+ModeRoutingSettings usage. Set just the desired reasoning/verbosity fields on a
+ModeRouting to obtain those individual settings. Native model settings merging is
+also shown with `adk::codec::snapshots::ModelSettings`; the same scenario retains
+builder-driven mocked requests and explicit session shutdown.
+
+`tools_registry` constructs `adk::tools::Registry::build` with the canonical Write
+feature and `AccessMode::WorkspaceWrite`, retrieves `get("Write")`, executes the
+original file_path/content arguments, and asserts notes.txt contains exactly hello.
+Selection under the configured access mode replaces the source IsEnabled check;
+the host supplies the working directory and execution policy in ToolContext.
+The registry does not grant permission merely because a tool is registered.
+The existing ReadFile bundle and post-close rejection checks remain. These are
+runnable documentation/example counterparts, not closure of every registry tool,
+all routing algorithms, live provider behavior or byte-identical Go prose.

@@ -386,6 +386,29 @@ async fn tools_registry() {
             .unwrap()
             .contains("registry evidence")
     );
+    let registry = adk::tools::Registry::build(
+        &Config {
+            features: Features::Strict(["Write".into()].into()),
+            access: AccessMode::WorkspaceWrite,
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    let write = registry.get("Write").expect("Write tool missing");
+    ctx.policy.access = AccessMode::WorkspaceWrite;
+    let output = write
+        .execute(
+            &ctx,
+            call("Write", json!({"file_path":"notes.txt","content":"hello"})),
+        )
+        .await
+        .unwrap();
+    assert!(!output.is_error);
+    assert_eq!(
+        std::fs::read(temp.path().join("notes.txt")).unwrap(),
+        b"hello"
+    );
     bundle.close().await.unwrap();
     let error = tool
         .execute(&ctx, call("read_file", json!({"path":"example.txt"})))
@@ -1044,6 +1067,33 @@ async fn context_compaction() {
     assert!(defaults.trigger_tokens > defaults.target_tokens);
 }
 async fn settings_routing() {
+    use adk::codec::{dto, mode};
+    let routing = dto::ModeRouting {
+        default_model: "medium".into(),
+        reasoning_level: "high".into(),
+        text_verbosity: "low".into(),
+        role_overrides: Some(
+            [(
+                "writer".into(),
+                dto::ModeRoleRouting {
+                    model: "small".into(),
+                    reasoning_level: "low".into(),
+                    text_verbosity: "high".into(),
+                    ..Default::default()
+                },
+            )]
+            .into(),
+        ),
+        ..Default::default()
+    };
+    let top = mode::resolve_mode_routing("", "anthropic", Some(&routing));
+    assert_eq!(top.model, "claude-sonnet-4-6");
+    assert_eq!(top.model_settings.reasoning_effort, "high");
+    assert_eq!(top.model_settings.text_verbosity, "low");
+    let writer = mode::resolve_role_mode_routing("", "anthropic", "writer", Some(&routing));
+    assert_eq!(writer.model, "claude-haiku-4-5");
+    assert_eq!(writer.model_settings.reasoning_effort, "low");
+    assert_eq!(writer.model_settings.text_verbosity, "high");
     use adk::builder::{Builder, Config, Features, ModeSpec, ModelRouting, RoleRouting, RoleSpec};
     use adk::codec::snapshots::ModelSettings;
     let settings = ModelSettings {
@@ -1708,5 +1758,15 @@ mod tests {
     #[tokio::test]
     async fn original_context_compaction_example() {
         super::context_compaction().await;
+    }
+
+    #[tokio::test]
+    async fn original_settings_routing_example() {
+        super::settings_routing().await;
+    }
+
+    #[tokio::test]
+    async fn original_tools_registry_example() {
+        super::tools_registry().await;
     }
 }

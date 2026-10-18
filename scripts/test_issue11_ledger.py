@@ -24,6 +24,8 @@ class ReferenceSelectionTests(unittest.TestCase):
         claims = {"claims": {str(i): {"reference_test": name} for i, name in enumerate([
             "github.com/gratefulagents/sdk/internal/agent/TestRunner",
             "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+            "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
+            "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
             "github.com/gratefulagents/sdk/examples/features/unrelated/TestNotSelected",
             "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
@@ -35,6 +37,8 @@ class ReferenceSelectionTests(unittest.TestCase):
         ])}}
         self.reference.add_claimed_tests(claims, selected)
         self.assertEqual(selected, {"examples/features/context_compaction": {"TestContextCompactionExample"}, "internal/agent": {"TestHistorical", "TestRunner"},
+                                    "examples/features/settings_routing": {"TestSettingsAndModeRoutingExample"},
+                                    "examples/features/tools_registry": {"TestSDKToolRegistryExample"},
                                     "internal/agent/agents": {"TestBuiltInKindsAreStable"},
                                     "internal/openai": {"TestMetadata"},
                                     "internal/modelactivity": {"TestReadActivity"},

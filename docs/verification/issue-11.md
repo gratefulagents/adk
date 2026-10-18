@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Complete run-item analysis record byte contract
+
+The pinned-Go run-item corpus grows from 40 to 421 decode/encode observations.
+Reflection enumerates all 14 source fields, including pointer-object defaults,
+null/reset/merge behavior, wrong-type overwritten errors, case folding, malformed
+typed strings and mixed raw fields. Rust and the standalone compat facade check
+every resulting byte sequence and both message/tool-output image nil states.
+The codec additionally checks original raw byte retention and 20 direct marshal
+cases for missing, empty, invalid and deep raw input.
+
+This supports 15 explicit claims: the 13 previously unbound members, the data
+declaration and its public alias. The existing Type member claim is unchanged.
+Closure is for the fresh-value sealed byte interface, not Go error text, partial
+mutation or pointer identity. Snapshot builder/helper functions and whole request
+and response envelope claims remain separate and unresolved.
+
 ### Explicit leaf-snapshot field evidence
 
 Seventeen individual field claims now bind the six LLMReasoning fields, four

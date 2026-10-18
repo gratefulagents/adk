@@ -68,6 +68,16 @@ func payloadSample(field reflect.StructField, populated bool) string {
 		if field.Type.Elem().Kind() == reflect.Bool {
 			return "true"
 		}
+		if field.Type.Elem().Kind() == reflect.Struct {
+			var fields []string
+			typ := field.Type.Elem()
+			for i := 0; i < typ.NumField(); i++ {
+				nested := typ.Field(i)
+				key := strings.Split(nested.Tag.Get("json"), ",")[0]
+				fields = append(fields, strconv.Quote(key)+":"+payloadSample(nested, true))
+			}
+			return "{" + strings.Join(fields, ",") + "}"
+		}
 		return "0.125"
 	case reflect.Int:
 		if populated {
@@ -117,6 +127,41 @@ func runItemByteCases() []map[string]any {
 			inputs = append(inputs, fmt.Sprintf(`{"%s":{"input":%s0%s}}`, field, strings.Repeat("[", depth), strings.Repeat("]", depth)))
 		}
 	}
+	typ := reflect.TypeOf(LLMRunItemSnapshot{})
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		key := strings.Split(field.Tag.Get("json"), ",")[0]
+		quoted := strconv.Quote(key)
+		good := payloadSample(field, true)
+		for _, candidate := range []string{good, payloadSample(field, false), `null`, `42`, `1.5`, `true`, `"string"`, `{}`, `[]`} {
+			inputs = append(inputs, "{"+quoted+":"+candidate+"}", "{"+quoted+":"+candidate+","+quoted+":"+good+"}")
+		}
+		inputs = append(inputs,
+			"{"+strconv.Quote(strings.ToUpper(key))+":"+good+"}",
+			"{"+strconv.Quote(field.Name)+":"+good+"}",
+			"{"+quoted+":"+good+","+quoted+":null}",
+			"{"+quoted+":"+good+","+quoted+":"+payloadSample(field, false)+"}",
+		)
+		folded := strings.NewReplacer("k", "K", "s", "ſ").Replace(key)
+		inputs = append(inputs, "{"+strconv.Quote(folded)+":"+good+"}")
+		if field.Type.Kind() == reflect.Ptr {
+			first := strings.Split(field.Type.Elem().Field(0).Tag.Get("json"), ",")[0]
+			inputs = append(inputs,
+				"{"+quoted+":"+good+","+quoted+":{}}",
+				"{"+quoted+":"+good+","+quoted+":null,"+quoted+":{}}",
+				"{"+quoted+":"+good+","+quoted+":{"+strconv.Quote(first)+":null}}",
+			)
+		}
+		if field.Type.Kind() == reflect.String {
+			for _, candidate := range []string{`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, "\"\xff\"", "\"\xe2\x82\"", "\"\xed\xa0\x80\""} {
+				inputs = append(inputs, "{"+quoted+":"+candidate+"}")
+			}
+		}
+	}
+	inputs = append(inputs,
+		`{"tool_approval":{"input":{"n":1e9999}},"tool_call":{"input":{"n":-0}},"TOOL_APPROVAL":{"approved":true},"TOOL_CALL":{"name":"tool"}}`,
+		"{\"tool_call\":{\"input\":\"\xff\"},\"tool_approval\":{\"input\":\"\xed\xa0\x80\"}}",
+	)
 	cases := []map[string]any{}
 	for _, input := range inputs {
 		var item LLMRunItemSnapshot
@@ -134,6 +179,11 @@ func runItemByteCases() []map[string]any {
 				raw["tool_approval"] = map[string]any{"present": item.ToolApproval.Input != nil, "hex": hex.EncodeToString(item.ToolApproval.Input)}
 			}
 			row["raw"] = raw
+			row["message_images_nil"] = item.MessageImages == nil
+			row["output_images_nil"] = nil
+			if item.ToolOutput != nil {
+				row["output_images_nil"] = item.ToolOutput.Images == nil
+			}
 		}
 		cases = append(cases, row)
 	}

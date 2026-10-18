@@ -25416,6 +25416,294 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-B38C694EA1A4FE95": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::agent_name"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.AgentName maps to agent_name. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.AgentName"
+    },
+    "SDK-02BB4D2A45330428": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::compaction"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.Compaction maps to compaction. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.Compaction"
+    },
+    "SDK-B00EC5D5ECDFF242": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::handoff_call"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.HandoffCall maps to handoff_call. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.HandoffCall"
+    },
+    "SDK-275B902EAF62AACC": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::handoff_output"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.HandoffOutput maps to handoff_output. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.HandoffOutput"
+    },
+    "SDK-18806927522B2741": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::message_images"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.MessageImages maps to message_images. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.MessageImages"
+    },
+    "SDK-1269C1E959ECBF55": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::message_phase"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.MessagePhase maps to message_phase. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.MessagePhase"
+    },
+    "SDK-673035782BAE42BE": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::message_text"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.MessageText maps to message_text. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.MessageText"
+    },
+    "SDK-7F7DAEBC0E174B86": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::reasoning"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.Reasoning maps to reasoning. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.Reasoning"
+    },
+    "SDK-6808D338E594920D": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::reasoning_text"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.ReasoningText maps to reasoning_text. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.ReasoningText"
+    },
+    "SDK-535568940112D128": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::thinking_text"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.ThinkingText maps to thinking_text. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.ThinkingText"
+    },
+    "SDK-DE35EC1F8AFBE89A": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::tool_approval"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.ToolApproval maps to tool_approval. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.ToolApproval"
+    },
+    "SDK-249912E58C9505EC": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::tool_call"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.ToolCall maps to tool_call. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.ToolCall"
+    },
+    "SDK-95F609D84437D67A": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot::tool_output"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact member LLMRunItemSnapshot.ToolOutput maps to tool_output. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot.ToolOutput"
+    },
+    "SDK-1F6DD1C67B309B8B": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot",
+        "crates/adk-codec/src/payload_decode/snapshot_bytes.rs::Document"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRunItemSnapshot"
+    },
+    "SDK-0E475B59476C7B8A": {
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::RunItemSnapshot",
+        "crates/adk-codec/src/payload_decode/snapshot_bytes.rs::Document",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "run_item_nested_raw_byte_codecs_match_go",
+        "public_run_item_snapshot_bytes_match_pinned_go",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Public alias maps to adk::codec::dto::RunItemSnapshot under compat without platform dependencies. Fresh-value analysis record through the sealed byte codec, with all14 source fields mapped explicitly. The independent immutable Go oracle now executes421 run-item decode/encode cases: every field, populated/zero/null values, folded and duplicate keys, wrong types including overwritten errors, all pointer resets/merges, string replacement and mixed nested raw fields. Tests compare exact output bytes, original raw bytes and nil image state;20 direct marshal cases cover missing/empty/invalid/deep raw fragments. The minimal compat facade independently executes all421 cases. Native snapshot projection and nested repeated-image behavior have separate Go observations. This closes the data declaration, not SnapshotRunItems/BuildLLMRequestSnapshot/BuildLLMResponseSnapshot, error-text/partial-mutation identity, or general Serde byte compatibility.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ],
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMRunItemSnapshot"
     }
   }
 }

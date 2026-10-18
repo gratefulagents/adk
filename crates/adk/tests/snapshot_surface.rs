@@ -93,7 +93,7 @@ fn public_run_item_snapshot_bytes_match_pinned_go() {
     let fixture: serde_json::Value =
         serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
     let cases = fixture["run_item_byte_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 40);
+    assert_eq!(cases.len(), 421);
     for (index, case) in cases.iter().enumerate() {
         let decoded = from_go_json::<RunItemSnapshot>(&unhex(case["input_hex"].as_str().unwrap()));
         assert_eq!(
@@ -102,6 +102,21 @@ fn public_run_item_snapshot_bytes_match_pinned_go() {
             "case {index}"
         );
         if let Ok(item) = decoded {
+            assert_eq!(
+                item.message_images.is_none(),
+                case["message_images_nil"],
+                "case {index}"
+            );
+            assert_eq!(
+                serde_json::to_value(
+                    item.tool_output
+                        .as_ref()
+                        .map(|output| output.images.is_none())
+                )
+                .unwrap(),
+                case["output_images_nil"],
+                "case {index}"
+            );
             let encoded = to_go_json_bytes(&item);
             assert_eq!(
                 encoded.is_ok(),

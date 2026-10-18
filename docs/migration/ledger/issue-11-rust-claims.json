@@ -20367,6 +20367,634 @@
         "mcp",
         "project-state"
       ]
+    },
+    "SDK-407579E85172C4F7": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "BuiltInKinds",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::built_in_kinds"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record BuiltInKinds. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-91D898E3660FA679": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "Definition.Aliases",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Definition::aliases"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record Definition.Aliases. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D9D56747E9C05578": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "Definition.Kind",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Definition::kind"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record Definition.Kind. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E5D256E4284B0DA0": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "Definition.ReadOnly",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Definition::read_only"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record Definition.ReadOnly. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-77E79DF8AF94506E": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "Definition",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Definition"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record Definition. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C2012FC494EA171E": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "Definitions",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::definitions"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record Definitions. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F7F308C6378A0D45": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "IsAllowed",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestIsAllowedResolvesAliases",
+      "rationale": "Reviewed complete apis record IsAllowed. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B7736AA697119574": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "Kind",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record Kind. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0D758CCEC636C5FF": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindAnalyst",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::ANALYST"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindAnalyst. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-43BD796D60473454": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindArchitect",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::ARCHITECT"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindArchitect. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2B23DBB938D9F421": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindCritic",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::CRITIC"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindCritic. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D94CBCA125469125": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindDebugger",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::DEBUGGER"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindDebugger. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4124F41A300B3366": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindDependencyExpert",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::DEPENDENCY_EXPERT"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindDependencyExpert. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E9F788F7E3B925B7": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindDesigner",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::DESIGNER"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindDesigner. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6E2A7FCDAD0813E7": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindExecutor",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::EXECUTOR"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindExecutor. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-B161BA2416684CDD": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindExplore",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::EXPLORE"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindExplore. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-90AC07B144C92C92": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindPlanner",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::PLANNER"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindPlanner. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-203302972E4AB6A9": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindSecurityReviewer",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::SECURITY_REVIEWER"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindSecurityReviewer. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0E4A386894C8DAF1": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "KindWriter",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind::WRITER"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete apis record KindWriter. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7B3B6470EF668420": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "ParseKind",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::parse_kind"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestResolveKindSupportsLegacyAliases",
+      "rationale": "Reviewed complete apis record ParseKind. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-5BB8101389FC1B4F": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": "ResolveKind",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::resolve_kind"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestResolveKindSupportsLegacyAliases",
+      "rationale": "Reviewed complete apis record ResolveKind. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-ED637F85A9095F3F": {
+      "source": "internal/agent/agents/types.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete files record internal/agent/agents/types.go. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-887CDD1243AB67B6": {
+      "source": "internal/agent/agents/types_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete files record internal/agent/agents/types_test.go. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A49B1934751465DE": {
+      "source": null,
+      "source_name": "agents",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete packages record agents. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4EE1D36FB06696E1": {
+      "source": "internal/agent/agents/types_test.go",
+      "source_name": "TestBuiltInKindsAreStable",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete tests record TestBuiltInKindsAreStable. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7A36395FAE6B0C09": {
+      "source": "internal/agent/agents/types_test.go",
+      "source_name": "TestIsAllowedResolvesAliases",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestIsAllowedResolvesAliases",
+      "rationale": "Reviewed complete tests record TestIsAllowedResolvesAliases. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D2901421693213F3": {
+      "source": "internal/agent/agents/types_test.go",
+      "source_name": "TestResolveKindSupportsLegacyAliases",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestResolveKindSupportsLegacyAliases",
+      "rationale": "Reviewed complete tests record TestResolveKindSupportsLegacyAliases. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2C721C70BE95F280": {
+      "source": "internal/agent/agents/types_test.go",
+      "source_name": "TestResolveKindUnknown",
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestResolveKindUnknown",
+      "rationale": "Reviewed complete tests record TestResolveKindUnknown. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4E7D6E564DBE92B5": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/agents.rs::Kind",
+        "crates/adk-codec/src/agents.rs::Definition",
+        "crates/adk-codec/src/agents.rs::built_in_kinds",
+        "crates/adk-codec/src/agents.rs::definitions",
+        "crates/adk-codec/src/agents.rs::parse_kind",
+        "crates/adk-codec/src/agents.rs::resolve_kind",
+        "crates/adk-codec/src/agents.rs::is_allowed"
+      ],
+      "rust_test_identifiers": [
+        "governed_kind_catalog_and_resolution_match_pinned_go",
+        "governed_kind_codecs_match_pinned_go_state_and_bytes",
+        "original_governed_kind_regressions",
+        "governed_definitions_are_owned_and_unknown_kinds_remain_open",
+        "governed_kinds_are_available_through_compat_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
+      "rationale": "Reviewed complete verification_groups record verification_groups:sdk::specialists. The independent immutable Go oracle verifies eleven ordered constants and definitions,312 normalization/alias cases,1122 allow-list outcomes and126 JSON decode/state/exact-byte cases. Native metadata preserves alias nil/empty state, folded keys, duplicate/null scalar updates, hidden slice slots, malformed-string replacement, omission and depth rejection. Unknown Kind strings remain representable; empty allow-lists allow all labels, otherwise the input kind is compared exactly with resolved canonical candidates. Four original Go regressions have native assertion counterparts. Owned returned alias vectors deliberately do not expose the Go helper's shallow global alias-slice sharing, as documented. This is a pure valid-UTF8 native catalog/compat-byte boundary, not Go reflection/pointer identity, partial error mutation or execution authorization; scheduling and host role catalogs remain separate.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

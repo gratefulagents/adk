@@ -159,3 +159,21 @@ fn signed_cost_projection_is_available_without_runtime_accounting() {
     assert_eq!(callback_usage.borrow().as_ref().unwrap().input_tokens, 3);
     assert_eq!(estimate_result_cost(None, Some(&price)), (0.0, false));
 }
+
+#[test]
+fn governed_kinds_are_available_through_compat_facade() {
+    use adk::codec::agents::{
+        Definition, Kind, built_in_kinds, definitions, is_allowed, parse_kind, resolve_kind,
+    };
+    assert_eq!(built_in_kinds().len(), 11);
+    assert_eq!(definitions().len(), 11);
+    assert_eq!(parse_kind("Plan"), Some(Kind::PLANNER));
+    assert!(resolve_kind("Explore").unwrap().read_only);
+    assert!(is_allowed(&Kind::EXECUTOR, &["general-purpose".into()]));
+    let metadata: Definition =
+        from_go_json(br#"{"KIND":"planner","READONLY":true,"ALIASES":["Plan"]}"#).unwrap();
+    assert_eq!(
+        to_go_json_bytes(&metadata).unwrap(),
+        br#"{"kind":"planner","readOnly":true,"aliases":["Plan"]}"#
+    );
+}

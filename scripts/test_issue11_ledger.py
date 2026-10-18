@@ -23,6 +23,7 @@ class ReferenceSelectionTests(unittest.TestCase):
         selected = {"internal/agent": {"TestHistorical"}}
         claims = {"claims": {str(i): {"reference_test": name} for i, name in enumerate([
             "github.com/gratefulagents/sdk/internal/agent/TestRunner",
+            "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
             "github.com/gratefulagents/sdk/internal/modelactivity/TestReadActivity",
@@ -32,6 +33,7 @@ class ReferenceSelectionTests(unittest.TestCase):
         ])}}
         self.reference.add_claimed_internal_tests(claims, selected)
         self.assertEqual(selected, {"internal/agent": {"TestHistorical", "TestRunner"},
+                                    "internal/agent/agents": {"TestBuiltInKindsAreStable"},
                                     "internal/openai": {"TestMetadata"},
                                     "internal/modelactivity": {"TestReadActivity"},
                                     "internal/anthropic": {"TestAssembler"}})

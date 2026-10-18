@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Governed agent-kind catalog and selection helpers
+
+Added `adk::codec::agents`: open string Kind labels, eleven constants, owned
+Definition metadata, stable catalog order, canonical/legacy parsing and allow-list
+selection. These helpers do not authorize tool execution. Owned returned aliases
+cannot mutate the catalog; Go slice alias identity is intentionally not retained.
+Go-compatible byte decoding covers folded/duplicate keys, null updates and aliases.
+
+The independently executed pinned-Go oracle compares312 resolution inputs,
+1,122 allow-list cases and126 codec cases, plus all eleven catalog definitions.
+Original governed-kind regressions and the minimal facade consumer pass. All29
+package records are reviewed with these bounded contracts, including its group.
+
+Fresh Rust1.88 Linux: **1,777 workspace +10 doctests passed;0 failed,30 ignored**.
+Strict Clippy/typecheck/rustdoc/format, full facade matrix/standalone consumer/purity,
+all20 offline feature examples and host session passed. Bound native/Go evidence,
+all56 validators, artifact/overlay/audit and immutable source locks passed.
+Ledger: **1,141 verified /7,750 unresolved /251 excluded**. Full retained issue
+acceptance remains incomplete; live credentials and non-Linux targets are unverified.
+
 ### Enclosing subagent selector and generic fallback
 
 Extended the original-Go automatic-builder oracle from12 to26 cases, preserving

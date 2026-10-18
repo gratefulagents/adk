@@ -246,3 +246,20 @@ This compatibility projection deliberately preserves negative, infinite and NaN
 prices. It is **not** a billing-validation API. Native runtime accounting and its
 price sanitization remain unchanged. No Go model-interface reflection or pointer
 identity is required; the host supplies the appropriate borrowed callback.
+
+### Governed built-in agent kinds
+
+`adk::codec::agents` exposes the pinned eleven-kind catalog with `Kind` constants,
+`Definition` metadata, `built_in_kinds`, `definitions`, `parse_kind`, `resolve_kind`
+and `is_allowed`. Resolution trims SDK whitespace and matches canonical names or
+legacy aliases (`Explore`, `Plan`, `general-purpose`) case-insensitively using Go
+simple lowercase. `Kind` is an open string: constructing it does not normalize or
+validate it. `is_allowed` compares a canonical kind against resolved candidates;
+an empty allow-list allows even an unknown kind. Use `parse_kind` separately when
+known-kind validation is required. These helpers do not grant execution authority.
+
+Kind and definition records support Go byte decoding/encoding, including alias
+nil/empty state, omission, duplicate/null updates and malformed-string replacement.
+Returned metadata owns its alias lists: modifying a returned list cannot mutate
+the catalog. This deliberately avoids the Go helper's shallow alias-slice sharing.
+The native scheduler and role catalogs remain independently host-configured.

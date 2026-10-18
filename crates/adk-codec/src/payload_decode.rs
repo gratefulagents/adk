@@ -1,3 +1,4 @@
+use crate::agents::{Definition as AgentDefinition, Kind as AgentKind};
 use crate::dto::*;
 use crate::go_decode::{ElementSeed, GoSlice, fold_key, go_object, normalize_strings, read_field};
 use crate::mode::ModeRoutingResolution;
@@ -119,6 +120,8 @@ macro_rules! target {
     )*};
 }
 target!(
+    AgentKind,
+    AgentDefinition,
     ModelRetryAdvice,
     ModeRoutingResolution,
     ModelSettings,
@@ -249,6 +252,12 @@ impl GoJsonEncode for ToolSnapshot {}
 
 go_object!(OutputSchema, "name" => name: scalar, "schema" => schema: raw, "strict" => strict: scalar);
 go_object!(ToolSnapshot, "name" => name: scalar, "description" => description: scalar, "input_schema" => input_schema: raw, "read_only" => read_only: scalar, "needs_approval" => needs_approval: scalar, "timeout_seconds" => timeout_seconds: integer);
+
+go_object!(AgentDefinition,
+    "kind" => kind: scalar,
+    "readonly" => read_only: scalar
+    preserve_nil { "aliases" => aliases }
+);
 
 go_object!(ModelRetryAdvice,
     "shouldretry" => should_retry: scalar,

@@ -1,5 +1,7 @@
 #[path = "runner/activity.rs"]
 mod activity;
+#[path = "runner/authorization.rs"]
+mod authorization;
 
 use adk_core::*;
 use adk_runtime::*;

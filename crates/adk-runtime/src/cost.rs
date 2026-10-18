@@ -104,6 +104,7 @@ mod tests {
     }
     fn result(usage: Usage, responses: Vec<Usage>, subtotal: Option<(f64, bool)>) -> RunResult {
         RunResult {
+            action_audit_records: vec![],
             metrics: Some(RunMetrics {
                 model: Some("active".into()),
                 turns: 2,

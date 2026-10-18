@@ -3342,6 +3342,7 @@ async fn public_raw_instruction_resolution_matches_pinned_get_instructions() {
         ..Default::default()
     };
     let snapshot = RunResult {
+        action_audit_records: vec![],
         metrics: None,
         status: RunStatus::Incomplete,
         final_output: None,

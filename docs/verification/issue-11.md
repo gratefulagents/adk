@@ -2,6 +2,37 @@
 
 ## Current continuation evidence
 
+### Native ordinary-tool action authorization
+
+Added a host-owned ActionAuthorizer hook, exact fail-closed normalization/open
+labels, raw request/audit records, ordered preflight authorization and allow/deny/
+ask integration without expanding native tool permissions or waiving approvals.
+Approval resume reauthorizes; automatic child runners inherit the callback.
+Cancellation, deadline, panic and owner-drop tests prevent unintended execution.
+Durable callbacks require a stable replay key; audits survive recovery, changed
+bindings reject resume, and uncertain external effects still require operator
+resolution. Native approval journals deliberately reject malformed JSON, unlike
+the source in-memory path; Go wire DTO and whole-interface parity are not claimed.
+
+Independent pinned Go observations cover **80 normalization and72 runner cases**,
+including raw/empty/null/duplicate-key/malformed arguments. Eleven exact constants,
+normalizer and original regression records are reviewed, not entire files/groups.
+Rust1.88 Linux verification: **1,807 workspace tests +10 doctests +6 example tests
+passed;0 failed,30 ignored**. Strict all-feature/all-target lint/typecheck, format,
+rustdoc, facade feature matrix, standalone consumer,20 offline scenarios and host
+session pass. The example script's cargo-clippy launcher failed because procfs is
+unavailable; its equivalent strict direct-driver check and all remaining commands
+passed. Initial ledger validation rejected stale evidence; regenerated independent
+fixtures/Go evidence and all56 validators pass. Go reference:962 passing records,
+5 skips,46 packages. Source locks and dependency purity pass. Oracle case-count
+prose was corrected from54 to72 and source-bound evidence regenerated.
+
+Ledger: **1,266 verified /7,625 unresolved /251 excluded**. CI on the prior pushed
+head f35992e passed all46 reported checks, including Linux/macOS sandbox and
+Postgres jobs; that is not CI evidence for this new slice or comprehensive live/
+non-Linux acceptance. Full issue acceptance remains incomplete. Next identified
+retained gap: original offline retry-policy/provider-advice examples and helpers.
+
 ### Explicit legacy policy projections
 
 Added `adk::codec::policy`: legacy permission/remote-write labels, normalizers,

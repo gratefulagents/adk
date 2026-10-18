@@ -678,9 +678,13 @@ impl Runner {
     fn durable_fingerprint(&self) -> Result<String, Error> {
         let config = &self.config;
         if config
-            .immediate_input_poller
+            .action_authorizer
             .as_ref()
             .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
+            || config
+                .immediate_input_poller
+                .as_ref()
+                .is_some_and(|callback| callback.durable_key().is_none_or(str::is_empty))
             || config
                 .immediate_input_signal
                 .as_ref()
@@ -719,7 +723,7 @@ impl Runner {
             || config.durable.is_some()
         {
             return Err(unsupported(
-                "durable execution does not support custom compaction, turn context, or replay-unsafe model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates, final answer verifiers or hooks",
+                "durable execution does not support custom compaction, turn context, or replay-unsafe action authorizers, model resolvers, immediate input or carry-forward callbacks, guardrails, stop gates, final answer verifiers or hooks",
             ));
         }
         // Policy-derived child guidance must change when restore narrows access;
@@ -885,6 +889,9 @@ impl Runner {
             "transient_context": config.transient_context, "return_tool_output": config.return_tool_output,
             "tool_error_limit": config.consecutive_tool_error_limit,
         });
+        if let Some(authorizer) = &config.action_authorizer {
+            baseline["action_authorizer"] = serde_json::json!(authorizer.durable_key());
+        }
         if !config.tool_input_guardrails.is_empty() || !config.tool_output_guardrails.is_empty() {
             baseline["tool_guardrails"] = serde_json::json!({"input": config.tool_input_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>(), "output": config.tool_output_guardrails.iter().map(|g| (g.name(), g.durable_key())).collect::<Vec<_>>()});
         }
@@ -1485,6 +1492,7 @@ impl Runner {
             started_at: recovery.started_at,
             deadline_at: recovery.deadline_at,
             result: RunResult {
+                action_audit_records: vec![],
                 metrics: None,
                 history_provenance,
                 new_items_provenance: Vec::new(),

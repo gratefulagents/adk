@@ -134,6 +134,7 @@ fn partial_run_retains_history_usage_and_cause() {
         },
     };
     let partial = RunResult {
+        action_audit_records: vec![],
         final_output_is_raw_json: false,
         metrics: None,
         history_provenance: Vec::new(),

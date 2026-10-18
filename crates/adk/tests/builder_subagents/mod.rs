@@ -1,4 +1,5 @@
 use super::*;
+mod authorization;
 mod durable;
 mod lifecycle;
 use std::num::NonZeroU32;

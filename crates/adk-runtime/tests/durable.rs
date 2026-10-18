@@ -1,3 +1,6 @@
+#[path = "durable/authorization.rs"]
+mod authorization;
+
 use adk_core::*;
 use adk_runtime::*;
 use serde_json::{Value, json};

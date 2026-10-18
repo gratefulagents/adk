@@ -87,6 +87,7 @@ fn external_span_ownership_keeps_session_completion_in_ring_and_pending_events()
     let scope = adapter.session(4, "working");
     scope.finish(
         &RunResult {
+            action_audit_records: vec![],
             metrics: None,
             status: RunStatus::Completed,
             final_output: None,

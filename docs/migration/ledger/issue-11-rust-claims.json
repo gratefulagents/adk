@@ -23753,6 +23753,194 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-53E694C0CFB22B93": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionDecisionAllow",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionDecisionAllow. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-1ADF3604A9C945E1": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionDecisionAsk",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionDecisionAsk. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-3BC3C528FE512B9E": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionDecisionClassify",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionDecisionClassify. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7D22ACEF26AF8D1A": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionDecisionDeny",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionDecisionDeny. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-D729683FA6AB0196": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionRiskHigh",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionRiskHigh. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4103AB19044A3A45": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionRiskLow",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionRiskLow. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-9A279E57A87A2BCD": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "ActionRiskMedium",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record ActionRiskMedium. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-9CDB964CBE52DEC0": {
+      "source": "internal/agent/authorization.go",
+      "source_name": "NormalizeActionAuthorization",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed apis record NormalizeActionAuthorization. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-365B98FEE299B8D5": {
+      "source": "internal/agent/authorization_test.go",
+      "source_name": "TestNormalizeActionAuthorizationFailsClosed",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "action_authorization_normalization_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNormalizeActionAuthorizationFailsClosed",
+      "rationale": "Reviewed tests record TestNormalizeActionAuthorizationFailsClosed. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-81ADABC7CAA0FF66": {
+      "source": "internal/agent/authorization_test.go",
+      "source_name": "TestRunnerExecutesToolsWhenActionAuthorizerIsNil",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "authorization::action_authorizer_is_optional_and_cannot_expand_native_tool_access"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerExecutesToolsWhenActionAuthorizerIsNil",
+      "rationale": "Reviewed tests record TestRunnerExecutesToolsWhenActionAuthorizerIsNil. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-D8A69A58679F2A31": {
+      "source": "internal/agent/runner_authorization_test.go",
+      "source_name": "TestRunnerActionAuthorizationDecisions",
+      "implementation_symbols": [
+        "crates/adk-core/src/authorization.rs::normalize_action_authorization",
+        "crates/adk-runtime/src/runner.rs::Engine::authorize_action"
+      ],
+      "rust_test_identifiers": [
+        "authorization::action_authorizer_decisions_preserve_approval_in_run_and_stream",
+        "authorization::action_authorizer_rechecks_resumed_approval_and_clears_interruption"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerActionAuthorizationDecisions",
+      "rationale": "Reviewed tests record TestRunnerActionAuthorizationDecisions. Independently executed pinned Go oracle covers 80 normalization cases and 72 runner configurations/raw inputs, plus original regressions. Exact open decision/risk constants and fail-closed error/invalid-decision normalization preserve risk. Native ordinary-tool execution honors nil/allow/deny/ask, existing approval ceilings, raw request/audit order and resume reauthorization in run and stream. Malformed-input approval is explicitly stricter: native journal rejects instead of persisting invalid JSON; no equivalence claimed for that extra probe. Native tests additionally cover cancellation/owner drop, panic/deadline, ordered batches, child inheritance, replay-key checks and uncertain-effect rejection. No Go wire DTO, whole-interface/type, file or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

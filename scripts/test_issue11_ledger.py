@@ -103,6 +103,7 @@ class EvidenceTests(unittest.TestCase):
         original = self.evidence["reference_fixture_check"]
         for marker in ("Pinned tool schemas reproduced exactly",
                    "Pinned policy observations reproduced exactly",
+                   "Pinned action authorization observations reproduced exactly",
                        "272 SDK lifecycle results and resulting filesystem trees verified",
                        "1176 SDK ApplyPatch results and resulting filesystem trees verified",
                        "Pinned SDK MCP prompt observations reproduced exactly",

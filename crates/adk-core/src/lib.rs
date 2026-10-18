@@ -8,11 +8,13 @@
 //! **not** the Go compatibility format; wire conversion belongs to `adk-codec`.
 //! Contexts, credentials, trait objects, and runtime handles are not serializable.
 
+mod authorization;
 mod contracts;
 mod error;
 mod policy;
 mod types;
 
+pub use authorization::*;
 pub use contracts::*;
 pub use error::*;
 pub use policy::*;

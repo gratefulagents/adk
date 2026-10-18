@@ -389,6 +389,8 @@ pub struct RunMetrics {
 /// Pending approvals must be resolved before replaying their calls.
 #[derive(Debug, Clone, PartialEq, Serialize, Deserialize, JsonSchema)]
 pub struct RunResult {
+    #[serde(default, skip_serializing_if = "Vec::is_empty")]
+    pub action_audit_records: Vec<crate::ActionAuditRecord>,
     #[serde(default, skip_serializing_if = "Option::is_none")]
     pub metrics: Option<RunMetrics>,
     pub status: RunStatus,

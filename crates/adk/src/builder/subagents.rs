@@ -42,6 +42,7 @@ impl ChildExecutor for PendingExecutor {
 // Children own their input admission; retaining the parent session would also create an Arc cycle.
 pub(super) fn runner_config(parent: &RunnerConfig) -> RunnerConfig {
     RunnerConfig {
+        action_authorizer: parent.action_authorizer.clone(),
         work_dir: parent.work_dir.clone(),
         output: parent.output.clone(),
         retry: parent.retry.clone(),

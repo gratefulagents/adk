@@ -36,6 +36,7 @@ use std::{
 
 use adk_codec::approval::ApprovalMarkerBoundary;
 use adk_core::*;
+use futures_util::FutureExt;
 use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
@@ -651,6 +652,7 @@ pub trait CompactionModelResolver: Send + Sync {
 
 #[derive(Clone)]
 pub struct RunnerConfig {
+    pub action_authorizer: Option<Arc<dyn ActionAuthorizer>>,
     pub immediate_input_poller: Option<Arc<dyn ImmediateInputPoller>>,
     pub immediate_input_signal: Option<Arc<dyn ImmediateInputSignal>>,
     pub immediate_input_finalizer: Option<Arc<dyn ImmediateInputFinalizer>>,
@@ -712,6 +714,7 @@ pub struct RunnerConfig {
 impl Default for RunnerConfig {
     fn default() -> Self {
         Self {
+            action_authorizer: None,
             immediate_input_poller: None,
             immediate_input_signal: None,
             immediate_input_finalizer: None,
@@ -827,6 +830,7 @@ impl Continuation {
     ) -> Result<RunOutcome, RunError> {
         self.engine.result.status = RunStatus::Incomplete;
         self.engine.tools_prepared = true;
+        self.engine.action_authorizations.clear();
         self.engine.streaming = false;
         self.engine.sender.take();
         let initial_items = self.engine.result.new_items.len();
@@ -948,6 +952,7 @@ impl Continuation {
         }
         self.engine.streaming = false;
         self.engine.approvals = decisions.into_iter().collect();
+        self.engine.action_authorizations.clear();
         self.engine.tools_prepared = false;
         self.engine.result.status = RunStatus::Incomplete;
         Ok(self.engine)
@@ -1088,6 +1093,7 @@ impl Runner {
             calls: VecDeque::new(),
             disabled_handoff_calls: HashMap::new(),
             approvals: HashMap::new(),
+            action_authorizations: HashMap::new(),
             denial_reasons: HashMap::new(),
             deferred_calls: VecDeque::new(),
             pending_marker_events: Vec::new(),
@@ -1120,6 +1126,7 @@ impl Runner {
             sender: None,
             spills: vec![],
             result: RunResult {
+                action_audit_records: vec![],
                 metrics: None,
                 history_provenance: if request.input_provenance.is_empty() {
                     vec![ItemProvenance::Unknown; request.input.len()]
@@ -1179,6 +1186,7 @@ struct Engine {
     calls: VecDeque<ToolCall>,
     disabled_handoff_calls: HashMap<String, Option<String>>,
     approvals: HashMap<String, ApprovalDecision>,
+    action_authorizations: HashMap<String, ActionAuthorization>,
     denial_reasons: HashMap<String, String>,
     deferred_calls: VecDeque<ToolCall>,
     pending_marker_events: Vec<Observation>,
@@ -3555,6 +3563,57 @@ impl Engine {
             decision
         }
     }
+    async fn authorize_action(
+        &mut self,
+        call: &ToolCall,
+        definition: &ToolDefinition,
+    ) -> Result<Option<ActionAuthorization>, Error> {
+        let Some(authorizer) = self.config.action_authorizer.clone() else {
+            return Ok(None);
+        };
+        if let Some(authorization) = self.action_authorizations.get(&call.id) {
+            return Ok(Some(authorization.clone()));
+        }
+        let request = ActionRequest {
+            tool_name: call.name.clone(),
+            input: call.argument_text().into_owned(),
+            work_dir: self.config.work_dir.clone(),
+            read_only: definition.read_only,
+            provenance: "model-tool-call".into(),
+        };
+        let outcome = bounded(&self.context, None, async {
+            Ok(std::panic::AssertUnwindSafe(async {
+                authorizer.authorize(&self.context, request.clone()).await
+            })
+            .catch_unwind()
+            .await
+            .unwrap_or_else(|_| {
+                Err(Error::new(ErrorCategory::Host, "action authorizer panicked").into())
+            }))
+        })
+        .await?;
+        self.context.check_active()?;
+        let (authorization, error) = match outcome {
+            Ok(authorization) => (authorization, None),
+            Err(failure) => (
+                ActionAuthorization {
+                    risk: failure.risk,
+                    ..Default::default()
+                },
+                Some(failure.error),
+            ),
+        };
+        let authorization = normalize_action_authorization(authorization, error.as_ref());
+        self.result.action_audit_records.push(ActionAuditRecord {
+            request,
+            authorization: authorization.clone(),
+            error: error.map(|error| error.to_string()).unwrap_or_default(),
+        });
+        self.action_authorizations
+            .insert(call.id.clone(), authorization.clone());
+        Ok(Some(authorization))
+    }
+
     async fn prepare_tools(&mut self) -> Result<(), Error> {
         if self.durable_state.is_some() {
             return Ok(());
@@ -3578,7 +3637,23 @@ impl Engine {
                 .find(|tool| tool.definition().name == call.name);
             if let Some(tool) = tool {
                 let definition = tool.definition();
-                if self.tool_decision(definition) == ToolDecision::RequireApproval {
+                let decision = self.tool_decision(definition);
+                let authorization = if decision == ToolDecision::Deny {
+                    None
+                } else {
+                    self.authorize_action(&call, definition).await?
+                };
+                if authorization
+                    .as_ref()
+                    .is_some_and(|auth| auth.decision == ACTION_DECISION_DENY)
+                {
+                    ready.push_back(call);
+                    continue;
+                }
+                let action_ask = authorization
+                    .as_ref()
+                    .is_some_and(|auth| auth.decision == ACTION_DECISION_ASK);
+                if decision == ToolDecision::RequireApproval || action_ask {
                     if self.config.validate_tool_arguments
                         && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
                     {
@@ -3589,7 +3664,12 @@ impl Engine {
                     }
                     let request = ApprovalRequest {
                         call: call.clone(),
-                        reason: "tool policy requires approval".into(),
+                        reason: if action_ask {
+                            "action authorizer requires approval"
+                        } else {
+                            "tool policy requires approval"
+                        }
+                        .into(),
                     };
                     let approval = if let Some(approval) = self.approvals.remove(&call.id) {
                         approval
@@ -3636,6 +3716,11 @@ impl Engine {
                     let definition = tool.definition();
                     definition.name == call.name
                         && self.tool_decision(definition) == ToolDecision::Allow
+                        && (self.config.action_authorizer.is_none()
+                            || self
+                                .action_authorizations
+                                .get(&call.id)
+                                .is_some_and(|auth| auth.decision == ACTION_DECISION_ALLOW))
                         && (!self.config.validate_tool_arguments
                             || compile_schema(&definition.input_schema)
                                 .is_ok_and(|schema| schema.is_valid(&call.arguments)))
@@ -3718,7 +3803,39 @@ impl Engine {
             return Ok(false);
         }
         let definition = definition.unwrap();
-        let decision = self.tool_decision(definition);
+        let authorization = if tool.is_some() {
+            self.authorize_action(&call, definition).await?
+        } else {
+            None
+        };
+        if let Some(authorization) = &authorization
+            && authorization.decision == ACTION_DECISION_DENY
+        {
+            let reason = authorization.reason.trim();
+            let reason = if reason.is_empty() {
+                "the action is not permitted by policy"
+            } else {
+                reason
+            };
+            self.finish_tool(call, ExecutedTool {
+                guardrails: vec![],
+                raw: ToolOutput {
+                    content: vec![Content::Text { text: format!("Action denied: {reason}. Respect this boundary and find a safer approach; do not route around it.") }],
+                    is_error: true,
+                    should_pause: false,
+                },
+                hook_error: None,
+            }).await?;
+            return Ok(false);
+        }
+        let action_ask = authorization
+            .as_ref()
+            .is_some_and(|auth| auth.decision == ACTION_DECISION_ASK);
+        let decision = if action_ask {
+            ToolDecision::RequireApproval
+        } else {
+            self.tool_decision(definition)
+        };
         if handoff.is_none()
             && self.config.validate_tool_arguments
             && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
@@ -3731,7 +3848,12 @@ impl Engine {
         if decision == ToolDecision::RequireApproval {
             let request = ApprovalRequest {
                 call: call.clone(),
-                reason: "tool policy requires approval".into(),
+                reason: if action_ask {
+                    "action authorizer requires approval"
+                } else {
+                    "tool policy requires approval"
+                }
+                .into(),
             };
             if self.durable_state.is_some() {
                 self.checkpoint(Boundary::ApprovalPending, Some(&call))
@@ -4164,6 +4286,10 @@ impl Engine {
     async fn finish_tool(&mut self, call: ToolCall, executed: ExecutedTool) -> Result<(), Error> {
         self.calls.pop_front();
         self.approvals.remove(&call.id);
+        self.action_authorizations.remove(&call.id);
+        self.result
+            .pending_approvals
+            .retain(|request| request.call.id != call.id);
         self.result.guardrails.extend(executed.guardrails);
         let raw = executed.raw;
         self.tool_pause |= raw.should_pause;

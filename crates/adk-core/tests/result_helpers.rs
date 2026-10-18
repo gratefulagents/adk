@@ -3,6 +3,7 @@ use serde_json::json;
 
 fn result() -> RunResult {
     RunResult {
+        action_audit_records: vec![],
         final_output_is_raw_json: false,
         metrics: None,
         status: RunStatus::Completed,

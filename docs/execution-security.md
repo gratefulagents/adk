@@ -133,3 +133,33 @@ Native `core::ToolPolicy` still defaults to ReadOnly; `security::normalize_acces
 still fails closed on empty/unknown input. Hosts must explicitly resolve legacy
 configuration against their native permission ceiling. These helpers do not grant
 network, remote-write, MCP or sandbox authority.
+
+## Native per-action authorization
+
+Hosts can set `runtime::RunnerConfig::action_authorizer` to an
+`Arc<dyn core::ActionAuthorizer>`. The default is absent. Each accessible ordinary
+tool call supplies its name, original argument text, workspace, read-only flag and
+`model-tool-call` provenance. Handoff routing is not an ordinary tool authorization
+request. Static permission ceilings remain authoritative: an allow result cannot
+make a hidden or denied tool executable, nor waive an existing approval requirement.
+Automatic builder-created child runners inherit the parent authorizer.
+
+The open decision strings `allow`, `deny`, and `ask` are recognized exactly. Empty,
+unknown, case-mismatched and `classify` decisions fail closed. Callback failures
+retain risk metadata but replace the decision, reason and rule with a canonical
+denial. Panics are sanitized; cancellation, deadlines and dropping the run owner
+cancel pending authorization rather than detach it. Ask enters the normal approval
+flow. Authorization is repeated when an approval is resumed, so an old approval
+cannot override a newer denial. Batch audit order follows tool-call order.
+
+`RunResult::action_audit_records` contains raw requests, normalized decisions and
+host errors. These records can include private tool arguments and must be treated
+as sensitive data, not automatically forwarded to public logs. The typed native
+records are not Go JSON wire DTOs. Unlike the source in-memory approval path, the
+native approval journal rejects malformed raw JSON instead of persisting it.
+
+Durable execution requires a nonempty `ActionAuthorizer::durable_key()` identifying
+all policy inputs and asserting replay-safe repeated authorization. Missing or
+changed bindings cannot resume a checkpoint. Existing audit records survive native
+checkpoint recovery; uncertain external effects still require operator resolution
+before any reauthorization or re-execution.

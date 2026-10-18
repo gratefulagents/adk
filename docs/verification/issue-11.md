@@ -2,6 +2,18 @@
 
 ## Current continuation evidence
 
+### Explicit leaf-snapshot field evidence
+
+Seventeen individual field claims now bind the six LLMReasoning fields, four
+LLMCompaction fields, three LLMToolCall fields and four LLMToolApproval fields
+to their Rust members. These are not inferred from a parent declaration label:
+the independent pinned-Go reflection harness enumerates every exported field,
+and Rust compares field observations plus exact encoded bytes. The standalone
+compat facade executes all 693 leaf decode/encode cases. Existing raw-encode
+tests additionally cover empty/missing/null, invalid syntax and depth limits for
+the raw input members. No request/response/run-item envelope or builder claim
+is included in these field-level closures.
+
 ### Nullable message and tool-output images
 
 MessageOutput and ToolOutputData now preserve absent/null versus allocated-empty

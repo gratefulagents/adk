@@ -25120,6 +25120,302 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-5764CB710A6D73C5": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMCompaction.Content",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionSnapshot::content"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMCompaction.Content mapped to content. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-43796827B05B5A54": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMCompaction.CreatedBy",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionSnapshot::created_by"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMCompaction.CreatedBy mapped to created_by. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0449737D56349A12": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMCompaction.EncryptedContent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionSnapshot::encrypted_content"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMCompaction.EncryptedContent mapped to encrypted_content. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-67A0A52CFC811B07": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMCompaction.ID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionSnapshot::id"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMCompaction.ID mapped to id. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D5ECF53B43EFF956": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning.EncryptedContent",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot::encrypted_content"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMReasoning.EncryptedContent mapped to encrypted_content. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-540F6091F3E8CCC6": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning.ID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot::id"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMReasoning.ID mapped to id. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-ABD66CB1A66C2F34": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning.RedactedData",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot::redacted_data"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMReasoning.RedactedData mapped to redacted_data. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-39269DCF3784F731": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning.Signature",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot::signature"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMReasoning.Signature mapped to signature. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9103A059CBA91B8D": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning.Text",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot::text"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMReasoning.Text mapped to text. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8738EC72E81AD021": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning.Thinking",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot::thinking"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMReasoning.Thinking mapped to thinking. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-378A3313F18DC40A": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolApproval.Approved",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalSnapshot::approved"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolApproval.Approved mapped to approved. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-140BF60191FA5874": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolApproval.CallID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalSnapshot::call_id"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolApproval.CallID mapped to call_id. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-5FA23031C07A782D": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolApproval.Input",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalSnapshot::input"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolApproval.Input mapped to input. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DF7404E0C2511A79": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolApproval.ToolName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalSnapshot::tool_name"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolApproval.ToolName mapped to tool_name. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FE3BF2D13F633A83": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolCall.ID",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallSnapshot::id"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolCall.ID mapped to id. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C449DF101474E6BA": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolCall.Input",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallSnapshot::input"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolCall.Input mapped to input. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F721D0D37BE0B04A": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolCall.Name",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallSnapshot::name"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Exact field LLMToolCall.Name mapped to name. The independent reflection-driven Go oracle enumerates every exported field of this actual pinned type; Rust compares decoded field observations and exact encoded bytes, and the standalone facade executes the same byte cases. Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

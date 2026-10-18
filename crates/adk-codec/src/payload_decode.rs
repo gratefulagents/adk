@@ -7,8 +7,16 @@ use crate::snapshots::{
 };
 use serde::Deserialize;
 
+mod snapshot_bytes;
+
 mod sealed {
     pub trait Sealed: serde::Serialize {
+        fn decode_bytes(input: &[u8]) -> Result<Self, serde_json::Error>
+        where
+            Self: Sized + serde::de::DeserializeOwned,
+        {
+            super::decode_flat(input)
+        }
         const RAW_FIELD: Option<&'static str> = None;
         fn restore_raw(&mut self, _raw: super::RawJson) {}
         fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error>
@@ -23,6 +31,8 @@ mod sealed {
 /// The bounded compatibility records supported by [`from_go_json`].
 ///
 /// This trait is sealed; `RunItem` and `Agent` are not supported targets.
+/// The non-recursive analysis `RunItemSnapshot` is supported, including its
+/// nested tool-call and tool-approval raw inputs.
 pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 
 /// Decode a pinned SDK record with Go string replacement and object semantics.
@@ -43,6 +53,12 @@ pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 /// ```
 pub fn from_go_json<T: GoJsonDecode>(input: &[u8]) -> Result<T, serde_json::Error> {
     check_depth(input)?;
+    T::decode_bytes(input)
+}
+
+fn decode_flat<T: sealed::Sealed + serde::de::DeserializeOwned>(
+    input: &[u8],
+) -> Result<T, serde_json::Error> {
     let (bytes, raw) = if let Some(field) = T::RAW_FIELD {
         normalize_payload(input, field)?
     } else {
@@ -253,6 +269,17 @@ impl GoJsonEncode for ToolApprovalData {}
 impl sealed::Sealed for SnapshotModelSettings {}
 impl GoJsonDecode for SnapshotModelSettings {}
 impl GoJsonEncode for SnapshotModelSettings {}
+
+impl sealed::Sealed for RunItemSnapshot {
+    fn decode_bytes(input: &[u8]) -> Result<Self, serde_json::Error> {
+        snapshot_bytes::decode(input)
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        snapshot_bytes::encode(self)
+    }
+}
+impl GoJsonDecode for RunItemSnapshot {}
+impl GoJsonEncode for RunItemSnapshot {}
 
 go_object!(ResponseSnapshot,
     "end_turn" => end_turn: raw,

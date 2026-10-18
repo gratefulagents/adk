@@ -1,7 +1,10 @@
 #![cfg(feature = "compat")]
 
 use adk::codec::{
-    dto::{CompactionSnapshot, ReasoningSnapshot, ToolApprovalSnapshot, ToolCallSnapshot},
+    dto::{
+        CompactionSnapshot, ReasoningSnapshot, RunItemSnapshot, ToolApprovalSnapshot,
+        ToolCallSnapshot,
+    },
     from_go_json, to_go_json_bytes,
 };
 
@@ -10,6 +13,37 @@ fn unhex(text: &str) -> Vec<u8> {
         .chunks_exact(2)
         .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
         .collect()
+}
+
+#[test]
+fn public_run_item_snapshot_bytes_match_pinned_go() {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let cases = fixture["run_item_byte_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 40);
+    for (index, case) in cases.iter().enumerate() {
+        let decoded = from_go_json::<RunItemSnapshot>(&unhex(case["input_hex"].as_str().unwrap()));
+        assert_eq!(
+            decoded.is_ok(),
+            case["decode_ok"].as_bool().unwrap(),
+            "case {index}"
+        );
+        if let Ok(item) = decoded {
+            let encoded = to_go_json_bytes(&item);
+            assert_eq!(
+                encoded.is_ok(),
+                case["marshal_ok"].as_bool().unwrap(),
+                "case {index}"
+            );
+            if let Ok(bytes) = encoded {
+                assert_eq!(
+                    bytes,
+                    unhex(case["marshal_hex"].as_str().unwrap()),
+                    "case {index}"
+                );
+            }
+        }
+    }
 }
 
 #[test]

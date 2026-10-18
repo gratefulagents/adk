@@ -3,6 +3,89 @@ use adk_codec::{GoJsonDecode, GoJsonEncode, approval, dto::*, from_go_json, to_g
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
+#[test]
+fn run_item_nested_raw_byte_codecs_match_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let cases = fixture["run_item_byte_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 40);
+    for (index, case) in cases.iter().enumerate() {
+        let result = from_go_json::<RunItemSnapshot>(&unhex(case["input_hex"].as_str().unwrap()));
+        assert_eq!(
+            result.is_ok(),
+            case["decode_ok"].as_bool().unwrap(),
+            "case {index}"
+        );
+        if let Ok(item) = result {
+            for (field, raw) in [
+                ("tool_call", item.tool_call.as_ref().map(|call| &call.input)),
+                (
+                    "tool_approval",
+                    item.tool_approval.as_ref().map(|call| &call.input),
+                ),
+            ] {
+                let expected = &case["raw"][field];
+                assert_eq!(raw.is_some(), expected.is_object(), "case {index}/{field}");
+                if let Some(raw) = raw {
+                    assert_eq!(!raw.is_missing(), expected["present"].as_bool().unwrap());
+                    assert_eq!(raw.bytes(), unhex(expected["hex"].as_str().unwrap()));
+                }
+            }
+            let encoded = to_go_json_bytes(&item);
+            assert_eq!(
+                encoded.is_ok(),
+                case["marshal_ok"].as_bool().unwrap(),
+                "case {index}"
+            );
+            if let Ok(bytes) = encoded {
+                assert_eq!(
+                    bytes,
+                    unhex(case["marshal_hex"].as_str().unwrap()),
+                    "case {index}"
+                );
+            }
+        }
+    }
+    let cases = fixture["run_item_encode_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 20);
+    for (index, case) in cases.iter().enumerate() {
+        let raw = if case["raw_nil"].as_bool().unwrap() {
+            RawJson::Missing
+        } else {
+            RawJson::EncodedBytes(unhex(case["raw_hex"].as_str().unwrap()))
+        };
+        let mut item = RunItemSnapshot::default();
+        match case["field"].as_str().unwrap() {
+            "tool_call" => {
+                item.tool_call = Some(ToolCallSnapshot {
+                    input: raw,
+                    ..Default::default()
+                })
+            }
+            "tool_approval" => {
+                item.tool_approval = Some(ToolApprovalSnapshot {
+                    input: raw,
+                    ..Default::default()
+                })
+            }
+            field => panic!("unexpected field {field}"),
+        }
+        let encoded = to_go_json_bytes(&item);
+        assert_eq!(
+            encoded.is_ok(),
+            case["marshal_ok"].as_bool().unwrap(),
+            "encode case {index}"
+        );
+        if let Ok(bytes) = encoded {
+            assert_eq!(
+                bytes,
+                unhex(case["marshal_hex"].as_str().unwrap()),
+                "encode case {index}"
+            );
+        }
+    }
+}
+
 fn unhex(text: &str) -> Vec<u8> {
     text.as_bytes()
         .chunks_exact(2)

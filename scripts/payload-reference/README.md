@@ -28,6 +28,15 @@ are independently observed. The facade now checks 693 leaf decode/encode cases.
 The entire payload fixture contains 2,598 decode cases and 28 direct snapshot
 marshal cases; this still does not implement nested request/response raw bytes.
 
+`run_item_byte_cases` adds 40 whole run-item decode observations, including
+original nested raw bytes and whole-object marshal bytes. `run_item_encode_cases`
+adds 20 direct nested raw marshal probes. They distinguish whole-input decode
+depth from independently validated raw fragments during marshal. The native
+schema-bounded transport uses call-local tokens while the existing object
+decoder handles repeated pointers and nulls; it neither traverses arbitrary raw
+JSON as typed fields nor uses global state. Whole request/response codecs remain
+outside this bounded run-item slice.
+
 Output: `fixtures/payloads/observations.json`.
 
 - `schema_version`: 1.

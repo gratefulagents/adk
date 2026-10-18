@@ -95,6 +95,72 @@ func payloadSample(field reflect.StructField, populated bool) string {
 	}
 }
 
+func runItemByteCases() []map[string]any {
+	inputs := []string{
+		`{}`, `null`, `[]`, `false`,
+		`{"TYPE":"message","MESSAGE_TEXT":"retained","message_text":null}`,
+		`{"tool_call":{"input":{"a":1}},"TOOL_CALL":{"name":"tool"}}`,
+		`{"tool_call":{"input":true},"tool_call":null,"tool_call":{"name":"new"}}`,
+		`{"tool_call":{"input":true},"tool_call":{"input":null}}`,
+		`{"tool_call":{"input":01},"tool_call":null}`,
+		`{"tool_approval":{"input":{"a":1},"approved":true},"TOOL_APPROVAL":{"input":false,"approved":null}}`,
+		`{"tool_approval":{"input":true},"tool_approval":null}`,
+		`{"tool_call":{"input":{"input":"not another field"}},"unknown":{"tool_call":{"input":42}}}`,
+		`{"message_images":[{"media_type":"one","data":"a"},{"media_type":"two","data":"b"}],"message_images":[{}],"message_images":[null,null]}`,
+		"{\"message_text\":\"\xff\",\"tool_call\":{\"name\":\"\xff\",\"input\":\"\xff\"}}",
+	}
+	for _, field := range []string{"tool_call", "tool_approval"} {
+		for _, raw := range []string{`null`, `false`, `-0`, `1e99999`, `{ "x":1e+02,"x":2,"s":"\ud800" }`, `"\ud800"`, "\"\xff\"", "{\"\xff\":\"\xff\"}", `[1,]`} {
+			inputs = append(inputs, fmt.Sprintf(`{"%s":{"input":%s}}`, field, raw))
+		}
+		for _, depth := range []int{9997, 9998, 9999, 10000} {
+			inputs = append(inputs, fmt.Sprintf(`{"%s":{"input":%s0%s}}`, field, strings.Repeat("[", depth), strings.Repeat("]", depth)))
+		}
+	}
+	cases := []map[string]any{}
+	for _, input := range inputs {
+		var item LLMRunItemSnapshot
+		err := json.Unmarshal([]byte(input), &item)
+		row := map[string]any{"input_hex": hex.EncodeToString([]byte(input)), "decode_ok": err == nil}
+		if err == nil {
+			encoded, marshalErr := json.Marshal(item)
+			row["marshal_ok"] = marshalErr == nil
+			row["marshal_hex"] = hex.EncodeToString(encoded)
+			raw := map[string]any{}
+			if item.ToolCall != nil {
+				raw["tool_call"] = map[string]any{"present": item.ToolCall.Input != nil, "hex": hex.EncodeToString(item.ToolCall.Input)}
+			}
+			if item.ToolApproval != nil {
+				raw["tool_approval"] = map[string]any{"present": item.ToolApproval.Input != nil, "hex": hex.EncodeToString(item.ToolApproval.Input)}
+			}
+			row["raw"] = raw
+		}
+		cases = append(cases, row)
+	}
+	return cases
+}
+
+func runItemEncodeCases() []map[string]any {
+	cases := []map[string]any{}
+	values := []json.RawMessage{nil, {}, json.RawMessage(`null`), json.RawMessage(` { "b":1e+09,"b":2 } `), json.RawMessage("\"\xff\""), json.RawMessage(` `), json.RawMessage(`[1,]`)}
+	for _, depth := range []int{9999, 10000, 10001} {
+		values = append(values, json.RawMessage(strings.Repeat("[", depth)+"0"+strings.Repeat("]", depth)))
+	}
+	for _, raw := range values {
+		for _, field := range []string{"tool_call", "tool_approval"} {
+			item := LLMRunItemSnapshot{}
+			if field == "tool_call" {
+				item.ToolCall = &LLMToolCall{Input: raw}
+			} else {
+				item.ToolApproval = &LLMToolApproval{Input: raw}
+			}
+			encoded, err := json.Marshal(item)
+			cases = append(cases, map[string]any{"field": field, "raw_nil": raw == nil, "raw_hex": hex.EncodeToString(raw), "marshal_ok": err == nil, "marshal_hex": hex.EncodeToString(encoded)})
+		}
+	}
+	return cases
+}
+
 func TestNativePayloadReference(t *testing.T) {
 	if strconv.IntSize != 64 {
 		t.Fatalf("oracle requires IntSize 64, got %d", strconv.IntSize)
@@ -308,6 +374,7 @@ func TestNativePayloadReference(t *testing.T) {
 	}
 	result := map[string]any{
 		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
+		"run_item_byte_cases": runItemByteCases(), "run_item_encode_cases": runItemEncodeCases(),
 		"enum_values": map[string]RunItemType{
 			"RunItemMessage": RunItemMessage, "RunItemToolCall": RunItemToolCall,
 			"RunItemToolOutput": RunItemToolOutput, "RunItemHandoffCall": RunItemHandoffCall,

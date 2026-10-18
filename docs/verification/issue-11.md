@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Run-item nested raw byte transport
+
+The sealed byte codecs now accept analysis `RunItemSnapshot` documents. A finite
+schema walker protects only the tool-call/approval raw input fields with
+call-local tokens. Existing object decoding resolves repeated/null pointers
+before original raw bytes are restored. Encoding uses the same schema to splice
+validated compact raw fragments into typed JSON; no global state or JSON Value
+round trip is involved. Whole input syntax/depth is checked before replacement,
+so a later null cannot hide an invalid earlier raw fragment.
+
+Forty independent Go decode cases and twenty direct marshal cases cover nested
+raw UTF-8, lexical spelling, nil/empty/null, pointer merges/resets, ignored lookalike
+fields and the different decode versus raw-marshal depth boundaries. The public
+compat-only facade runs all forty decode comparisons. This is new executable
+coverage, not a whole `LLMRunItemSnapshot` declaration or request/response closure;
+the ledger remains **1,330 verified /7,561 unresolved /251 excluded**.
+
 ### Raw-bearing leaf snapshot byte codecs
 
 `ToolCallSnapshot` and `ToolApprovalSnapshot` now use the existing single-raw-field

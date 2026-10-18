@@ -2,6 +2,16 @@
 
 ## Current continuation evidence
 
+### Shared lossless snapshot settings
+
+Analysis `snapshots::ModelSettings` now re-exports the existing lossless DTO instead
+of maintaining a second, lossy record and decoder. Nil versus allocated-empty
+stop sequences survive decoding and merge. The pinned payload comparisons no
+longer normalize nil stop sequences to empty arrays. Public facade and request
+regressions cover the shared type; ordinary JSON float serialization now uses
+the same Go spelling as the DTO (including integer-spelled zero). This removes
+duplicate code without promoting whole request or trace integration claims.
+
 ### Request/response nested raw byte codecs
 
 The private bounded transport now also covers `RequestSnapshot` and
@@ -691,7 +701,9 @@ repeated stop-array backing slots. The regression failed before the fix with
 compare decoded state, binary64 bits (including negative zero and subnormals)
 and exact encoded bytes. All1,629 preceding observations remain unchanged;
 the full payload oracle now has1,905 cases. The public facade regression passes.
-The nil-preserving DTO remains separate; analysis Vec collapses nil/empty stops.
+At this checkpoint the nil-preserving DTO remained separate and analysis Vec
+collapsed nil/empty stops; the shared lossless settings continuation above
+removes that limitation.
 Enclosing RequestSnapshot compatibility is not claimed.
 
 Fresh Rust1.88 Linux: **1,769 all-feature workspace +10 doctests passed; 0 failed,

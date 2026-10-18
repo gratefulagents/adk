@@ -2,9 +2,7 @@ use crate::agents::{Definition as AgentDefinition, Kind as AgentKind};
 use crate::dto::*;
 use crate::go_decode::{ElementSeed, GoSlice, fold_key, go_object, normalize_strings, read_field};
 use crate::mode::ModeRoutingResolution;
-use crate::snapshots::{
-    ModelSettings as SnapshotModelSettings, OutputSchema, RequestSnapshot, ToolSnapshot,
-};
+use crate::snapshots::{OutputSchema, RequestSnapshot, ToolSnapshot};
 use serde::Deserialize;
 
 mod snapshot_bytes;
@@ -266,10 +264,6 @@ impl sealed::Sealed for ToolApprovalData {
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
 
-impl sealed::Sealed for SnapshotModelSettings {}
-impl GoJsonDecode for SnapshotModelSettings {}
-impl GoJsonEncode for SnapshotModelSettings {}
-
 impl sealed::Sealed for RunItemSnapshot {
     fn decode_bytes(input: &[u8]) -> Result<Self, serde_json::Error> {
         snapshot_bytes::decode(input)
@@ -363,18 +357,6 @@ go_object!(RequestSnapshot,
     "tools" => tools
     pointers { "output_schema" => output_schema }
     objects { "settings" => settings }
-);
-
-go_object!(SnapshotModelSettings,
-    "temperature" => temperature: raw,
-    "max_tokens" => max_tokens: integer,
-    "top_p" => top_p: raw,
-    "tool_choice" => tool_choice: scalar,
-    "parallel_tool_calls" => parallel_tool_calls: raw,
-    "thinking_budget" => thinking_budget: integer,
-    "reasoning_effort" => reasoning_effort: scalar,
-    "text_verbosity" => text_verbosity: scalar;
-    "stop_sequences" => stop_sequences
 );
 
 impl sealed::Sealed for OutputSchema {

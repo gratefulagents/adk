@@ -3,64 +3,8 @@
 use crate::dto::{RawJson, RunItemSnapshot};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize)]
-pub struct ModelSettings {
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(serialize_with = "finite_optional")]
-    pub temperature: Option<f64>,
-    #[serde(skip_serializing_if = "is_zero")]
-    pub max_tokens: i64,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(serialize_with = "finite_optional")]
-    pub top_p: Option<f64>,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub tool_choice: String,
-    #[serde(skip_serializing_if = "Option::is_none")]
-    pub parallel_tool_calls: Option<bool>,
-    #[serde(skip_serializing_if = "is_zero")]
-    pub thinking_budget: i64,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub reasoning_effort: String,
-    #[serde(skip_serializing_if = "String::is_empty")]
-    pub text_verbosity: String,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub stop_sequences: Vec<String>,
-}
-impl ModelSettings {
-    pub fn merge(&self, overrides: &Self) -> Self {
-        let mut merged = self.clone();
-        if overrides.temperature.is_some() {
-            merged.temperature = overrides.temperature;
-        }
-        if overrides.max_tokens > 0 {
-            merged.max_tokens = overrides.max_tokens;
-        }
-        if overrides.top_p.is_some() {
-            merged.top_p = overrides.top_p;
-        }
-        if !overrides.tool_choice.is_empty() {
-            merged.tool_choice.clone_from(&overrides.tool_choice);
-        }
-        if overrides.parallel_tool_calls.is_some() {
-            merged.parallel_tool_calls = overrides.parallel_tool_calls;
-        }
-        if overrides.thinking_budget > 0 {
-            merged.thinking_budget = overrides.thinking_budget;
-        }
-        if !overrides.reasoning_effort.is_empty() {
-            merged
-                .reasoning_effort
-                .clone_from(&overrides.reasoning_effort);
-        }
-        if !overrides.text_verbosity.is_empty() {
-            merged.text_verbosity.clone_from(&overrides.text_verbosity);
-        }
-        if !overrides.stop_sequences.is_empty() {
-            merged.stop_sequences.clone_from(&overrides.stop_sequences);
-        }
-        merged
-    }
-}
+/// The analysis document uses the same lossless settings record as the SDK facade.
+pub use crate::dto::ModelSettings;
 
 fn is_zero(value: &i64) -> bool {
     *value == 0
@@ -229,16 +173,6 @@ pub fn to_go_json(value: &impl Serialize) -> Result<Vec<u8>, serde_json::Error> 
         GoFormatter,
     ))?;
     Ok(bytes)
-}
-
-fn finite_optional<S: serde::Serializer>(
-    value: &Option<f64>,
-    serializer: S,
-) -> Result<S::Ok, S::Error> {
-    if value.is_some_and(|number| !number.is_finite()) {
-        return Err(serde::ser::Error::custom("non-finite model setting"));
-    }
-    value.serialize(serializer)
 }
 
 #[derive(Deserialize)]

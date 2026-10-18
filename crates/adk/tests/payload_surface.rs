@@ -121,7 +121,7 @@ fn snapshot_settings_codec_is_available_through_facade() {
         settings.temperature.unwrap().to_bits(),
         (-0.0_f64).to_bits()
     );
-    assert_eq!(settings.stop_sequences, ["a"]);
+    assert_eq!(settings.stop_sequences, Some(vec!["a".into()]));
     assert_eq!(
         to_go_json_bytes(&settings).unwrap(),
         br#"{"temperature":-0,"max_tokens":7,"stop_sequences":["a"]}"#

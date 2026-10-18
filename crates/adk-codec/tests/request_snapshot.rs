@@ -74,8 +74,13 @@ fn model_settings_merge_matches_pinned_sdk_without_aliasing_inputs() {
             case["merged"].as_str().unwrap().as_bytes(),
             "{case}"
         );
-        base.stop_sequences.push("changed base".into());
-        overrides.stop_sequences.push("changed override".into());
+        base.stop_sequences
+            .get_or_insert_with(Vec::new)
+            .push("changed base".into());
+        overrides
+            .stop_sequences
+            .get_or_insert_with(Vec::new)
+            .push("changed override".into());
         assert_eq!(
             adk_codec::snapshots::to_go_json(&merged).unwrap(),
             case["merged"].as_str().unwrap().as_bytes()
@@ -107,7 +112,7 @@ fn nil_and_explicit_zero_settings_are_distinct() {
     };
     assert_eq!(
         serde_json::to_value(settings).unwrap(),
-        serde_json::json!({"temperature":0.0,"parallel_tool_calls":false})
+        serde_json::json!({"temperature":0,"parallel_tool_calls":false})
     );
 }
 
@@ -186,5 +191,26 @@ fn settings_folded_scalar_null_and_slice_reuse() {
     ).unwrap();
     assert_eq!(settings.max_tokens, 7);
     assert_eq!(settings.temperature, None);
-    assert_eq!(settings.stop_sequences, ["a", "b"]);
+    assert_eq!(settings.stop_sequences, Some(vec!["a".into(), "b".into()]));
+}
+
+#[test]
+fn snapshot_settings_preserve_nil_and_allocated_empty_sequences() {
+    let nil: RequestSnapshot =
+        adk_codec::from_go_json(br#"{"settings":{"stop_sequences":null}}"#).unwrap();
+    let empty: RequestSnapshot =
+        adk_codec::from_go_json(br#"{"settings":{"stop_sequences":[]}}"#).unwrap();
+    assert_eq!(nil.settings.stop_sequences, None);
+    assert_eq!(empty.settings.stop_sequences, Some(vec![]));
+    assert_eq!(
+        empty
+            .settings
+            .merge(&ModelSettings::default())
+            .stop_sequences,
+        Some(vec![])
+    );
+    assert_eq!(
+        adk_codec::to_go_json_bytes(&nil).unwrap(),
+        adk_codec::to_go_json_bytes(&empty).unwrap()
+    );
 }

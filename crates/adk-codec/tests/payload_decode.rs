@@ -185,9 +185,6 @@ fn compare<T: Observation>(case: &Value) {
     if expected.get("images") == Some(&Value::Null) {
         expected["images"] = json!([]);
     }
-    if expected.get("stop_sequences") == Some(&Value::Null) {
-        expected["stop_sequences"] = json!([]);
-    }
     assert_eq!(decoded.fields(), expected, "decoded fields: {id}");
     match decoded.raw() {
         Some(raw) => {

@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Explicit provider configuration composition (partial factory evidence)
+
+`providers::factory::config` resolves a supported declarative configuration subset
+into scoped native routes and binds them to host-owned credential stores. Named
+instances do not inherit parent credentials or endpoints; selected scopes acquire
+credentials lazily. Ambiguous empty-provider configurations that would spread
+parent settings across canonical Go legs are rejected, not silently treated as
+source-equivalent behavior. Unsupported credential-file/OAuth acquisition,
+Copilot configuration and model fallbacks remain explicit limitations.
+
+The immutable Go oracle in `scripts/provider-config-reference` compares supported
+configuration projections and real loopback named-route requests. Independent
+Rust checks cover the resolver, request headers and opaque gateway model IDs,
+lazy scoped credential acquisition, actual facade Builder execution, and the
+providers-only facade without builder/runtime features. Eight targeted tests
+passed, followed by a full Rust 1.88 workspace test run and strict workspace
+Clippy. This is not a live-provider check or complete `ProviderSpec`/factory
+closure. No additional ledger entries are promoted by this implementation slice.
+
 ### Sandbox closure correction and local-refusal test replacements
 
 The closure claims added in `f7be72d` and `bcfb315` overstated source parity.

@@ -112,6 +112,7 @@ class EvidenceTests(unittest.TestCase):
         for marker in ("Pinned tool schemas reproduced exactly",
                    "Pinned policy observations reproduced exactly",
                    "Pinned MCP display observations reproduced exactly",
+                   "Pinned provider configuration observations reproduced exactly",
                    "Pinned sandbox expansion observations reproduced exactly",
                    "Pinned retry policy observations reproduced exactly",
                    "Pinned action authorization observations reproduced exactly",

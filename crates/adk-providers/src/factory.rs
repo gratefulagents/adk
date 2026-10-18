@@ -1,4 +1,5 @@
 //! Typed baseline provider selection. Credentials never inherit across routes.
+pub mod config;
 use crate::{
     auth::{AuthMode, CredentialStore, Refresh, Scope, Session},
     client::Provider,

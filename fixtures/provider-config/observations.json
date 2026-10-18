@@ -1,0 +1,998 @@
+{
+  "cases": [
+    {
+      "default": "openai",
+      "input": {},
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "local",
+      "input": {
+        "provider": "local"
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        }
+      ]
+    },
+    {
+      "default": "xai",
+      "input": {
+        "provider": " XAI "
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openai",
+      "input": {
+        "provider": "multi"
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "anthropic",
+      "input": {
+        "api_key": " top ",
+        "auth_mode": "oauth",
+        "base_url": " https://example.test/v1 ",
+        "default_provider": " ANTHROPIC ",
+        "model": "openrouter/a/b",
+        "provider": "multi"
+      },
+      "routes": [
+        {
+          "auth": "oauth",
+          "endpoint": "https://example.test/v1",
+          "key": "top",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openrouter",
+      "input": {
+        "api_key": " top ",
+        "api_mode": "responses",
+        "model": " OpenRouter /anthropic/claude",
+        "provider": "multi"
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "top",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "anthropic",
+      "input": {
+        "api_key": " parent ",
+        "provider": " Anthropic ",
+        "routes": [
+          {
+            "prefix": " Team ",
+            "provider": "groq"
+          }
+        ]
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "parent",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "team",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openrouter",
+      "input": {
+        "api_key": " top ",
+        "api_mode": "responses",
+        "base_url": "https://top.test/v1",
+        "default_provider": "openrouter",
+        "provider": "multi",
+        "provider_api_keys": {
+          " OPENROUTER ": " override ",
+          "anthropic": " secondary "
+        },
+        "provider_api_modes": {
+          "OPENROUTER": " chat-completions "
+        },
+        "provider_base_urls": {
+          " OpenRouter ": " https://override.test/v1 "
+        }
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "secondary",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://override.test/v1",
+          "key": "override",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openrouter",
+      "input": {
+        "api_key": " top ",
+        "api_mode": "responses",
+        "base_url": "https://top.test/v1",
+        "default_provider": "openrouter",
+        "provider": "multi",
+        "provider_api_keys": {
+          " OPENROUTER ": " \t "
+        },
+        "provider_api_modes": {
+          "openrouter": " "
+        },
+        "provider_base_urls": {
+          "openrouter": " "
+        }
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://top.test/v1",
+          "key": "top",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "anthropic",
+      "input": {
+        "auth_mode": "oauth",
+        "default_provider": "anthropic",
+        "provider": "multi",
+        "provider_auth_modes": {
+          " ANTHROPIC ": " api-key "
+        }
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openai",
+      "input": {
+        "default_provider": "openai",
+        "provider": "multi",
+        "provider_auth_modes": {
+          "anthropic": " OAUTH "
+        }
+      },
+      "routes": [
+        {
+          "auth": "oauth",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openrouter",
+      "input": {
+        "api_mode": "chat-completions",
+        "default_provider": "openrouter",
+        "provider": "multi",
+        "provider_api_modes": {
+          "openai": "responses"
+        }
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "anthropic",
+      "input": {
+        "api_key": "parent",
+        "auth_mode": "oauth",
+        "base_url": "https://parent.test",
+        "provider": "anthropic",
+        "routes": [
+          {
+            "api_key": "first",
+            "prefix": "anthropic",
+            "provider": "anthropic"
+          },
+          {
+            "api_key": " last ",
+            "prefix": " ",
+            "provider": " ANTHROPIC "
+          },
+          {
+            "prefix": "isolated",
+            "provider": "anthropic"
+          }
+        ]
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "last",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "isolated",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openai",
+      "input": {
+        "routes": [
+          {
+            "prefix": "extra",
+            "provider": "anthropic"
+          }
+        ]
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "extra",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openai",
+      "input": {
+        "base_url": "https://chatgpt.com/backend-api/codex",
+        "provider": "openai"
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "openai",
+      "input": {
+        "default_provider": " ",
+        "model": " /empty",
+        "provider": "multi"
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    }
+  ],
+  "errors": {
+    "missing": true,
+    "nested": true,
+    "unknown": true
+  },
+  "provenance": {
+    "archiveSHA256": "02efd0112edea295795df8d2435f10d2f7dcbf639defcc386e5cc68fe3194741",
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goARCH": "amd64",
+    "goOS": "linux",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/provider-config-reference/reference_test.go": "1e97caa46d1c53719893e885116dbf98e2ca0fa0566edbd88acbdaa61bd25c81",
+      "scripts/provider-config-reference/run.py": "e6157ab11b30b247ac4f99b210b3cf2efe59b5a5e4e826ad5fe245d0ee7db6f2"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/anthropic/client.go": "c2ac78f759ee433498f967cf2df2487c88d9c1e3f0e56f21c20abb922da1249a",
+      "internal/openai/client.go": "a306feeaad2929f44bd63700b41931e2ecf05d794f64b12a4e8172c843c0f68a",
+      "pkg/agentsdk/providers/audit_fixes_test.go": "c8942ecc70a539c0586b29eb1a105f594f788fcd140ee307163724aaccc80f03",
+      "pkg/agentsdk/providers/factory.go": "3cff648f22544444882583b0134fb4c7da1f3582310457b4fb9ac764fd009b79",
+      "pkg/agentsdk/providers/factory_test.go": "b0da0d150f03dae84ee8e688a357504e3c0bbbd40ddfa42f6850d293d0f5a580"
+    }
+  },
+  "schema_version": 1,
+  "wire": [
+    {
+      "api_key": "fixture-key",
+      "authorization": "",
+      "flavor": "key",
+      "model": "claude-sonnet-4-5",
+      "oauth_beta": false,
+      "path": "/v1/messages",
+      "text": "ok"
+    },
+    {
+      "api_key": "",
+      "authorization": "Bearer fixture-bearer",
+      "flavor": "bearer",
+      "model": "claude-sonnet-4-5",
+      "oauth_beta": true,
+      "path": "/v1/messages",
+      "text": "ok"
+    },
+    {
+      "api_key": "",
+      "authorization": "Bearer fixture-openrouter",
+      "flavor": "openrouter",
+      "model": "anthropic/claude-sonnet-4.6",
+      "oauth_beta": false,
+      "path": "/api/v1/chat/completions",
+      "text": "ok"
+    }
+  ]
+}

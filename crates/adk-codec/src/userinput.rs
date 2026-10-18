@@ -43,7 +43,7 @@ pub fn extract_ask_user_choices(input: &[u8]) -> Option<Vec<u8>> {
     }
     go_object!(Input, "choices" => choices: slice);
     let input = decode::<Option<Input>>(input).ok()??;
-    let choices = input.choices.into_values().unwrap_or_default();
+    let choices = input.choices.into_values().ok()?.unwrap_or_default();
     if choices.is_empty() {
         return None;
     }
@@ -71,7 +71,9 @@ pub fn extract_present_plan_data(input: &[u8]) -> (String, Option<Vec<u8>>) {
         return (String::new(), None);
     };
     let input = input.unwrap_or_default();
-    let actions = input.actions.into_values();
+    let Ok(actions) = input.actions.into_values() else {
+        return (String::new(), None);
+    };
     (
         input.summary,
         Some(marshal_quick_actions(actions.as_deref())),
@@ -103,13 +105,18 @@ pub fn extract_ask_user_question(input: &[u8]) -> String {
     go_object!(Structured, "questions" => questions: slice);
     go_object!(Simple, "question" => question: scalar);
     if let Ok(Some(value)) = decode::<Option<Structured>>(input) {
-        let questions = value.questions.into_values().unwrap_or_default();
+        let questions = value
+            .questions
+            .into_values()
+            .ok()
+            .flatten()
+            .unwrap_or_default();
         if !questions.is_empty() {
-            return questions
+            let formatted = questions
                 .into_iter()
-                .map(|q| {
+                .map(|q| -> Result<String, serde_json::Error> {
                     let mut text = q.question;
-                    let options = q.options.into_values().unwrap_or_default();
+                    let options = q.options.into_values()?.unwrap_or_default();
                     if !options.is_empty() {
                         text.push_str(" Options: ");
                         text.push_str(
@@ -126,10 +133,12 @@ pub fn extract_ask_user_question(input: &[u8]) -> String {
                                 .join(" | "),
                         );
                     }
-                    text
+                    Ok(text)
                 })
-                .collect::<Vec<_>>()
-                .join("\n");
+                .collect::<Result<Vec<_>, _>>();
+            if let Ok(formatted) = formatted {
+                return formatted.join("\n");
+            }
         }
     }
     if let Ok(Some(value)) = decode::<Option<Simple>>(input) {

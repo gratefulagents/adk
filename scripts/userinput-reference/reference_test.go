@@ -10,6 +10,9 @@ import (
 
 func TestNativeUserInputReference(t *testing.T) {
 	inputs := []string{
+		`{"questions":[{"question":"Q","options":[{"label":"one"},{"label":"two"}]}],"questions":[{"options":[{"label":"short"}]}],"questions":[{"options":[null,null]}]}`,
+		`{"questions":[{"question":"Q","options":[{"label":"one"},{"label":"two"}]}],"questions":[],"questions":[{"options":[null,null]}]}`,
+		`{"questions":[{"options":[{"label":1}]}],"questions":[],"question":"simple"}`,
 		``, `{`, `null`, `{}`, `[]`, `42`, `"text"`,
 		`{"question":"Continue?","choices":["Yes","No"]}`,
 		`{"question":" <&>\u2028 ","choices":["<&>",null,""]}`,

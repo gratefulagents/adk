@@ -1,6 +1,9 @@
 package main
 
-import agent "github.com/gratefulagents/sdk/pkg/agentsdk"
+import (
+	"encoding/json"
+	agent "github.com/gratefulagents/sdk/pkg/agentsdk"
+)
 
 func imageSliceStates(items []agent.LLMRunItemSnapshot) []bool {
 	out := []bool{}
@@ -29,4 +32,25 @@ func responseSliceState(snapshot agent.LLMResponseSnapshot) map[string]any {
 		"tool_calls":      snapshot.ToolCalls == nil,
 		"message_images":  imageSliceStates(snapshot.Items),
 	}
+}
+
+func requestInPlaceCases() []map[string]any {
+	inputs := [][2]string{
+		{`{"settings":{"stop_sequences":[]}}`, `{}`},
+		{`{"settings":{"stop_sequences":[]}}`, `{"settings":{}}`},
+		{`{"settings":{"stop_sequences":[]}}`, `{"settings":null}`},
+		{`{"input_items":[],"tools":[],"settings":{"stop_sequences":[]}}`, `{}`},
+		{`{"input_items":[{"message_images":[]}]}`, `{"input_items":[{}]}`},
+		{`{"input_items":[{"message_images":[]}]}`, `{"input_items":[null]}`},
+	}
+	var cases []map[string]any
+	for _, input := range inputs {
+		var snapshot agent.LLMRequestSnapshot
+		must(json.Unmarshal([]byte(input[0]), &snapshot))
+		must(json.Unmarshal([]byte(input[1]), &snapshot))
+		encoded, err := json.Marshal(snapshot)
+		must(err)
+		cases = append(cases, map[string]any{"initial": input[0], "input": input[1], "encoded": string(encoded), "nil_slices": requestSliceState(snapshot)})
+	}
+	return cases
 }

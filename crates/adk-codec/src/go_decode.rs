@@ -16,22 +16,60 @@ where
     }
 }
 
-// Go retains backing-array elements across repeated nonempty slice fields.
+// Slice elements explicitly opt into Go object merging; primitive strings replace.
+pub(crate) trait SliceElement: Default + serde::de::DeserializeOwned {
+    const MERGE_OBJECTS: bool;
+}
+impl SliceElement for String {
+    const MERGE_OBJECTS: bool = false;
+}
+
+// Retain each slot's updates until the outer array is complete. Materializing T
+// after every occurrence would discard hidden backing slots in its nested arrays.
 #[derive(Default)]
 pub(crate) struct GoSlice<T> {
-    slots: Vec<T>,
+    slots: Vec<GoPointer<T>>,
     len: Option<usize>,
 }
 impl<T> GoSlice<T> {
     pub(crate) fn from_values(slots: Vec<T>) -> Self {
         Self {
             len: Some(slots.len()),
-            slots,
+            slots: slots
+                .into_iter()
+                .map(|value| GoPointer::from_value(Some(value)))
+                .collect(),
         }
     }
-    pub(crate) fn into_values(self) -> Option<Vec<T>> {
+}
+impl<T: SliceElement> GoSlice<T> {
+    pub(crate) fn into_values(self) -> Result<Option<Vec<T>>, serde_json::Error> {
         self.len
-            .map(|len| self.slots.into_iter().take(len).collect())
+            .map(|len| {
+                self.slots
+                    .into_iter()
+                    .take(len)
+                    .map(|slot| slot.into_value().map(Option::unwrap_or_default))
+                    .collect()
+            })
+            .transpose()
+    }
+}
+pub(crate) struct SliceElementSeed<'a, T>(&'a mut GoPointer<T>);
+impl<'de, T: SliceElement> serde::de::DeserializeSeed<'de> for SliceElementSeed<'_, T> {
+    type Value = ();
+    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+        let raw = Option::<Box<serde_json::value::RawValue>>::deserialize(d)?;
+        if let Some(raw) = raw {
+            let text = raw.get();
+            let _: T = serde_json::from_str(text).map_err(serde::de::Error::custom)?;
+            if T::MERGE_OBJECTS {
+                self.0.append_object(text);
+            } else {
+                self.0.fields = Some(text.to_owned());
+            }
+        }
+        Ok(())
     }
 }
 pub(crate) struct ElementSeed<'a, T>(pub(crate) &'a mut T);
@@ -53,7 +91,7 @@ impl<'de, T: Deserialize<'de>> serde::de::Visitor<'de> for ElementSeed<'_, T> {
         T::deserialize_in_place(d, self.0)
     }
 }
-impl<'de, T: Deserialize<'de> + Default> Deserialize<'de> for GoSlice<T> {
+impl<'de, T: SliceElement> Deserialize<'de> for GoSlice<T> {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
         let mut out = Self::default();
         Self::deserialize_in_place(d, &mut out)?;
@@ -64,7 +102,7 @@ impl<'de, T: Deserialize<'de> + Default> Deserialize<'de> for GoSlice<T> {
         out: &mut Self,
     ) -> Result<(), D::Error> {
         struct Slice<'a, T>(&'a mut GoSlice<T>);
-        impl<'de, T: Deserialize<'de> + Default> serde::de::Visitor<'de> for Slice<'_, T> {
+        impl<'de, T: SliceElement> serde::de::Visitor<'de> for Slice<'_, T> {
             type Value = ();
             fn expecting(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
                 f.write_str("an SDK slice or null")
@@ -77,10 +115,10 @@ impl<'de, T: Deserialize<'de> + Default> Deserialize<'de> for GoSlice<T> {
                 let mut len = 0;
                 loop {
                     if len == self.0.slots.len() {
-                        self.0.slots.push(T::default());
+                        self.0.slots.push(GoPointer::from_value(Some(T::default())));
                     }
                     if seq
-                        .next_element_seed(ElementSeed(&mut self.0.slots[len]))?
+                        .next_element_seed(SliceElementSeed(&mut self.0.slots[len]))?
                         .is_none()
                     {
                         break;
@@ -100,38 +138,17 @@ impl<'de, T: Deserialize<'de> + Default> Deserialize<'de> for GoSlice<T> {
 
 pub(crate) struct GoPointer<T> {
     fields: Option<String>,
-    marker: std::marker::PhantomData<T>,
+    value: Option<T>,
 }
-impl<T: serde::Serialize + serde::de::DeserializeOwned> GoPointer<T> {
-    pub(crate) fn from_value(value: Option<T>) -> Result<Self, serde_json::Error> {
-        let fields = value
-            .map(|value| serde_json::to_string(&value))
-            .transpose()?;
-        Ok(Self {
-            fields,
-            marker: std::marker::PhantomData,
-        })
+impl<T> GoPointer<T> {
+    pub(crate) fn from_value(value: Option<T>) -> Self {
+        Self {
+            fields: None,
+            value,
+        }
     }
-    pub(crate) fn into_value(self) -> Result<Option<T>, serde_json::Error> {
-        self.fields
-            .map(|fields| serde_json::from_str(&fields))
-            .transpose()
-    }
-}
-pub(crate) struct PointerSeed<'a, T>(pub(crate) &'a mut GoPointer<T>);
-impl<'de, T: serde::de::DeserializeOwned> serde::de::DeserializeSeed<'de> for PointerSeed<'_, T> {
-    type Value = ();
-    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
-        let raw = Option::<Box<serde_json::value::RawValue>>::deserialize(d)?;
-        let Some(raw) = raw else {
-            self.0.fields = None;
-            return Ok(());
-        };
-        let text = raw.get();
-        // Validate before a later null can discard an invalid pointer object.
-        let _: T = serde_json::from_str(text).map_err(serde::de::Error::custom)?;
-        if let Some(fields) = &mut self.0.fields {
-            // Decode repeated objects together so slice backing slots survive.
+    fn append_object(&mut self, text: &str) {
+        if let Some(fields) = &mut self.fields {
             let inner = text[1..text.len() - 1].trim();
             if !inner.is_empty() {
                 fields.pop();
@@ -142,8 +159,36 @@ impl<'de, T: serde::de::DeserializeOwned> serde::de::DeserializeSeed<'de> for Po
                 fields.push('}');
             }
         } else {
-            self.0.fields = Some(text.to_owned());
+            self.fields = Some(text.to_owned());
         }
+    }
+}
+impl<T: Default + serde::de::DeserializeOwned> GoPointer<T> {
+    pub(crate) fn into_value(self) -> Result<Option<T>, serde_json::Error> {
+        let Some(fields) = self.fields else {
+            return Ok(self.value);
+        };
+        let mut value = self.value.unwrap_or_default();
+        let mut decoder = serde_json::Deserializer::from_str(&fields);
+        T::deserialize_in_place(&mut decoder, &mut value)?;
+        decoder.end()?;
+        Ok(Some(value))
+    }
+}
+pub(crate) struct PointerSeed<'a, T>(pub(crate) &'a mut GoPointer<T>);
+impl<'de, T: serde::de::DeserializeOwned> serde::de::DeserializeSeed<'de> for PointerSeed<'_, T> {
+    type Value = ();
+    fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
+        let raw = Option::<Box<serde_json::value::RawValue>>::deserialize(d)?;
+        let Some(raw) = raw else {
+            self.0.fields = None;
+            self.0.value = None;
+            return Ok(());
+        };
+        let text = raw.get();
+        // Validate before a later null can discard an invalid pointer object.
+        let _: T = serde_json::from_str(text).map_err(serde::de::Error::custom)?;
+        self.0.append_object(text);
         Ok(())
     }
 }
@@ -217,7 +262,9 @@ macro_rules! read_field {
     };
     ($map:ident, $out:expr, slice) => {
         struct SliceSeed<'a, T>(&'a mut GoSlice<T>);
-        impl<'de, T: Deserialize<'de> + Default> serde::de::DeserializeSeed<'de> for SliceSeed<'_, T> {
+        impl<'de, T: $crate::go_decode::SliceElement> serde::de::DeserializeSeed<'de>
+            for SliceSeed<'_, T>
+        {
             type Value = ();
             fn deserialize<D: serde::Deserializer<'de>>(self, d: D) -> Result<(), D::Error> {
                 GoSlice::deserialize_in_place(d, self.0)
@@ -229,6 +276,7 @@ macro_rules! read_field {
 
 macro_rules! go_object {
     ($ty:ident, $( $key:literal => $field:ident : $kind:ident ),* $(,)? $(; $( $slice_key:literal => $slice:ident ),* )? $( preserve_nil { $( $nil_key:literal => $nil_slice:ident ),* } )? $( pointers { $( $ptr_key:literal => $ptr:ident ),* } )? $( objects { $( $obj_key:literal => $obj:ident ),* } )?) => {
+        impl $crate::go_decode::SliceElement for $ty { const MERGE_OBJECTS: bool = true; }
         impl<'de> Deserialize<'de> for $ty {
             fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
                 let mut out = Self::default();
@@ -250,8 +298,8 @@ macro_rules! go_object {
                         let out = self.0;
                         $($(let mut $slice = GoSlice::from_values(std::mem::take(&mut out.$slice));)*)?
                         $($(let mut $nil_slice = out.$nil_slice.take().map(GoSlice::from_values).unwrap_or_default();)*)?
-                        $($(let mut $ptr = $crate::go_decode::GoPointer::from_value(out.$ptr.take()).map_err(serde::de::Error::custom)?;)*)?
-                        $($(let mut $obj = $crate::go_decode::GoPointer::from_value(Some(std::mem::take(&mut out.$obj))).map_err(serde::de::Error::custom)?;)*)?
+                        $($(let mut $ptr = $crate::go_decode::GoPointer::from_value(out.$ptr.take());)*)?
+                        $($(let mut $obj = $crate::go_decode::GoPointer::from_value(Some(std::mem::take(&mut out.$obj)));)*)?
                         while let Some(key) = map.next_key::<String>()? {
                             let key = fold_key(&key);
                             match key.as_str() {
@@ -263,8 +311,8 @@ macro_rules! go_object {
                                 _ => { map.next_value::<serde::de::IgnoredAny>()?; }
                             }
                         }
-                        $($(out.$slice = $slice.into_values().unwrap_or_default();)*)?
-                        $($(out.$nil_slice = $nil_slice.into_values();)*)?
+                        $($(out.$slice = $slice.into_values().map_err(serde::de::Error::custom)?.unwrap_or_default();)*)?
+                        $($(out.$nil_slice = $nil_slice.into_values().map_err(serde::de::Error::custom)?;)*)?
                         $($(out.$ptr = $ptr.into_value().map_err(serde::de::Error::custom)?;)*)?
                         $($(out.$obj = $obj.into_value().map_err(serde::de::Error::custom)?.expect("value object state remains non-null");)*)?
                         Ok(())

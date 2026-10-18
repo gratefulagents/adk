@@ -489,7 +489,11 @@ go_object!(RoleSpec,
 
 impl<'de> Deserialize<'de> for RoleCatalog {
     fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
-        Ok(Self(GoSlice::<RoleSpec>::deserialize(d)?.into_values()))
+        Ok(Self(
+            GoSlice::<RoleSpec>::deserialize(d)?
+                .into_values()
+                .map_err(serde::de::Error::custom)?,
+        ))
     }
 
     fn deserialize_in_place<D: serde::Deserializer<'de>>(
@@ -498,7 +502,7 @@ impl<'de> Deserialize<'de> for RoleCatalog {
     ) -> Result<(), D::Error> {
         let mut roles = out.0.take().map(GoSlice::from_values).unwrap_or_default();
         GoSlice::deserialize_in_place(d, &mut roles)?;
-        out.0 = roles.into_values();
+        out.0 = roles.into_values().map_err(serde::de::Error::custom)?;
         Ok(())
     }
 }

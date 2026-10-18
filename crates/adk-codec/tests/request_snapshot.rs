@@ -50,6 +50,34 @@ fn request_snapshot_field_records_match_independent_pinned_go() {
 }
 
 #[test]
+fn in_place_snapshot_decoding_retains_allocated_empty_state() {
+    use serde::Deserialize;
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["request_inplace_cases"].as_array().unwrap() {
+        let mut snapshot: RequestSnapshot =
+            adk_codec::from_go_json(case["initial"].as_str().unwrap().as_bytes()).unwrap();
+        let mut decoder = serde_json::Deserializer::from_str(case["input"].as_str().unwrap());
+        RequestSnapshot::deserialize_in_place(&mut decoder, &mut snapshot).unwrap();
+        decoder.end().unwrap();
+        assert_eq!(
+            serde_json::json!({
+                "input_items": snapshot.input_items.is_none(),
+                "tools": snapshot.tools.is_none(),
+                "stop_sequences": snapshot.settings.stop_sequences.is_none(),
+                "message_images": snapshot.input_items.iter().flatten().map(|item| item.message_images.is_none()).collect::<Vec<_>>()
+            }),
+            case["nil_slices"],
+            "{case}"
+        );
+        assert_eq!(
+            adk_codec::to_go_json_bytes(&snapshot).unwrap(),
+            case["encoded"].as_str().unwrap().as_bytes()
+        );
+    }
+}
+
+#[test]
 fn model_settings_merge_preserves_original_sdk_example() {
     let base = ModelSettings {
         temperature: Some(0.5),

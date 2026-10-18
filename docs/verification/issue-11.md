@@ -2,6 +2,21 @@
 
 ## Current continuation evidence
 
+### Nested decoder backing state
+
+Slice elements now retain validated object updates until materialization, rather
+than losing nested backing slots between duplicate array fields. Pointer objects
+use the same replay mechanism; null/empty resets remain distinct, scalar elements
+replace, and invalid earlier updates still reject even when later overwritten.
+Pinned-Go request observations exercise nested image shrink/regrowth, pointer
+updates and resets, while in-place decoding checks preserve allocated-empty
+initial state. Three independent user-input observations cover nested option
+retention, outer-array reset and invalid overwritten options.
+
+The targeted request, user-input and content-event suites pass (28 tests).
+This strengthens shared decoder behavior, not whole-envelope or issue closure;
+the retained acceptance ledger remains unchanged.
+
 ### Nullable analysis snapshot slices
 
 Request input/tool arrays, response item/text/reasoning/tool arrays and run-item

@@ -388,10 +388,22 @@ impl<'de> serde::Deserialize<'de> for ParsedEvent {
                         }
                     }
                 }
-                out.tools = tools.into_values().unwrap_or_default();
-                out.subagent_depends_on = subagent_depends_on.into_values().unwrap_or_default();
-                out.subagent_waiting_on = subagent_waiting_on.into_values().unwrap_or_default();
-                out.mcp_servers = mcp_servers.into_values().unwrap_or_default();
+                out.tools = tools
+                    .into_values()
+                    .map_err(serde::de::Error::custom)?
+                    .unwrap_or_default();
+                out.subagent_depends_on = subagent_depends_on
+                    .into_values()
+                    .map_err(serde::de::Error::custom)?
+                    .unwrap_or_default();
+                out.subagent_waiting_on = subagent_waiting_on
+                    .into_values()
+                    .map_err(serde::de::Error::custom)?
+                    .unwrap_or_default();
+                out.mcp_servers = mcp_servers
+                    .into_values()
+                    .map_err(serde::de::Error::custom)?
+                    .unwrap_or_default();
                 Ok(ParsedEvent(out))
             }
         }

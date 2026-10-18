@@ -575,6 +575,80 @@
   "request_record_cases": [
     {
       "accepted": true,
+      "encoded": "{\"input_items\":[{\"type\":\"\",\"message_images\":[{\"media_type\":\"\",\"data\":\"short\"},{\"media_type\":\"\",\"data\":\"two\"}]}],\"settings\":{}}",
+      "input": "{\"input_items\":[{\"message_images\":[{\"data\":\"one\"},{\"data\":\"two\"}]}],\"input_items\":[{\"message_images\":[{\"data\":\"short\"}]}],\"input_items\":[{\"message_images\":[null,null]}]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          false
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
+    },
+    {
+      "accepted": true,
+      "encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"images\":[{\"media_type\":\"\",\"data\":\"short\"},{\"media_type\":\"\",\"data\":\"two\"}],\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "input": "{\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":\"one\"},{\"data\":\"two\"}]}}],\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":\"short\"}]}}],\"input_items\":[{\"tool_output\":{\"images\":[null,null]}}]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          true
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
+    },
+    {
+      "accepted": true,
+      "encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"images\":[{\"media_type\":\"\",\"data\":\"\"},{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "input": "{\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":\"one\"},{\"data\":\"two\"}]}}],\"input_items\":[{\"tool_output\":null}],\"input_items\":[{\"tool_output\":{\"images\":[null,null]}}]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          true
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
+    },
+    {
+      "accepted": true,
+      "encoded": "{\"input_items\":[{\"type\":\"\",\"message_images\":[{\"media_type\":\"\",\"data\":\"\"},{\"media_type\":\"\",\"data\":\"\"}]}],\"settings\":{}}",
+      "input": "{\"input_items\":[{\"message_images\":[{\"data\":\"one\"},{\"data\":\"two\"}]}],\"input_items\":[],\"input_items\":[{\"message_images\":[null,null]}]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          false
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
+    },
+    {
+      "accepted": true,
+      "encoded": "{\"input_items\":[{\"type\":\"\",\"message_images\":[{\"media_type\":\"\",\"data\":\"short\"}]},{\"type\":\"\",\"message_images\":[{\"media_type\":\"\",\"data\":\"three\"},{\"media_type\":\"\",\"data\":\"four\"}]}],\"settings\":{}}",
+      "input": "{\"input_items\":[{\"message_images\":[{\"data\":\"one\"},{\"data\":\"two\"}]},{\"message_images\":[{\"data\":\"three\"},{\"data\":\"four\"}]}],\"input_items\":[{\"message_images\":[{\"data\":\"short\"}]}],\"input_items\":[null,{\"message_images\":[null,null]}]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          false,
+          false
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
+    },
+    {
+      "accepted": false,
+      "input": "{\"input_items\":[{\"message_images\":[{\"data\":1}]}],\"input_items\":[]}"
+    },
+    {
+      "accepted": false,
+      "input": "{\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":1}]}}],\"input_items\":[{\"tool_output\":null}]}"
+    },
+    {
+      "accepted": true,
       "encoded": "{\"settings\":{}}",
       "input": "{\"input_items\":[],\"tools\":[],\"settings\":{\"stop_sequences\":[]}}",
       "nil_slices": {
@@ -3577,6 +3651,78 @@
       "texts": true,
       "thinking_texts": true,
       "tool_calls": true
+    }
+  ],
+  "request_inplace_cases": [
+    {
+      "encoded": "{\"settings\":{}}",
+      "initial": "{\"settings\":{\"stop_sequences\":[]}}",
+      "input": "{}",
+      "nil_slices": {
+        "input_items": true,
+        "message_images": [],
+        "stop_sequences": false,
+        "tools": true
+      }
+    },
+    {
+      "encoded": "{\"settings\":{}}",
+      "initial": "{\"settings\":{\"stop_sequences\":[]}}",
+      "input": "{\"settings\":{}}",
+      "nil_slices": {
+        "input_items": true,
+        "message_images": [],
+        "stop_sequences": false,
+        "tools": true
+      }
+    },
+    {
+      "encoded": "{\"settings\":{}}",
+      "initial": "{\"settings\":{\"stop_sequences\":[]}}",
+      "input": "{\"settings\":null}",
+      "nil_slices": {
+        "input_items": true,
+        "message_images": [],
+        "stop_sequences": false,
+        "tools": true
+      }
+    },
+    {
+      "encoded": "{\"settings\":{}}",
+      "initial": "{\"input_items\":[],\"tools\":[],\"settings\":{\"stop_sequences\":[]}}",
+      "input": "{}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [],
+        "stop_sequences": false,
+        "tools": false
+      }
+    },
+    {
+      "encoded": "{\"input_items\":[{\"type\":\"\"}],\"settings\":{}}",
+      "initial": "{\"input_items\":[{\"message_images\":[]}]}",
+      "input": "{\"input_items\":[{}]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          false
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
+    },
+    {
+      "encoded": "{\"input_items\":[{\"type\":\"\"}],\"settings\":{}}",
+      "initial": "{\"input_items\":[{\"message_images\":[]}]}",
+      "input": "{\"input_items\":[null]}",
+      "nil_slices": {
+        "input_items": false,
+        "message_images": [
+          false
+        ],
+        "stop_sequences": true,
+        "tools": true
+      }
     }
   ]
 }

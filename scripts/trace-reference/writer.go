@@ -71,6 +71,13 @@ func responseRecordCases() []map[string]any {
 
 func requestRecordCases() []map[string]any {
 	inputs := []string{
+		`{"input_items":[{"message_images":[{"data":"one"},{"data":"two"}]}],"input_items":[{"message_images":[{"data":"short"}]}],"input_items":[{"message_images":[null,null]}]}`,
+		`{"input_items":[{"tool_output":{"images":[{"data":"one"},{"data":"two"}]}}],"input_items":[{"tool_output":{"images":[{"data":"short"}]}}],"input_items":[{"tool_output":{"images":[null,null]}}]}`,
+		`{"input_items":[{"tool_output":{"images":[{"data":"one"},{"data":"two"}]}}],"input_items":[{"tool_output":null}],"input_items":[{"tool_output":{"images":[null,null]}}]}`,
+		`{"input_items":[{"message_images":[{"data":"one"},{"data":"two"}]}],"input_items":[],"input_items":[{"message_images":[null,null]}]}`,
+		`{"input_items":[{"message_images":[{"data":"one"},{"data":"two"}]},{"message_images":[{"data":"three"},{"data":"four"}]}],"input_items":[{"message_images":[{"data":"short"}]}],"input_items":[null,{"message_images":[null,null]}]}`,
+		`{"input_items":[{"message_images":[{"data":1}]}],"input_items":[]}`,
+		`{"input_items":[{"tool_output":{"images":[{"data":1}]}}],"input_items":[{"tool_output":null}]}`,
 		`{"input_items":[],"tools":[],"settings":{"stop_sequences":[]}}`,
 		`{"input_items":[{"message_images":[]}],"input_items":[null]}`,
 		`{"input_items":[{"message_images":[]}],"input_items":[{"message_images":null}]}`,
@@ -278,6 +285,7 @@ func writerFixture() {
 	result["native_response_variants"] = responseVariants
 	result["native_response_nil_slices"] = responseNilVariants
 	result["native_request_nil_slices"] = nativeRequestNilCases()
+	result["request_inplace_cases"] = requestInPlaceCases()
 	result["response_record_cases"] = responseRecordCases()
 	result["request_record_cases"] = requestRecordCases()
 	result["merged_settings_cases"] = mergedSettingsCases()

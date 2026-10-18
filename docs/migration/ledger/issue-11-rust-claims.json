@@ -19674,6 +19674,85 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-865710F04D30223E": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestFunctionToolExecute",
+      "implementation_symbols": [
+        "crates/adk-core/src/contracts.rs::Tool",
+        "crates/adk-core/src/types.rs::ToolCall::argument_text",
+        "crates/adk-runtime/src/runner.rs::execute_tool"
+      ],
+      "rust_test_identifiers": [
+        "native_tool_echo_preserves_original_raw_input_and_success_result"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestFunctionToolExecute",
+      "rationale": "Only the original echo execution regression is closed. The native owned Tool implementation receives the exact quoted hello input and returns echoed text with is_error=false; a real runner dispatch and subsequent model request verify preservation end-to-end. The object schema does not force argument-shape validation, matching the isolated original helper. Explicit full-access/trusted-output test configuration isolates execution from native policy filtering/wrapping, without changing production security defaults. Rust typed Tool/ToolOutput contracts replace the Go Fn callback wrapper; whole FunctionTool helper API, nil callbacks and all error/timeout behavior remain unclaimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-CFA2311D5A3F8312": {
+      "source": "internal/agent/types_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::add",
+        "crates/adk-codec/src/dto.rs::Usage::total_tokens",
+        "crates/adk-codec/src/items.rs::extract_last_text",
+        "crates/adk-codec/src/items.rs::extract_text",
+        "crates/adk-codec/src/items.rs::extract_tool_calls",
+        "crates/adk-codec/src/snapshots.rs::ModelSettings::merge",
+        "crates/adk-core/src/contracts.rs::Tool",
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-core/src/types.rs::RunResult::final_text",
+        "crates/adk-core/src/types.rs::RunResult::is_interrupted",
+        "crates/adk-core/src/types.rs::ToolCall::argument_text",
+        "crates/adk-providers/src/routing.rs::Routes::resolve",
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire",
+        "crates/adk-runtime/src/hooks.rs::CompositeHooks",
+        "crates/adk-runtime/src/runner.rs::AgentConfig",
+        "crates/adk-runtime/src/runner.rs::Engine::model_response",
+        "crates/adk-runtime/src/runner.rs::Engine::model_turn",
+        "crates/adk-runtime/src/runner.rs::Handoff::new",
+        "crates/adk-runtime/src/runner.rs::InstructionProvider",
+        "crates/adk-runtime/src/runner.rs::RunHooks",
+        "crates/adk-runtime/src/runner.rs::execute_tool",
+        "crates/adk-runtime/src/runner.rs::model_turn",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig",
+        "crates/adk/src/builder.rs::Builder::build"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution",
+        "complete_and_stream_share_named_override_default_and_nested_resolution",
+        "dynamic_instructions_failure_cancellation_and_drop_never_dispatch_a_model",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff",
+        "empty_composite_hooks_are_noop_for_original_lifecycle_categories",
+        "final_text_matches_original_sdk_example",
+        "handoff_tool_definition_matches_original_sdk_example",
+        "interruption_matches_original_sdk_example",
+        "item_extractors_match_pinned_go_including_empty_messages_and_mismatched_payloads",
+        "item_helpers_are_available_through_standalone_facade",
+        "model_settings_merge_matches_pinned_sdk_without_aliasing_inputs",
+        "model_settings_merge_preserves_original_sdk_example",
+        "native_tool_echo_preserves_original_raw_input_and_success_result",
+        "output_schema_name_and_strict_default_match_original_sdk_test",
+        "parent_and_child_turn_defaults_are_independent",
+        "signed_usage_arithmetic_matches_pinned_go",
+        "stop_at_tools_membership_matches_original_sdk_example",
+        "tool_call_extraction_preserves_missing_empty_and_invalid_raw_input",
+        "tool_exposure_orders_explicit_tools_before_handoffs",
+        "tripwire_messages_identify_phase_without_serializing_diagnostic_data",
+        "turn_limit_error_includes_limit_and_preserves_partial_history",
+        "usage_add_and_total_match_original_sdk_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestFunctionToolExecute",
+      "rationale": "Reviewed all281 lines and all21 original test functions. Every original has a separately mapped native regression and is independently executed from the immutable SDK pin: instructions/tool order/clone, independent turn defaults, result/usage/item/settings helpers, echo execution, handoff/routing/stopping, ordinary-ASCII error messages, schema defaults and no-op hooks. Closure is strictly this regression file, under each individual claim boundary: owned Rust traits/policies replace nullable Go pointers/callbacks; explicit test access/trust settings isolate direct-helper behavior. No inference of whole agent/tool/provider/hook/error/configuration implementation parity, arbitrary Go formatting or pointer identity is made.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime"
+      ]
     }
   }
 }

@@ -296,6 +296,87 @@ fn stop_at_tools_membership_matches_original_sdk_example() {
 }
 
 #[tokio::test]
+async fn native_tool_echo_preserves_original_raw_input_and_success_result() {
+    struct Echo(ToolDefinition);
+    impl Tool for Echo {
+        fn definition(&self) -> &ToolDefinition {
+            &self.0
+        }
+        fn execute<'a>(
+            &'a self,
+            _: &'a ToolContext,
+            call: ToolCall,
+        ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+            Box::pin(async move {
+                Ok(ToolOutput {
+                    content: vec![Content::Text {
+                        text: format!("echoed: {}", call.argument_text()),
+                    }],
+                    is_error: false,
+                    should_pause: false,
+                })
+            })
+        }
+    }
+    let model = TestModel::with(vec![
+        Ok(response(
+            vec![RunItem::ToolCall {
+                call: ToolCall {
+                    id: "echo-call".into(),
+                    name: "echo".into(),
+                    arguments: json!("hello"),
+                    raw_arguments: Some("\"hello\"".into()),
+                },
+            }],
+            None,
+        )),
+        Ok(answer("done")),
+    ]);
+    let mut agent = agent(model.clone());
+    agent.tools.push(Arc::new(Echo(ToolDefinition {
+        name: "echo".into(),
+        description: "echoes input".into(),
+        input_schema: schemars::json_schema!({"type": "object"}),
+        read_only: false,
+        requires_approval: false,
+    })));
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            output: adk_runtime::output::OutputPolicy {
+                untrusted: false,
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let mut request = request(2);
+    request.policy.tools.access = AccessMode::FullAccess;
+    runner
+        .run(context(), request, Arc::new(TestHost::default()))
+        .await
+        .unwrap();
+    let requests = model.requests.lock().unwrap();
+    assert_eq!(requests.len(), 2);
+    let output = requests[1]
+        .input
+        .iter()
+        .find_map(|item| match item {
+            RunItem::ToolResult { call_id, output } if call_id == "echo-call" => Some(output),
+            _ => None,
+        })
+        .unwrap();
+    assert!(!output.is_error);
+    assert_eq!(
+        output.content,
+        vec![Content::Text {
+            text: "echoed: \"hello\"".into()
+        }]
+    );
+}
+
+#[tokio::test]
 async fn empty_composite_hooks_are_noop_for_original_lifecycle_categories() {
     let hooks: Arc<dyn RunHooks> = Arc::new(CompositeHooks::default());
     let call = ToolCall {

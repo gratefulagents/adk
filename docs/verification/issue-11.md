@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Complete original type-test file
+
+Reviewed all281 lines and all21 original tests in `internal/agent/types_test.go`.
+The final echo counterpart passes a raw JSON string through actual native `Tool`
+dispatch and verifies the exact successful echo in the next model request. Its
+object schema does not impose argument-shape validation. Explicit test access and
+trusted-output settings isolate the original direct-helper boundary; production
+security defaults are unchanged. Typed `Tool`/`ToolOutput` replace the Go callback
+wrapper, without claiming the entire FunctionTool API or nil/error/timeout cases.
+All21 originals now execute and have individually scoped native counterparts;
+the complete regression-file mapping adds no broader implementation-file claim.
+
+Fresh Rust 1.88 Linux: **1,759 workspace +10 doctests passed; 0 failed,30 ignored**.
+Strict Clippy/typecheck/format, independent bound references, all56 validators,
+separate artifact proof, overlay/audit and immutable source locks passed.
+Original Go: **933 pass /5 skip /38 packages**. Ledger: **1,082 verified /7,809
+unresolved /251 excluded**. Full retained acceptance remains incomplete.
+
 ### Additional original type regressions and no-op hooks
 
 Mapped six original regressions: static/dynamic instruction precedence, explicit

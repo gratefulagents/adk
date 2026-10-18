@@ -2,46 +2,92 @@
 
 ## Current continuation evidence
 
-### Explicit sandbox configuration parsing
+### Sandbox closure correction and local-refusal test replacements
 
-Added `config_from_environment_posix` and a data-only `ConfigProjection`, with
-363 hermetic Go comparisons of every constructed field and the resulting base
-environment. Covers both original config regressions, raw mode/PATH/GOROOT,
-cleaned lists preserving duplicates, newline-over-comma ExtraEnv delimiters,
-first-equals splitting, trimmed duplicate last-wins keys, invalid-key rejection,
-literal values and30 flag spellings. In particular, source `TrUe` is false while
-`YeS` is true; parsed flags never enable native unsafe-local or Kubernetes access.
+The closure claims added in `f7be72d` and `bcfb315` overstated source parity.
+Under `docs/migration/ledger/acceptance-contracts.json`, complete constructor and
+environment-site obligations include acquisition: Go `ConfigFromEnv` calls
+`os.Getenv`, and `SafeEnvMap` delegates to `SafeEnvMapWithConfig`, which calls
+`os.Getenv` and `os.Environ`. Rust's explicit-map projections do not acquire the
+process environment. No approved divergence authorizes treating that difference
+as equivalent; no ambient reads or permissions are added to resolve it.
 
-Full workspace tests/rustdoc and strict all-target lint/typecheck/format pass,
-as do12 compat-only facade tests, the standalone consumer,20 scenarios, refreshed
-bound evidence,56 validators, source locks and purity. The initial stdlib evidence
-path assumed older atob.go; located Go1.26's actual strconv/number.go and rebound
-it before final verification. Four exact API/config/test facets and ten production
-ConfigFromEnv key-lookup facets are verified, explicitly through host snapshots
-rather than automatic native environment loading. Ledger **1,329 verified /
-7,562 unresolved /251 excluded**. Whole Config JSON/type, other lookup sites,
-Windows and Default executor remain unclaimed; full issue11 is not complete.
+Removed 17 claims: the `SafeEnvMap`, `SafeEnvMapWithConfig` and `ConfigFromEnv`
+API records; the latter two functions' configuration records; all ten
+`ConfigFromEnv` environment-lookup records; and the original `TestConfigFromEnv`
+and `TestConfigFromEnvParsesAllowUnsafeReadOnlyLocal` test records. Their
+projection code and tests remain useful partial evidence, not constructor or
+acquisition closure. Refreshed source-bound Rust/artifact evidence and the
+overlay/audit now record **1,314 verified /7,577 unresolved /251 excluded**.
 
+The nine constants, ordered name-list API/configuration facets, and `ExpandSafe`
+remain pure obligations supported by the pinned source, direct oracle observations
+and `sandbox_configuration_names_match_pinned_go_and_are_owned` /
+`explicit_environment_expansion_matches_pinned_go`. The configuration-name facet
+covers only the pure list declaration, not environment acquisition.
 
-### POSIX base-environment projection
+Two separate test-only replacements cover `TestLocalExecutorRejectsReadOnly`
+(`SDK-A66EAE07F918B66A`) and `TestLocalExecutorRejectsWorkspaceWrite`
+(`SDK-88A64FA34EA9D2CA`). The public-facade test
+`local_executor_rejects_restricted_modes_before_spawn` selects `Backend::Local`
+and `Network::Allow`, checks the exact native `Error::Invalid` message
+`local requires explicit FullAccess and network Allow` for both access modes,
+and checks that a command's marker file was never created. This deliberately
+replaces the Go diagnostic-substring assertions with a precise native policy
+error; it does not close the Go Build API, Default executor or whole executor.
+The test is gated for Linux/macOS with the execution feature, but execution
+evidence is Linux Rust 1.88 only; no macOS execution is claimed.
 
-Added `codec::sandbox_env::EnvironmentConfig` and `safe_environment_map_posix`.
-The host supplies a parent snapshot; the helper never acquires ambient values,
-spawns a process or installs native sandbox grants.106 hermetic pinned-Go cases
-verify complete maps, original configuration-test inputs, identity/locale selection,
-secret exclusion, configured/inherited/fallback PATH, prepend/append precedence,
-lexical cleanup/deduplication, GOROOT, sorted extra expansion, trimmed duplicate
-keys, all25 Go whitespace scalars and byte-preserving NUL/invalid UTF-8 behavior.
-The compatibility-only facade regression runs without host/runtime features.
+### Explicit sandbox configuration parsing (projection evidence only)
 
-Full workspace tests and rustdoc passed with0 failures/30 ignored; subsequent
-minimal-facade tests (11 passed), full feature matrix/standalone consumer,20 scenarios,
-strict all-target lint/typecheck/format, refreshed bound evidence,56 validators,
-source locks and purity pass. Four exact API/test/configuration facets are closed;
-ledger **1,315 verified /7,576 unresolved /251 excluded**. No whole Config/JSON,
-Windows path, request-override-ordering, flattened SafeEnv or ConfigFromEnv claim.
-CI for preceding c72f913 passed46/46; this continuation's CI is tracked separately.
-Full issue11 acceptance remains incomplete.
+`config_from_environment_posix` and the data-only `ConfigProjection` have 363
+hermetic Go comparisons of normalized field values and resulting base maps.
+They include the original configuration inputs, raw mode/PATH/GOROOT, cleaned
+lists preserving duplicates, newline-over-comma ExtraEnv delimiters, first-equals
+splitting, trimmed duplicate last-wins keys, invalid-key rejection, literal values
+and 30 flag spellings. Source `TrUe` is false while `YeS` is true; parsed flags
+never enable native unsafe-local or Kubernetes access.
+
+These comparisons do not port the original tests' process-environment acquisition.
+In `scripts/sandbox-env-reference/environment_test.go`, `nativeHexList` and
+`nativeHexMap` normalize nil slices/maps to empty collections. Consequently the
+oracle does not establish nil-versus-empty representation or full Config/JSON
+parity, even when every projected field compares equal. Whole constructors,
+production lookup sites, Windows behavior and Default executor remain unclosed.
+
+### POSIX base-environment projection (projection evidence only)
+
+`codec::sandbox_env::EnvironmentConfig` and `safe_environment_map_posix` consume
+a host-supplied parent snapshot; they never acquire ambient values, spawn a
+process or install native sandbox grants. The 106 pinned-Go cases compare output
+maps for identity/locale selection, secret exclusion, configured/inherited/fallback
+PATH, prepend/append precedence, lexical cleanup/deduplication, GOROOT, sorted
+extra expansion, trimmed duplicate keys, all 25 Go whitespace scalars and
+byte-preserving NUL/invalid UTF-8 behavior.
+
+Retained only the test record `SDK-C46CF0DD7263D870` from `f7be72d` as an explicit
+replacement of the complete `TestSafeEnvSandboxConfiguration` entry point
+(`executor_test.go:59-84`). All five original assertions depend only on supplied
+Config: cleaned configured PATH, configured GOROOT, JAVA_HOME, TOOL_PATH expanded
+from that configured PATH, and invalid BAD-NAME omission. The first
+`nativeEnvironmentCases` Config is the exact original input; the Rust
+`posix_environment_projection_matches_pinned_go` regression checks its complete
+output maps across parent snapshots. The source test has no skip/live gates or
+platform guards. This pure assertion coverage does not close its ambient-reading
+callee, the constructor/configuration facet, or Windows paths.
+
+Fresh Linux Rust 1.88 checks for this correction: all four `adk-codec` sandbox
+environment tests and the targeted facade local-refusal test pass (zero failures).
+Codec test-target typecheck and warning-denied direct-driver Clippy pass, as do
+canonical JSON/exact claim-delta validation and `git diff --check`. The standard
+Cargo launcher failed because `/proc/self/exe` is unavailable; verification used
+the installed Rust 1.88 binaries directly. Subsequently the full bound Rust/Go
+evidence suite, artifact verification, all 56 ledger validators, source locks and
+dependency purity passed. All four execution-only facade tests and the targeted
+native policy regression passed; strict workspace all-target lint and formatting
+also passed. Preceding head `bcfb315` has 46/46 successful CI checks; those are
+historical evidence, not CI proof of this correction. Full issue #11 acceptance
+remains incomplete.
 
 
 ### Sandbox configuration-name metadata

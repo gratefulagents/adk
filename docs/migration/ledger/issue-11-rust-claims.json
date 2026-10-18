@@ -24804,41 +24804,7 @@
         "sandbox_configuration_names_match_pinned_go_and_are_owned"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
-      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle. Reviewed the configuration-constructor/registration facet: it covers exactly executor.go lines93–104, the same pure name-list declaration, not configuration parsing or installation.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-20264AB04BB4BCA2": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": "SafeEnvMap",
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
-        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
-      ],
-      "rust_test_identifiers": [
-        "posix_environment_projection_matches_pinned_go"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvInheritsSystemVarsOnly",
-      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-DCF109F148404596": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": "SafeEnvMapWithConfig",
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
-        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
-      ],
-      "rust_test_identifiers": [
-        "posix_environment_projection_matches_pinned_go"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvSandboxConfiguration",
-      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy.",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle. Reviewed the configuration-constructor/registration facet: it covers exactly executor.go lines93\u2013104, the same pure name-list declaration, not configuration parsing or installation.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
@@ -24855,269 +24821,42 @@
         "posix_environment_projection_matches_pinned_go"
       ],
       "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvSandboxConfiguration",
-      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy.",
+      "rationale": "Test-only replacement of the complete TestSafeEnvSandboxConfiguration entry point (executor_test.go:59-84), not SafeEnvMapWithConfig API/configuration or environment-acquisition closure. Its five assertions depend solely on explicit Config: configured PATH cleans to /custom/bin:/usr/bin regardless of parent PATH, GOROOT is /custom/go, JAVA_HOME is /opt/jdk, TOOL_PATH expands that configured PATH with /extra,with-comma, and BAD-NAME is omitted. The exact original Config is the first nativeEnvironmentCases fixture in scripts/sandbox-env-reference/environment_test.go; posix_environment_projection_matches_pinned_go checks the full resulting map across supplied parent snapshots. The original test has no live/skip gates or platform guards. This preserves its pure assertions, not ambient acquisition, nil-versus-empty Config representation, other constructor tests, Windows paths, or executor behavior.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
     },
-    "SDK-8CED05AB91BF32FF": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": "SafeEnvMapWithConfig",
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
-        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
-      ],
-      "rust_test_identifiers": [
-        "posix_environment_projection_matches_pinned_go"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvSandboxConfiguration",
-      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy. Separately reviewed configuration-constructor facet executor.go1160–1180: the exact same pure map-construction body, not executor installation or ConfigFromEnv.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-ABE5ABFB1DFF24F8": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": "ConfigFromEnv",
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix",
-        "crates/adk-codec/src/sandbox_env.rs::ConfigProjection"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Explicit-host-snapshot POSIX parser projection only, not ambient acquisition or executor installation.363 independently executed Go cases compare every constructed Config field and its derived SafeEnvMap output; includes both original config regressions. Covers raw mode/PATH/GOROOT, cleaned path lists preserving duplicates, newline-over-comma ExtraEnv delimiters, first-equals split, trimmed keys/values with duplicate last-wins, invalid-key rejection, no premature expansion, and30 flag spellings (TrUe false, YeS true). Native projection preserves default empty workspace/false Kubernetes detection. Caller-owned data and compat-only facade retain no execution authority; parsed unsafe-local/Kubernetes flags do not alter native policy. No whole Config JSON/type, Windows or Default executor closure.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-1FF4CF07B6057407": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": "ConfigFromEnv",
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix",
-        "crates/adk-codec/src/sandbox_env.rs::ConfigProjection"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Explicit-host-snapshot POSIX parser projection only, not ambient acquisition or executor installation.363 independently executed Go cases compare every constructed Config field and its derived SafeEnvMap output; includes both original config regressions. Covers raw mode/PATH/GOROOT, cleaned path lists preserving duplicates, newline-over-comma ExtraEnv delimiters, first-equals split, trimmed keys/values with duplicate last-wins, invalid-key rejection, no premature expansion, and30 flag spellings (TrUe false, YeS true). Native projection preserves default empty workspace/false Kubernetes detection. Caller-owned data and compat-only facade retain no execution authority; parsed unsafe-local/Kubernetes flags do not alter native policy. No whole Config JSON/type, Windows or Default executor closure.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-87AB4E95AA2E28B4": {
+    "SDK-A66EAE07F918B66A": {
       "source": "pkg/agentsdk/sandbox/executor_test.go",
-      "source_name": "TestConfigFromEnv",
+      "source_name": "TestLocalExecutorRejectsReadOnly",
       "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix",
-        "crates/adk-codec/src/sandbox_env.rs::ConfigProjection"
+        "crates/adk/tests/execution.rs::local_executor_rejects_restricted_modes_before_spawn"
       ],
       "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
+        "local_executor_rejects_restricted_modes_before_spawn"
       ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Explicit-host-snapshot POSIX parser projection only, not ambient acquisition or executor installation.363 independently executed Go cases compare every constructed Config field and its derived SafeEnvMap output; includes both original config regressions. Covers raw mode/PATH/GOROOT, cleaned path lists preserving duplicates, newline-over-comma ExtraEnv delimiters, first-equals split, trimmed keys/values with duplicate last-wins, invalid-key rejection, no premature expansion, and30 flag spellings (TrUe false, YeS true). Native projection preserves default empty workspace/false Kubernetes detection. Caller-owned data and compat-only facade retain no execution authority; parsed unsafe-local/Kubernetes flags do not alter native policy. No whole Config JSON/type, Windows or Default executor closure.",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestLocalExecutorRejectsReadOnly",
+      "rationale": "Test-only native replacement after complete review of TestLocalExecutorRejectsReadOnly: the source LocalExecutor.Build rejects the restricted permission mode with a non-nil policy error mentioning read-only or subprocess sandbox. The public-facade regression uses Backend::Local, tests ReadOnly and WorkspaceWrite with Network::Allow to isolate access refusal, and replaces Go diagnostic substring assertions with exact sandbox::Error::Invalid(\"local requires explicit FullAccess and network Allow\"). A shell command would create a marker; absence of that file verifies rejection before execution. This is a native diagnostic replacement, not Go error-text, Build API, Default executor, environment acquisition or whole executor equivalence. The regression is execution-feature gated for Linux/macOS; execution evidence is Linux Rust 1.88 only, with no macOS run claimed.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
-        "compat"
+        "execution"
       ]
     },
-    "SDK-E09710B26CD9EED4": {
+    "SDK-88A64FA34EA9D2CA": {
       "source": "pkg/agentsdk/sandbox/executor_test.go",
-      "source_name": "TestConfigFromEnvParsesAllowUnsafeReadOnlyLocal",
+      "source_name": "TestLocalExecutorRejectsWorkspaceWrite",
       "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix",
-        "crates/adk-codec/src/sandbox_env.rs::ConfigProjection"
+        "crates/adk/tests/execution.rs::local_executor_rejects_restricted_modes_before_spawn"
       ],
       "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
+        "local_executor_rejects_restricted_modes_before_spawn"
       ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnvParsesAllowUnsafeReadOnlyLocal",
-      "rationale": "Explicit-host-snapshot POSIX parser projection only, not ambient acquisition or executor installation.363 independently executed Go cases compare every constructed Config field and its derived SafeEnvMap output; includes both original config regressions. Covers raw mode/PATH/GOROOT, cleaned path lists preserving duplicates, newline-over-comma ExtraEnv delimiters, first-equals split, trimmed keys/values with duplicate last-wins, invalid-key rejection, no premature expansion, and30 flag spellings (TrUe false, YeS true). Native projection preserves default empty workspace/false Kubernetes detection. Caller-owned data and compat-only facade retain no execution authority; parsed unsafe-local/Kubernetes flags do not alter native policy. No whole Config JSON/type, Windows or Default executor closure.",
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestLocalExecutorRejectsWorkspaceWrite",
+      "rationale": "Test-only native replacement after complete review of TestLocalExecutorRejectsWorkspaceWrite: the source LocalExecutor.Build rejects the restricted permission mode with a non-nil policy error mentioning restricted. The public-facade regression uses Backend::Local, tests ReadOnly and WorkspaceWrite with Network::Allow to isolate access refusal, and replaces Go diagnostic substring assertions with exact sandbox::Error::Invalid(\"local requires explicit FullAccess and network Allow\"). A shell command would create a marker; absence of that file verifies rejection before execution. This is a native diagnostic replacement, not Go error-text, Build API, Default executor, environment acquisition or whole executor equivalence. The regression is execution-feature gated for Linux/macOS; execution evidence is Linux Rust 1.88 only, with no macOS run claimed.",
       "target_features": [
         "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-889F5A6AC2661A38": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxModeEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-67355C97370212AA": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxPathEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-E939C89C84A2E141": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxPathPrependEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-E8B0C90BF5E5E731": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxPathAppendEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-8B54BCE402A38D1B": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxExtraReadOnlyPathsEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-C4E3DF8028EA83DC": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxExtraWritablePathsEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-8F8000E2C3470852": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxExtraEnvEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-D54B8370B56BCDC2": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(\"GOROOT\") and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-C91A0D8D11732D68": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnv",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxExposeKubernetesServiceAccountEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
-      ]
-    },
-    "SDK-D8BCD5D24CB2CD8A": {
-      "source": "pkg/agentsdk/sandbox/executor.go",
-      "source_name": null,
-      "implementation_symbols": [
-        "crates/adk-codec/src/sandbox_env.rs::config_from_environment_posix"
-      ],
-      "rust_test_identifiers": [
-        "posix_configuration_parser_matches_pinned_go",
-        "sandbox_configuration_parser_is_data_only_in_compat_facade"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestConfigFromEnvParsesAllowUnsafeReadOnlyLocal",
-      "rationale": "Reviewed only the production ConfigFromEnv lookup os.Getenv(SandboxAllowUnsafeReadOnlyLocalEnv) and its enclosing constructor transformation. Native host-snapshot lookup preserves exact case-sensitive POSIX key, absent/empty fallback and raw-string/path-list/extra-map/flag behavior as applicable.363 hermetic source-executed cases compare every returned field and resulting environment, including default absence, malformed/duplicate inputs and30 flag spellings; source configuration fixtures never include real credentials. This is explicit host acquisition instead of implicit process reads, not a claim that native executors or builders automatically read/install this key, nor a claim for similarly named reads at other production/test sites.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat"
+        "execution"
       ]
     }
   }

@@ -19573,6 +19573,107 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-8FAAF412ECC23AD2": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestAgentGetInstructions_Static",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig",
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Static",
+      "rationale": "Only the original static instruction passthrough regression is closed. The independently executed normal/stream instruction oracle verifies unchanged static text when no callback exists; native request inspection covers composition, retries and handoffs. Rust uses owned configuration rather than nullable Go agent/context pointers.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4C7D12D64FF73E5E": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestAgentGetInstructions_Dynamic",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::InstructionProvider",
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff",
+        "dynamic_instructions_failure_cancellation_and_drop_never_dispatch_a_model"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic",
+      "rationale": "Only the original dynamic-over-static instruction regression is closed. Independent Go observations and native actual model requests verify callback precedence, active-agent name, usage, blank callback results, composition and handoffs. Rust uses an awaited owned provider; this does not close the entire agent/context API.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-0787AD3377E33AA7": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestAgentGetAllTools",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig",
+        "crates/adk-runtime/src/runner.rs::model_turn"
+      ],
+      "rust_test_identifiers": [
+        "tool_exposure_orders_explicit_tools_before_handoffs"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentGetAllTools",
+      "rationale": "Only the original two-tool ordering example is closed: explicit tool1 precedes transfer_to_helper with the original descriptions/target. Native actual request inspection uses an explicitly full-access policy so policy filtering is not conflated with catalog assembly. No whole tool-discovery or agent API claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-3A59A100E0BCCB6C": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestGuardrailTripwireErrors",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire"
+      ],
+      "rust_test_identifiers": [
+        "tripwire_messages_identify_phase_without_serializing_diagnostic_data"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestGuardrailTripwireErrors",
+      "rationale": "Only the original ordinary-ASCII input/output tripwire message regression is closed. Native tests additionally check tool phases and ensure diagnostic data never enters serialized errors. This does not claim arbitrary Go %q formatting, diagnostic-output inclusion, all error types or whole guardrail parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-A0A10DF6EE6180E4": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestNewModel",
+      "implementation_symbols": [
+        "crates/adk-providers/src/routing.rs::Routes::resolve"
+      ],
+      "rust_test_identifiers": [
+        "complete_and_stream_share_named_override_default_and_nested_resolution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNewModel",
+      "rationale": "Only the original unknown provider-prefix rejection regression is closed: a missing provider prefix yields an error rather than dispatching to the default. Native tests also check case-sensitive lookup and normal/stream nested resolution. No whole MultiProvider constructor, default-provider assembly or credential behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime"
+      ]
+    },
+    "SDK-17B8B9DCA3602453": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestNoOpHooksCompile",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/hooks.rs::CompositeHooks",
+        "crates/adk-runtime/src/runner.rs::RunHooks"
+      ],
+      "rust_test_identifiers": [
+        "empty_composite_hooks_are_noop_for_original_lifecycle_categories"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestNoOpHooksCompile",
+      "rationale": "Only the original no-op hook interface/dispatch regression is closed. An empty CompositeHooks is used through Arc<dyn RunHooks> and receives all seven source categories: agent start/end, handoff, tool start/end and model start/end; every awaited observation succeeds. Native owned typed observations/context replace Go nullable callback arguments, and the shared observation trait replaces separate Go run/agent no-op classes. This does not claim complete Go hook ordering, callback signatures, error aggregation or whole hook types.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

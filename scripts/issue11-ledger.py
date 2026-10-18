@@ -108,6 +108,7 @@ RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-re
                "crates/adk/src/observability.rs",
                "crates/adk/tests/observability.rs",
                "crates/adk-runtime/src/tracing.rs", "crates/adk-runtime/src/runner.rs",
+               "crates/adk-runtime/src/hooks.rs",
                "crates/adk-runtime/src/cost.rs", "fixtures/costs/sdk-result-cost.json",
                "scripts/cost-reference/run.py", "scripts/cost-reference/reference_test.go",
                "crates/adk/src/progress/mod.rs", "crates/adk/src/progress/state.rs",

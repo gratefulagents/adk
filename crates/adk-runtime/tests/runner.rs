@@ -296,6 +296,55 @@ fn stop_at_tools_membership_matches_original_sdk_example() {
 }
 
 #[tokio::test]
+async fn empty_composite_hooks_are_noop_for_original_lifecycle_categories() {
+    let hooks: Arc<dyn RunHooks> = Arc::new(CompositeHooks::default());
+    let call = ToolCall {
+        raw_arguments: None,
+        id: String::new(),
+        name: String::new(),
+        arguments: Value::Null,
+    };
+    let observations = [
+        Observation::AgentStarted {
+            agent: String::new(),
+            instructions: String::new(),
+        },
+        Observation::AgentEnded {
+            agent: String::new(),
+            output: Value::Null,
+        },
+        Observation::Handoff {
+            from: String::new(),
+            to: String::new(),
+        },
+        Observation::ToolStarted {
+            agent: String::new(),
+            call: call.clone(),
+        },
+        Observation::RawToolOutput {
+            call,
+            output: ToolOutput {
+                content: Vec::new(),
+                is_error: false,
+                should_pause: false,
+            },
+        },
+        Observation::ModelAttempt {
+            agent: String::new(),
+            model: String::new(),
+            attempt: 0,
+        },
+        Observation::ModelAccepted {
+            agent: String::new(),
+            response: response(Vec::new(), None),
+        },
+    ];
+    for observation in observations {
+        hooks.observe(&context(), observation).await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn tool_exposure_orders_explicit_tools_before_handoffs() {
     let model = TestModel::with(vec![Ok(answer("done"))]);
     let mut target = agent(model.clone());

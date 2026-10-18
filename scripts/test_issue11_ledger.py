@@ -3,6 +3,7 @@ import importlib.util
 import io
 import json
 from pathlib import Path
+import tempfile
 import unittest
 from unittest.mock import patch
 
@@ -34,6 +35,29 @@ class ReferenceSelectionTests(unittest.TestCase):
                                     "internal/openai": {"TestMetadata"},
                                     "internal/modelactivity": {"TestReadActivity"},
                                     "internal/anthropic": {"TestAssembler"}})
+
+    def test_reference_failures_keep_diagnostics_and_nonzero_status(self):
+        output = json.dumps({"Action": "fail", "Package": "reference", "Test": "TestFailure"}) + "\n"
+        result = self.reference.subprocess.CompletedProcess([], 1, output, "underlying failure\n")
+        stderr = io.StringIO()
+        with tempfile.TemporaryDirectory() as directory:
+            destination = Path(directory) / "reference.json"
+            with (
+                patch.object(self.reference.sys, "argv", ["test-sdk", "--output", str(destination)]),
+                patch.object(self.reference.subprocess, "check_output",
+                             side_effect=[self.reference.PIN + "\n", b"", "go version test\n"]),
+                patch.object(self.reference.subprocess, "run", return_value=result),
+                patch.object(self.reference.sys, "stderr", stderr),
+                patch.object(self.reference.sys, "stdout", io.StringIO()),
+                self.assertRaises(SystemExit) as raised,
+            ):
+                self.reference.main()
+            self.assertEqual(raised.exception.code, 1)
+            report = json.loads(destination.read_text())
+            self.assertEqual(report["exit_code"], 1)
+            self.assertEqual(report["tests"]["reference/TestFailure"], "fail")
+        self.assertIn(output, stderr.getvalue())
+        self.assertIn("underlying failure", stderr.getvalue())
 
     def test_internal_reference_patterns_and_subtests_cannot_expand_execution(self):
         for name in ("TestAny|TestOther", "TestAny/subtest", "TestAny$", "../TestOther", ""):

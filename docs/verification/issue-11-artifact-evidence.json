@@ -20,9 +20,9 @@
     "docs/migration/source-lock.json": "f5ccbe03a730d24d8fe85570b1de8d0f5d7127390ec01710e2c20b88b76e5087",
     "docs/verification/issue-11-license-review.json": "6eba059048335fe0b4fffa5ab3fe765dd86af99709d01f991cb49327d51aa947",
     "scripts/issue11-audit.py": "40b93a05675697851de53f00d84f29862b19c35a41cc7ea6e0c84b1920d1d269",
-    "scripts/issue11-ledger.py": "b73f3f31f579746a4dc60d3f9e6a96e6551025d564decfde853681b2acbca3cc",
+    "scripts/issue11-ledger.py": "ee22574dd30a59553b591c164e8be3c069199ad82ef2d3dd4fd5372efd57f6b4",
     "scripts/test_issue11_audit.py": "f7ee812e8d924149c1cad68b7f25ff75e3c008fc148c89dc8bf10ff33b81f93a",
-    "scripts/test_issue11_ledger.py": "321997fa22a1cfdf30bb524efece7e34848393e6f90402961591565b21f67746"
+    "scripts/test_issue11_ledger.py": "c200b5c2082777f2962ab7c31fd2b04936dd6f86523f85e7e60db6034dd8b6a0"
   },
   "platform": "Linux-6.12.90+deb13.1-amd64-x86_64-with-glibc2.41",
   "profile": "sdk-license-only-v1",

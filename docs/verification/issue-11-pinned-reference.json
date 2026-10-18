@@ -15,7 +15,7 @@
       "-json",
       "./internal/agent",
       "-run",
-      "^(TestAgentClone|TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildLLMResponseSnapshotCapturesReasoningAndRaw|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestBuildRunBudgetContext|TestBuildSubAgentBudgetContext|TestChildTrackerForwardsLLMUsageToAncestors|TestChildTrackerForwardsToolCallCounts|TestCompactionDefaultsForModel|TestEstimateRunResultCostPropagatesUnknownCost|TestEstimateRunResultCostSumsResponseCosts|TestExtractHelpers|TestFinalAnswerVerifierSingleRefutationRound|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestItemHelpersExtractLastText|TestItemHelpersExtractText|TestItemHelpersExtractToolCalls|TestMaxTurnsExceededError|TestModeReasoningSettings|TestModelSettingsMerge|TestNewChildTracker|TestNewProgressTracker|TestOutputSchemaNew|TestPartialProgressTail|TestProgressTracker_DrainPendingEvents|TestProgressTracker_InferStep|TestProgressTracker_RecordAssistantText|TestProgressTracker_RecordCompactBoundary|TestProgressTracker_RecordLifecycleEvent|TestProgressTracker_RecordSessionComplete|TestProgressTracker_RecordSubagentLifecycle|TestProgressTracker_RecordSystemInitIncludesPermissionMode|TestProgressTracker_RecordToolResult|TestProgressTracker_SetSession|TestPromptCacheKeyStableForParentRun|TestPromptCacheWireKeyStableAndNamespaced|TestRecordSubagentCompletedDoesNotDoubleCountForwardedUsage|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveModelForProviderLeavesUnknownProvidersAlone|TestResolveRoleModeRouting|TestRestoreRequeuesInFlightSteeringBeforeQueued|TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch|TestRunConfigEffectiveMaxTurns|TestRunConfigEffectiveSubAgentMaxTurns|TestRunResultFinalText|TestRunResultIsInterrupted|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunSubAgentOnceForcesStableTaskPromptCacheKey|TestRunSubAgentOnceModelFailureSurfacesPartialProgress|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestStopAtToolsContains|TestSubAgentActivity_CurrentTool|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize|TestTruncate|TestTruncateBytes|TestTruncateMiddle|TestUsageAddAndTotal)$"
+      "^(TestAgentClone|TestAgentGetAllTools|TestAgentGetInstructions_Dynamic|TestAgentGetInstructions_Static|TestBuildLLMResponseSnapshotCapturesReasoningAndRaw|TestBuildMCPPromptContextEmpty|TestBuildMCPPromptContextSanitizesServerNames|TestBuildRunBudgetContext|TestBuildSubAgentBudgetContext|TestChildTrackerForwardsLLMUsageToAncestors|TestChildTrackerForwardsToolCallCounts|TestCompactionDefaultsForModel|TestEstimateRunResultCostPropagatesUnknownCost|TestEstimateRunResultCostSumsResponseCosts|TestExtractHelpers|TestFinalAnswerVerifierSingleRefutationRound|TestGuardrailTripwireErrors|TestHandoffInputFilterSeesCurrentTurnItems|TestHandoffIsEnabledGatesTool|TestHandoffToTool|TestItemHelpersExtractLastText|TestItemHelpersExtractText|TestItemHelpersExtractToolCalls|TestMaxTurnsExceededError|TestModeReasoningSettings|TestModelSettingsMerge|TestNewChildTracker|TestNewModel|TestNewProgressTracker|TestNoOpHooksCompile|TestOutputSchemaNew|TestPartialProgressTail|TestProgressTracker_DrainPendingEvents|TestProgressTracker_InferStep|TestProgressTracker_RecordAssistantText|TestProgressTracker_RecordCompactBoundary|TestProgressTracker_RecordLifecycleEvent|TestProgressTracker_RecordSessionComplete|TestProgressTracker_RecordSubagentLifecycle|TestProgressTracker_RecordSystemInitIncludesPermissionMode|TestProgressTracker_RecordToolResult|TestProgressTracker_SetSession|TestPromptCacheKeyStableForParentRun|TestPromptCacheWireKeyStableAndNamespaced|TestRecordSubagentCompletedDoesNotDoubleCountForwardedUsage|TestRequireCompletionConfirmation|TestRequireCompletionConfirmationOffByDefault|TestResolveModelForProviderLeavesUnknownProvidersAlone|TestResolveRoleModeRouting|TestRestoreRequeuesInFlightSteeringBeforeQueued|TestResumeRestoredTaskCancellationDuringPersistenceDoesNotDispatch|TestRunConfigEffectiveMaxTurns|TestRunConfigEffectiveSubAgentMaxTurns|TestRunResultFinalText|TestRunResultIsInterrupted|TestRunStreamedDoesNotEmitThinkingDeltaEvents|TestRunSubAgentOnceForcesStableTaskPromptCacheKey|TestRunSubAgentOnceModelFailureSurfacesPartialProgress|TestRunnerInputGuardrailTripwire|TestRunnerRecoversFromPanickingInputGuardrail|TestRunnerStopAtToolsRunsOutputGuardrails|TestRunnerStopAtToolsUsesToolOutputAsFinal|TestRunnerStopOnFirstTool|TestRunnerStreamsThinkingDeltasToEventStream|TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues|TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError|TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace|TestSanitizeMCPServerName|TestStopAtToolsContains|TestSubAgentActivity_CurrentTool|TestThinkingDeltaEmitterCoalesces|TestThinkingDeltaEmitterFlushesOnSize|TestTruncate|TestTruncateBytes|TestTruncateMiddle|TestUsageAddAndTotal)$"
     ],
     [
       "go",
@@ -46,7 +46,7 @@
     ]
   ],
   "counts": {
-    "pass": 928,
+    "pass": 932,
     "skip": 5
   },
   "exit_code": 0,
@@ -96,6 +96,7 @@
   "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n\n\n\n",
   "tests": {
     "github.com/gratefulagents/sdk/internal/agent/TestAgentClone": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestAgentGetAllTools": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Static": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw": "pass",
@@ -138,6 +139,7 @@
     "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers/ExtractFilePath": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestExtractHelpers/ExtractGrepPattern": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestFinalAnswerVerifierSingleRefutationRound": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestGuardrailTripwireErrors": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestHandoffInputFilterSeesCurrentTurnItems": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestHandoffIsEnabledGatesTool": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestHandoffToTool": "pass",
@@ -155,7 +157,9 @@
     "github.com/gratefulagents/sdk/internal/agent/TestModeReasoningSettings/xhigh": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestModelSettingsMerge": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestNewChildTracker": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestNewModel": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestNewProgressTracker": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/TestNoOpHooksCompile": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestOutputSchemaNew": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestPartialProgressTail": "pass",
     "github.com/gratefulagents/sdk/internal/agent/TestProgressTracker_DrainPendingEvents": "pass",

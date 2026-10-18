@@ -2,6 +2,29 @@
 
 ## Current continuation evidence
 
+### Additional original type regressions and no-op hooks
+
+Mapped six original regressions: static/dynamic instruction precedence, explicit
+tool-before-handoff ordering, ordinary-ASCII tripwire messages, unknown provider
+rejection, and no-op hooks. Existing independent request/route/guardrail coverage
+supports the first five. A new test invokes empty `CompositeHooks` through
+`Arc<dyn RunHooks>` for all seven original lifecycle categories; its production
+implementation is now included in the evidence input hashes. Native owned
+observations replace Go nullable callback arguments. These are test-level claims,
+not whole agent, provider, hook or arbitrary Go formatting closure.
+
+Fresh native verification: **1,758 workspace +10 doctests passed; 0 failed,
+30 ignored**; strict Clippy/typecheck/format passed. Final independent references,
+**56 validators**, separate artifact proof, overlay/audit and source locks passed.
+The first Go run failed `TestServerModeUsesPolicyBoundaryAndImmutableRequest`;
+ten targeted repeats passed, followed by a full **932 pass /5 skip /38 package**
+run. The cause was not established and no SDK source was changed. The reference
+runner now preserves failing command output, with a unit test proving diagnostics
+and nonzero status survive; this does not suppress failures or retry internally.
+
+Ledger: **1,080 verified /7,811 unresolved /251 excluded**. All46 remote checks
+passed at preceding `57eab4e`; full acceptance remains incomplete.
+
 ### Original parent/child turn default regressions
 
 Independently executed the exact `TestRunConfigEffectiveMaxTurns` and

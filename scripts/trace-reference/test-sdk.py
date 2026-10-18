@@ -69,6 +69,9 @@ def main():
     results = []
     for command in commands:
         result = subprocess.run(command, cwd=SDK, text=True, capture_output=True)
+        if result.returncode:
+            sys.stderr.write(result.stdout)
+            sys.stderr.write(result.stderr)
         results.append(result)
         for line in result.stdout.splitlines():
             event = json.loads(line)

@@ -112,6 +112,47 @@ pub fn lookup(catalog: &Catalog, provider: &str, model: &str) -> Option<ModelLim
         .map(|(_, limits)| *limits)
 }
 
+#[derive(Default)]
+struct CacheTime(crate::timestamp::GoTimestamp);
+impl<'de> Deserialize<'de> for CacheTime {
+    fn deserialize<D: serde::Deserializer<'de>>(d: D) -> Result<Self, D::Error> {
+        let raw = Box::<serde_json::value::RawValue>::deserialize(d)?;
+        let text = raw
+            .get()
+            .strip_prefix('"')
+            .and_then(|text| text.strip_suffix('"'))
+            .ok_or_else(|| serde::de::Error::custom("invalid cached timestamp"))?;
+        crate::timestamp::GoTimestamp::parse_event(text)
+            .map(Self)
+            .ok_or_else(|| serde::de::Error::custom("invalid cached timestamp"))
+    }
+}
+type CacheModels = BTreeMap<String, Option<BTreeMap<String, ModelLimits>>>;
+#[derive(Default)]
+struct CacheEnvelope {
+    fetched_at: CacheTime,
+    catalog: Option<CacheModels>,
+}
+go_object!(CacheEnvelope, "fetched_at" => fetched_at: scalar, "catalog" => catalog: map);
+
+/// Decode a disk envelope into owned catalog data and a normalized Go timestamp.
+/// Nil provider maps become empty maps; this does not change lookup/cache behavior.
+pub fn parse_cached_catalog(body: &[u8]) -> Result<(Catalog, String), serde_json::Error> {
+    crate::payload_decode::check_depth(body)?;
+    let envelope: CacheEnvelope = serde_json::from_slice(&normalize_strings(body))?;
+    let catalog = envelope
+        .catalog
+        .filter(|catalog| !catalog.is_empty())
+        .ok_or_else(|| serde::de::Error::custom("empty cached catalog"))?;
+    Ok((
+        catalog
+            .into_iter()
+            .map(|(provider, models)| (provider, models.unwrap_or_default()))
+            .collect(),
+        envelope.fetched_at.0.as_str().to_owned(),
+    ))
+}
+
 #[cfg(test)]
 mod tests {
     use super::*;

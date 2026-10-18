@@ -191,3 +191,16 @@ fn modelsdev_catalog_is_available_without_provider_transport() {
         100
     );
 }
+
+#[cfg(feature = "providers")]
+#[test]
+fn modelsdev_resolver_options_are_available_through_facade() {
+    use adk::providers::modelsdev::{CacheTtl, Options, Resolver};
+    let options = Options {
+        url: "not a URL".into(),
+        cache_path: None,
+        ttl: CacheTtl::nanoseconds(-1),
+        ..Options::default()
+    };
+    assert!(Resolver::new(options).is_ok());
+}

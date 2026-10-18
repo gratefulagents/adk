@@ -21303,6 +21303,849 @@
         "compat",
         "providers-runtime"
       ]
+    },
+    "SDK-EA8790F62395758E": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Catalog",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Catalog. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-34865D29BC738DE2": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "NewResolver",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record NewResolver. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-5CFABAE5250D5FA0": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Option",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Option. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-52DFBAB945AC2561": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.CompactionResolverFunc",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.CompactionResolverFunc. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-548F054954B9F7E2": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.CompactionThresholds",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.CompactionThresholds. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-FAF6736EEE88B68E": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.Lookup",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.Lookup. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-95640A9F7BC79D87": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.cachePath",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.cachePath. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-9939CA8B47699D42": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.catalog",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.catalog. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-687EE74AB67501A1": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.client",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.client. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-A19532E43F24435A": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.fetchedAt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.fetchedAt. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-0402FBC355A8B08B": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.mu",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.mu. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-74279C06490B190C": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.ttl",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.ttl. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-99B1EAC145340639": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver.url",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver.url. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-643600E30063D833": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "Resolver",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record Resolver. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-558FF7651FE26237": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "WithCachePath",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record WithCachePath. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-125566A32F58A331": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "WithHTTPClient",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record WithHTTPClient. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-337C01211BC42DAA": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "WithTTL",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record WithTTL. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-0E76F6113D6AD1D1": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "WithURL",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record WithURL. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-F6B26D8C57982442": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "diskCacheEnvelope.Catalog",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record diskCacheEnvelope.Catalog. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-1A07FBE7CF935E8A": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "diskCacheEnvelope.FetchedAt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record diskCacheEnvelope.FetchedAt. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-58909C9FAF24B9CF": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "diskCacheEnvelope",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed source helper record diskCacheEnvelope. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-4A0C1B53F4D644A7": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport",
+        "modelsdev_resolver_options_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Manually reviewed all35 constituent records and the complete helper call paths, not automatic propagation from module existence. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-5982572BAD33ACC0": {
+      "source": null,
+      "source_name": "modelsdev",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport",
+        "modelsdev_resolver_options_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Manually reviewed all35 constituent records and the complete helper call paths, not automatic propagation from module existence. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-4A7416D4E370BE6D": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::Catalog",
+        "crates/adk-codec/src/modelsdev.rs::parse_cached_catalog",
+        "crates/adk-providers/src/modelsdev.rs::Options",
+        "crates/adk-providers/src/modelsdev.rs::Resolver",
+        "crates/adk-providers/src/modelsdev.rs::CompactionResolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "modelsdev::tests::memory_ttl_uses_monotonic_time_not_wall_clock",
+        "modelsdev::tests::disk_envelopes_match_pinned_go",
+        "modelsdev::tests::cache_writer_matches_go_escaping_and_file_permissions",
+        "modelsdev::tests::constructor_defaults_match_go",
+        "modelsdev::tests::default_cache_directories_match_go",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "parse_failure_is_not_cached",
+        "native_compaction_adapter_rejects_signed_overflow_and_honors_cancellation",
+        "custom_transport_timeout_and_deadline_report_miss",
+        "disk_freshness_and_signed_ttls_match_pinned_go",
+        "fetch_byte_limits_status_and_body_errors_match_go",
+        "modelsdev_catalog_is_available_without_provider_transport",
+        "modelsdev_resolver_options_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Manually reviewed all35 constituent records and the complete helper call paths, not automatic propagation from module existence. 31 pinned-Go parse inputs,126 lookup/threshold/routing cases and exhaustive Unicode scalar comparison cover signed limits/normalization.26 disk envelopes and130 signed-TTL decisions cover duplicate/folded/null updates, zero/missing times, timestamp overflow/offset/fraction behavior and duration saturation. Five HTTP boundary cases verify exact64MiB cutoff, status200-only and body-error rejection; eight child-process environment cases verify Linux default cache paths. Native tests additionally prove coalescing, memory/disk stale fallback, monotonic memory TTL, transport overrides, cancellation, exact fixed-time cache bytes/HTML escaping, permissions and lexical path behavior. Owned Options replace functional options; Reqwest client configuration and async methods/captured default-provider adapter replace Go object/callback shapes. Nullable standalone catalogs use Option<Catalog>; loaded nil provider maps become empty without behavioral changes. Instant-preserving timestamps/UTC cache writes do not retain Go Location identity. No Go reflection/arbitrary option side effects, transport object identity, automatic builder wiring, non-Linux defaults or live service claim; the native runtime adapter separately enforces cancellation and rejects negative thresholds.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
     }
   }
 }

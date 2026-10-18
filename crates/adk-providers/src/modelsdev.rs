@@ -3,55 +3,80 @@
 
 pub use adk_codec::modelsdev::{Catalog, ModelLimits, parse_catalog};
 use adk_core::{Context, Error, ErrorCategory};
-use serde::{Deserialize, Serialize};
+use serde::Serialize;
 use std::{
-    path::PathBuf,
+    path::{Component, Path, PathBuf},
     sync::Arc,
     time::{Duration, Instant},
 };
+pub use time::Duration as CacheTtl;
 use time::{OffsetDateTime, format_description::well_known::Rfc3339};
 use tokio::{io::AsyncWriteExt, sync::Mutex};
 
 pub const CATALOG_URL: &str = "https://models.dev/api.json";
 const MAX_CATALOG_BYTES: usize = 64 << 20;
+const DEFAULT_FETCH_TIMEOUT: Duration = Duration::from_secs(20);
 
 #[derive(Clone)]
 pub struct Options {
     pub url: String,
     pub cache_path: Option<PathBuf>,
-    pub ttl: Duration,
+    pub ttl: CacheTtl,
     pub client: Option<reqwest::Client>,
 }
 impl Default for Options {
     fn default() -> Self {
         let cache = match std::env::consts::OS {
-            "windows" => std::env::var_os("LocalAppData").map(PathBuf::from),
-            "macos" => {
-                std::env::var_os("HOME").map(|home| PathBuf::from(home).join("Library/Caches"))
-            }
-            _ => std::env::var_os("XDG_CACHE_HOME")
+            "windows" => std::env::var_os("LocalAppData")
                 .filter(|value| !value.is_empty())
-                .map(PathBuf::from)
-                .or_else(|| {
-                    std::env::var_os("HOME")
-                        .filter(|home| !home.is_empty())
-                        .map(|home| PathBuf::from(home).join(".cache"))
-                })
-                .filter(|path| path.is_absolute()),
+                .map(PathBuf::from),
+            "macos" => std::env::var_os("HOME")
+                .filter(|value| !value.is_empty())
+                .map(|home| PathBuf::from(home).join("Library/Caches")),
+            _ => match std::env::var_os("XDG_CACHE_HOME").filter(|value| !value.is_empty()) {
+                Some(value) => {
+                    let path = PathBuf::from(value);
+                    path.is_absolute().then_some(path)
+                }
+                None => std::env::var_os("HOME")
+                    .filter(|home| !home.is_empty())
+                    .map(|home| PathBuf::from(home).join(".cache")),
+            },
         };
         Self {
             url: CATALOG_URL.into(),
-            cache_path: cache.map(|path| path.join("gratefulagents/modelsdev.json")),
-            ttl: Duration::from_secs(24 * 60 * 60),
+            cache_path: cache.map(|path| clean_path(&path.join("gratefulagents/modelsdev.json"))),
+            ttl: CacheTtl::hours(24),
             client: None,
         }
     }
 }
 
+fn clean_path(path: &Path) -> PathBuf {
+    let mut result = PathBuf::new();
+    for component in path.components() {
+        match component {
+            Component::CurDir => {}
+            Component::ParentDir => {
+                if result.file_name().is_some_and(|name| name != "..") {
+                    result.pop();
+                } else if !result.has_root() {
+                    result.push("..");
+                }
+            }
+            component => result.push(component.as_os_str()),
+        }
+    }
+    if result.as_os_str().is_empty() {
+        result.push(".");
+    }
+    result
+}
+
 #[derive(Default)]
 struct Cache {
     catalog: Option<Arc<Catalog>>,
-    fetched_at: Option<OffsetDateTime>,
+    fetched_at: Option<i128>,
     fresh_since: Option<Instant>,
 }
 
@@ -61,7 +86,7 @@ pub struct Resolver {
     cache: Mutex<Cache>,
 }
 
-#[derive(Serialize, Deserialize)]
+#[derive(Serialize)]
 struct DiskCache {
     fetched_at: String,
     catalog: Catalog,
@@ -73,7 +98,7 @@ impl Resolver {
         let client = match &options.client {
             Some(client) => client.clone(),
             None => reqwest::Client::builder()
-                .timeout(Duration::from_secs(20))
+                .timeout(DEFAULT_FETCH_TIMEOUT)
                 .build()
                 .map_err(|_| {
                     Error::new(
@@ -139,11 +164,12 @@ impl Resolver {
         let fresh = cache.fresh_since.map_or_else(
             || {
                 cache.fetched_at.is_some_and(|at| {
-                    (OffsetDateTime::now_utc() - at).whole_nanoseconds()
-                        < self.options.ttl.as_nanos() as i128
+                    (OffsetDateTime::now_utc().unix_timestamp_nanos() - at)
+                        .clamp(i128::from(i64::MIN), i128::from(i64::MAX))
+                        < self.options.ttl.whole_nanoseconds()
                 })
             },
-            |at| at.elapsed() < self.options.ttl,
+            |at| (at.elapsed().as_nanos() as i128) < self.options.ttl.whole_nanoseconds(),
         );
         if cache.catalog.is_some() && fresh {
             return cache.catalog.clone();
@@ -154,7 +180,7 @@ impl Resolver {
             self.save_disk(&catalog, fetched_at).await;
             *cache = Cache {
                 catalog: Some(Arc::new(catalog)),
-                fetched_at: Some(fetched_at),
+                fetched_at: Some(fetched_at.unix_timestamp_nanos()),
                 fresh_since: Some(fresh_since),
             };
         }
@@ -192,13 +218,26 @@ impl Resolver {
             .as_ref()
             .filter(|path| !path.as_os_str().is_empty())?;
         let bytes = tokio::fs::read(path).await.ok()?;
-        let disk: DiskCache = serde_json::from_slice(&bytes).ok()?;
-        if disk.catalog.is_empty() {
-            return None;
-        }
-        let fetched_at = OffsetDateTime::parse(&disk.fetched_at, &Rfc3339).ok()?;
+        let (catalog, timestamp) = adk_codec::modelsdev::parse_cached_catalog(&bytes).ok()?;
+        let (utc, offset) = if timestamp.ends_with('Z') {
+            (timestamp, 0_i128)
+        } else {
+            let zone = &timestamp[timestamp.len() - 6..];
+            let minutes: i128 = zone[4..].parse().ok()?;
+            let hours: i128 = zone[1..3].parse().ok()?;
+            let sign = if zone.starts_with('-') { -1 } else { 1 };
+            (
+                format!("{}Z", &timestamp[..timestamp.len() - 6]),
+                sign * (hours * 3600 + minutes * 60),
+            )
+        };
+        // Go accepts offsets beyond RFC3339's normal range and UTC years beyond9999.
+        let fetched_at = OffsetDateTime::parse(&utc, &Rfc3339)
+            .ok()?
+            .unix_timestamp_nanos()
+            - offset * 1_000_000_000;
         Some(Cache {
-            catalog: Some(Arc::new(disk.catalog)),
+            catalog: Some(Arc::new(catalog)),
             fetched_at: Some(fetched_at),
             fresh_since: None,
         })
@@ -216,7 +255,7 @@ impl Resolver {
         let Ok(fetched_at) = fetched_at.format(&Rfc3339) else {
             return;
         };
-        let Ok(bytes) = serde_json::to_vec(&DiskCache {
+        let Ok(bytes) = adk_codec::snapshots::to_go_json(&DiskCache {
             fetched_at,
             catalog: catalog.clone(),
         }) else {
@@ -230,7 +269,7 @@ impl Resolver {
             directories.recursive(true);
             #[cfg(unix)]
             directories.mode(0o755);
-            if directories.create(parent).await.is_err() {
+            if directories.create(clean_path(parent)).await.is_err() {
                 return;
             }
         }
@@ -289,7 +328,7 @@ mod tests {
             parse_catalog(br#"{"p":{"models":{"m":{"limit":{"context":100}}}}}"#).unwrap();
         *resolver.cache.lock().await = Cache {
             catalog: Some(Arc::new(catalog)),
-            fetched_at: Some(OffsetDateTime::UNIX_EPOCH),
+            fetched_at: Some(0),
             fresh_since: Some(Instant::now()),
         };
         let context = Context {
@@ -302,5 +341,175 @@ mod tests {
                 .await
                 .unwrap();
         assert_eq!(result.unwrap().context_tokens, 100);
+    }
+
+    #[tokio::test]
+    async fn disk_envelopes_match_pinned_go() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/modelsdev/observations.json"
+        ))
+        .unwrap();
+        let path =
+            std::env::temp_dir().join(format!("adk-modelsdev-envelope-{}", std::process::id()));
+        let resolver = Resolver::new(Options {
+            cache_path: Some(path.clone()),
+            ..Options::default()
+        })
+        .unwrap();
+        for case in fixture["cache"].as_array().unwrap() {
+            tokio::fs::write(&path, case["input"].as_str().unwrap())
+                .await
+                .unwrap();
+            let loaded = resolver.load_disk().await;
+            if loaded.is_some() != case["ok"].as_bool().unwrap() {
+                tokio::fs::remove_file(&path).await.unwrap();
+                panic!("{case}");
+            }
+            if let Some(loaded) = loaded {
+                let mut expected = case["catalog"].clone();
+                for models in expected.as_object_mut().unwrap().values_mut() {
+                    if models.is_null() {
+                        *models = serde_json::json!({});
+                    }
+                }
+                assert_eq!(
+                    serde_json::to_value(loaded.catalog.unwrap().as_ref()).unwrap(),
+                    expected,
+                    "{case}"
+                );
+                assert_eq!(
+                    loaded.fetched_at.unwrap(),
+                    i128::from(case["seconds"].as_i64().unwrap()) * 1_000_000_000
+                        + i128::from(case["nanos"].as_i64().unwrap()),
+                    "{case}"
+                );
+            }
+        }
+        tokio::fs::remove_file(&path).await.unwrap();
+    }
+
+    #[tokio::test]
+    async fn cache_writer_matches_go_escaping_and_file_permissions() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/modelsdev/observations.json"
+        ))
+        .unwrap();
+        let path = std::env::temp_dir()
+            .join(format!("adk-modelsdev-write-{}", std::process::id()))
+            .join("catalog.json");
+        let resolver = Resolver::new(Options {
+            cache_path: Some(path.clone()),
+            ..Options::default()
+        })
+        .unwrap();
+        let catalog = serde_json::from_value(fixture["encoding_catalog"].clone()).unwrap();
+        resolver
+            .save_disk(
+                &catalog,
+                OffsetDateTime::parse("2026-01-02T03:04:05.123456Z", &Rfc3339).unwrap(),
+            )
+            .await;
+        let bytes = tokio::fs::read(&path).await.unwrap();
+        assert_eq!(bytes, fixture["encoded_cache"].as_str().unwrap().as_bytes());
+        #[cfg(unix)]
+        {
+            use std::os::unix::fs::PermissionsExt;
+            assert_eq!(
+                std::fs::metadata(&path).unwrap().permissions().mode() & 0o133,
+                0
+            );
+            assert_eq!(
+                std::fs::metadata(path.parent().unwrap())
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o022,
+                0
+            );
+        }
+        let unclean = Resolver::new(Options {
+            cache_path: Some(path.parent().unwrap().join("missing/../other.json")),
+            ..Options::default()
+        })
+        .unwrap();
+        unclean.save_disk(&catalog, OffsetDateTime::now_utc()).await;
+        assert_eq!(
+            path.parent().unwrap().join("other.json").exists(),
+            fixture["unclean_cache_path"]["file_exists"]
+                .as_bool()
+                .unwrap()
+        );
+        assert_eq!(
+            path.parent().unwrap().join("missing").exists(),
+            fixture["unclean_cache_path"]["intermediate_exists"]
+                .as_bool()
+                .unwrap()
+        );
+        tokio::fs::remove_dir_all(path.parent().unwrap())
+            .await
+            .unwrap();
+    }
+
+    #[test]
+    fn constructor_defaults_match_go() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/modelsdev/observations.json"
+        ))
+        .unwrap();
+        let options = Options::default();
+        assert_eq!(options.url, fixture["defaults"]["url"]);
+        assert_eq!(
+            options.ttl.whole_nanoseconds(),
+            i128::from(fixture["defaults"]["ttl"].as_i64().unwrap())
+        );
+        assert_eq!(
+            DEFAULT_FETCH_TIMEOUT.as_nanos(),
+            u128::from(fixture["defaults"]["timeout"].as_u64().unwrap())
+        );
+        assert!(options.client.is_none());
+        let resolver = Resolver::new(Options {
+            url: "not a URL".into(),
+            cache_path: None,
+            ..options
+        })
+        .unwrap();
+        let cache = resolver.cache.try_lock().unwrap();
+        assert_eq!(cache.catalog.is_none(), fixture["defaults"]["catalog_nil"]);
+        assert_eq!(cache.fetched_at.is_none(), fixture["defaults"]["zero_time"]);
+    }
+
+    #[cfg(target_os = "linux")]
+    #[test]
+    fn default_cache_directories_match_go() {
+        if let Ok(expected) = std::env::var("ADK_MODELSDEV_CACHE_PATH_EXPECTED") {
+            let expected = (!expected.is_empty()).then(|| PathBuf::from(expected));
+            assert_eq!(Options::default().cache_path, expected);
+            return;
+        }
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/modelsdev/observations.json"
+        ))
+        .unwrap();
+        for case in fixture["cache_paths"].as_array().unwrap() {
+            let output = std::process::Command::new(std::env::args_os().next().unwrap())
+                .args([
+                    "--exact",
+                    "modelsdev::tests::default_cache_directories_match_go",
+                    "--nocapture",
+                ])
+                .env("HOME", case["home"].as_str().unwrap())
+                .env("XDG_CACHE_HOME", case["xdg"].as_str().unwrap())
+                .env(
+                    "ADK_MODELSDEV_CACHE_PATH_EXPECTED",
+                    case["path"].as_str().unwrap(),
+                )
+                .output()
+                .unwrap();
+            assert!(
+                output.status.success(),
+                "{case}: {}",
+                String::from_utf8_lossy(&output.stdout)
+            );
+        }
     }
 }

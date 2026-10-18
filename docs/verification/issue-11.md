@@ -2,6 +2,40 @@
 
 ## Current continuation evidence
 
+### models.dev cache compatibility and helper-group review
+
+Fixed cache decoding to retain valid catalogs with missing/null timestamps and nil
+provider maps, Go folded/duplicate/null field updates, raw timestamp parsing and
+fraction/offset quirks. A newly executed Go cache case failed against the previous
+reader (`{"catalog":{"p":null}}`), then passed after the fix. Cache timestamps now
+retain wide instant nanoseconds; disk age saturates like signed Go durations.
+Options exposes signed CacheTtl, including negative and integer-limit values.
+Cache writes use Go HTML/Unicode escaping and lexical parent-path cleaning.
+
+The oracle adds26 disk envelopes,130 actual signed-TTL/fetch decisions,five HTTP
+size/status/body-error boundaries and eight isolated Linux default-cache directory
+cases. Tests check exact64MiB truncation in both directions, partial-body errors,
+fixed-time cache bytes, permissions and no unexpected intermediate directory for
+`missing/../file`. The environment matrix caught relative-HOME and dot-parent
+normalization differences. Its initial native subprocess launch hit unavailable
+/proc/self/exe; using the test binary's argv[0] fixed that harness limitation.
+All earlier31 parse/126 lookup/full-Unicode observations are unchanged.
+
+Manually reviewed all35 modelsdev group records and helper call paths, adding24
+remaining API/file/package/group claims. Native Options/Reqwest ownership, async
+methods, nullable standalone maps, instant-preserving timestamps/UTC writes and
+strict native compaction-adapter behavior are documented adaptations, not Go
+reflection or arbitrary functional-option/transport object replication. The pinned
+SDK itself does not automatically install modelsdev into runtime builders; this
+remains an explicit helper. Non-Linux defaults/live service behavior are unverified.
+
+Final Rust1.88 Linux: **1,793 workspace +10 doctests passed;0 failed,30 ignored**.
+Minimal compat+providers facade tests, strict whole-workspace Clippy/typecheck/
+rustdoc/format, full facade matrix/consumer/purity, all20 offline examples/host
+session, bound native/Go references,56 validators, artifact/overlay/audit and source
+locks passed. Ledger: **1,178 verified /7,713 unresolved /251 excluded**. Full
+retained issue acceptance remains incomplete; this closes only modelsdev.
+
 ### Explicit models.dev catalog resolution
 
 Added separate codec/provider modelsdev modules: signed model limits and catalog

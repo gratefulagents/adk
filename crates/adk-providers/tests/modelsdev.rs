@@ -147,7 +147,7 @@ async fn memory_disk_stale_fallback_and_cancelled_cache_hits() {
     task.abort();
     let (url, failed_hits, failed_task) = server("down".into(), 500).await;
     opts.url = url;
-    opts.ttl = Duration::ZERO;
+    opts.ttl = adk_providers::modelsdev::CacheTtl::ZERO;
     let stale = Resolver::new(opts.clone()).unwrap();
     assert_eq!(
         stale
@@ -253,4 +253,93 @@ async fn custom_transport_timeout_and_deadline_report_miss() {
         ..context()
     };
     assert!(resolver.lookup(&expired, "openai", "m").await.is_none());
+}
+
+#[tokio::test]
+async fn disk_freshness_and_signed_ttls_match_pinned_go() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/modelsdev/observations.json"
+    ))
+    .unwrap();
+    let (url, hits, task) = server("offline".into(), 503).await;
+    let path = std::env::temp_dir().join(format!("adk-modelsdev-freshness-{}", std::process::id()));
+    for case in fixture["freshness"].as_array().unwrap() {
+        tokio::fs::write(&path, case["input"].as_str().unwrap())
+            .await
+            .unwrap();
+        let mut options = options(url.clone());
+        options.cache_path = Some(path.clone());
+        options.ttl =
+            adk_providers::modelsdev::CacheTtl::nanoseconds(case["ttl"].as_i64().unwrap());
+        let resolver = Resolver::new(options).unwrap();
+        let before = hits.load(Ordering::SeqCst);
+        let result = resolver.lookup(&context(), "p", "m").await;
+        assert_eq!(result.is_some(), case["ok"].as_bool().unwrap(), "{case}");
+        if let Some(result) = result {
+            assert_eq!(
+                serde_json::to_value(result).unwrap(),
+                case["limits"],
+                "{case}"
+            );
+        }
+        assert_eq!(
+            hits.load(Ordering::SeqCst) - before,
+            case["hits"].as_u64().unwrap() as usize,
+            "{case}"
+        );
+    }
+    task.abort();
+    tokio::fs::remove_file(&path).await.unwrap();
+}
+
+#[tokio::test]
+async fn fetch_byte_limits_status_and_body_errors_match_go() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/modelsdev/observations.json"
+    ))
+    .unwrap();
+    let max = fixture["max_bytes"].as_u64().unwrap() as usize;
+    let valid = r#"{"p":{"models":{"m":{"limit":{"context":100}}}}}"#;
+    for case in fixture["fetch_cases"].as_array().unwrap() {
+        let name = case["name"].as_str().unwrap();
+        let body = match name {
+            "just_under_limit" => format!("{}{valid}", " ".repeat(max - valid.len())),
+            "limit_after_valid" => format!("{valid}{}junk", " ".repeat(max - valid.len())),
+            "truncated_json" => format!("{{\"pad\":\"{}\",{}", " ".repeat(max), &valid[1..]),
+            _ => valid.to_owned(),
+        };
+        let status = if name == "created_status" { 201 } else { 200 };
+        let declared = body.len() + usize::from(name == "reader_error");
+        let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+        let resolver = Resolver::new(options(format!(
+            "http://{}",
+            listener.local_addr().unwrap()
+        )))
+        .unwrap();
+        let server = tokio::spawn(async move {
+            let (mut stream, _) = listener.accept().await.unwrap();
+            let mut request = Vec::new();
+            while !request.windows(4).any(|v| v == b"\r\n\r\n") {
+                let mut buffer = [0; 4096];
+                let n = stream.read(&mut buffer).await.unwrap();
+                assert!(n > 0);
+                request.extend_from_slice(&buffer[..n]);
+            }
+            stream.write_all(format!("HTTP/1.1 {status} Test\r\nContent-Length: {declared}\r\nConnection: close\r\n\r\n").as_bytes()).await.unwrap();
+            stream.write_all(body.as_bytes()).await
+        });
+        let result = resolver.lookup(&context(), "p", "m").await;
+        assert_eq!(result.is_some(), case["ok"].as_bool().unwrap(), "{case}");
+        if let Some(result) = result {
+            assert_eq!(
+                serde_json::to_value(result).unwrap(),
+                case["limits"],
+                "{case}"
+            );
+        }
+        let write = server.await.unwrap();
+        if name == "just_under_limit" {
+            write.unwrap();
+        }
+    }
 }

@@ -349,7 +349,7 @@ assembly semantics, not complete provider or JSON-decoder equivalence.
 catalog resolver, not the provider backend `/models` metadata resolver. Construct
 it explicitly; it is not silently installed into existing builders. Construction
 performs no I/O. `Options::default()` uses `https://models.dev/api.json`, a20-second
-HTTP timeout,24-hour TTL, and the OS cache directory's
+HTTP timeout,24-hour signed `CacheTtl` (including zero/negative overrides), and the OS cache directory's
 `gratefulagents/modelsdev.json`. Set `cache_path: None` to disable disk access;
 provide `client` to own transport policy and `url` for a local catalog.
 
@@ -371,9 +371,25 @@ the SDK's wrapping signed arithmetic. Normalized-key collisions and equal-length
 suffix ties have deterministic native map ordering instead of Go map iteration.
 
 The pinned oracle checks31 parsing inputs,126 lookup/threshold/routing cases and
-all1,112,064 Unicode scalars against Go's lowercase table. Native local-HTTP tests
-cover coalescing, stale disk fallback, cancellation, timeout, parse failures and
-signed-overflow adaptation. Linux is verified; other OS cache defaults and live
-models.dev service behavior remain unverified. The disk reader currently accepts
-ordinary canonical cache envelopes; full Go folded/duplicate/null envelope decoding
-is not claimed, nor is exact cache-byte or complete resolver/group parity.
+all1,112,064 Unicode scalars against Go's lowercase table. Additional independent
+cases cover26 disk envelopes,130 signed-TTL/cache decisions,five HTTP size/status/
+body-error boundaries and eight isolated Linux cache-directory environments.
+Disk decoding handles folded/duplicate/null fields and Go timestamp parsing,
+including escaped-string rejection, fractional truncation and out-of-range offsets.
+Missing timestamps are stale rather than discarding valid catalog data. Disk age
+saturates like Go durations; in-memory age remains monotonic. Cache writing uses Go
+JSON escaping and0755/0644 creation modes (subject to the host umask), with lexical
+parent-path cleaning and no new intermediate directories for `missing/../file`.
+
+The native configuration value replaces Go functional options; caller-owned
+Reqwest clients control transport. Async lookup/threshold methods and the optional
+native adapter replace Go synchronous methods/captured closures. Catalogs are owned
+maps; use `Option<Catalog>` for a nullable standalone value. Nil provider maps in
+loaded caches become empty maps without changing lookup/freshness. Normalized cache
+timestamps preserve instants, not Go Location/pointer identity; newly written cache
+timestamps use UTC. Go reflection, arbitrary functional-option side effects and
+Go-specific transport object identity are not reproduced. Linux helper contracts
+are verified; other OS defaults and live models.dev behavior remain unverified.
+Native local-HTTP tests also cover coalescing, stale fallback, cancellation, timeout,
+parse failures and signed-overflow adaptation. Modelsdev is not automatically
+installed into builders; existing provider metadata fallback policy is unchanged.

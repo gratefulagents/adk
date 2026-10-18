@@ -32,7 +32,7 @@ def main():
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
         paths = ['internal/agent/model_settings.go', 'internal/agent/items.go', 'internal/agent/llm_snapshot.go', 'pkg/agentsdk/aliases.go', 'go.mod', 'go.sum']
-        harness = ['scripts/payload-reference/run.py', 'scripts/payload-reference/reference_test.go']
+        harness = ['scripts/payload-reference/run.py', 'scripts/payload-reference/reference_test.go', 'scripts/payload-reference/envelope_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk',
             'commit': SHA,
@@ -45,6 +45,7 @@ def main():
             'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in harness},
         }
         shutil.copyfile(ROOT / harness[1], source / 'internal/agent/native_payload_reference_test.go')
+        shutil.copyfile(ROOT / harness[2], source / 'internal/agent/native_payload_envelope_test.go')
         output = source / 'payload-observations.json'
         env['PAYLOAD_OUTPUT'] = str(output)
         execution = subprocess.run(

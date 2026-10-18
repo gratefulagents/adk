@@ -375,6 +375,7 @@ func TestNativePayloadReference(t *testing.T) {
 	result := map[string]any{
 		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
 		"run_item_byte_cases": runItemByteCases(), "run_item_encode_cases": runItemEncodeCases(),
+		"envelope_byte_cases": snapshotEnvelopeCases(), "envelope_encode_cases": snapshotEnvelopeEncodeCases(),
 		"enum_values": map[string]RunItemType{
 			"RunItemMessage": RunItemMessage, "RunItemToolCall": RunItemToolCall,
 			"RunItemToolOutput": RunItemToolOutput, "RunItemHandoffCall": RunItemHandoffCall,

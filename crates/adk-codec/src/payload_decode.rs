@@ -31,8 +31,8 @@ mod sealed {
 /// The bounded compatibility records supported by [`from_go_json`].
 ///
 /// This trait is sealed; `RunItem` and `Agent` are not supported targets.
-/// The non-recursive analysis `RunItemSnapshot` is supported, including its
-/// nested tool-call and tool-approval raw inputs.
+/// Analysis `RunItemSnapshot`, `RequestSnapshot`, and `ResponseSnapshot` are
+/// supported, including their schema-identified nested raw fields.
 pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 
 /// Decode a pinned SDK record with Go string replacement and object semantics.
@@ -280,6 +280,28 @@ impl sealed::Sealed for RunItemSnapshot {
 }
 impl GoJsonDecode for RunItemSnapshot {}
 impl GoJsonEncode for RunItemSnapshot {}
+
+impl sealed::Sealed for RequestSnapshot {
+    fn decode_bytes(input: &[u8]) -> Result<Self, serde_json::Error> {
+        snapshot_bytes::decode(input)
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        snapshot_bytes::encode(self)
+    }
+}
+impl GoJsonDecode for RequestSnapshot {}
+impl GoJsonEncode for RequestSnapshot {}
+
+impl sealed::Sealed for ResponseSnapshot {
+    fn decode_bytes(input: &[u8]) -> Result<Self, serde_json::Error> {
+        snapshot_bytes::decode(input)
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        snapshot_bytes::encode(self)
+    }
+}
+impl GoJsonDecode for ResponseSnapshot {}
+impl GoJsonEncode for ResponseSnapshot {}
 
 go_object!(ResponseSnapshot,
     "end_turn" => end_turn: raw,

@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Request/response nested raw byte codecs
+
+The private bounded transport now also covers `RequestSnapshot` and
+`ResponseSnapshot`. Typed list traversal and raw-field visitation are shared
+across the three analysis document roots; unknown values and raw fragments remain
+opaque. The existing Go-style decoder, not the walker, owns duplicate-array,
+hidden-slot, pointer merge/reset and scalar-null behavior. Encoding clones inputs,
+preserving original raw values and typed metadata without mutating the caller.
+
+The immutable payload oracle adds 130 envelope decode cases and 80 direct marshal
+cases across eight raw locations. Native checks compare original raw bytes and
+presence, exact encoded bytes, rejection and whole-input versus per-fragment depth
+limits. The minimal compat-only facade runs all 130 decode comparisons.
+
+No whole declaration or trace-writer closure is promoted: analysis Vec fields
+still require a complete nil/empty representation audit, and
+`tracewriter::Snapshot::from_json` still requires a serde JSON Value projection.
+Generic trace serialization is not automatically switched to the new byte codecs.
+These are explicit remaining integration/contracts, not inferred completion.
+Ledger remains **1,330 verified /7,561 unresolved /251 excluded**.
+
 ### Run-item nested raw byte transport
 
 The sealed byte codecs now accept analysis `RunItemSnapshot` documents. A finite

@@ -25,8 +25,8 @@ marshal cases. Their sealed native codecs preserve a single raw `input` field
 without normalizing its original bytes. Raw omission, empty versus null values,
 invalid UTF-8, duplicate keys, lexical numbers, malformed syntax and depth limits
 are independently observed. The facade now checks 693 leaf decode/encode cases.
-The entire payload fixture contains 2,598 decode cases and 28 direct snapshot
-marshal cases; this still does not implement nested request/response raw bytes.
+The leaf portion of the payload fixture contains 2,598 decode cases and 28 direct
+snapshot marshal cases. Additional nested-document observations are described below.
 
 `run_item_byte_cases` adds 40 whole run-item decode observations, including
 original nested raw bytes and whole-object marshal bytes. `run_item_encode_cases`
@@ -35,7 +35,17 @@ depth from independently validated raw fragments during marshal. The native
 schema-bounded transport uses call-local tokens while the existing object
 decoder handles repeated pointers and nulls; it neither traverses arbitrary raw
 JSON as typed fields nor uses global state. Whole request/response codecs remain
-outside this bounded run-item slice.
+outside the original bounded run-item slice.
+
+`envelope_byte_cases` now adds 130 request/response decode observations;
+`envelope_encode_cases` adds 80 direct marshal probes at eight raw-field locations.
+The oracle additionally injects `envelope_test.go` into the disposable archive.
+Comparisons cover original raw bytes, whole encoded bytes, typed-string
+replacement, duplicate arrays with retained hidden slots, pointer resets,
+malformed overwritten values, and both depth boundaries. The native schema
+walker now traverses only the declared item/tool arrays and schema fields.
+Byte-codec support does not imply automatic trace-writer integration or complete
+in-memory slice-representation parity.
 
 Output: `fixtures/payloads/observations.json`.
 

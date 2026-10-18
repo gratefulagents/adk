@@ -1,11 +1,19 @@
-//! Schema-bounded raw transport for a run-item analysis snapshot.
+//! Schema-bounded raw transport for analysis snapshots.
 //! Tokens are local to one call; ordinary Go-style decoding retains duplicate
 //! pointer/object and slice-slot semantics before raw values are restored.
 use super::{append_raw, fold_key, normalize_strings, raw_end, string_end};
-use crate::dto::{RawJson, RunItemSnapshot};
+use crate::dto::{RawJson, ResponseSnapshot, RunItemSnapshot};
+use crate::snapshots::RequestSnapshot;
 
 #[derive(Clone, Copy)]
-enum Node {
+pub(super) enum Node {
+    Request,
+    Response,
+    Items,
+    Tools,
+    Calls,
+    Tool,
+    Schema,
     Item,
     Input,
     Raw,
@@ -14,6 +22,13 @@ enum Node {
 
 fn child(node: Node, key: &str) -> Node {
     match (node, key) {
+        (Node::Request, "input_items") | (Node::Response, "items") => Node::Items,
+        (Node::Request, "tools") => Node::Tools,
+        (Node::Request, "output_schema") => Node::Schema,
+        (Node::Response, "tool_calls") => Node::Calls,
+        (Node::Response, "raw") | (Node::Tool, "input_schema") | (Node::Schema, "schema") => {
+            Node::Raw
+        }
         (Node::Item, "tool_call" | "tool_approval") => Node::Input,
         (Node::Input, "input") => Node::Raw,
         _ => Node::Other,
@@ -37,6 +52,30 @@ fn rewrite(
     let input = input.trim_ascii();
     if matches!(node, Node::Raw) {
         return raw(input);
+    }
+    let element = match node {
+        Node::Items => Some(Node::Item),
+        Node::Tools => Some(Node::Tool),
+        Node::Calls => Some(Node::Input),
+        _ => None,
+    };
+    if let Some(element) = element {
+        if input.first() != Some(&b'[') {
+            return Ok(normalize_strings(input));
+        }
+        let mut out = vec![b'['];
+        let mut i = skip_space(input, 1);
+        while input[i] != b']' {
+            let end = raw_end(input, i);
+            out.extend(rewrite(&input[i..end], element, raw)?);
+            i = skip_space(input, end);
+            if input[i] == b',' {
+                out.push(b',');
+                i = skip_space(input, i + 1);
+            }
+        }
+        out.push(b']');
+        return Ok(out);
     }
     if matches!(node, Node::Other) || input.first() != Some(&b'{') {
         return Ok(normalize_strings(input));
@@ -84,19 +123,72 @@ fn original_raw(bytes: &[u8]) -> Result<RawJson, serde_json::Error> {
     }
 }
 
-pub(super) fn decode(input: &[u8]) -> Result<RunItemSnapshot, serde_json::Error> {
+pub(super) trait Document: Clone + serde::Serialize + serde::de::DeserializeOwned {
+    const NODE: Node;
+    fn visit_raw(
+        &mut self,
+        visit: &mut impl FnMut(&mut RawJson) -> Result<(), serde_json::Error>,
+    ) -> Result<(), serde_json::Error>;
+}
+
+impl Document for RunItemSnapshot {
+    const NODE: Node = Node::Item;
+    fn visit_raw(
+        &mut self,
+        visit: &mut impl FnMut(&mut RawJson) -> Result<(), serde_json::Error>,
+    ) -> Result<(), serde_json::Error> {
+        visit_raw(self, visit)
+    }
+}
+
+impl Document for RequestSnapshot {
+    const NODE: Node = Node::Request;
+    fn visit_raw(
+        &mut self,
+        visit: &mut impl FnMut(&mut RawJson) -> Result<(), serde_json::Error>,
+    ) -> Result<(), serde_json::Error> {
+        for item in &mut self.input_items {
+            visit_raw(item, &mut *visit)?;
+        }
+        for tool in &mut self.tools {
+            visit(&mut tool.input_schema)?;
+        }
+        if let Some(schema) = &mut self.output_schema {
+            visit(&mut schema.schema)?;
+        }
+        Ok(())
+    }
+}
+
+impl Document for ResponseSnapshot {
+    const NODE: Node = Node::Response;
+    fn visit_raw(
+        &mut self,
+        visit: &mut impl FnMut(&mut RawJson) -> Result<(), serde_json::Error>,
+    ) -> Result<(), serde_json::Error> {
+        for item in &mut self.items {
+            visit_raw(item, &mut *visit)?;
+        }
+        for call in &mut self.tool_calls {
+            visit(&mut call.input)?;
+        }
+        visit(&mut self.raw)
+    }
+}
+
+pub(super) fn decode<T: Document>(input: &[u8]) -> Result<T, serde_json::Error> {
     // Validate every occurrence before replacing raw values, including values
     // that a later null or duplicate key will discard.
     let normalized = normalize_strings(input);
     let _: &serde_json::value::RawValue = serde_json::from_slice(&normalized)?;
     let mut slots = Vec::new();
-    let rewritten = rewrite(input, Node::Item, &mut |bytes| {
+    let rewritten = rewrite(input, T::NODE, &mut |bytes| {
         let index = slots.len();
         slots.push(bytes.to_vec());
         Ok(index.to_string().into_bytes())
     })?;
-    let mut item: RunItemSnapshot = serde_json::from_slice(&rewritten)?;
-    visit_raw(&mut item, |raw| {
+    let mut item: T = serde_json::from_slice(&rewritten)?;
+    item.visit_raw(&mut |raw| {
         if raw.bytes().is_empty() {
             return Ok(());
         }
@@ -110,10 +202,10 @@ pub(super) fn decode(input: &[u8]) -> Result<RunItemSnapshot, serde_json::Error>
     Ok(item)
 }
 
-pub(super) fn encode(item: &RunItemSnapshot) -> Result<Vec<u8>, serde_json::Error> {
+pub(super) fn encode<T: Document>(item: &T) -> Result<Vec<u8>, serde_json::Error> {
     let mut item = item.clone();
     let mut slots = Vec::new();
-    visit_raw(&mut item, |raw| {
+    item.visit_raw(&mut |raw| {
         if raw.bytes().is_empty() {
             *raw = RawJson::Missing;
         } else {
@@ -126,7 +218,7 @@ pub(super) fn encode(item: &RunItemSnapshot) -> Result<Vec<u8>, serde_json::Erro
         Ok(())
     })?;
     let encoded = crate::snapshots::to_go_json(&item)?;
-    rewrite(&encoded, Node::Item, &mut |bytes| {
+    rewrite(&encoded, T::NODE, &mut |bytes| {
         let index: usize = serde_json::from_slice(bytes)?;
         slots
             .get(index)

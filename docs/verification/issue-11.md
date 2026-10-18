@@ -2,6 +2,16 @@
 
 ## Current continuation evidence
 
+### Subagent selector capability facets
+
+Separately reviewed the Async and GenericFallback capability records against the
+26-case actual-builder oracle and policy/registration/default tests, not by
+automatically propagating API status. These close only selector capabilities,
+not whole child runtime or scheduler lifecycle behavior. Fresh bound native/Go
+checks and56 validators pass; ledger **1,143 verified /7,748 unresolved /251
+excluded**. Production remains3fda97c with its1,777 workspace+10docs verification.
+Full retained acceptance remains incomplete.
+
 ### Governed agent-kind catalog and selection helpers
 
 Added `adk::codec::agents`: open string Kind labels, eleven constants, owned

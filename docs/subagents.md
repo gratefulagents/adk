@@ -16,6 +16,11 @@ execution ID or a newly synthesized Go trace object. Parent and child scopes
 therefore share the default namespace when their owner identity matches; an
 explicit namespace overrides this default.
 
+Managed children default to 50 turns, independently of the parent run's 100-turn
+default. `SchedulerConfig.max_turns` sets the child ceiling; a lower per-submission
+policy remains effective. Explicit ceilings can exceed the default when the
+submission policy also permits them.
+
 ## Session ownership
 
 A host registers child `Runner`s in `RunnerChildExecutor`, configures permitted

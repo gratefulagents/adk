@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Managed child turn default
+
+Reproduced the native scheduler dispatching a 100-turn default where the pinned
+SDK registry resolves to 50. The scheduler now defaults to 50; parent policy
+remains 100. Regression coverage inspects actual child invocation policies for
+default 50, explicit 40, a lower submission limit of 12, and explicit 120 with a
+150-turn submission allowance. The independent Go harness executes the exported
+resolvers with zero, negative, and positive inputs; its test file is included in
+the existing evidence input hashes and runs through `check.py`.
+
+The initial full suite and concurrent evidence run exposed the old child guidance
+expectation of a 100-turn ceiling. That expectation is now 50, retaining the full
+static/dynamic instruction and non-mutation assertions. Final Rust 1.88 Linux:
+**1,756 workspace +10 doctests passed; 0 failed, 30 ignored**. Strict
+Clippy/typecheck/rustdoc/format, facade matrix, standalone consumer/purity,
+all 20 offline feature scenarios and the host-session example passed. Examples
+used the established direct-driver Clippy workaround. Go harness test/vet/build,
+all bound references, 55 validators, artifact/overlay/audit and source locks passed.
+Ledger remains **1,068 verified /7,823 unresolved /251 excluded**; these fixes do
+not close the remaining SDK acceptance obligations.
+
 ### Child default cache namespace
 
 Reproduced a child request hashing its task-specific execution ID rather than the

@@ -250,7 +250,7 @@ impl Default for SchedulerConfig {
             max_tasks: 256,
             max_depth: 4,
             parent_depth: 0,
-            max_turns: std::num::NonZeroU32::new(100).unwrap(),
+            max_turns: std::num::NonZeroU32::new(50).unwrap(),
             security: SecurityBaseline::default(),
             agents: BTreeMap::new(),
             budget: BudgetLimits::default(),

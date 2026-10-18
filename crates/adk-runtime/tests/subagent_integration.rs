@@ -1779,7 +1779,7 @@ async fn child_context_guidance_wraps_static_and_dynamic_instructions_without_mu
                         Arc::new(SchedulerCheckpoints::default()) as Arc<dyn SchedulerStore>
                     });
                     let (owner, session) = session_with_runner(child.clone(), store).await;
-                    for (turns, effective_turns) in [(3, 3), (7, 7), (1000, 100)] {
+                    for (turns, effective_turns) in [(3, 3), (7, 7), (1000, 50)] {
                         let mut submission = Submission::new("worker", "inspect");
                         submission.policy.tools.access = AccessMode::FullAccess;
                         submission.policy.max_turns = std::num::NonZeroU32::new(turns).unwrap();

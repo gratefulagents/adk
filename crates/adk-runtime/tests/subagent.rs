@@ -126,6 +126,33 @@ async fn wait(handle: &SchedulerHandle, ids: &[&str]) -> Vec<TaskSnapshot> {
 }
 
 #[tokio::test]
+async fn child_turn_default_and_explicit_caps_are_applied_before_execution() {
+    for (configured, requested, expected) in [
+        (None, 100, 50),
+        (Some(40), 100, 40),
+        (None, 12, 12),
+        (Some(120), 150, 120),
+    ] {
+        let mut cfg = config();
+        if let Some(limit) = configured {
+            cfg.max_turns = std::num::NonZeroU32::new(limit).unwrap();
+        }
+        let (owner, handle, mut starts, _) = rig(cfg, None);
+        let mut submission = request("limited");
+        submission.policy.max_turns = std::num::NonZeroU32::new(requested).unwrap();
+        handle.submit(submission).await.unwrap();
+        let child = next(&mut starts).await;
+        assert_eq!(child.invocation.request.policy.max_turns.get(), expected);
+        child.done.send(ChildOutcome::completed("done")).unwrap();
+        assert_eq!(
+            wait(&handle, &["limited"]).await[0].status,
+            TaskStatus::Completed
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn fresh_context_explicit_history_and_common_sync_background_engine() {
     let (owner, handle, mut starts, _) = rig(config(), None);
     let sync = handle.run(request("sync"));

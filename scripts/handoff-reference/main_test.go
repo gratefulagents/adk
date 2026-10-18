@@ -116,3 +116,25 @@ func TestFixtureRepeatability(t *testing.T) {
 		}
 	}
 }
+
+func TestPinnedParentAndChildTurnDefaults(t *testing.T) {
+	for _, tc := range []struct {
+		configured int
+		parent     int
+		child      int
+	}{
+		{0, 100, 50},
+		{-1, 100, 50},
+		{12, 12, 12},
+		{40, 40, 40},
+		{120, 120, 120},
+	} {
+		cfg := agentsdk.RunConfig{MaxTurns: tc.configured, SubAgentMaxTurns: tc.configured}
+		if got := cfg.EffectiveMaxTurns(); got != tc.parent {
+			t.Fatalf("parent configured=%d: got %d, want %d", tc.configured, got, tc.parent)
+		}
+		if got := cfg.EffectiveSubAgentMaxTurns(); got != tc.child {
+			t.Fatalf("child configured=%d: got %d, want %d", tc.configured, got, tc.child)
+		}
+	}
+}

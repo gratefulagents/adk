@@ -1,5 +1,11 @@
 # Independent pinned Go handoff oracles
 
+`check.py` also executes `go test -count=1 ./...` against the clean SDK pin.
+`TestPinnedParentAndChildTurnDefaults` checks the actual exported turn resolvers:
+zero and negative inputs resolve to 100/50, while positive 12/40/120 overrides
+are retained. The native scheduler regression inspects dispatched child policies
+for the 50-turn default, lower submission limits, and explicit lower/higher caps.
+
 ## Prompt-cache request observations
 
 The `prompt-cache` command produces `fixtures/handoff/sdk-prompt-cache.json`:

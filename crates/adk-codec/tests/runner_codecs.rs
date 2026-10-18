@@ -366,6 +366,7 @@ fn native_text_items_roundtrip_and_unsupported_fields_fail_closed() {
             .as_mut()
             .unwrap()
             .images
+            .get_or_insert_default()
             .push(dto::ImageAttachment::default());
         assert_eq!(
             encode_item(&decode_item(&media).unwrap(), agent.as_ref()).unwrap(),
@@ -590,9 +591,12 @@ fn multimodal_history_preserves_pdf_detail_phase_markers_and_compaction_origin()
     let markers = vec![marker("images", ApprovalPhase::Approved, 3)];
     let wire = encode_history(&items, &agents, &markers).unwrap();
     let message = wire[0].message.as_ref().unwrap();
-    assert_eq!(message.images[0].media_type, "application/pdf");
-    assert_eq!(message.images[0].data, "cGRm");
-    assert_eq!(message.images[1].detail, "high");
+    assert_eq!(
+        message.images.as_ref().unwrap()[0].media_type,
+        "application/pdf"
+    );
+    assert_eq!(message.images.as_ref().unwrap()[0].data, "cGRm");
+    assert_eq!(message.images.as_ref().unwrap()[1].detail, "high");
     assert_eq!(wire[4].tool_output.as_ref().unwrap().images, message.images);
     let wire_json = serde_json::to_value(&wire).unwrap();
     let decoded = decode_history(

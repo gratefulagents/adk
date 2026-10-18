@@ -13,6 +13,45 @@ func imageSliceStates(items []agent.LLMRunItemSnapshot) []bool {
 	return out
 }
 
+func imagePayloadCases() []map[string]any {
+	inputs := []string{
+		`null`, `{}`, `{"images":null}`, `{"images":[]}`, `{"images":[null]}`,
+		`{"images":[{"data":"one"},{"data":"two"}],"images":[{"data":"short"}],"images":[null,null]}`,
+		`{"images":[{"data":"one"}],"images":[],"images":[null]}`,
+		`{"images":[{"data":"one"}],"images":null,"images":[null]}`,
+	}
+	var cases []map[string]any
+	for _, input := range inputs {
+		var message agent.MessageOutput
+		var output agent.ToolOutputData
+		must(json.Unmarshal([]byte(input), &message))
+		must(json.Unmarshal([]byte(input), &output))
+		snapshots := agent.SnapshotRunItems([]agent.RunItem{
+			{Type: agent.RunItemMessage, Message: &message},
+			{Type: agent.RunItemToolOutput, ToolOutput: &output},
+		})
+		messageBytes, err := json.Marshal(message)
+		must(err)
+		outputBytes, err := json.Marshal(output)
+		must(err)
+		requestInput := `{"input_items":[{"tool_output":` + input + `}]}`
+		var request agent.LLMRequestSnapshot
+		must(json.Unmarshal([]byte(requestInput), &request))
+		requestBytes, err := json.Marshal(request)
+		must(err)
+		cases = append(cases, map[string]any{
+			"input": input, "images_nil": message.Images == nil,
+			"output_images_nil":           output.Images == nil,
+			"message_snapshot_images_nil": snapshots[0].MessageImages == nil,
+			"output_snapshot_images_nil":  snapshots[1].ToolOutput.Images == nil,
+			"message_encoded":             string(messageBytes), "output_encoded": string(outputBytes),
+			"request_input": requestInput, "request_encoded": string(requestBytes),
+			"output_present": request.InputItems[0].ToolOutput != nil,
+		})
+	}
+	return cases
+}
+
 func requestSliceState(snapshot agent.LLMRequestSnapshot) map[string]any {
 	return map[string]any{
 		"input_items":    snapshot.InputItems == nil,

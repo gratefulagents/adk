@@ -284,6 +284,7 @@ func writerFixture() {
 	responseVariants = append(responseVariants, string(emptyResponse))
 	result["native_response_variants"] = responseVariants
 	result["native_response_nil_slices"] = responseNilVariants
+	result["image_payload_cases"] = imagePayloadCases()
 	result["native_request_nil_slices"] = nativeRequestNilCases()
 	result["request_inplace_cases"] = requestInPlaceCases()
 	result["response_record_cases"] = responseRecordCases()

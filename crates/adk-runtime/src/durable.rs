@@ -1320,7 +1320,7 @@ impl Runner {
                     wire.message = Some(adk_codec::dto::MessageOutput {
                         text: item.message_text.clone(),
                         phase: item.message_phase.clone(),
-                        images: item.message_images.clone().unwrap_or_default(),
+                        images: item.message_images.clone(),
                     });
                 }
                 SnapshotType::ToolCall => {

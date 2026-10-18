@@ -115,7 +115,7 @@ pub struct NativeHistory {
 
 pub(crate) fn encode_content(
     content: &[Content],
-) -> Result<(String, Vec<dto::ImageAttachment>), BridgeError> {
+) -> Result<(String, Option<Vec<dto::ImageAttachment>>), BridgeError> {
     let (text, attachments) = match content.split_first() {
         Some((Content::Text { text }, rest)) => (text.clone(), rest),
         _ => (String::new(), content),
@@ -136,8 +136,8 @@ pub(crate) fn encode_content(
                 "wire content requires optional leading text followed by inline attachments",
             )),
         })
-        .collect::<Result<_, _>>()?;
-    Ok((text, images))
+        .collect::<Result<Vec<_>, _>>()?;
+    Ok((text, (!images.is_empty()).then_some(images)))
 }
 
 fn decode_content(text: &str, images: &[dto::ImageAttachment]) -> Vec<Content> {
@@ -244,7 +244,10 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
                 } else {
                     Role::User
                 },
-                content: decode_content(&message.text, &message.images),
+                content: decode_content(
+                    &message.text,
+                    message.images.as_deref().unwrap_or_default(),
+                ),
             };
             if message.phase.is_empty() {
                 RunItem::Message { message: native }
@@ -287,7 +290,10 @@ pub fn decode_item(wire: &dto::RunItem) -> Result<RunItem, BridgeError> {
             RunItem::ToolResult {
                 call_id: output.call_id.clone(),
                 output: ToolOutput {
-                    content: decode_content(&output.content, &output.images),
+                    content: decode_content(
+                        &output.content,
+                        output.images.as_deref().unwrap_or_default(),
+                    ),
                     is_error: output.is_error,
                     should_pause: false,
                 },

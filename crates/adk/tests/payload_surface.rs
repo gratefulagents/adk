@@ -16,7 +16,15 @@ fn payload_decoder_is_available_through_standalone_facade() {
     let message: dto::MessageOutput =
         from_go_json(br#"{"TEXT":"hello","text":null,"images":[null]}"#).unwrap();
     assert_eq!(message.text, "hello");
-    assert_eq!(message.images, vec![dto::ImageAttachment::default()]);
+    assert_eq!(message.images, Some(vec![dto::ImageAttachment::default()]));
+    let nil: dto::MessageOutput = from_go_json(br#"{"images":null}"#).unwrap();
+    let empty: dto::MessageOutput = from_go_json(br#"{"images":[]}"#).unwrap();
+    assert!(nil.images.is_none());
+    assert_eq!(empty.images, Some(vec![]));
+    assert_eq!(
+        to_go_json_bytes(&nil).unwrap(),
+        to_go_json_bytes(&empty).unwrap()
+    );
 
     let call: dto::ToolCallData =
         from_go_json(br#"{"ID":"call","input":{"x":1e+02,"x":2}}"#).unwrap();

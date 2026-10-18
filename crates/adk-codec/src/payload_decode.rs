@@ -43,8 +43,8 @@ pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 /// is used.
 /// The Go nesting limit of 10,000 is enforced, including ignored and raw values.
 /// Errors do not expose Go's partial mutation state or reproduce its error text.
-/// Existing `Vec` image fields collapse Go's nil and empty slices; both are
-/// omitted on the wire. Slot reuse is retained during each object decode.
+/// Nullable image collections preserve Go's nil and allocated-empty slices;
+/// both are omitted on the wire. Nested slot reuse survives repeated objects.
 ///
 /// ```compile_fail
 /// let _: adk_codec::dto::RunItem = adk_codec::from_go_json(b"{}").unwrap();
@@ -509,10 +509,10 @@ impl<'de> Deserialize<'de> for RoleCatalog {
 
 go_object!(Cursor, "message_id" => message_id: integer, "token" => token: scalar);
 go_object!(Usage, "requests" => requests: integer, "input_tokens" => input_tokens: integer, "output_tokens" => output_tokens: integer, "cache_read_tokens" => cache_read_tokens: integer, "cache_create_tokens" => cache_create_tokens: integer);
-go_object!(MessageOutput, "text" => text: scalar, "phase" => phase: scalar; "images" => images);
+go_object!(MessageOutput, "text" => text: scalar, "phase" => phase: scalar preserve_nil { "images" => images });
 go_object!(ImageAttachment, "media_type" => media_type: scalar, "data" => data: scalar, "detail" => detail: scalar);
 go_object!(ToolCallData, "id" => id: scalar, "name" => name: scalar, "input" => input: raw);
-go_object!(ToolOutputData, "call_id" => call_id: scalar, "content" => content: scalar, "is_error" => is_error: scalar; "images" => images);
+go_object!(ToolOutputData, "call_id" => call_id: scalar, "content" => content: scalar, "is_error" => is_error: scalar preserve_nil { "images" => images });
 go_object!(HandoffCallData, "from_agent" => from_agent: scalar, "to_agent" => to_agent: scalar);
 go_object!(HandoffOutputData, "from_agent" => from_agent: scalar, "to_agent" => to_agent: scalar);
 go_object!(ReasoningData, "id" => id: scalar, "text" => text: scalar, "signature" => signature: scalar, "redacted_data" => redacted_data: scalar, "encrypted_content" => encrypted_content: scalar);

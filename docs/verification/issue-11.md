@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Nullable message and tool-output images
+
+MessageOutput and ToolOutputData now preserve absent/null versus allocated-empty
+image arrays with `Option<Vec<_>>`. Their omitempty bytes remain unchanged. Native
+content adapters create nil for no attachments and explicitly project optional
+arrays when decoding; durable history preserves the snapshot representation.
+Eight new independent pinned-Go observations verify both payloads, nested request
+tool outputs, and snapshot projection. In particular, message snapshot copying
+collapses an allocated-empty array to nil, whereas copying a tool-output struct
+preserves its allocated-empty image array. Existing in-place image reuse tests
+and native multimodal round trips remain passing (40 targeted tests).
+
+No acceptance IDs are promoted solely by this representation correction.
+
 ### Nested decoder backing state
 
 Slice elements now retain validated object updates until materialization, rather

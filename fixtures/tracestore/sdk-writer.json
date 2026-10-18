@@ -3724,5 +3724,103 @@
         "tools": true
       }
     }
+  ],
+  "image_payload_cases": [
+    {
+      "images_nil": true,
+      "input": "null",
+      "message_encoded": "{\"text\":\"\"}",
+      "message_snapshot_images_nil": true,
+      "output_encoded": "{\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": true,
+      "output_present": false,
+      "output_snapshot_images_nil": true,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\"}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":null}]}"
+    },
+    {
+      "images_nil": true,
+      "input": "{}",
+      "message_encoded": "{\"text\":\"\"}",
+      "message_snapshot_images_nil": true,
+      "output_encoded": "{\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": true,
+      "output_present": true,
+      "output_snapshot_images_nil": true,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{}}]}"
+    },
+    {
+      "images_nil": true,
+      "input": "{\"images\":null}",
+      "message_encoded": "{\"text\":\"\"}",
+      "message_snapshot_images_nil": true,
+      "output_encoded": "{\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": true,
+      "output_present": true,
+      "output_snapshot_images_nil": true,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{\"images\":null}}]}"
+    },
+    {
+      "images_nil": false,
+      "input": "{\"images\":[]}",
+      "message_encoded": "{\"text\":\"\"}",
+      "message_snapshot_images_nil": true,
+      "output_encoded": "{\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": false,
+      "output_present": true,
+      "output_snapshot_images_nil": false,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{\"images\":[]}}]}"
+    },
+    {
+      "images_nil": false,
+      "input": "{\"images\":[null]}",
+      "message_encoded": "{\"text\":\"\",\"images\":[{\"media_type\":\"\",\"data\":\"\"}]}",
+      "message_snapshot_images_nil": false,
+      "output_encoded": "{\"images\":[{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": false,
+      "output_present": true,
+      "output_snapshot_images_nil": false,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"images\":[{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{\"images\":[null]}}]}"
+    },
+    {
+      "images_nil": false,
+      "input": "{\"images\":[{\"data\":\"one\"},{\"data\":\"two\"}],\"images\":[{\"data\":\"short\"}],\"images\":[null,null]}",
+      "message_encoded": "{\"text\":\"\",\"images\":[{\"media_type\":\"\",\"data\":\"short\"},{\"media_type\":\"\",\"data\":\"two\"}]}",
+      "message_snapshot_images_nil": false,
+      "output_encoded": "{\"images\":[{\"media_type\":\"\",\"data\":\"short\"},{\"media_type\":\"\",\"data\":\"two\"}],\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": false,
+      "output_present": true,
+      "output_snapshot_images_nil": false,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"images\":[{\"media_type\":\"\",\"data\":\"short\"},{\"media_type\":\"\",\"data\":\"two\"}],\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":\"one\"},{\"data\":\"two\"}],\"images\":[{\"data\":\"short\"}],\"images\":[null,null]}}]}"
+    },
+    {
+      "images_nil": false,
+      "input": "{\"images\":[{\"data\":\"one\"}],\"images\":[],\"images\":[null]}",
+      "message_encoded": "{\"text\":\"\",\"images\":[{\"media_type\":\"\",\"data\":\"\"}]}",
+      "message_snapshot_images_nil": false,
+      "output_encoded": "{\"images\":[{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": false,
+      "output_present": true,
+      "output_snapshot_images_nil": false,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"images\":[{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":\"one\"}],\"images\":[],\"images\":[null]}}]}"
+    },
+    {
+      "images_nil": false,
+      "input": "{\"images\":[{\"data\":\"one\"}],\"images\":null,\"images\":[null]}",
+      "message_encoded": "{\"text\":\"\",\"images\":[{\"media_type\":\"\",\"data\":\"\"}]}",
+      "message_snapshot_images_nil": false,
+      "output_encoded": "{\"images\":[{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}",
+      "output_images_nil": false,
+      "output_present": true,
+      "output_snapshot_images_nil": false,
+      "request_encoded": "{\"input_items\":[{\"type\":\"\",\"tool_output\":{\"images\":[{\"media_type\":\"\",\"data\":\"\"}],\"call_id\":\"\",\"content\":\"\"}}],\"settings\":{}}",
+      "request_input": "{\"input_items\":[{\"tool_output\":{\"images\":[{\"data\":\"one\"}],\"images\":null,\"images\":[null]}}]}"
+    }
   ]
 }

@@ -91,7 +91,11 @@ pub fn snapshot_items(items: &[RunItem]) -> Vec<RunItemSnapshot> {
                     if let Some(v) = &item.message {
                         out.message_text = v.text.clone();
                         out.message_phase = v.phase.clone();
-                        out.message_images = (!v.images.is_empty()).then(|| v.images.clone());
+                        out.message_images = v
+                            .images
+                            .as_ref()
+                            .filter(|images| !images.is_empty())
+                            .cloned();
                     }
                 }
                 SnapshotType::ToolCall => {

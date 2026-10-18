@@ -424,9 +424,9 @@ pub struct MessageOutput {
     #[serde(
         rename = "images",
         deserialize_with = "null_default",
-        skip_serializing_if = "Vec::is_empty"
+        skip_serializing_if = "empty_slice"
     )]
-    pub images: Vec<ImageAttachment>,
+    pub images: Option<Vec<ImageAttachment>>,
 }
 
 #[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
@@ -461,9 +461,9 @@ pub struct ToolOutputData {
     #[serde(
         rename = "images",
         deserialize_with = "null_default",
-        skip_serializing_if = "Vec::is_empty"
+        skip_serializing_if = "empty_slice"
     )]
-    pub images: Vec<ImageAttachment>,
+    pub images: Option<Vec<ImageAttachment>>,
     #[serde(rename = "call_id", deserialize_with = "null_default")]
     pub call_id: String,
     #[serde(rename = "content", deserialize_with = "null_default")]

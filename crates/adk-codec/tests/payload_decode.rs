@@ -4,6 +4,57 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 #[test]
+fn nullable_image_payloads_and_snapshot_projection_match_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["image_payload_cases"].as_array().unwrap() {
+        let input = case["input"].as_str().unwrap().as_bytes();
+        let message: MessageOutput = from_go_json(input).unwrap();
+        let output: ToolOutputData = from_go_json(input).unwrap();
+        assert_eq!(message.images.is_none(), case["images_nil"], "{case}");
+        assert_eq!(output.images.is_none(), case["output_images_nil"], "{case}");
+        assert_eq!(
+            to_go_json_bytes(&message).unwrap(),
+            case["message_encoded"].as_str().unwrap().as_bytes()
+        );
+        assert_eq!(
+            to_go_json_bytes(&output).unwrap(),
+            case["output_encoded"].as_str().unwrap().as_bytes()
+        );
+        let request: adk_codec::snapshots::RequestSnapshot =
+            from_go_json(case["request_input"].as_str().unwrap().as_bytes()).unwrap();
+        let nested = &request.input_items.as_ref().unwrap()[0].tool_output;
+        assert_eq!(nested.is_some(), case["output_present"]);
+        if let Some(nested) = nested {
+            assert_eq!(nested.images, output.images);
+        }
+        assert_eq!(
+            to_go_json_bytes(&request).unwrap(),
+            case["request_encoded"].as_str().unwrap().as_bytes()
+        );
+        let snapshots = adk_codec::snapshot_items(&[
+            RunItem {
+                message: Some(message),
+                ..Default::default()
+            },
+            RunItem {
+                kind: RunItemType(2),
+                tool_output: Some(output),
+                ..Default::default()
+            },
+        ]);
+        assert_eq!(
+            snapshots[0].message_images.is_none(),
+            case["message_snapshot_images_nil"]
+        );
+        assert_eq!(
+            snapshots[1].tool_output.as_ref().unwrap().images.is_none(),
+            case["output_snapshot_images_nil"]
+        );
+    }
+}
+
+#[test]
 fn run_item_nested_raw_byte_codecs_match_go() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
@@ -154,13 +205,13 @@ fields!(ToolApprovalData, tool_name, call_id, approved; input);
 impl Observation for MessageOutput {
     fn fields(&self) -> Value {
         json!({"text": self.text, "phase": self.phase,
-            "images": self.images.iter().map(Observation::fields).collect::<Vec<_>>()})
+            "images": self.images.iter().flatten().map(Observation::fields).collect::<Vec<_>>()})
     }
 }
 impl Observation for ToolOutputData {
     fn fields(&self) -> Value {
         json!({"call_id": self.call_id, "content": self.content, "is_error": self.is_error,
-            "images": self.images.iter().map(Observation::fields).collect::<Vec<_>>()})
+            "images": self.images.iter().flatten().map(Observation::fields).collect::<Vec<_>>()})
     }
 }
 impl Observation for RunItemType {
@@ -303,11 +354,11 @@ fn public_raw_representations_share_go_marshal_depth_limit() {
 fn ordinary_serde_retains_duplicate_and_in_place_semantics() {
     let mut message = MessageOutput {
         text: "before".into(),
-        images: vec![ImageAttachment {
+        images: Some(vec![ImageAttachment {
             data: "keep".into(),
             detail: "high".into(),
             ..Default::default()
-        }],
+        }]),
         ..Default::default()
     };
     let mut de = serde_json::Deserializer::from_str(
@@ -315,14 +366,14 @@ fn ordinary_serde_retains_duplicate_and_in_place_semantics() {
     );
     MessageOutput::deserialize_in_place(&mut de, &mut message).unwrap();
     assert_eq!(message.text, "before");
-    assert_eq!(message.images[0].data, "keep");
-    assert_eq!(message.images[0].media_type, "new");
+    assert_eq!(message.images.as_ref().unwrap()[0].data, "keep");
+    assert_eq!(message.images.as_ref().unwrap()[0].media_type, "new");
     MessageOutput::deserialize_in_place(
         &mut serde_json::Deserializer::from_str("null"),
         &mut message,
     )
     .unwrap();
-    assert_eq!(message.images[0].detail, "high");
+    assert_eq!(message.images.as_ref().unwrap()[0].detail, "high");
     let mut kind = RunItemType(99);
     RunItemType::deserialize_in_place(&mut serde_json::Deserializer::from_str("null"), &mut kind)
         .unwrap();

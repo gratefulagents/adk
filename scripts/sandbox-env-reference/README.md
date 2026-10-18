@@ -19,3 +19,10 @@ prepend/append precedence, lexical cleanup/deduplication, GOROOT, sorted extra
 variable expansion, original configuration-test inputs, all25 Go whitespace
 scalars and non-whitespace/invalid UTF-8 controls. Native execution policy and
 request-override ordering are not changed or claimed by this projection.
+
+ConfigFromEnv is checked separately with363 explicit snapshots, comparing every
+constructed field and the derived environment. Both original config regressions
+are included.30 flag spellings preserve ParseBool-before-yes/y/on behavior (mixed
+TrUe is false), plus raw strings, cleaned path lists, newline/comma selection,
+trimmed duplicate keys and literal extra values. These are data-only projections,
+not ambient acquisition or native permission grants.

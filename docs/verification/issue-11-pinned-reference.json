@@ -186,7 +186,7 @@
       "-json",
       "./pkg/agentsdk/sandbox",
       "-run",
-      "^(TestSafeEnvDoesNotInheritSecrets|TestSafeEnvInheritsSystemVarsOnly|TestSafeEnvSandboxConfiguration)$"
+      "^(TestConfigFromEnv|TestConfigFromEnvParsesAllowUnsafeReadOnlyLocal|TestSafeEnvDoesNotInheritSecrets|TestSafeEnvInheritsSystemVarsOnly|TestSafeEnvSandboxConfiguration)$"
     ]
   ],
   "counts": {

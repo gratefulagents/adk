@@ -24,7 +24,7 @@ func TestNativeExpansionReference(t *testing.T) {
 	for key, value := range env {
 		encodedEnv[hex.EncodeToString([]byte(key))] = hex.EncodeToString([]byte(value))
 	}
-	data, err := json.Marshal(map[string]any{"environment": encodedEnv, "cases": cases, "configEnvNames": SandboxConfigEnvNames(), "modeEnvName": SandboxModeEnv, "environmentCases": nativeEnvironmentCases(t)})
+	data, err := json.Marshal(map[string]any{"environment": encodedEnv, "cases": cases, "configEnvNames": SandboxConfigEnvNames(), "modeEnvName": SandboxModeEnv, "environmentCases": nativeEnvironmentCases(t), "configCases": nativeConfigCases(t)})
 	if err != nil {
 		t.Fatal(err)
 	}

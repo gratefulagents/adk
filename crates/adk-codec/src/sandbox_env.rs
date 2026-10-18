@@ -77,6 +77,68 @@ pub struct EnvironmentConfig {
     pub go_root: Vec<u8>,
 }
 
+/// Legacy configuration data, never automatically applied to native execution.
+#[derive(Clone, Default)]
+pub struct ConfigProjection {
+    pub mode: Vec<u8>,
+    pub running_in_kubernetes: bool,
+    pub workspace_root: Vec<u8>,
+    pub environment: EnvironmentConfig,
+    pub extra_read_only_paths: Vec<Vec<u8>>,
+    pub extra_writable_paths: Vec<Vec<u8>>,
+    pub expose_kubernetes_service_account: bool,
+    pub allow_unsafe_read_only_local: bool,
+}
+
+/// Parse legacy POSIX configuration from an explicit host environment snapshot.
+/// Parsed flags and paths are data, not sandbox grants or native defaults.
+pub fn config_from_environment_posix(environment: &BTreeMap<Vec<u8>, Vec<u8>>) -> ConfigProjection {
+    let value = |key: &str| {
+        environment
+            .get(key.as_bytes())
+            .map(Vec::as_slice)
+            .unwrap_or_default()
+    };
+    let raw_extra = value(SANDBOX_EXTRA_ENV_ENV);
+    let separator = if raw_extra.contains(&b'\n') {
+        b'\n'
+    } else {
+        b','
+    };
+    let mut extra_env = BTreeMap::new();
+    for pair in raw_extra.split(|byte| *byte == separator) {
+        if let Some(equal) = pair.iter().position(|byte| *byte == b'=') {
+            let key = trim_space(&pair[..equal]);
+            if valid_key(key) {
+                extra_env.insert(key.to_vec(), trim_space(&pair[equal + 1..]).to_vec());
+            }
+        }
+    }
+    ConfigProjection {
+        mode: value(SANDBOX_MODE_ENV).to_vec(),
+        environment: EnvironmentConfig {
+            path: value(SANDBOX_PATH_ENV).to_vec(),
+            path_prepend: path_list(value(SANDBOX_PATH_PREPEND_ENV)),
+            path_append: path_list(value(SANDBOX_PATH_APPEND_ENV)),
+            extra_env,
+            go_root: value("GOROOT").to_vec(),
+        },
+        extra_read_only_paths: path_list(value(SANDBOX_EXTRA_READ_ONLY_PATHS_ENV)),
+        extra_writable_paths: path_list(value(SANDBOX_EXTRA_WRITABLE_PATHS_ENV)),
+        expose_kubernetes_service_account: env_flag(value(
+            SANDBOX_EXPOSE_KUBERNETES_SERVICE_ACCOUNT_ENV,
+        )),
+        allow_unsafe_read_only_local: env_flag(value(SANDBOX_ALLOW_UNSAFE_READ_ONLY_LOCAL_ENV)),
+        ..Default::default()
+    }
+}
+
+fn env_flag(value: &[u8]) -> bool {
+    let value = trim_space(value);
+    matches!(value, b"1" | b"t" | b"T" | b"true" | b"TRUE" | b"True")
+        || matches!(value.to_ascii_lowercase().as_slice(), b"yes" | b"y" | b"on")
+}
+
 /// Project the SDK's POSIX base environment from an explicit parent snapshot.
 /// This does not read the process environment or configure a native executor.
 /// Its output is not a native sandbox grant; native policy owns protected keys.

@@ -85,3 +85,80 @@ func nativeEnvironmentCases(t *testing.T) []map[string]any {
 	}
 	return cases
 }
+
+func nativeConfigCases(t *testing.T) []map[string]any {
+	original := os.Environ()
+	defer func() {
+		os.Clearenv()
+		for _, pair := range original {
+			key, value, _ := strings.Cut(pair, "=")
+			if err := os.Setenv(key, value); err != nil {
+				t.Fatal(err)
+			}
+		}
+	}()
+	cases := []map[string]any{}
+	record := func(parent map[string]string) {
+		os.Clearenv()
+		for key, value := range parent {
+			if err := os.Setenv(key, value); err != nil {
+				t.Fatalf("fixture key %s: %v", key, err)
+			}
+		}
+		config := ConfigFromEnv()
+		cases = append(cases, map[string]any{
+			"parent": nativeHexMap(parent),
+			"config": map[string]any{
+				"mode":                     hex.EncodeToString([]byte(config.Mode)),
+				"runningInKubernetes":      config.RunningInKubernetes,
+				"workspaceRoot":            hex.EncodeToString([]byte(config.WorkspaceRoot)),
+				"path":                     hex.EncodeToString([]byte(config.Path)),
+				"prepend":                  nativeHexList(config.PathPrepend),
+				"append":                   nativeHexList(config.PathAppend),
+				"goRoot":                   hex.EncodeToString([]byte(config.GOROOT)),
+				"extra":                    nativeHexMap(config.ExtraEnv),
+				"readOnlyPaths":            nativeHexList(config.ExtraReadOnlyPaths),
+				"writablePaths":            nativeHexList(config.ExtraWritablePaths),
+				"exposeServiceAccount":     config.ExposeKubernetesServiceAccount,
+				"allowUnsafeReadOnlyLocal": config.AllowUnsafeReadOnlyLocal,
+			},
+			"output": nativeHexMap(SafeEnvMapWithConfig(config)),
+		})
+	}
+	flags := []string{"", "1", "0", "t", "T", "true", "TRUE", "True", "TrUe", "f", "F", "false", "FALSE", "False", "FaLsE", "yes", "YeS", "y", "Y", "on", "ON", "oN", "off", "2", "enabled", " \ttrue\n", " \u00a0yes\u3000", "trueish", "猫", "\xff"}
+	extras := []string{"", " \u3000", "A=1,B=$A", " A = one , A=two,1BAD=x,BAD-NAME=x", "A=a,b\nB=b,c\n", "A=a\rB=b", "missing,=empty,B=valid", "A==x", "A=$OPENAI_API_KEY", "A=\xff,BAD\xff=x", "\u00a0A\u3000=one,A=two", "OPENAI_API_KEY=explicit-dummy"}
+	paths := []string{"", "relative", "/usr/bin:/bin:/usr/bin", " /a/../b : : . :/ ", "/.././:/a//b/:/a/b", "/x\xff:/x", "\u00a0"}
+	for i, flag := range flags {
+		for j, extra := range extras {
+			record(map[string]string{
+				SandboxModeEnv:                           " required \n",
+				SandboxPathEnv:                           paths[(i+j)%len(paths)],
+				SandboxPathPrependEnv:                    "relative:/a:/a/./::/b/..",
+				SandboxPathAppendEnv:                     "/last:/a",
+				SandboxExtraReadOnlyPathsEnv:             "/one:/one/.:relative:/../two",
+				SandboxExtraWritablePathsEnv:             "/scratch/../scratch:/scratch",
+				SandboxExtraEnvEnv:                       extra,
+				SandboxExposeKubernetesServiceAccountEnv: flag,
+				SandboxAllowUnsafeReadOnlyLocalEnv:       flags[(i+j)%len(flags)],
+				"GOROOT":                                 " /go/../root ",
+				"PATH":                                   "/usr/bin:/bin",
+				"OPENAI_API_KEY":                         "ambient-dummy",
+				"KUBERNETES_SERVICE_HOST":                "ignored",
+				"GRATEFULAGENTS_WORKSPACE_ROOT":          "/ignored",
+			})
+		}
+	}
+	record(map[string]string{
+		SandboxModeEnv:                           "required",
+		SandboxPathEnv:                           "/custom/bin:relative:/usr/bin",
+		SandboxPathPrependEnv:                    "/prepend/bin:relative",
+		SandboxPathAppendEnv:                     "/append/bin",
+		SandboxExtraReadOnlyPathsEnv:             "/opt/tooling:relative",
+		SandboxExtraWritablePathsEnv:             "/tmp/scratch:relative",
+		SandboxExtraEnvEnv:                       "JAVA_HOME=/opt/jdk\nTOOL_PATH=$PATH:/tooling\nBAD-NAME=no",
+		SandboxExposeKubernetesServiceAccountEnv: "true",
+	})
+	record(map[string]string{SandboxAllowUnsafeReadOnlyLocalEnv: "1"})
+	record(nil)
+	return cases
+}

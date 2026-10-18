@@ -249,3 +249,30 @@ fn sandbox_environment_projections_are_standalone_and_explicit() {
     assert!(!environment.contains_key(b"OPENAI_API_KEY".as_slice()));
     assert_eq!(config_env_names().len(), 8);
 }
+
+#[test]
+fn sandbox_configuration_parser_is_data_only_in_compat_facade() {
+    use adk::codec::sandbox_env::{
+        SANDBOX_ALLOW_UNSAFE_READ_ONLY_LOCAL_ENV, SANDBOX_EXPOSE_KUBERNETES_SERVICE_ACCOUNT_ENV,
+        SANDBOX_MODE_ENV, config_from_environment_posix,
+    };
+    let parent = std::collections::BTreeMap::from([
+        (SANDBOX_MODE_ENV.as_bytes().to_vec(), b" required ".to_vec()),
+        (
+            SANDBOX_ALLOW_UNSAFE_READ_ONLY_LOCAL_ENV.as_bytes().to_vec(),
+            b"1".to_vec(),
+        ),
+        (
+            SANDBOX_EXPOSE_KUBERNETES_SERVICE_ACCOUNT_ENV
+                .as_bytes()
+                .to_vec(),
+            b"TrUe".to_vec(),
+        ),
+    ]);
+    let parsed = config_from_environment_posix(&parent);
+    assert_eq!(parsed.mode, b" required ");
+    assert!(parsed.allow_unsafe_read_only_local);
+    assert!(!parsed.expose_kubernetes_service_account);
+    assert!(!parsed.running_in_kubernetes);
+    assert!(parsed.workspace_root.is_empty());
+}

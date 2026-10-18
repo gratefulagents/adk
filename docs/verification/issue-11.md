@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Explicit sandbox configuration parsing
+
+Added `config_from_environment_posix` and a data-only `ConfigProjection`, with
+363 hermetic Go comparisons of every constructed field and the resulting base
+environment. Covers both original config regressions, raw mode/PATH/GOROOT,
+cleaned lists preserving duplicates, newline-over-comma ExtraEnv delimiters,
+first-equals splitting, trimmed duplicate last-wins keys, invalid-key rejection,
+literal values and30 flag spellings. In particular, source `TrUe` is false while
+`YeS` is true; parsed flags never enable native unsafe-local or Kubernetes access.
+
+Full workspace tests/rustdoc and strict all-target lint/typecheck/format pass,
+as do12 compat-only facade tests, the standalone consumer,20 scenarios, refreshed
+bound evidence,56 validators, source locks and purity. The initial stdlib evidence
+path assumed older atob.go; located Go1.26's actual strconv/number.go and rebound
+it before final verification. Four exact API/config/test facets and ten production
+ConfigFromEnv key-lookup facets are verified, explicitly through host snapshots
+rather than automatic native environment loading. Ledger **1,329 verified /
+7,562 unresolved /251 excluded**. Whole Config JSON/type, other lookup sites,
+Windows and Default executor remain unclaimed; full issue11 is not complete.
+
+
 ### POSIX base-environment projection
 
 Added `codec::sandbox_env::EnvironmentConfig` and `safe_environment_map_posix`.

@@ -110,3 +110,100 @@ fn posix_environment_projection_matches_pinned_go() {
         BTreeMap::from([(b"PATH".to_vec(), b"/usr/local/bin:/usr/bin:/bin".to_vec())])
     );
 }
+
+#[test]
+fn posix_configuration_parser_matches_pinned_go() {
+    use adk_codec::sandbox_env::{config_from_environment_posix, safe_environment_map_posix};
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/sandbox-env/observations.json"
+    ))
+    .unwrap();
+    let map = |value: &serde_json::Value| -> BTreeMap<Vec<u8>, Vec<u8>> {
+        value
+            .as_object()
+            .unwrap()
+            .iter()
+            .map(|(key, value)| (decode(key), decode(value.as_str().unwrap())))
+            .collect()
+    };
+    let list = |value: &serde_json::Value| -> Vec<Vec<u8>> {
+        value
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|value| decode(value.as_str().unwrap()))
+            .collect()
+    };
+    let cases = fixture["configCases"].as_array().unwrap();
+    assert_eq!(cases.len(), 363);
+    for (index, case) in cases.iter().enumerate() {
+        let parent = map(&case["parent"]);
+        let actual = config_from_environment_posix(&parent);
+        let expected = &case["config"];
+        assert_eq!(
+            actual.mode,
+            decode(expected["mode"].as_str().unwrap()),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.running_in_kubernetes,
+            expected["runningInKubernetes"].as_bool().unwrap(),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.workspace_root,
+            decode(expected["workspaceRoot"].as_str().unwrap()),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.environment.path,
+            decode(expected["path"].as_str().unwrap()),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.environment.path_prepend,
+            list(&expected["prepend"]),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.environment.path_append,
+            list(&expected["append"]),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.environment.go_root,
+            decode(expected["goRoot"].as_str().unwrap()),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.environment.extra_env,
+            map(&expected["extra"]),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.extra_read_only_paths,
+            list(&expected["readOnlyPaths"]),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.extra_writable_paths,
+            list(&expected["writablePaths"]),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.expose_kubernetes_service_account,
+            expected["exposeServiceAccount"].as_bool().unwrap(),
+            "case {index}"
+        );
+        assert_eq!(
+            actual.allow_unsafe_read_only_local,
+            expected["allowUnsafeReadOnlyLocal"].as_bool().unwrap(),
+            "case {index}"
+        );
+        assert_eq!(
+            safe_environment_map_posix(&parent, &actual.environment),
+            map(&case["output"]),
+            "case {index}"
+        );
+    }
+}

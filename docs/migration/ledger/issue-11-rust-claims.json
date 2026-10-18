@@ -19999,6 +19999,25 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-F62B7CB3EB983AFC": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.GetInstructions",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::InstructionContext::resolve",
+        "crates/adk-runtime/src/runner.rs::InstructionProvider"
+      ],
+      "rust_test_identifiers": [
+        "public_raw_instruction_resolution_matches_pinned_get_instructions",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff",
+        "dynamic_instructions_failure_cancellation_and_drop_never_dispatch_a_model"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentGetInstructions_Dynamic",
+      "rationale": "Public InstructionContext::resolve exposes raw static/dynamic resolution without model dispatch or run-wide/schema/MCP additions.16 independently executed direct Go getter cases preserve empty/whitespace/Unicode/NUL text, dynamic precedence, unchanged static data and callback agent/usage/counts.16 existing real normal/streamed request cases verify runtime composition, retries and handoffs. The native fallible async provider retains existing cancellation/deadline/drop ownership; static data is read directly. This follows the documented owned borrowed-context adaptation, not nil Go pointers, mutable pointer identity, arbitrary synchronous callback/panic semantics or whole Agent/RunContext closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

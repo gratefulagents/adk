@@ -1,14 +1,14 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7795,
-    "verified": 1096
+    "unresolved": 7794,
+    "verified": 1097
   },
   "groups": [
     {
       "counts": {
-        "apis:unresolved": 405,
-        "apis:verified": 114,
+        "apis:unresolved": 404,
+        "apis:verified": 115,
         "configuration:unresolved": 15,
         "configuration:verified": 2,
         "defaults:unresolved": 5,
@@ -654,7 +654,6 @@
         "SDK-F38B7DF554810389",
         "SDK-F3CDEBE52A0229E1",
         "SDK-F40D7AF4502A1FBC",
-        "SDK-F62B7CB3EB983AFC",
         "SDK-F67E18771F891802",
         "SDK-F6C0DCF19C87B4B9",
         "SDK-F7EA2567E5C38EDB",
@@ -828,6 +827,7 @@
         "SDK-EEE9D0133772C8A8",
         "SDK-F14E37CB6D88B04D",
         "SDK-F29D82D524568F14",
+        "SDK-F62B7CB3EB983AFC",
         "SDK-F868546AC78821FB",
         "SDK-FA0603C217D1F3DA",
         "SDK-FAE738CEF5D2DFE4",
@@ -10960,8 +10960,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "7c6002e1317127ec81df31170a72d26379de350d9aa7ef1431af188ff2ef6e93",
-    "docs/migration/ledger/issue-11-rust-claims.json": "035cfb577d3083f1d95a77c85912799959b929947d2aa049382d17f252f01ca7",
+    "docs/migration/ledger/issue-11-overlay.json": "dd6190d11e751ceff14942303d20212c857e1074f167d29ec6fc100052f7f18f",
+    "docs/migration/ledger/issue-11-rust-claims.json": "21cc048378942c76852ab027e48e0fd36b21f13302aaad4ebb4a4a06390c3629",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10970,6 +10970,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1094
+    "rust_test": 1095
   }
 }

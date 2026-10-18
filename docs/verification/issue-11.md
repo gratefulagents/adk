@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Public raw instruction resolution
+
+Added `InstructionContext::resolve().await` as the native direct counterpart to
+`Agent.GetInstructions`. The runner uses the same extracted resolution branch;
+run-wide/schema/MCP composition and existing provider cancellation/deadline/drop
+behavior are unchanged. Embedders can resolve raw instructions without dispatching
+a model, preserving whitespace and blank dynamic overrides rather than silently
+falling back to static text.
+
+Sixteen new independently executed direct Go getter cases compare exact raw
+output, callback agent/usage/counts and unchanged static text, including Unicode,
+NUL, escaped quotes and blank/whitespace strings. The existing16 normal/streamed
+request cases still verify composition, retries and handoffs. Native tests also
+retain provider-error/cancellation/drop checks. This maps only the getter under
+the documented async fallible borrowed-context adaptation, not nil pointers,
+mutable Go pointer identity, arbitrary synchronous callback/panic semantics or
+whole Agent/RunContext closure.
+
+Fresh Rust1.88 Linux: **1,762 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**. Strict Clippy/typecheck/rustdoc/format, full facade matrix,
+standalone consumer/purity, all20 offline scenarios and host-session example,
+independently reproduced bound references, all56 validators, artifact/overlay/
+audit and immutable source locks passed. Ledger: **1,097 verified /7,794 unresolved
+/251 excluded**. Full retained acceptance remains incomplete.
+
+
 ### MCP server names and pure stopping values
 
 Mapped six exact records: the ordered MCP-server-name field, exact StopAtTools

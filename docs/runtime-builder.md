@@ -1145,6 +1145,13 @@ provider. Retries and fallbacks resolve again; a model call never outlives its
 instruction future. Provider errors abort before dispatch; cancellation or
 owner drop drops a pending future rather than spawning detached work.
 
+Embedders can call `InstructionContext::resolve().await` directly to obtain raw
+static/dynamic instructions without dispatching a model. The runner uses this
+same method before composition. Raw whitespace and blank dynamic results are
+preserved; run-wide/schema/MCP additions are not applied. Static text is read
+directly, while provider futures use the supplied operation's cancellation and
+deadline boundary.
+
 Unlike Go's synchronous function field, the native trait permits cancellable
 async host work and explicit errors. It does not mutate the agent's static text.
 Configuration files do not serialize callbacks. Durable runners reject providers

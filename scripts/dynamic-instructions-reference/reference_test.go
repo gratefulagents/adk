@@ -104,7 +104,23 @@ func TestNativeDynamicInstructionsReference(t *testing.T) {
 			cases = append(cases, map[string]any{"name": name, "streamed": streamed, "instructions": instructions, "calls": calls, "final": result.FinalText(), "original": a.Instructions})
 		}
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": cases}, "", "  ")
+	raw := []map[string]any{}
+	for _, dynamic := range []bool{false, true} {
+		for _, text := range []string{"", " ", "\t\n", "plain", "中😀", "a\x00b", "\\quoted\"", "line\nbreak"} {
+			calls := []string{}
+			a := &Agent{Name: "raw-agent", Instructions: text, MCPServers: []string{"files"}, OutputType: &OutputSchema{Schema: json.RawMessage(`{}`)}}
+			if dynamic {
+				a.Instructions = "static fallback"
+				a.InstructionsFn = func(ctx *RunContext, agent *Agent) string {
+					calls = append(calls, fmt.Sprintf("%s:%d:%d", agent.Name, ctx.Usage.InputTokens, ctx.Usage.OutputTokens))
+					return text
+				}
+			}
+			resolved := a.GetInstructions(&RunContext{Usage: Usage{InputTokens: 17, OutputTokens: 5}})
+			raw = append(raw, map[string]any{"dynamic": dynamic, "text": text, "static": a.Instructions, "resolved": resolved, "calls": calls})
+		}
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": cases, "raw": raw}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

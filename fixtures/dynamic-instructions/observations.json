@@ -209,7 +209,7 @@
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/dynamic-instructions-reference/reference_test.go": "ca433391b6740c9209c5f598682ba3756227ab3513bf7e6c519b1a11423e6591",
+      "scripts/dynamic-instructions-reference/reference_test.go": "c9f4dfd18c1dba1dd77c6fd83dfaef2a071592818583ee5833d839c24409b629",
       "scripts/dynamic-instructions-reference/run.py": "6127aa713a0f04a2c4bdd41ee10c69a0d789f60ea4a8452e04485a5a8c01ae0f"
     },
     "license": "GPL-3.0-only",
@@ -223,5 +223,135 @@
       "internal/agent/types_test.go": "9d71a1e6609d79cc77abd6713e043cb72d8ca9e22729b30cb71c268fecaeef10",
       "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894"
     }
-  }
+  },
+  "raw": [
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "",
+      "static": "",
+      "text": ""
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": " ",
+      "static": " ",
+      "text": " "
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "\t\n",
+      "static": "\t\n",
+      "text": "\t\n"
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "plain",
+      "static": "plain",
+      "text": "plain"
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "\u4e2d\ud83d\ude00",
+      "static": "\u4e2d\ud83d\ude00",
+      "text": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "a\u0000b",
+      "static": "a\u0000b",
+      "text": "a\u0000b"
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "\\quoted\"",
+      "static": "\\quoted\"",
+      "text": "\\quoted\""
+    },
+    {
+      "calls": [],
+      "dynamic": false,
+      "resolved": "line\nbreak",
+      "static": "line\nbreak",
+      "text": "line\nbreak"
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "",
+      "static": "static fallback",
+      "text": ""
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": " ",
+      "static": "static fallback",
+      "text": " "
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "\t\n",
+      "static": "static fallback",
+      "text": "\t\n"
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "plain",
+      "static": "static fallback",
+      "text": "plain"
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "\u4e2d\ud83d\ude00",
+      "static": "static fallback",
+      "text": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "a\u0000b",
+      "static": "static fallback",
+      "text": "a\u0000b"
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "\\quoted\"",
+      "static": "static fallback",
+      "text": "\\quoted\""
+    },
+    {
+      "calls": [
+        "raw-agent:17:5"
+      ],
+      "dynamic": true,
+      "resolved": "line\nbreak",
+      "static": "static fallback",
+      "text": "line\nbreak"
+    }
+  ]
 }

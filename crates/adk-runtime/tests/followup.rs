@@ -3306,3 +3306,92 @@ async fn original_critic_verifier_approved_and_rejected() {
         }
     }
 }
+
+#[tokio::test]
+async fn public_raw_instruction_resolution_matches_pinned_get_instructions() {
+    struct RawInstructions {
+        text: String,
+        calls: Mutex<Vec<String>>,
+    }
+    impl InstructionProvider for RawInstructions {
+        fn instructions<'a>(
+            &'a self,
+            ctx: InstructionContext<'a>,
+        ) -> BoxFuture<'a, Result<String, Error>> {
+            Box::pin(async move {
+                self.calls.lock().unwrap().push(format!(
+                    "{}:{}:{}",
+                    ctx.agent.name,
+                    ctx.snapshot.usage.input_tokens,
+                    ctx.snapshot.usage.output_tokens
+                ));
+                Ok(self.text.clone())
+            })
+        }
+    }
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/dynamic-instructions/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["raw"].as_array().unwrap();
+    assert_eq!(cases.len(), 16);
+    let operation = context();
+    let policy = RunPolicy::default();
+    let config = RunnerConfig {
+        additional_instructions: "must not append".into(),
+        ..Default::default()
+    };
+    let snapshot = RunResult {
+        metrics: None,
+        status: RunStatus::Incomplete,
+        final_output: None,
+        final_output_is_raw_json: false,
+        new_items: vec![],
+        new_items_provenance: vec![],
+        history: vec![],
+        history_provenance: vec![],
+        responses: vec![],
+        usage: Usage {
+            input_tokens: 17,
+            output_tokens: 5,
+            ..Default::default()
+        },
+        pending_approvals: vec![],
+        last_agent: Some("raw-agent".into()),
+        guardrails: vec![],
+    };
+    for case in cases {
+        let model = Script::new(vec![]);
+        let mut agent = AgentConfig::new(
+            "raw-agent",
+            ModelBinding::complete("offline", model.clone()),
+        );
+        agent.instructions = case["static"].as_str().unwrap().into();
+        agent.mcp_servers = vec!["files".into()];
+        agent.output_schema = Some(JsonDocument::new("{}".into()).unwrap());
+        let provider = Arc::new(RawInstructions {
+            text: case["text"].as_str().unwrap().into(),
+            calls: Mutex::new(vec![]),
+        });
+        if case["dynamic"].as_bool().unwrap() {
+            agent.instruction_provider = Some(provider.clone());
+        }
+        let resolved = InstructionContext {
+            operation: &operation,
+            agent: &agent,
+            snapshot: &snapshot,
+            config: &config,
+            policy: &policy,
+        }
+        .resolve()
+        .await
+        .unwrap();
+        assert_eq!(resolved, case["resolved"].as_str().unwrap(), "{case}");
+        assert_eq!(agent.instructions, case["static"].as_str().unwrap());
+        assert_eq!(
+            serde_json::to_value(&*provider.calls.lock().unwrap()).unwrap(),
+            case["calls"]
+        );
+        assert!(model.requests.lock().unwrap().is_empty());
+    }
+}

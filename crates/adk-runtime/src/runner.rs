@@ -217,6 +217,18 @@ pub struct InstructionContext<'a> {
     pub policy: &'a RunPolicy,
 }
 
+impl InstructionContext<'_> {
+    /// Resolve raw instructions before run-wide/schema/MCP composition.
+    /// Blank dynamic results deliberately do not fall back to static text.
+    pub async fn resolve(self) -> Result<String, Error> {
+        if let Some(provider) = &self.agent.instruction_provider {
+            bounded(self.operation, None, provider.instructions(self)).await
+        } else {
+            Ok(self.agent.instructions.clone())
+        }
+    }
+}
+
 pub trait InstructionProvider: Send + Sync {
     /// Stable identity of a deterministic, effect-free provider and its configuration.
     fn durable_key(&self) -> Option<&str> {
@@ -2848,22 +2860,15 @@ impl Engine {
         accounting
     }
     async fn build_instructions(&self) -> Result<String, Error> {
-        let resolved = if let Some(provider) = &self.agent.instruction_provider {
-            bounded(
-                &self.context,
-                None,
-                provider.instructions(InstructionContext {
-                    operation: &self.context,
-                    agent: &self.agent,
-                    snapshot: &self.result,
-                    config: &self.config,
-                    policy: &self.policy,
-                }),
-            )
-            .await?
-        } else {
-            self.agent.instructions.clone()
-        };
+        let resolved = InstructionContext {
+            operation: &self.context,
+            agent: &self.agent,
+            snapshot: &self.result,
+            config: &self.config,
+            policy: &self.policy,
+        }
+        .resolve()
+        .await?;
         let mut instructions = if self.config.cache_prefix.is_empty() {
             resolved
         } else {

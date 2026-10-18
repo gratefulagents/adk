@@ -24986,6 +24986,22 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-1005AC0260D0DA43": {
+      "source": "pkg/agentsdk/providers/factory.go",
+      "source_name": "DefaultCodexBackendBaseURL",
+      "implementation_symbols": [
+        "crates/adk-providers/src/factory.rs::DEFAULT_CODEX_BACKEND_BASE_URL"
+      ],
+      "rust_test_identifiers": [
+        "codex_backend_default_matches_pinned_go_without_changing_api_key_default"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/providers/TestNewProviderFromConfigSupportsLocal",
+      "rationale": "Complete pure exported backend URL constant. The immutable Go oracle observes the actual source constant, and the providers-only public facade compares its exact value and OAuth endpoint reuse while preserving the API-key endpoint. The named original factory test is supplemental evidence; direct constant observation is bound in provider-config/observations.json. This closes only the constant API, not OAuth acquisition, factory construction, or whole-file behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers"
+      ]
     }
   }
 }

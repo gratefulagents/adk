@@ -190,6 +190,7 @@ func TestNativeProviderConfigReference(t *testing.T) {
 		errors[name] = err != nil
 	}
 	result := map[string]any{"schema_version": 1, "cases": cases, "wire": wire, "errors": errors, "fallbacks": nativeFallbackObservations(t), "copilot": nativeCopilotObservations(t), "openai_oauth": nativeOpenAiOAuthObservation(t)}
+	result["codex_backend_base_url"] = DefaultCodexBackendBaseURL
 	result["provider_names"] = map[string]string{
 		"DefaultProviderOpenAI":     DefaultProviderOpenAI,
 		"DefaultProviderAnthropic":  DefaultProviderAnthropic,

@@ -10,6 +10,8 @@ use std::sync::Arc;
 
 pub const DEFAULT_CHAT_MODEL: &str = "gpt-5.6-sol";
 pub const DEFAULT_CHAT_MINI_MODEL: &str = "gpt-5.3-codex-spark";
+/// Default backend for explicitly supplied OpenAI OAuth sessions.
+pub const DEFAULT_CODEX_BACKEND_BASE_URL: &str = "https://chatgpt.com/backend-api/codex";
 
 // Canonical routing names do not install credentials or register providers.
 pub const DEFAULT_PROVIDER_OPENAI: &str = "openai";
@@ -63,9 +65,7 @@ impl Kind {
     }
     pub fn endpoint(self, mode: AuthMode) -> &'static str {
         match self {
-            Self::OpenAi if mode == AuthMode::OpenAiOAuth => {
-                "https://chatgpt.com/backend-api/codex"
-            }
+            Self::OpenAi if mode == AuthMode::OpenAiOAuth => DEFAULT_CODEX_BACKEND_BASE_URL,
             Self::OpenAi => "https://api.openai.com/v1",
             Self::Anthropic => "https://api.anthropic.com",
             Self::OpenRouter => "https://openrouter.ai/api/v1",

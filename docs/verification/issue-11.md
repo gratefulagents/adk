@@ -2,6 +2,15 @@
 
 ## Current continuation evidence
 
+### Codex backend URL constant
+
+The public `factory::DEFAULT_CODEX_BACKEND_BASE_URL` closes only the pure
+`DefaultCodexBackendBaseURL` API record (`SDK-1005AC0260D0DA43`). The immutable
+Go oracle reads the actual constant; a providers-only facade regression checks
+its exact value, OAuth endpoint reuse, and the unchanged API-key endpoint.
+It neither acquires credentials nor claims whole-factory parity. The ledger now
+records **1,323 verified /7,568 unresolved /251 excluded**.
+
 ### Canonical provider-name constants
 
 Eight pure API records from `pkg/agentsdk/providers/default.go` map to the public

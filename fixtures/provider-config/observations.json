@@ -1213,6 +1213,7 @@
       ]
     }
   ],
+  "codex_backend_base_url": "https://chatgpt.com/backend-api/codex",
   "copilot": [
     {
       "api_version": "2026-06-01",
@@ -1354,7 +1355,7 @@
       "scripts/provider-config-reference/copilot_test.go": "8ea5dbd61b3e6cc0ef9061953c60a8bc4767893388f3efde82f3fea27615065b",
       "scripts/provider-config-reference/fallback_test.go": "a00dca2bd5655f6ae15a7c58172c953e3d7a02047ebd7273cd9f58e659de4cc4",
       "scripts/provider-config-reference/openai_oauth_test.go": "c539d6523fe4f2bf09d46427b234f981c873da54769efd880ce43481fe49f287",
-      "scripts/provider-config-reference/reference_test.go": "837276200c5940d8106456c1659893e449c0692dad7bc33e24bbf5a7d02ce396",
+      "scripts/provider-config-reference/reference_test.go": "6f15e020232b9ea1010f4b40b1ef67e436a6217c3b51213cf39eab31834bceba",
       "scripts/provider-config-reference/run.py": "32143bf164699cb22bdefa6e73b64ecd996bba69a5d7093a57fd0ca83fa2e4f6"
     },
     "license": "GPL-3.0-only",

@@ -3,8 +3,8 @@
 use adk::providers::{
     auth::AuthMode,
     factory::{
-        Kind,
         config::{Config, NamedRoute},
+        Kind,
     },
     wire::Protocol,
 };
@@ -73,6 +73,30 @@ fn public_configuration_refuses_ambiguous_secret_fanout() {
         ..Default::default()
     };
     assert!(config.resolve().is_err());
+}
+
+#[test]
+fn codex_backend_default_matches_pinned_go_without_changing_api_key_default() {
+    use adk::providers::{
+        auth::AuthMode,
+        factory::{Kind, DEFAULT_CODEX_BACKEND_BASE_URL},
+    };
+    let reference: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/provider-config/observations.json"
+    ))
+    .unwrap();
+    assert_eq!(
+        reference["codex_backend_base_url"],
+        DEFAULT_CODEX_BACKEND_BASE_URL
+    );
+    assert_eq!(
+        Kind::OpenAi.endpoint(AuthMode::OpenAiOAuth),
+        DEFAULT_CODEX_BACKEND_BASE_URL
+    );
+    assert_eq!(
+        Kind::OpenAi.endpoint(AuthMode::ApiKey),
+        "https://api.openai.com/v1"
+    );
 }
 
 #[test]

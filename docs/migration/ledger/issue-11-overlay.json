@@ -18,8 +18,8 @@
     "by_category": {
       "apis": {
         "excluded": 81,
-        "unresolved": 4889,
-        "verified": 889
+        "unresolved": 4888,
+        "verified": 890
       },
       "artifacts": {
         "excluded": 16,
@@ -100,8 +100,8 @@
     },
     "excluded": 251,
     "total": 9142,
-    "unresolved": 7569,
-    "verified": 1322
+    "unresolved": 7568,
+    "verified": 1323
   },
   "disposition_rules": [
     "Exclude sdk_cli records.",
@@ -9277,7 +9277,7 @@
     "SDK-0FF53E7917EB1EDC": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/openai.ValidateChatCompletionsModel@internal/openai/models.go", "proposed_rust_module": "sdk::providers::openai", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/openai/models.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers::openai", "verification_status": "not_run"},
     "SDK-0FFA0124C37CB83A": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tools/lsp.Config@pkg/agentsdk/tools/lsp/manager.go", "proposed_rust_module": "sdk::tools::lsp", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/lsp/manager.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::lsp", "verification_status": "not_run"},
     "SDK-1004D0ADA66D844E": {"approved_divergence_reference": null, "category": "tools", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "tools:pkg/agentsdk/tools/projectstate.primeContextTool", "proposed_rust_module": "sdk::tools::project_state", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/projectstate/tools.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::project_state", "verification_status": "not_run"},
-    "SDK-1005AC0260D0DA43": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/providers.DefaultCodexBackendBaseURL@pkg/agentsdk/providers/factory.go", "proposed_rust_module": "sdk::providers", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/providers/factory.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::providers", "verification_status": "not_run"},
+    "SDK-1005AC0260D0DA43": {"approved_divergence_reference": null, "category": "apis", "command_log": ["docs/verification/issue-11-rust-evidence.json"], "disposition": "verified", "disposition_rationale": "Complete pure exported backend URL constant. The immutable Go oracle observes the actual source constant, and the providers-only public facade compares its exact value and OAuth endpoint reuse while preserving the API-key endpoint. The named original factory test is supplemental evidence; direct constant observation is bound in provider-config/observations.json. This closes only the constant API, not OAuth acquisition, factory construction, or whole-file behavior.", "evidence_kind": "rust_test", "implementation_symbols": ["crates/adk-providers/src/factory.rs::DEFAULT_CODEX_BACKEND_BASE_URL"], "ledger_record_id": "apis:pkg/agentsdk/providers.DefaultCodexBackendBaseURL@pkg/agentsdk/providers/factory.go", "proposed_rust_module": "sdk::providers", "rust_test_identifiers": ["codex_backend_default_matches_pinned_go_without_changing_api_key_default"], "scope": "in_scope", "semantic_closure": "verified", "source": "pkg/agentsdk/providers/factory.go", "target_features": ["x86_64-unknown-linux-gnu", "providers"], "upstream_regression_reference_group": "verification_groups:sdk::providers", "verification_status": "passed"},
     "SDK-1005E26B1BF8C7BD": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:internal/agent.ErrorActionRetry@internal/agent/run_error_handler.go", "proposed_rust_module": "sdk::error", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "internal/agent/run_error_handler.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::error", "verification_status": "not_run"},
     "SDK-100A4092AEA419DE": {"approved_divergence_reference": null, "category": "files", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "files:pkg/agentsdk/tools/search/search.go", "proposed_rust_module": "sdk::tools::search", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/search/search.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::search", "verification_status": "not_run"},
     "SDK-1014CE55962EBBDA": {"approved_divergence_reference": null, "category": "apis", "command_log": [], "disposition": "unresolved", "disposition_rationale": null, "implementation_symbols": [], "ledger_record_id": "apis:pkg/agentsdk/tools/search.GlobTool.Execute@pkg/agentsdk/tools/search/search.go", "proposed_rust_module": "sdk::tools::search", "rust_test_identifiers": [], "scope": "in_scope", "semantic_closure": "unresolved", "source": "pkg/agentsdk/tools/search/search.go", "target_features": [], "upstream_regression_reference_group": "verification_groups:sdk::tools::search", "verification_status": "not_run"},

@@ -24547,6 +24547,42 @@
         "providers-runtime",
         "builder"
       ]
+    },
+    "SDK-6989397AFF4D462E": {
+      "source": "examples/features/streaming/streaming_test.go",
+      "source_name": "TestSDKOpenAIStreamingViaHTTPTest",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::streaming"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_local_http_streaming_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/streaming/TestSDKOpenAIStreamingViaHTTPTest",
+      "rationale": "Original offline httptest example reproduced with a real native provider SSE stream against an owned loopback listener. Uses original model/instructions/input/token setting and exact SSE deltas/finish/usage/DONE; verifies final items, output usage4, assembled text and outgoing model/stream/path. Dummy credentials remain local; joined client/server futures are bounded and not detached. No live streaming example closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime",
+        "tools",
+        "builder"
+      ]
+    },
+    "SDK-682F0C8F4C9109D5": {
+      "source": "examples/features/tools/tools_test.go",
+      "source_name": "TestReadOnlyToolsRegistryFiltersMutatingToolsExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tools"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_readonly_registry_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tools/TestReadOnlyToolsRegistryFiltersMutatingToolsExample",
+      "rationale": "Original offline registry example reproduced using canonical read_file/glob/grep/Write/Edit selections. ReadOnly retains all three readers and hides both writers; WorkspaceWrite exposes both writers. Native features remain explicitly selected rather than claiming legacy implicit registry defaults. Does not claim separate live FunctionTool/approval wrapper examples.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "providers-runtime",
+        "tools",
+        "builder"
+      ]
     }
   }
 }

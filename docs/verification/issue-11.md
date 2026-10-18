@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Original loopback streaming and read-only registry examples
+
+The streaming scenario now sends a real native OpenAI chat request to an owned
+loopback listener, consumes the original SSE deltas/finish/usage/DONE fixture,
+and verifies assembled text, final items, output usage4 and outgoing model/stream/
+path. Client/server futures are joined under one five-second bound, with only a
+local dummy credential. ReadOnly registry assertions now cover the original
+read_file/glob/grep/Write/Edit names, with WorkspaceWrite sanity checks. Native
+feature selection stays explicit; live streaming/tool examples remain unclaimed.
+An initial registry call omitted the explicit implementation list; corrected to
+the existing empty-list convention before tests and strict lint passed.
+
+Fresh Rust1.88 Linux: **1,809 workspace +10 doctests +12 example tests passed;
+0 failed,30 ignored**. Strict lint/typecheck/docs/format, facade matrix/standalone
+consumer,20 offline scenarios/host session, all56 validators, independent Go
+references and pins/purity pass. Go reference:970 passing records,5 skips,
+51 packages. Two exact original test records added; ledger **1,297 verified /
+7,594 unresolved /251 excluded**. Full retained acceptance remains incomplete;
+credential-dependent live checks are still unverified, and remaining sandbox/
+guardrail example obligations and broader API mapping remain active work.
+
 ### Exact MCP text projections and provider/MCP offline examples
 
 Added explicit legacy MCP approval-display/model-description projections, sharing

@@ -412,6 +412,38 @@ async fn providers() {
 }
 
 async fn tools() {
+    use adk::tools::{Config, Features, Registry};
+    let features = Features::Strict(
+        ["ReadFile", "Glob", "Grep", "Write", "Edit"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect(),
+    );
+    let readonly = Registry::build(
+        &Config {
+            features: features.clone(),
+            access: AccessMode::ReadOnly,
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    let writable = Registry::build(
+        &Config {
+            features,
+            access: AccessMode::WorkspaceWrite,
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    for name in ["read_file", "glob", "grep"] {
+        assert!(readonly.get(name).is_some());
+    }
+    for name in ["Write", "Edit"] {
+        assert!(readonly.get(name).is_none());
+        assert!(writable.get(name).is_some());
+    }
     let tool = Lookup::new(true);
     let model = Scripted::new(vec![
         tool_response("lookup", json!({"key":"answer"})),
@@ -1147,7 +1179,147 @@ async fn streaming() {
         stream.finish().await.unwrap().result.final_output,
         Some(json!("hello"))
     );
+
+    use adk::providers::{
+        auth::*,
+        factory::{Kind, RouteSpec},
+        wire::Protocol,
+    };
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    struct FixtureCredentials;
+    impl CredentialStore for FixtureCredentials {
+        fn load<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            Box::pin(async {
+                Ok(Material {
+                    access_token: Secret::new("offline-fixture-token"),
+                    refresh_token: None,
+                    id_token: None,
+                    email: None,
+                    account: None,
+                    expires_at: None,
+                    last_refresh: None,
+                    revision: 0,
+                })
+            })
+        }
+        fn replace<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: u64,
+            _: Material,
+        ) -> BoxFuture<'a, Result<bool, Error>> {
+            panic!("fixture credentials must not refresh")
+        }
+    }
+    impl Refresh for FixtureCredentials {
+        fn refresh<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: Material,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            panic!("fixture credentials must not refresh")
+        }
+    }
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let mut spec = RouteSpec::new(Kind::OpenAi, AuthMode::ApiKey);
+    spec.endpoint = Some(format!("http://{}", listener.local_addr().unwrap()));
+    spec.protocol = Some(Protocol::Chat);
+    let model = spec
+        .build(Arc::new(FixtureCredentials), Arc::new(FixtureCredentials))
+        .unwrap();
+    let server = async move {
+        let (mut socket, _) = listener.accept().await.unwrap();
+        let mut bytes = Vec::new();
+        let (headers, body) = loop {
+            let mut chunk = [0; 1024];
+            let count = socket.read(&mut chunk).await.unwrap();
+            assert!(count > 0, "incomplete streaming request");
+            bytes.extend_from_slice(&chunk[..count]);
+            if let Some(end) = bytes.windows(4).position(|part| part == b"\r\n\r\n") {
+                let headers = std::str::from_utf8(&bytes[..end]).unwrap();
+                let length: usize = headers
+                    .lines()
+                    .find_map(|line| {
+                        line.split_once(':')
+                            .filter(|(name, _)| name.eq_ignore_ascii_case("content-length"))
+                            .map(|(_, value)| value.trim().parse().unwrap())
+                    })
+                    .unwrap();
+                if bytes.len() >= end + 4 + length {
+                    break (
+                        headers.to_owned(),
+                        bytes[end + 4..end + 4 + length].to_vec(),
+                    );
+                }
+            }
+        };
+        let sse = [
+            r#"data: {"id":"chatcmpl-test","model":"gpt-4.1-mini","choices":[{"index":0,"delta":{"content":"hello from "}}]}"#,
+            r#"data: {"choices":[{"index":0,"delta":{"content":"test server"},"finish_reason":"stop"}]}"#,
+            r#"data: {"choices":[],"usage":{"prompt_tokens":5,"completion_tokens":4,"total_tokens":9}}"#,
+            "data: [DONE]", "",
+        ].join("\n\n");
+        socket.write_all(format!("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", sse.len()).as_bytes()).await.unwrap();
+        socket.write_all(sse.as_bytes()).await.unwrap();
+        socket.shutdown().await.unwrap();
+        (headers, body)
+    };
+    let client = async {
+        let context = context();
+        let request = ModelRequest {
+            input_provenance: vec![],
+            model: "gpt-4.1-mini".into(),
+            instructions: "Say hi.".into(),
+            input: vec![message(Role::User, "hi")],
+            tools: vec![],
+            output_schema: None,
+            output_schema_name: "answer".into(),
+            output_schema_strict: true,
+            settings: [("max_tokens".into(), json!(32))].into_iter().collect(),
+        };
+        let mut stream = model.stream(&context, request).await.unwrap();
+        let mut delta = String::new();
+        let mut complete = None;
+        while let Some(event) = stream.next().await.unwrap() {
+            match event {
+                ModelEvent::TextDelta { delta: part } => delta.push_str(&part),
+                ModelEvent::Complete { response } => {
+                    assert!(complete.replace(response).is_none());
+                }
+                _ => {}
+            }
+        }
+        assert_eq!(delta, "hello from test server");
+        let complete = complete.unwrap();
+        assert!(!complete.items.is_empty());
+        assert_eq!(complete.usage.output_tokens, 4);
+    };
+    let ((headers, body), ()) = tokio::time::timeout(Duration::from_secs(5), async {
+        tokio::join!(server, client)
+    })
+    .await
+    .unwrap();
+    assert!(
+        headers
+            .lines()
+            .next()
+            .unwrap()
+            .split_whitespace()
+            .nth(1)
+            .unwrap()
+            .ends_with("/chat/completions")
+    );
+    let body: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(body["model"], "gpt-4.1-mini");
+    assert_eq!(body["stream"], true);
 }
+
 async fn context_compaction() {
     use compaction::{LocalCompactionPolicy, compact_for_request, extract_summary};
     let mut history = vec![message(Role::User, "Preserve the original goal")];
@@ -2030,6 +2202,16 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
+    #[tokio::test]
+    async fn original_local_http_streaming_example() {
+        super::streaming().await;
+    }
+
+    #[tokio::test]
+    async fn original_readonly_registry_example() {
+        super::tools().await;
+    }
+
     #[tokio::test]
     async fn original_provider_configuration_example() {
         super::providers().await;

@@ -258,3 +258,22 @@ The separate `codec::text::sanitize_mcp_tool_description` retains the SDK's
 untrusted-text framing as bytes. Names remain unbounded in this legacy projection.
 It too is separate from the stricter native MCP formatter. Both pure helpers are
 checked against160 independently executed cases and every Unicode scalar.
+
+## Original local HTTP streaming and read-only registry checks
+
+`streaming` now additionally runs a real provider SSE stream against an owned
+loopback TCP server. It sends the original gpt-4.1-mini/Say hi./hi/32-token request,
+consumes the original hello from /test server/usage/DONE sequence, checks the
+assembled text and output usage4, and verifies the outgoing model, stream flag
+and /chat/completions path. A dummy host credential is used only for that local
+endpoint. Client and server futures are joined under one five-second bound; no
+server task is detached. This is the original offline httptest counterpart, not
+evidence for the separate credential-dependent streaming examples. Existing
+native runner event/finish assertions remain in the scenario.
+
+`tools` also selects the original five canonical registry tools. ReadOnly exposes
+read_file/glob/grep and excludes Write/Edit; WorkspaceWrite exposes both mutating
+tools as a sanity check. Native feature selection remains explicit rather than
+implicitly enabling every legacy registry tool. The existing mocked approval/
+resume assertions remain; this does not claim the original live FunctionTool or
+live approval-wrapper test has run.

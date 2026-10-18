@@ -71,7 +71,7 @@ RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-re
                "fixtures/mcp-prompt/observations.json", "scripts/mcp-prompt-reference/run.py",
                "scripts/mcp-prompt-reference/reference_test.go","fixtures/run-instructions/observations.json", "scripts/run-instructions-reference/run.py",
                "scripts/run-instructions-reference/reference_test.go","crates/adk/src/tracing_runtime.rs", "crates/adk/tests/tracing_runtime.rs",
-               "crates/adk/examples/features.rs", "crates/adk-runtime/src/guardrails.rs", "crates/adk-runtime/tests/guardrails.rs",
+               "crates/adk/tests/tool_behavior.rs", "crates/adk/examples/features.rs", "crates/adk-runtime/src/guardrails.rs", "crates/adk-runtime/tests/guardrails.rs",
                "crates/adk/src/tracing.rs", "crates/adk/tests/tracing.rs",
                "crates/adk/tests/tracing_sinks.rs", "crates/adk/src/lib.rs", "Cargo.lock", "crates/adk/Cargo.toml", "crates/adk/src/tracestore.rs",
                "crates/adk/tests/tracestore.rs", "crates/adk/src/telemetry.rs",
@@ -621,7 +621,7 @@ def verify_rust() -> None:
                "--test", "native_request_snapshot", "--test", "projected_snapshot", "--test", "durable",
                "--test", "telemetry_stdout", "--test", "telemetry_defaults",
                "--test", "tracing", "--test", "tracing_sinks",
-               "--test", "guardrails", "--test", "runner", "--test", "subagent", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup", "--test", "llm_compaction", "--test", "local_compaction", "--test", "autoloop", "--test", "content_events", "--test", "line_writer", "--test", "specialists", "--test", "generation_content", "--test", "content_stream", "--test", "content_logger", "--test", "agent_logger"]
+               "--test", "tool_behavior", "--test", "guardrails", "--test", "runner", "--test", "subagent", "--test", "subagent_integration", "--test", "tracing_runtime", "--test", "followup", "--test", "llm_compaction", "--test", "local_compaction", "--test", "autoloop", "--test", "content_events", "--test", "line_writer", "--test", "specialists", "--test", "generation_content", "--test", "content_stream", "--test", "content_logger", "--test", "agent_logger"]
     result = subprocess.run(command, cwd=ROOT, text=True, capture_output=True,
                             env={**os.environ, "ADK_TEST_GO": "1"})
     print(result.stdout, end="")

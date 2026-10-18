@@ -88,7 +88,14 @@ func TestNativeToolStoppingReference(t *testing.T) {
 			cases = append(cases, map[string]any{"name": name, "streamed": streamed, "error": err != nil, "output": output, "text": text, "guards": guards, "requests": len(model.requests)})
 		}
 	}
-	data, err := json.MarshalIndent(map[string]any{"cases": cases}, "", "  ")
+	membership := []map[string]any{}
+	for _, names := range [][]string{nil, {}, {""}, {"read", "read", "bash"}, {"Read", " read ", "read "}, {"é", "e\u0301", "中😀"}, {"a\x00b", "\t", "\n"}, {" ", "ß", "SS"}} {
+		stop := &StopAtTools{ToolNames: names}
+		for _, query := range []string{"", "read", "Read", " read ", "é", "e\u0301", "中😀", "a\x00b", "\t", "ss", "a", "ß", "SS", " "} {
+			membership = append(membership, map[string]any{"names": names, "query": query, "contains": stop.Contains(query)})
+		}
+	}
+	data, err := json.MarshalIndent(map[string]any{"cases": cases, "membership": membership, "constants": []int{int(RunLLMAgain), int(StopOnFirstTool)}}, "", "  ")
 	if err != nil {
 		t.Fatal(err)
 	}

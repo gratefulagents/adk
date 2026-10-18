@@ -308,6 +308,21 @@ fn stop_at_tools_membership_matches_original_sdk_example() {
     a.stop_at_tools = ["bash".into(), "read".into()].into();
     assert!(a.stop_at_tools.contains("bash"));
     assert!(!a.stop_at_tools.contains("write"));
+    let fixture: Value = serde_json::from_str(include_str!(
+        "../../../fixtures/tool-stopping/observations.json"
+    ))
+    .unwrap();
+    let cases = fixture["membership"].as_array().unwrap();
+    assert_eq!(cases.len(), 112);
+    for case in cases {
+        let names: Option<Vec<String>> = serde_json::from_value(case["names"].clone()).unwrap();
+        a.stop_at_tools = names.unwrap_or_default().into_iter().collect();
+        assert_eq!(
+            a.stop_at_tools.contains(case["query"].as_str().unwrap()),
+            case["contains"].as_bool().unwrap(),
+            "{case}"
+        );
+    }
 }
 
 #[tokio::test]

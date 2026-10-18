@@ -379,11 +379,885 @@
       "text": "done"
     }
   ],
+  "constants": [
+    0,
+    1
+  ],
+  "membership": [
+    {
+      "contains": false,
+      "names": null,
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": null,
+      "query": " "
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": [],
+      "query": " "
+    },
+    {
+      "contains": true,
+      "names": [
+        ""
+      ],
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": [
+        ""
+      ],
+      "query": " "
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": ""
+    },
+    {
+      "contains": true,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": [
+        "read",
+        "read",
+        "bash"
+      ],
+      "query": " "
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "read"
+    },
+    {
+      "contains": true,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "Read"
+    },
+    {
+      "contains": true,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": [
+        "Read",
+        " read ",
+        "read "
+      ],
+      "query": " "
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": " read "
+    },
+    {
+      "contains": true,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "\u00e9"
+    },
+    {
+      "contains": true,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "e\u0301"
+    },
+    {
+      "contains": true,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": [
+        "\u00e9",
+        "e\u0301",
+        "\u4e2d\ud83d\ude00"
+      ],
+      "query": " "
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": true,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": true,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "a"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "\u00df"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": "SS"
+    },
+    {
+      "contains": false,
+      "names": [
+        "a\u0000b",
+        "\t",
+        "\n"
+      ],
+      "query": " "
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": ""
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "read"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "Read"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": " read "
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "\u00e9"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "e\u0301"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "\u4e2d\ud83d\ude00"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "a\u0000b"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "\t"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "ss"
+    },
+    {
+      "contains": false,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "a"
+    },
+    {
+      "contains": true,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "\u00df"
+    },
+    {
+      "contains": true,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": "SS"
+    },
+    {
+      "contains": true,
+      "names": [
+        " ",
+        "\u00df",
+        "SS"
+      ],
+      "query": " "
+    }
+  ],
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/tool-stopping-reference/reference_test.go": "9f2bd1f89b40b783a94a9aafa8eb094c3c2d2b95edbf2e29c7601a534c6e337d",
+      "scripts/tool-stopping-reference/reference_test.go": "36d84692b1d93b7836aedb63a37bce4289858bfc849d862f6c8a276a9e9a6f14",
       "scripts/tool-stopping-reference/run.py": "f46c19de6a33017e32c83ae877d471c8b9ac91e662aa308bec8336f7322132fb"
     },
     "license": "GPL-3.0-only",

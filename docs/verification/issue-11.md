@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### MCP server names and pure stopping values
+
+Mapped six exact records: the ordered MCP-server-name field, exact StopAtTools
+membership, and the two named stopping constants plus their public aliases.
+The existing56-case request oracle covers MCP prompt composition; native handoff
+requests use destination server names.112 new independently executed Go helper
+cases cover nil/empty/duplicate lists, empty names, case/space, controls/NUL and
+composed/decomposed Unicode membership. A minimal-facade regression verifies
+public native Continue/StopAfterTool variants and defaults, alongside the existing
+34 actual normal/streamed stopping observations.
+
+This does not close the separately exposed ordered Go ToolNames slice, mutable
+slice identity, nil receivers, invalid-UTF8 Go strings, arbitrary unnamed integer
+behavior/numeric wire encoding or whole Agent/stopping types. No runtime
+implementation changed in this batch.
+
+Fresh Rust1.88 Linux: **1,761 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**; minimal-facade and focused membership tests, strict Clippy/typecheck/
+format, independently reproduced bound references, all56 validators,
+artifact/overlay/audit and immutable source locks passed. Full facade matrix,
+standalone consumer/purity, rustdoc and all20 offline examples/host session passed
+at preceding `c0a0c1f`, whose production implementation is unchanged.
+Ledger: **1,096 verified /7,795 unresolved /251 excluded**. Full retained acceptance
+remains incomplete.
+
+
 ### Go-compatible guardrail label formatting
 
 Fixed `GuardrailTripwire` Display to use Go-style quoted labels instead of Rust

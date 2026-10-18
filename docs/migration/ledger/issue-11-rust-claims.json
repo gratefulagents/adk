@@ -19891,6 +19891,114 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-654341C96E86708B": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.MCPServers",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::mcp_servers",
+        "crates/adk-runtime/src/mcp_prompt.rs::context"
+      ],
+      "rust_test_identifiers": [
+        "mcp_prompt_matches_pinned_normal_streamed_and_structured_requests",
+        "handoff_preempts_siblings_and_pairs_all_calls",
+        "mcp_prompt::tests::original_empty_prompt_context"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildMCPPromptContextSanitizesServerNames",
+      "rationale": "Only the ordered owned UTF-8 server-name configuration field is mapped. Existing56 independently executed pinned normal/streamed/schema cases preserve duplicate/order/empty/control/Unicode names and actual prompt composition; native handoff requests use destination names. Native Vec replaces the Go slice; absent/empty lists emit no context. No mutable Go slice/backing-array identity, invalid-UTF8 strings, server registration or transport authority, whole Agent or Clone closure is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-4FEC58BB10CDE816": {
+      "source": "internal/agent/agent.go",
+      "source_name": "StopAtTools.Contains",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig::stop_at_tools"
+      ],
+      "rust_test_identifiers": [
+        "stop_at_tools_membership_matches_original_sdk_example",
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestStopAtToolsContains",
+      "rationale": "Only exact UTF-8 membership is closed, via native BTreeSet::contains.112 independently executed pinned Go helper cases cover nil/empty lists, duplicate names, empty names, whitespace/case, NUL/control and distinct composed/decomposed Unicode.34 existing normal/streamed cases verify operational stopping. Set ordering/deduplication is not claimed to preserve the separately exposed Go ToolNames slice; nil receivers, invalid-UTF8 Go strings and whole StopAtTools/Agent types remain outside this method claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-50A2DC997C792762": {
+      "source": "internal/agent/agent.go",
+      "source_name": "RunLLMAgain",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::ToolUseBehavior",
+        "crates/adk-runtime/src/runner.rs::AgentConfig::tool_use"
+      ],
+      "rust_test_identifiers": [
+        "named_tool_behaviors_are_available_with_native_defaults_through_facade",
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopOnFirstTool",
+      "rationale": "Only this named stopping constant is mapped to public adk::core::ToolUseBehavior::Continue or StopAfterTool. Independent pinned Go observations confirm named values0/1 and34 actual normal/streamed stopping cases; the minimal-facade regression verifies public native variants and Continue defaults. The native enum replaces iota integers, not Go numeric wire encoding or arbitrary unnamed integer behavior. No complete ToolUseBehavior type or whole Agent/runtime closure is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-9DE5E2CA604158A1": {
+      "source": "internal/agent/agent.go",
+      "source_name": "StopOnFirstTool",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::ToolUseBehavior",
+        "crates/adk-runtime/src/runner.rs::AgentConfig::tool_use"
+      ],
+      "rust_test_identifiers": [
+        "named_tool_behaviors_are_available_with_native_defaults_through_facade",
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopOnFirstTool",
+      "rationale": "Only this named stopping constant is mapped to public adk::core::ToolUseBehavior::Continue or StopAfterTool. Independent pinned Go observations confirm named values0/1 and34 actual normal/streamed stopping cases; the minimal-facade regression verifies public native variants and Continue defaults. The native enum replaces iota integers, not Go numeric wire encoding or arbitrary unnamed integer behavior. No complete ToolUseBehavior type or whole Agent/runtime closure is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-73100C2BB33D1FB3": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "RunLLMAgain",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::ToolUseBehavior",
+        "crates/adk-runtime/src/runner.rs::AgentConfig::tool_use"
+      ],
+      "rust_test_identifiers": [
+        "named_tool_behaviors_are_available_with_native_defaults_through_facade",
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopOnFirstTool",
+      "rationale": "Only this named stopping constant is mapped to public adk::core::ToolUseBehavior::Continue or StopAfterTool. Independent pinned Go observations confirm named values0/1 and34 actual normal/streamed stopping cases; the minimal-facade regression verifies public native variants and Continue defaults. The native enum replaces iota integers, not Go numeric wire encoding or arbitrary unnamed integer behavior. No complete ToolUseBehavior type or whole Agent/runtime closure is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-A70F2824FBF8C4CC": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "StopOnFirstTool",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::ToolUseBehavior",
+        "crates/adk-runtime/src/runner.rs::AgentConfig::tool_use"
+      ],
+      "rust_test_identifiers": [
+        "named_tool_behaviors_are_available_with_native_defaults_through_facade",
+        "per_agent_tool_stopping_matches_pinned_sdk_outputs_names_schema_and_guardrails"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunnerStopOnFirstTool",
+      "rationale": "Only this named stopping constant is mapped to public adk::core::ToolUseBehavior::Continue or StopAfterTool. Independent pinned Go observations confirm named values0/1 and34 actual normal/streamed stopping cases; the minimal-facade regression verifies public native variants and Continue defaults. The native enum replaces iota integers, not Go numeric wire encoding or arbitrary unnamed integer behavior. No complete ToolUseBehavior type or whole Agent/runtime closure is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

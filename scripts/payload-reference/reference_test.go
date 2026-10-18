@@ -52,6 +52,11 @@ func payloadSample(field reflect.StructField, populated bool) string {
 			return `"value <&>\u2028\u2029\n\"\\"`
 		}
 		return `""`
+	case reflect.Int:
+		if populated {
+			return "-7"
+		}
+		return "0"
 	case reflect.Bool:
 		if populated {
 			return `true`
@@ -75,7 +80,7 @@ func TestNativePayloadReference(t *testing.T) {
 	// the containing payload (which adds an outer object level).
 	for _, depth := range []int{10000, 10001} {
 		raw := json.RawMessage(strings.Repeat("[", depth) + "0" + strings.Repeat("]", depth))
-		for _, value := range []any{ToolCallData{Input: raw}, ToolApprovalData{Input: raw}} {
+		for _, value := range []any{ToolCallData{Input: raw}, ToolApprovalData{Input: raw}, LLMOutputSchema{Schema: raw}, LLMToolSnapshot{InputSchema: raw}} {
 			_, err := json.Marshal(value)
 			if (err == nil) != (depth == 10000) {
 				t.Fatalf("%T raw marshal depth %d: %v", value, depth, err)
@@ -127,7 +132,7 @@ func TestNativePayloadReference(t *testing.T) {
 		reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolOutputData{}),
 		reflect.TypeOf(HandoffCallData{}), reflect.TypeOf(HandoffOutputData{}),
 		reflect.TypeOf(ReasoningData{}), reflect.TypeOf(CompactionData{}),
-		reflect.TypeOf(ToolApprovalData{}),
+		reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{}),
 	}
 	for _, typ := range types {
 		var populated, zero []string
@@ -167,6 +172,11 @@ func TestNativePayloadReference(t *testing.T) {
 				add(typ, fmt.Sprintf("%s/type_%d", key, j), "{"+quoted+":"+candidate+"}")
 				add(typ, fmt.Sprintf("%s/earlier_type_%d", key, j), "{"+quoted+":"+candidate+","+quoted+":"+good+"}")
 			}
+			if field.Type.Kind() == reflect.Int {
+				for j, value := range []string{"-0", "9223372036854775807", "-9223372036854775808", "9223372036854775808", "-9223372036854775809", "1.0", "1e0"} {
+					add(typ, fmt.Sprintf("%s/integer_%d", key, j), "{"+quoted+":"+value+"}")
+				}
+			}
 			if field.Type.Kind() == reflect.String {
 				for j, text := range []string{`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, `"\ud800\ud800\udc00"`, `"\\ud800"`, `"\uDFFF\uD800"`, `"\u0000\b\f\r\t/é😀<&>"`, `"\ud800\uZZZZ"`} {
 					add(typ, fmt.Sprintf("%s/unicode_%d", key, j), "{"+quoted+":"+text+"}")
@@ -203,7 +213,19 @@ func TestNativePayloadReference(t *testing.T) {
 			add(typ, fmt.Sprintf("image_reuse_%02d", i), input)
 		}
 	}
-	for _, typ := range []reflect.Type{reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolApprovalData{})} {
+	for _, typ := range []reflect.Type{reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{})} {
+		field := "input"
+		if typ == reflect.TypeOf(LLMOutputSchema{}) {
+			field = "schema"
+		}
+		if typ == reflect.TypeOf(LLMToolSnapshot{}) {
+			field = "input_schema"
+		}
+		rawAdd := func(name, input string) {
+			input = strings.ReplaceAll(input, `"input"`, strconv.Quote(field))
+			input = strings.ReplaceAll(input, `"INPUT"`, strconv.Quote(strings.ToUpper(field)))
+			add(typ, name, input)
+		}
 		for i, raw := range []string{
 			`null`, `true`, `false`, `0`, `-0`, `-0.00`, `1e+09`, `1E-9`, `1.2300`,
 			`9007199254740993`, `9223372036854775808`, `1e999999`, strings.Repeat("9", 400),
@@ -211,7 +233,7 @@ func TestNativePayloadReference(t *testing.T) {
 			`[ 1, 2 , { "x" : 1, "x": 2 } ]`, `{ "b": 1e+09, "a": -0, "b": 1.2300 }`,
 			`{ "\ud800": "\udfff", "n":1e999999 }`,
 		} {
-			add(typ, fmt.Sprintf("raw_lexical_%02d", i), "{\"input\": \n\t"+raw+" \n}")
+			rawAdd(fmt.Sprintf("raw_lexical_%02d", i), "{\"input\": \n\t"+raw+" \n}")
 		}
 		for i, input := range []string{
 			`{"input":{"a":1},"INPUT": { "b": -0 }}`,
@@ -221,14 +243,14 @@ func TestNativePayloadReference(t *testing.T) {
 			`{"input":01,"input":{}}`, `{"input":"\uZZZZ","input":{}}`,
 			`{"input":NaN}`, `{"input":Infinity}`, `{"input":-Infinity}`,
 		} {
-			add(typ, fmt.Sprintf("raw_duplicate_or_invalid_%02d", i), input)
+			rawAdd(fmt.Sprintf("raw_duplicate_or_invalid_%02d", i), input)
 		}
 		for j, invalid := range []string{string([]byte{0xff}), string([]byte{0xe2, 0x82}), string([]byte{0xed, 0xa0, 0x80}), string([]byte{0xf0, 0x80, 0x80, 0x80})} {
-			add(typ, fmt.Sprintf("raw_invalid_utf8_%d", j), "{\"input\":\""+invalid+"\"}")
-			add(typ, fmt.Sprintf("raw_invalid_utf8_key_%d", j), "{\"input\":{\""+invalid+"\":\""+invalid+"\"}}")
+			rawAdd(fmt.Sprintf("raw_invalid_utf8_%d", j), "{\"input\":\""+invalid+"\"}")
+			rawAdd(fmt.Sprintf("raw_invalid_utf8_key_%d", j), "{\"input\":{\""+invalid+"\":\""+invalid+"\"}}")
 		}
 		for _, depth := range []int{9999, 10000, 10001} {
-			add(typ, fmt.Sprintf("raw_depth_%d", depth), `{"input":`+strings.Repeat("[", depth-1)+`0`+strings.Repeat("]", depth-1)+`}`)
+			rawAdd(fmt.Sprintf("raw_depth_%d", depth), `{"input":`+strings.Repeat("[", depth-1)+`0`+strings.Repeat("]", depth-1)+`}`)
 		}
 	}
 	enumType := reflect.TypeOf(RunItemType(0))
@@ -240,8 +262,15 @@ func TestNativePayloadReference(t *testing.T) {
 	} {
 		add(enumType, fmt.Sprintf("value_%02d", i), input)
 	}
+	encoding := []map[string]any{}
+	for _, raw := range []json.RawMessage{nil, {}, json.RawMessage(`null`), json.RawMessage(` { "b":1e+09, "a":-0, "b":1.00 } `), json.RawMessage("\"\xff\""), json.RawMessage(` `), json.RawMessage(`[1,]`)} {
+		for _, value := range []any{LLMOutputSchema{Schema: raw}, LLMToolSnapshot{InputSchema: raw}} {
+			encoded, err := json.Marshal(value)
+			encoding = append(encoding, map[string]any{"type": reflect.TypeOf(value).Name(), "raw_nil": raw == nil, "raw_hex": hex.EncodeToString(raw), "marshal_ok": err == nil, "marshal_hex": hex.EncodeToString(encoded)})
+		}
+	}
 	result := map[string]any{
-		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases,
+		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
 		"enum_values": map[string]RunItemType{
 			"RunItemMessage": RunItemMessage, "RunItemToolCall": RunItemToolCall,
 			"RunItemToolOutput": RunItemToolOutput, "RunItemHandoffCall": RunItemHandoffCall,

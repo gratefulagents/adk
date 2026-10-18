@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Snapshot schema and tool byte codecs
+
+Fixed folded-key and duplicate/null-update decoding for OutputSchema and
+ToolSnapshot, including raw schema preservation through the byte boundary.
+The scalar-null regression failed before the fix. The pinned Go oracle adds
+139 schema and223 tool cases (1,629 total), plus14 raw encoding cases checking
+omission, invalid UTF-8, HTML escaping and invalid JSON rejection. All1,267
+previous decode observations remain unchanged. A facade test checks both public
+types and their byte codecs. This closes four internal/public type mappings,
+not enclosing request/response snapshots or ordinary Serde byte fidelity.
+
+Fresh Rust1.88 Linux: **1,767 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**. Strict Clippy/typecheck/rustdoc/format, full facade matrix,
+standalone consumer/purity, all20 offline feature examples and host session,
+independently reproduced bound references, all56 validators, artifact/overlay/
+audit and immutable source locks passed. Ledger: **1,104 verified /7,787 unresolved
+/251 excluded**. Full retained acceptance remains incomplete.
+
+
 ### Custom structured-output parsing
 
 Mapped only the ParseFn capability to native OutputParser.98 independently

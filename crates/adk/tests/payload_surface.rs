@@ -90,3 +90,23 @@ fn logger_preserves_and_byte_truncates_invalid_raw_input() {
     expected.extend_from_slice("…\n".as_bytes());
     assert!(logged.ends_with(&expected));
 }
+
+#[test]
+fn snapshot_schema_and_tool_codecs_are_available_through_facade() {
+    use adk::codec::snapshots::{OutputSchema, ToolSnapshot};
+    let schema: OutputSchema = from_go_json(
+        b"{\"NAME\":\"schema\",\"name\":null,\"SCHEMA\":\"\xff\",\"STRICT\":true,\"strict\":null}",
+    )
+    .unwrap();
+    assert_eq!(schema.name, "schema");
+    assert!(schema.strict);
+    assert_eq!(
+        to_go_json_bytes(&schema).unwrap(),
+        b"{\"name\":\"schema\",\"schema\":\"\xff\",\"strict\":true}"
+    );
+    let tool: ToolSnapshot = from_go_json(br#"{"NAME":"tool","READ_ONLY":true,"read_only":null,"needs_approval":true,"TIMEOUT_SECONDS":-0,"INPUT_SCHEMA":{"z":1,"z":2}}"#).unwrap();
+    assert_eq!(
+        to_go_json_bytes(&tool).unwrap(),
+        br#"{"name":"tool","input_schema":{"z":1,"z":2},"read_only":true,"needs_approval":true}"#
+    );
+}

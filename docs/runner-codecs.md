@@ -22,6 +22,24 @@ unspecified, unknown and future labels before constructing executable state.
 open string. This does not claim all snapshot-decoder edge cases or provider
 response conversion are equivalent.
 
+### Standalone schema and tool snapshots
+
+With `compat`, `adk::codec::{from_go_json, to_go_json_bytes}` supports
+`snapshots::{OutputSchema, ToolSnapshot}` (the Go LLMOutputSchema and
+LLMToolSnapshot analysis records). Use this explicit byte API for Go case-folded
+keys, duplicate/null updates, signed64-bit timeout values, invalid typed-string
+replacement and opaque schema bytes. Raw schemas preserve lexical spelling,
+duplicate keys, lone-surrogate escapes and invalid UTF-8. Encoding omits both nil
+and empty raw schemas, but retains explicit JSON null; required name/boolean
+fields remain present. The existing Go10,000-level decode/raw-marshal boundaries
+apply, including public raw-byte and RawValue construction.
+
+The independent payload oracle now has1,629 decode cases (the original1,267 are
+unchanged), plus14 constructed snapshot encoding cases. This is a standalone
+record boundary: it does not make whole RequestSnapshot/ResponseSnapshot nested
+decoders equivalent, validate executable schemas, or reproduce partial Go
+mutation/error text. Ordinary Serde is not a substitute for the byte API.
+
 ## Explicit budget guidance
 
 With `compat`, `adk::codec::userinput::{build_run_budget_context,

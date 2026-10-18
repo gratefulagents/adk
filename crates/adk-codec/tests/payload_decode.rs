@@ -1,3 +1,4 @@
+use adk_codec::snapshots::{OutputSchema, ToolSnapshot};
 use adk_codec::{GoJsonDecode, GoJsonEncode, approval, dto::*, from_go_json, to_go_json_bytes};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -24,6 +25,8 @@ macro_rules! fields {
     };
 }
 fields!(ImageAttachment, media_type, data, detail);
+fields!(OutputSchema, name, strict; schema);
+fields!(ToolSnapshot, name, description, read_only, needs_approval, timeout_seconds; input_schema);
 fields!(ToolCallData, id, name; input);
 fields!(HandoffCallData, from_agent, to_agent);
 fields!(HandoffOutputData, from_agent, to_agent);
@@ -125,9 +128,11 @@ fn pinned_payload_decode_oracle() {
         assert_eq!(fixture["enum_values"][name], kind.0);
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 1267);
+    assert_eq!(cases.len(), 1629);
     for case in cases {
         match case["type"].as_str().unwrap() {
+            "LLMOutputSchema" => compare::<OutputSchema>(case),
+            "LLMToolSnapshot" => compare::<ToolSnapshot>(case),
             "MessageOutput" => compare::<MessageOutput>(case),
             "ImageAttachment" => compare::<ImageAttachment>(case),
             "ToolCallData" => compare::<ToolCallData>(case),
@@ -156,9 +161,19 @@ fn public_raw_representations_share_go_marshal_depth_limit() {
                 ..Default::default()
             };
             let approval = ToolApprovalData {
-                input: raw,
+                input: raw.clone(),
                 ..Default::default()
             };
+            let schema = OutputSchema {
+                schema: raw.clone(),
+                ..Default::default()
+            };
+            let tool = ToolSnapshot {
+                input_schema: raw,
+                ..Default::default()
+            };
+            assert_eq!(to_go_json_bytes(&schema).is_ok(), depth == 10_000);
+            assert_eq!(to_go_json_bytes(&tool).is_ok(), depth == 10_000);
             assert_eq!(adk_codec::to_go_json_bytes(&call).is_ok(), depth == 10_000);
             assert_eq!(
                 adk_codec::to_go_json_bytes(&approval).is_ok(),
@@ -384,4 +399,42 @@ fn user_input_helpers_receive_original_raw_bytes() {
     );
     assert!(pause.requested);
     assert_eq!(pause.question, "\u{fffd}\u{fffd}\u{fffd}");
+}
+
+#[test]
+fn snapshot_raw_encoding_matches_go_omission_bytes_and_rejection() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let cases = fixture["snapshot_encode_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 14);
+    for case in cases {
+        let raw = if case["raw_nil"].as_bool().unwrap() {
+            RawJson::Missing
+        } else {
+            RawJson::EncodedBytes(unhex(case["raw_hex"].as_str().unwrap()))
+        };
+        let encoded = match case["type"].as_str().unwrap() {
+            "LLMOutputSchema" => to_go_json_bytes(&OutputSchema {
+                schema: raw,
+                ..Default::default()
+            }),
+            "LLMToolSnapshot" => to_go_json_bytes(&ToolSnapshot {
+                input_schema: raw,
+                ..Default::default()
+            }),
+            other => panic!("unknown type {other}"),
+        };
+        assert_eq!(
+            encoded.is_ok(),
+            case["marshal_ok"].as_bool().unwrap(),
+            "{case}"
+        );
+        if let Ok(encoded) = encoded {
+            assert_eq!(
+                encoded,
+                unhex(case["marshal_hex"].as_str().unwrap()),
+                "{case}"
+            );
+        }
+    }
 }

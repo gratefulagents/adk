@@ -156,3 +156,12 @@ fn raw_json_null_remains_distinct_from_missing_schema() {
         explicit.as_bytes()
     );
 }
+
+#[test]
+fn snapshot_schema_case_folded_null_updates_preserve_previous_values() {
+    let schema: adk_codec::snapshots::OutputSchema =
+        serde_json::from_str(r#"{"NAME":"first","strict":true,"name":null,"STRICT":null}"#)
+            .unwrap();
+    assert_eq!(schema.name, "first");
+    assert!(schema.strict);
+}

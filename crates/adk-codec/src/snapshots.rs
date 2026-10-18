@@ -110,33 +110,24 @@ pub struct RequestSnapshot {
     pub total_token_estimate: i64,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub struct ToolSnapshot {
-    #[serde(deserialize_with = "null_default")]
     pub name: String,
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub description: String,
     #[serde(skip_serializing_if = "RawJson::is_missing")]
     pub input_schema: RawJson,
-    #[serde(deserialize_with = "null_default")]
     pub read_only: bool,
-    #[serde(deserialize_with = "null_default")]
     pub needs_approval: bool,
     #[serde(skip_serializing_if = "is_zero")]
-    #[serde(deserialize_with = "null_default")]
     pub timeout_seconds: i64,
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub struct OutputSchema {
-    #[serde(deserialize_with = "null_default")]
     pub name: String,
     #[serde(skip_serializing_if = "RawJson::is_missing")]
     pub schema: RawJson,
-    #[serde(deserialize_with = "null_default")]
     pub strict: bool,
 }
 

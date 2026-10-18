@@ -20073,6 +20073,94 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-930625068E53746F": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMOutputSchema",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::OutputSchema",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_raw_representations_share_go_marshal_depth_limit",
+        "snapshot_schema_case_folded_null_updates_preserve_previous_values",
+        "snapshot_schema_and_tool_codecs_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete declarative analysis-record type/alias review under the standalone explicit Go byte codec; no executable callbacks, methods, resource ownership or startup behavior.362 new independently executed Go decoding cases cover both snapshot types; all1267 prior payload cases remain unchanged.14 constructed encoding cases plus raw-depth boundaries cover nil/empty omission, explicit null, invalid raw rejection and preserved invalid UTF-8. Typed fields use Go folding, duplicate/null updates, string replacement and signed64-bit timeouts; opaque schemas preserve lexical bytes. Public facade access is tested. Owned Rust values replace Go alias identity; partial decode mutation/error text, ordinary Serde equivalence, whole parent request/response decoding and executable schema/tool/provider behavior are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-EB4C1954F0D06FDF": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_raw_representations_share_go_marshal_depth_limit",
+        "snapshot_schema_case_folded_null_updates_preserve_previous_values",
+        "snapshot_schema_and_tool_codecs_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete declarative analysis-record type/alias review under the standalone explicit Go byte codec; no executable callbacks, methods, resource ownership or startup behavior.362 new independently executed Go decoding cases cover both snapshot types; all1267 prior payload cases remain unchanged.14 constructed encoding cases plus raw-depth boundaries cover nil/empty omission, explicit null, invalid raw rejection and preserved invalid UTF-8. Typed fields use Go folding, duplicate/null updates, string replacement and signed64-bit timeouts; opaque schemas preserve lexical bytes. Public facade access is tested. Owned Rust values replace Go alias identity; partial decode mutation/error text, ordinary Serde equivalence, whole parent request/response decoding and executable schema/tool/provider behavior are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D0EF8946B55169B3": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMOutputSchema",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::OutputSchema",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_raw_representations_share_go_marshal_depth_limit",
+        "snapshot_schema_case_folded_null_updates_preserve_previous_values",
+        "snapshot_schema_and_tool_codecs_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete declarative analysis-record type/alias review under the standalone explicit Go byte codec; no executable callbacks, methods, resource ownership or startup behavior.362 new independently executed Go decoding cases cover both snapshot types; all1267 prior payload cases remain unchanged.14 constructed encoding cases plus raw-depth boundaries cover nil/empty omission, explicit null, invalid raw rejection and preserved invalid UTF-8. Typed fields use Go folding, duplicate/null updates, string replacement and signed64-bit timeouts; opaque schemas preserve lexical bytes. Public facade access is tested. Owned Rust values replace Go alias identity; partial decode mutation/error text, ordinary Serde equivalence, whole parent request/response decoding and executable schema/tool/provider behavior are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F54F38696755E44D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMToolSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::ToolSnapshot",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_raw_representations_share_go_marshal_depth_limit",
+        "snapshot_schema_case_folded_null_updates_preserve_previous_values",
+        "snapshot_schema_and_tool_codecs_are_available_through_facade"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete declarative analysis-record type/alias review under the standalone explicit Go byte codec; no executable callbacks, methods, resource ownership or startup behavior.362 new independently executed Go decoding cases cover both snapshot types; all1267 prior payload cases remain unchanged.14 constructed encoding cases plus raw-depth boundaries cover nil/empty omission, explicit null, invalid raw rejection and preserved invalid UTF-8. Typed fields use Go folding, duplicate/null updates, string replacement and signed64-bit timeouts; opaque schemas preserve lexical bytes. Public facade access is tested. Owned Rust values replace Go alias identity; partial decode mutation/error text, ordinary Serde equivalence, whole parent request/response decoding and executable schema/tool/provider behavior are not claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

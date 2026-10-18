@@ -1,11 +1,12 @@
 use crate::dto::*;
 use crate::go_decode::{ElementSeed, GoSlice, fold_key, go_object, normalize_strings, read_field};
 use crate::mode::ModeRoutingResolution;
+use crate::snapshots::{OutputSchema, ToolSnapshot};
 use serde::Deserialize;
 
 mod sealed {
     pub trait Sealed: serde::Serialize {
-        const RAW_INPUT: bool = false;
+        const RAW_FIELD: Option<&'static str> = None;
         fn restore_raw(&mut self, _raw: super::RawJson) {}
         fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error>
         where
@@ -24,7 +25,7 @@ pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 /// Decode a pinned SDK record with Go string replacement and object semantics.
 ///
 /// Unlike ordinary Serde JSON decoding, malformed UTF-8 and lone UTF-16
-/// surrogates in typed strings and keys are replaced as in Go. Raw `input`
+/// surrogates in typed strings and keys are replaced as in Go. Raw `input`, `schema` and `input_schema`
 /// values retain their original lexical JSON, including duplicate keys and
 /// escapes and invalid UTF-8 bytes. Only a validation copy is normalized; raw
 /// bytes are restored after the entire decode succeeds. No `Value` round trip
@@ -39,8 +40,8 @@ pub trait GoJsonDecode: sealed::Sealed + serde::de::DeserializeOwned {}
 /// ```
 pub fn from_go_json<T: GoJsonDecode>(input: &[u8]) -> Result<T, serde_json::Error> {
     check_depth(input)?;
-    let (bytes, raw) = if T::RAW_INPUT {
-        normalize_payload(input)?
+    let (bytes, raw) = if let Some(field) = T::RAW_FIELD {
+        normalize_payload(input, field)?
     } else {
         (normalize_strings(input), None)
     };
@@ -63,7 +64,7 @@ pub trait GoJsonEncode: sealed::Sealed {}
 
 /// Encode a record with Go field order, raw-byte preservation and HTML escaping.
 ///
-/// Unlike ordinary Serde serialization, raw input may contain invalid UTF-8.
+/// Unlike ordinary Serde serialization, raw fields may contain invalid UTF-8.
 /// Public `EncodedBytes` values are syntax-checked without a `Value` projection.
 ///
 /// ```compile_fail
@@ -141,7 +142,7 @@ target!(
     RunItemType
 );
 impl sealed::Sealed for ToolCallData {
-    const RAW_INPUT: bool = true;
+    const RAW_FIELD: Option<&'static str> = Some("input");
     fn restore_raw(&mut self, raw: RawJson) {
         self.input = raw;
     }
@@ -159,7 +160,7 @@ impl sealed::Sealed for ToolCallData {
 impl GoJsonDecode for ToolCallData {}
 impl GoJsonEncode for ToolCallData {}
 impl sealed::Sealed for ToolApprovalData {
-    const RAW_INPUT: bool = true;
+    const RAW_FIELD: Option<&'static str> = Some("input");
     fn restore_raw(&mut self, raw: RawJson) {
         self.input = raw;
     }
@@ -178,6 +179,60 @@ impl sealed::Sealed for ToolApprovalData {
 }
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
+
+impl sealed::Sealed for OutputSchema {
+    const RAW_FIELD: Option<&'static str> = Some("schema");
+    fn restore_raw(&mut self, raw: RawJson) {
+        self.schema = raw;
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        let mut bytes = b"{\"name\":".to_vec();
+        bytes.extend(crate::snapshots::to_go_json(&self.name)?);
+        if !self.schema.bytes().is_empty() {
+            bytes.extend_from_slice(b",\"schema\":");
+            append_raw(&mut bytes, &self.schema)?;
+        }
+        bytes.extend_from_slice(b",\"strict\":");
+        bytes.extend(crate::snapshots::to_go_json(&self.strict)?);
+        bytes.push(b'}');
+        Ok(bytes)
+    }
+}
+impl GoJsonDecode for OutputSchema {}
+impl GoJsonEncode for OutputSchema {}
+impl sealed::Sealed for ToolSnapshot {
+    const RAW_FIELD: Option<&'static str> = Some("input_schema");
+    fn restore_raw(&mut self, raw: RawJson) {
+        self.input_schema = raw;
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        let mut bytes = b"{\"name\":".to_vec();
+        bytes.extend(crate::snapshots::to_go_json(&self.name)?);
+        if !self.description.is_empty() {
+            bytes.extend_from_slice(b",\"description\":");
+            bytes.extend(crate::snapshots::to_go_json(&self.description)?);
+        }
+        if !self.input_schema.bytes().is_empty() {
+            bytes.extend_from_slice(b",\"input_schema\":");
+            append_raw(&mut bytes, &self.input_schema)?;
+        }
+        bytes.extend_from_slice(b",\"read_only\":");
+        bytes.extend(crate::snapshots::to_go_json(&self.read_only)?);
+        bytes.extend_from_slice(b",\"needs_approval\":");
+        bytes.extend(crate::snapshots::to_go_json(&self.needs_approval)?);
+        if self.timeout_seconds != 0 {
+            bytes.extend_from_slice(b",\"timeout_seconds\":");
+            bytes.extend(crate::snapshots::to_go_json(&self.timeout_seconds)?);
+        }
+        bytes.push(b'}');
+        Ok(bytes)
+    }
+}
+impl GoJsonDecode for ToolSnapshot {}
+impl GoJsonEncode for ToolSnapshot {}
+
+go_object!(OutputSchema, "name" => name: scalar, "schema" => schema: raw, "strict" => strict: scalar);
+go_object!(ToolSnapshot, "name" => name: scalar, "description" => description: scalar, "input_schema" => input_schema: raw, "read_only" => read_only: scalar, "needs_approval" => needs_approval: scalar, "timeout_seconds" => timeout_seconds: integer);
 
 go_object!(ModelRetryAdvice,
     "shouldretry" => should_retry: scalar,
@@ -325,7 +380,10 @@ fn raw_end(input: &[u8], start: usize) -> usize {
     i
 }
 
-fn normalize_payload(input: &[u8]) -> Result<(Vec<u8>, Option<&[u8]>), serde_json::Error> {
+fn normalize_payload<'a>(
+    input: &'a [u8],
+    field: &str,
+) -> Result<(Vec<u8>, Option<&'a [u8]>), serde_json::Error> {
     let mut last_raw = None;
     let mut bytes = Vec::with_capacity(input.len());
     let mut depth = 0usize;
@@ -337,8 +395,7 @@ fn normalize_payload(input: &[u8]) -> Result<(Vec<u8>, Option<&[u8]>), serde_jso
                 let end = string_end(input, i);
                 let normalized = normalize_strings(&input[i..end]);
                 if depth == 1 {
-                    raw_field =
-                        fold_key(&serde_json::from_slice::<String>(&normalized)?) == "input";
+                    raw_field = fold_key(&serde_json::from_slice::<String>(&normalized)?) == field;
                 }
                 bytes.extend_from_slice(&normalized);
                 i = end;

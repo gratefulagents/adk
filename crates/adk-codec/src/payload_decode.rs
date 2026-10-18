@@ -2,7 +2,9 @@ use crate::agents::{Definition as AgentDefinition, Kind as AgentKind};
 use crate::dto::*;
 use crate::go_decode::{ElementSeed, GoSlice, fold_key, go_object, normalize_strings, read_field};
 use crate::mode::ModeRoutingResolution;
-use crate::snapshots::{ModelSettings as SnapshotModelSettings, OutputSchema, ToolSnapshot};
+use crate::snapshots::{
+    ModelSettings as SnapshotModelSettings, OutputSchema, RequestSnapshot, ToolSnapshot,
+};
 use serde::Deserialize;
 
 mod sealed {
@@ -186,6 +188,19 @@ impl GoJsonEncode for ToolApprovalData {}
 impl sealed::Sealed for SnapshotModelSettings {}
 impl GoJsonDecode for SnapshotModelSettings {}
 impl GoJsonEncode for SnapshotModelSettings {}
+
+go_object!(RequestSnapshot,
+    "agent_name" => agent_name: scalar,
+    "model" => model: scalar,
+    "instructions" => instructions: scalar,
+    "input_token_estimate" => input_token_estimate: integer,
+    "request_overhead_token_estimate" => request_overhead_token_estimate: integer,
+    "total_token_estimate" => total_token_estimate: integer;
+    "input_items" => input_items,
+    "tools" => tools
+    pointers { "output_schema" => output_schema }
+    objects { "settings" => settings }
+);
 
 go_object!(SnapshotModelSettings,
     "temperature" => temperature: raw,

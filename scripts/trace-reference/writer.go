@@ -85,6 +85,19 @@ func requestRecordCases() []map[string]any {
 		`{"output_schema":{"strict":1}}`,
 		`{"input_token_estimate":-1,"request_overhead_token_estimate":9223372036854775807,"total_token_estimate":-9223372036854775808}`,
 		`{"total_token_estimate":1.5}`,
+		`null`,
+		`{"AGENT_NAME":"first","agent_name":"second","agent_name":null,"MODEL":"model","INSTRUCTIONS":"text"}`,
+		`{"INPUT_TOKEN_ESTIMATE":-0,"TOTAL_TOKEN_ESTIMATE":7,"total_token_estimate":null}`,
+		`{"settings":{"max_tokens":17},"SETTINGS":{"tool_choice":"required"},"settings":null}`,
+		`{"settings":{"stop_sequences":["a","b"]},"settings":{"stop_sequences":["c"]},"settings":{"stop_sequences":[null,null]}}`,
+		`{"tools":[{"name":"one","description":"retained"},{"name":"two"}],"TOOLS":[{"name":"new"}],"tools":[null,null]}`,
+		`{"tools":[{"name":"old"}],"tools":[],"tools":[null]}`,
+		`{"tools":[{"name":"old"}],"tools":null,"tools":[null]}`,
+		`{"output_schema":{"name":"first","strict":true},"OUTPUT_SCHEMA":{"schema":{"type":"string"}},"output_schema":{"name":null}}`,
+		`{"output_schema":{"name":"old","strict":true},"output_schema":null,"output_schema":{}}`,
+		`{"model":3,"model":"later"}`,
+		`{"settings":{"max_tokens":1.5},"settings":null}`,
+		`{"output_schema":{"strict":1},"output_schema":null}`,
 	}
 	cases := []map[string]any{}
 	for _, input := range inputs {

@@ -3,8 +3,8 @@
 use adk::providers::{
     auth::AuthMode,
     factory::{
-        config::{Config, NamedRoute},
         Kind,
+        config::{Config, NamedRoute},
     },
     wire::Protocol,
 };
@@ -79,7 +79,7 @@ fn public_configuration_refuses_ambiguous_secret_fanout() {
 fn codex_backend_default_matches_pinned_go_without_changing_api_key_default() {
     use adk::providers::{
         auth::AuthMode,
-        factory::{Kind, DEFAULT_CODEX_BACKEND_BASE_URL},
+        factory::{DEFAULT_CODEX_BACKEND_BASE_URL, Kind},
     };
     let reference: serde_json::Value = serde_json::from_str(include_str!(
         "../../../fixtures/provider-config/observations.json"

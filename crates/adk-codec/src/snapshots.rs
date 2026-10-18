@@ -1,6 +1,6 @@
 //! Analysis-oriented request documents; executable tool callbacks never serialize.
 
-use crate::dto::{RawJson, RunItemSnapshot, null_default, null_default_elements};
+use crate::dto::{RawJson, RunItemSnapshot};
 use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Clone, Default, PartialEq, Serialize)]
@@ -66,37 +66,26 @@ fn is_zero(value: &i64) -> bool {
     *value == 0
 }
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub struct RequestSnapshot {
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub agent_name: String,
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub model: String,
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub instructions: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    #[serde(deserialize_with = "null_default_elements")]
     pub input_items: Vec<RunItemSnapshot>,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    #[serde(deserialize_with = "null_default_elements")]
     pub tools: Vec<ToolSnapshot>,
-    #[serde(deserialize_with = "null_default")]
     pub settings: ModelSettings,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(deserialize_with = "null_default")]
     pub output_schema: Option<OutputSchema>,
     #[serde(skip_serializing_if = "is_zero")]
-    #[serde(deserialize_with = "null_default")]
     pub input_token_estimate: i64,
     #[serde(skip_serializing_if = "is_zero")]
-    #[serde(deserialize_with = "null_default")]
     pub request_overhead_token_estimate: i64,
     #[serde(skip_serializing_if = "is_zero")]
-    #[serde(deserialize_with = "null_default")]
     pub total_token_estimate: i64,
 }
 

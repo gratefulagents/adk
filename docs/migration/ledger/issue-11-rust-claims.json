@@ -501,28 +501,6 @@
         "observability"
       ]
     },
-    "SDK-41DC0B1C66C9BF51": {
-      "source": "internal/agent/llm_snapshot.go",
-      "source_name": "LLMRequestSnapshot",
-      "implementation_symbols": [
-        "crates/adk-codec/src/snapshots.rs::RequestSnapshot"
-      ],
-      "rust_test_identifiers": [
-        "float_thresholds_and_html_escaping_match_pinned_go_bytes",
-        "typed_request_metadata_digests_match_pinned_go_serialized_bytes",
-        "json_null_scalars_and_collections_follow_go_zero_values",
-        "raw_json_null_remains_distinct_from_missing_schema",
-        "raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_like_go",
-        "request_snapshot_field_records_match_independent_pinned_go"
-      ],
-      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
-      "rationale": "Typed analysis snapshot representation and serialization only, not automatic request assembly: independently executed pinned Go fixtures exercise every request field, nested settings/tool/schema values, zero/null omission, raw JSON ordering and numeric spelling, HTML escaping, and exact resulting trace metadata digests. Executable callbacks are absent by construction.",
-      "target_features": [
-        "x86_64-unknown-linux-gnu",
-        "compat",
-        "observability"
-      ]
-    },
     "SDK-AFC6D980CC52D10F": {
       "source": "internal/agent/tracing.go",
       "source_name": "NewSpan",

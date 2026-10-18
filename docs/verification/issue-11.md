@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Request snapshot decoding correction
+
+Reopened `SDK-41DC0B1C66C9BF51`: its prior serialization-only rationale does not
+establish the complete `LLMRequestSnapshot` declaration contract. The public
+alias remains unresolved too. Derived request decoding rejected repeated fields
+and missed case-folded keys. The request envelope now reuses existing Go-style
+decoding primitives for scalar nulls, integer spelling, repeated settings and
+schema objects, and retained tool-slice slots. Thirteen additional independently
+executed Go cases cover these behaviors and rejection before a later null.
+The existing eleven request-snapshot tests pass against the expanded fixture.
+Nested run-item decoding and arbitrary-byte raw/string behavior still prevent
+whole-record closure. No new decode/encode trait support or alias closure is
+claimed. The ledger returns to **1,322 verified /7,569 unresolved /251 excluded**.
+
 ### Codex backend URL constant
 
 The public `factory::DEFAULT_CODEX_BACKEND_BASE_URL` closes only the pure

@@ -231,3 +231,18 @@ numbers/booleans reset on null, and repeated stop arrays retain Go backing-slot
 values. Its `Vec` intentionally collapses nil and empty stops (both omit on
 encoding); use `dto::ModelSettings` when that distinction matters. This does not
 make the enclosing `RequestSnapshot` byte decoder Go-compatible.
+
+### Lossless display-cost projection
+
+`adk::codec::cost::estimate_result_cost` accepts an optional borrowed pair of
+signed usage and response DTOs, plus an optional synchronous pricing callback.
+The callback returns `(cost, known)`; adapt a legacy cost-only provider by returning
+`(cost, true)`. Absent results return unknown zero without invoking the callback.
+Empty response lists price all usage; nonempty lists sum response prices in order
+and price the componentwise-clamped residual once, preserving SDK signed wrapping
+arithmetic and uncertainty. Requests alone do not trigger residual pricing.
+
+This compatibility projection deliberately preserves negative, infinite and NaN
+prices. It is **not** a billing-validation API. Native runtime accounting and its
+price sanitization remain unchanged. No Go model-interface reflection or pointer
+identity is required; the host supplies the appropriate borrowed callback.

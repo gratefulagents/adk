@@ -107,11 +107,61 @@ func TestNativeResultCostReference(t *testing.T) {
 		}
 		floatCases = append(floatCases, map[string]string{"bits": fmt.Sprintf("%016x", math.Float64bits(value)), "json": string(fields["CostUSD"])})
 	}
-	data, err := json.Marshal(map[string]any{"cases": cases, "float_cases": floatCases})
+	data, err := json.Marshal(map[string]any{"cases": cases, "float_cases": floatCases, "compat_cases": costCompatibilityCases(t)})
 	if err != nil {
 		t.Fatal(err)
 	}
 	if err = os.WriteFile(os.Getenv("COST_OUTPUT"), data, 0600); err != nil {
 		t.Fatal(err)
 	}
+}
+
+func costCompatibilityCases(t *testing.T) []map[string]any {
+	totals := []Usage{{}, {Requests: 3, InputTokens: 10, OutputTokens: 5, CacheReadTokens: 8, CacheCreateTokens: 6}, {Requests: -1, InputTokens: -7, OutputTokens: -3, CacheReadTokens: -2, CacheCreateTokens: -8}, {Requests: math.MaxInt64, InputTokens: math.MaxInt64, OutputTokens: 1, CacheReadTokens: math.MinInt64, CacheCreateTokens: math.MaxInt64}, {Requests: math.MinInt64, InputTokens: math.MinInt64, OutputTokens: math.MaxInt64, CacheReadTokens: 1}}
+	amounts := []float64{0, math.Copysign(0, -1), .25, -1, math.NaN(), math.Inf(1), math.Inf(-1), math.MaxFloat64}
+	var cases []map[string]any
+	for totalIndex, total := range totals {
+		for responseKind := 0; responseKind < 5; responseKind++ {
+			for _, kind := range []string{"nil", "legacy", "known", "unknown"} {
+				for amountIndex, amount := range amounts {
+					for _, present := range []bool{false, true} {
+						responses := []ModelResponse{}
+						switch responseKind {
+						case 1:
+							responses = []ModelResponse{{Usage: Usage{Requests: 1, InputTokens: 7, OutputTokens: 4, CacheReadTokens: 2, CacheCreateTokens: 3}, CostUSD: amount, CostKnown: true}}
+						case 2:
+							responses = []ModelResponse{{Usage: total, CostUSD: amount, CostKnown: true}, {Usage: total, CostUSD: .25, CostKnown: false}}
+						case 3:
+							responses = []ModelResponse{{Usage: Usage{Requests: -1, InputTokens: -7, OutputTokens: -3, CacheReadTokens: -2, CacheCreateTokens: -8}, CostUSD: amount, CostKnown: false}}
+						case 4:
+							responses = []ModelResponse{{Usage: Usage{Requests: math.MaxInt64, InputTokens: math.MaxInt64, OutputTokens: math.MaxInt64, CacheReadTokens: math.MaxInt64, CacheCreateTokens: math.MaxInt64}, CostUSD: amount, CostKnown: true}, {Usage: Usage{Requests: 1, InputTokens: 1, OutputTokens: 1, CacheReadTokens: 1, CacheCreateTokens: 1}, CostUSD: amount, CostKnown: true}}
+						}
+						calls := []Usage{}
+						base := costReferenceLegacy{amount: amount, calls: &calls}
+						var model Model
+						switch kind {
+						case "legacy":
+							model = &base
+						case "known", "unknown":
+							model = &costReferenceEstimator{costReferenceLegacy: base, known: kind == "known"}
+						}
+						var result *RunResult
+						if present {
+							result = &RunResult{Usage: total, RawResponses: responses}
+						}
+						cost, known := estimateRunResultCost(result, model)
+						observedResponses := []map[string]any{}
+						for _, response := range responses {
+							observedResponses = append(observedResponses, map[string]any{"usage": response.Usage, "cost_bits": fmt.Sprintf("%016x", math.Float64bits(response.CostUSD)), "known": response.CostKnown})
+						}
+						cases = append(cases, map[string]any{"id": fmt.Sprintf("%d/%d/%s/%d/%t", totalIndex, responseKind, kind, amountIndex, present), "present": present, "usage": total, "responses": observedResponses, "fallback_kind": kind, "fallback_bits": fmt.Sprintf("%016x", math.Float64bits(amount)), "cost_bits": fmt.Sprintf("%016x", math.Float64bits(cost)), "known": known, "calls": calls})
+					}
+				}
+			}
+		}
+	}
+	if len(cases) != 1600 {
+		t.Fatalf("unexpected compatibility cases: %d", len(cases))
+	}
+	return cases
 }

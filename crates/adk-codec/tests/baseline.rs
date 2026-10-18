@@ -442,3 +442,70 @@ fn state_ready_sorts_equal_seconds_by_exact_nanoseconds() {
         json!(["later", "first", "whole"])
     );
 }
+
+#[test]
+fn signed_result_cost_matches_pinned_go_projection() {
+    use adk_codec::{
+        cost::estimate_result_cost,
+        dto::{ModelResponse, Usage},
+    };
+    use std::cell::RefCell;
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/costs/sdk-result-cost.json")).unwrap();
+    let cases = fixture["compat_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 1600);
+    let float = |value: &serde_json::Value| {
+        f64::from_bits(u64::from_str_radix(value.as_str().unwrap(), 16).unwrap())
+    };
+    for case in cases {
+        let id = case["id"].as_str().unwrap();
+        let usage: Usage = serde_json::from_value(case["usage"].clone()).unwrap();
+        let responses: Vec<ModelResponse> = case["responses"]
+            .as_array()
+            .unwrap()
+            .iter()
+            .map(|r| ModelResponse {
+                usage: serde_json::from_value(r["usage"].clone()).unwrap(),
+                cost_usd: float(&r["cost_bits"]),
+                cost_known: r["known"].as_bool().unwrap(),
+                ..Default::default()
+            })
+            .collect();
+        let before = responses
+            .iter()
+            .map(|r| (r.usage.clone(), r.cost_usd.to_bits(), r.cost_known))
+            .collect::<Vec<_>>();
+        let calls = RefCell::new(Vec::new());
+        let estimate = |usage: &Usage| {
+            calls.borrow_mut().push(usage.clone());
+            (
+                float(&case["fallback_bits"]),
+                case["fallback_kind"] != "unknown",
+            )
+        };
+        let fallback =
+            (case["fallback_kind"] != "nil").then_some(&estimate as &dyn Fn(&Usage) -> (f64, bool));
+        let result = case["present"]
+            .as_bool()
+            .unwrap()
+            .then_some((&usage, responses.as_slice()));
+        let (cost, known) = estimate_result_cost(result, fallback);
+        let expected = float(&case["cost_bits"]);
+        if expected.is_nan() {
+            assert!(cost.is_nan(), "{id}");
+        } else {
+            assert_eq!(cost.to_bits(), expected.to_bits(), "{id}");
+        }
+        assert_eq!(known, case["known"].as_bool().unwrap(), "{id}");
+        let expected_calls: Vec<Usage> = serde_json::from_value(case["calls"].clone()).unwrap();
+        assert_eq!(*calls.borrow(), expected_calls, "{id}");
+        assert_eq!(
+            before,
+            responses
+                .iter()
+                .map(|r| (r.usage.clone(), r.cost_usd.to_bits(), r.cost_known))
+                .collect::<Vec<_>>(),
+            "{id}"
+        );
+    }
+}

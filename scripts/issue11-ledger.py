@@ -85,7 +85,7 @@ RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-re
                "crates/adk-codec/src/value.rs",
                "fixtures/item-helpers/observations.json", "scripts/item-helpers-reference/run.py",
                "scripts/item-helpers-reference/reference_test.go",
-               "crates/adk-codec/tests/baseline.rs", "crates/adk-platform/src/codec.rs",
+               "crates/adk-codec/src/cost.rs", "crates/adk-codec/tests/baseline.rs", "crates/adk-platform/src/codec.rs",
                "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
                "crates/adk-codec/src/request_native.rs", "crates/adk-codec/tests/native_request_snapshot.rs",
                "scripts/trace-reference/request.go", "scripts/trace-reference/nonfinite.go",

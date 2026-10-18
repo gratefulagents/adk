@@ -127,3 +127,35 @@ fn snapshot_settings_codec_is_available_through_facade() {
         br#"{"temperature":-0,"max_tokens":7,"stop_sequences":["a"]}"#
     );
 }
+
+#[test]
+fn signed_cost_projection_is_available_without_runtime_accounting() {
+    use adk::codec::{
+        cost::estimate_result_cost,
+        dto::{ModelResponse, Usage},
+    };
+    let usage = Usage {
+        input_tokens: 2,
+        ..Default::default()
+    };
+    let responses = [ModelResponse {
+        usage: Usage {
+            input_tokens: -1,
+            ..Default::default()
+        },
+        cost_usd: -0.25,
+        cost_known: true,
+        ..Default::default()
+    }];
+    let callback_usage = std::cell::RefCell::new(None);
+    let price = |usage: &Usage| {
+        *callback_usage.borrow_mut() = Some(usage.clone());
+        (0.75, false)
+    };
+    assert_eq!(
+        estimate_result_cost(Some((&usage, &responses)), Some(&price)),
+        (0.5, false)
+    );
+    assert_eq!(callback_usage.borrow().as_ref().unwrap().input_tokens, 3);
+    assert_eq!(estimate_result_cost(None, Some(&price)), (0.0, false));
+}

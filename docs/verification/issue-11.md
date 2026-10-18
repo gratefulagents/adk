@@ -2,6 +2,31 @@
 
 ## Current continuation evidence
 
+### Lossless result-cost projection and usage group
+
+Added public `adk::codec::cost::estimate_result_cost` over borrowed signed Usage
+and response DTOs with an explicit optional pricing callback. It preserves SDK
+ordered prices, uncertainty, absent result/model behavior, wrapping accumulation
+and subtraction, residual clamps and callback conditions. Native runtime billing
+validation is unchanged; this separate compatibility path can return negative,
+infinite or NaN display prices and must not be used as billing validation.
+
+1,600 independently executed pinned Go cases compare result bits (NaNs by
+classification), certainty and exact callback usage/counts, including signed
+limits/overflow and all fallback forms. All21 previous runtime observations and11
+float-encoding observations remain unchanged. The complete cost.go file and usage
+group are manually closed under the documented callback/ownership adaptation;
+provider pricing and transport accounting remain separate obligations.
+
+An initial strict Clippy run rejected the nested callback signature; introducing
+the named borrowed CostEstimator type resolved it. Fresh final Rust1.88 Linux:
+**1,771 all-feature workspace +10 doctests passed;0 failed,30 ignored**. Complete
+codec suite, minimal facade regression, strict Clippy/typecheck/rustdoc/format,
+full facade matrix/standalone consumer/purity, all20 offline examples/host session,
+independent bound references, all56 validators, refreshed license artifact proof,
+overlay/audit and immutable source locks passed. Ledger: **1,107 verified /7,784
+unresolved /251 excluded**. Full retained acceptance is still incomplete.
+
 ### Mode verification-group closure
 
 Manually reviewed all91 constituent records of sdk::mode:72 APIs,12 defaults,

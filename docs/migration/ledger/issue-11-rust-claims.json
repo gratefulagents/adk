@@ -20204,6 +20204,62 @@
         "compat",
         "runtime"
       ]
+    },
+    "SDK-D942754BB910F2F3": {
+      "source": "internal/agent/cost.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/cost.rs::estimate_result_cost",
+        "crates/adk-codec/src/dto.rs::Usage::add",
+        "crates/adk-codec/src/dto.rs::Usage::total_tokens"
+      ],
+      "rust_test_identifiers": [
+        "signed_result_cost_matches_pinned_go_projection",
+        "signed_cost_projection_is_available_without_runtime_accounting",
+        "cost::tests::sdk_result_cost_matches_pinned_go_oracle"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostSumsResponseCosts",
+      "rationale": "Reviewed the complete1842-byte pure cost helper file: optional result/model handling, legacy CalculateCost versus EstimateCost certainty, ordered response accumulation, signed Usage accumulation, componentwise wrapping subtraction then max-zero, residual token/cache trigger and uncertainty propagation.1600 independently executed original-Go cases compare float bits (NaNs by classification), certainty and exact callback usage/counts across absent results, all four fallback states, signed limits/overflow, negative counters and zero/negative/nonfinite/overflowing prices. The original21 native runtime cases remain unchanged. The compatibility helper uses an explicit optional borrowed tuple and synchronous callback; legacy adapters return known=true instead of Go dynamic interface reflection. Inputs are borrowed, not mutated; no billing/provider dispatch occurs. This closes the pure source capability through the public compat facade, not Go pointer/interface identity or native accounting policy. Native accounting intentionally keeps its validation and unsigned counters, separate from this lossless projection.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BBB10D36D7BFA90F": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::Usage::add",
+        "crates/adk-codec/src/dto.rs::Usage::cache_create_tokens",
+        "crates/adk-codec/src/dto.rs::Usage::cache_read_tokens",
+        "crates/adk-codec/src/dto.rs::Usage::input_tokens",
+        "crates/adk-codec/src/dto.rs::Usage::output_tokens",
+        "crates/adk-codec/src/dto.rs::Usage::requests",
+        "crates/adk-codec/src/dto.rs::Usage::total_tokens",
+        "crates/adk-codec/src/dto.rs::Usage",
+        "crates/adk/src/lib.rs::codec",
+        "crates/adk-codec/src/cost.rs::estimate_result_cost",
+        "crates/adk-core/src/types.rs::RunMetrics",
+        "crates/adk-runtime/src/runner.rs::Engine::account_usage"
+      ],
+      "rust_test_identifiers": [
+        "signed_usage_arithmetic_matches_pinned_go",
+        "facade_signed_usage_matches_pinned_go",
+        "signed_result_cost_matches_pinned_go_projection",
+        "signed_cost_projection_is_available_without_runtime_accounting",
+        "cost::tests::sdk_result_cost_matches_pinned_go_oracle",
+        "cumulative_cost_sums_responses_without_losing_unknown_prices",
+        "generation_cost_distinguishes_unknown_zero_and_priced_retained_responses",
+        "cost_certainty_survives_resume_and_old_checkpoints_remain_unknown",
+        "summary_cost_uncertainty_is_preserved_in_cumulative_metrics"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestEstimateRunResultCostPropagatesUnknownCost",
+      "rationale": "Manual review of the complete usage verification group: all14 constituent records now have direct proof for signed Usage fields/arithmetic/type/alias, usage.go, cost.go, both original cost tests and their test file. The aggregate combines pinned signed arithmetic and overflow tests, the public standalone facade,1600 original-Go cost projections and existing native response/resume/compaction certainty regressions. Compatibility display projection preserves all floating prices and signed counters; runtime accounting retains its separate validation. This does not close provider pricing catalogs, provider transport usage accounting or enclosing RunResult codecs in their separate groups. No inferred closure from a shared module name, omitted IDs or Go interface/pointer identity claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime"
+      ]
     }
   }
 }

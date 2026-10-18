@@ -756,6 +756,84 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
 }
 
 #[test]
+fn full_capture_raw_json_matches_pinned_writer_bytes() {
+    use adk::codec::dto::{RawJson, ResponseSnapshot};
+    use std::collections::BTreeMap;
+    fn unhex(text: &str) -> Vec<u8> {
+        text.as_bytes()
+            .chunks_exact(2)
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect()
+    }
+    fn captured(path: &std::path::Path, category: &str, field: &str) -> Vec<u8> {
+        let text = fs::read_to_string(path.join(format!("{category}.jsonl"))).unwrap();
+        // RawValue avoids a recursive Value projection of depth-10,000 fields.
+        let record: BTreeMap<String, Box<serde_json::value::RawValue>> =
+            serde_json::from_str(text.trim()).unwrap();
+        record[field].get().as_bytes().to_vec()
+    }
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    let cases = fixture["raw_capture_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 38);
+    for (index, case) in cases.iter().enumerate() {
+        let root = tempfile::tempdir().unwrap();
+        let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+        let writer = TraceWriter::new(
+            store,
+            "run",
+            Options {
+                capture: CaptureMode::Full,
+                redactors: vec![Arc::new(|text| {
+                    text.replace("PRIVATE_CAPTURE", "[operator]")
+                })],
+            },
+        );
+        let path = writer
+            .init_run(&RunMetadata {
+                run_id: "run".into(),
+                ..Default::default()
+            })
+            .unwrap();
+        let input = unhex(case["input_hex"].as_str().unwrap());
+        writer.tool_start("agent", "Opaque", "call", &input, "");
+        assert!(
+            captured(&path, "tool_calls", "input")
+                == unhex(case["tool_capture_hex"].as_str().unwrap()),
+            "tool capture {index}"
+        );
+        let response = Snapshot::from_response(&ResponseSnapshot {
+            raw: RawJson::EncodedBytes(input),
+            raw_available: true,
+            ..Default::default()
+        });
+        assert_eq!(
+            response.is_ok(),
+            case["response_marshal_ok"].as_bool().unwrap(),
+            "marshal {index}"
+        );
+        if let Ok(response) = response {
+            writer.span_start(&Span::new(
+                "generation",
+                "run",
+                Some(SpanData::Generation(Box::new(Generation {
+                    response: Some(response),
+                    ..Default::default()
+                }))),
+            ));
+            for category in ["llm_calls", "spans"] {
+                assert!(
+                    captured(&path, category, "response")
+                        == unhex(case["response_capture_hex"].as_str().unwrap()),
+                    "response capture {index} in {category}"
+                );
+            }
+        }
+        assert_eq!(writer.health().write_errors, 0);
+    }
+}
+
+#[test]
 fn typed_snapshot_metadata_preserves_pinned_envelope_bytes() {
     use adk::codec::{
         dto::{RawJson, ResponseSnapshot},

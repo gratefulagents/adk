@@ -12,11 +12,34 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Map, Value, json};
 use sha2::{Digest, Sha256};
 use std::{
-    collections::HashMap,
+    collections::{BTreeMap, HashMap},
     path::PathBuf,
     sync::{Arc, LazyLock, Mutex},
     time::{Instant, SystemTime},
 };
+
+// Only explicitly captured top-level fields may override their placeholders.
+// RawValue serialization avoids recursively projecting deep JSON into Value.
+type RawFields = BTreeMap<&'static str, Box<serde_json::value::RawValue>>;
+struct CapturedRecord<'a> {
+    data: &'a Value,
+    raw: &'a RawFields,
+}
+impl Serialize for CapturedRecord<'_> {
+    fn serialize<S: serde::Serializer>(&self, serializer: S) -> Result<S::Ok, S::Error> {
+        use serde::ser::SerializeMap;
+        let fields = self.data.as_object().expect("trace record object");
+        let mut map = serializer.serialize_map(Some(fields.len()))?;
+        for (key, value) in fields {
+            if let Some(raw) = self.raw.get(key.as_str()) {
+                map.serialize_entry(key, raw)?;
+            } else {
+                map.serialize_entry(key, value)?;
+            }
+        }
+        map.end()
+    }
+}
 
 type Timestamp = DateTime<FixedOffset>;
 fn now() -> Timestamp {
@@ -344,22 +367,30 @@ impl State {
             digest(&adk_codec::snapshots::to_go_json(value).expect("serializable content"))
         }
     }
-    fn raw_content(&self, bytes: &[u8]) -> Value {
+    fn raw_content(&self, bytes: &[u8], key: &'static str, raw: &mut RawFields) -> Value {
         if self.options.capture == CaptureMode::Metadata {
             digest(bytes)
         } else {
-            serde_json::from_slice::<Value>(bytes)
-                .map(|value| self.sanitize(&value))
-                .unwrap_or_else(|_| json!(self.redact(&String::from_utf8_lossy(bytes))))
+            let bytes = adk_codec::value::redact_json(bytes, |text| self.redact(text));
+            let text = String::from_utf8(bytes).expect("encoded JSON is UTF-8");
+            raw.insert(
+                key,
+                serde_json::value::RawValue::from_string(text).expect("encoded JSON"),
+            );
+            Value::Null
         }
     }
-    fn append(&mut self, category: &str, mut data: Value) {
+    fn append(&mut self, category: &str, data: Value) {
+        self.append_captured(category, data, &RawFields::new());
+    }
+    fn append_captured(&mut self, category: &str, mut data: Value, raw: &RawFields) {
         if self.run_id.is_empty() {
             return;
         }
         data["schema_version"] = json!(TRACE_SCHEMA_VERSION);
         data["run_id"] = json!(self.run_id);
-        let bytes = adk_codec::snapshots::to_go_json(&data).expect("serializable trace record");
+        let bytes = adk_codec::snapshots::to_go_json(&CapturedRecord { data: &data, raw })
+            .expect("serializable trace record");
         let mut bytes = self
             .redact(std::str::from_utf8(&bytes).expect("JSON is UTF-8"))
             .into_bytes();
@@ -397,7 +428,7 @@ impl State {
             self.health.last_error = format!("write resolved instructions: {error}");
         }
     }
-    fn span_data(&self, data: &SpanData) -> Map<String, Value> {
+    fn span_data(&self, data: &SpanData, raw: &mut RawFields) -> Map<String, Value> {
         let mut value = serde_json::to_value(data).expect("serializable span");
         if let SpanData::Generation(generation) = data {
             value["input_tokens"] = json!(generation.prompt_tokens);
@@ -416,7 +447,7 @@ impl State {
                 ("response", &generation.response),
             ] {
                 if let Some(snapshot) = snapshot {
-                    value[key] = self.raw_content(&snapshot.bytes);
+                    value[key] = self.raw_content(&snapshot.bytes, key, raw);
                 }
             }
             if !generation.error.is_empty() {
@@ -469,14 +500,18 @@ impl State {
         } else {
             entry["timestamp"] = json!(span.start_time);
         }
+        let mut raw = RawFields::new();
         if let Some(data) = &span.data {
-            entry.as_object_mut().unwrap().extend(self.span_data(data));
+            entry
+                .as_object_mut()
+                .unwrap()
+                .extend(self.span_data(data, &mut raw));
         }
         if let Some(value) = invalid_cost {
             self.health.last_error =
                 format!("marshal spans entry: json: unsupported value: {value}");
         } else {
-            self.append("spans", entry.clone());
+            self.append_captured("spans", entry.clone(), &raw);
         }
         if let Some(SpanData::Generation(generation)) = &span.data {
             entry["type"] = json!(if ending {
@@ -493,7 +528,7 @@ impl State {
                 self.health.last_error =
                     format!("marshal llm_calls entry: json: unsupported value: {value}");
             } else {
-                self.append("llm_calls", entry);
+                self.append_captured("llm_calls", entry, &raw);
             }
             if !ending {
                 if let Some(instructions) = generation
@@ -581,7 +616,8 @@ impl TraceWriter {
         state
             .tools
             .insert(call_id.into(), (Instant::now(), agent.into()));
-        let mut entry = json!({"type":"tool_start", "call_id":call_id, "tool":tool, "agent":agent, "input":state.raw_content(input), "turn":state.turn, "timestamp":now()});
+        let mut raw = RawFields::new();
+        let mut entry = json!({"type":"tool_start", "call_id":call_id, "tool":tool, "agent":agent, "input":state.raw_content(input, "input", &mut raw), "turn":state.turn, "timestamp":now()});
         if !parent_call_id.is_empty() {
             entry["parent_call_id"] = json!(parent_call_id);
         }
@@ -596,7 +632,7 @@ impl TraceWriter {
                 }
             }
         }
-        state.append("tool_calls", entry);
+        state.append_captured("tool_calls", entry, &raw);
     }
     pub fn tool_end(
         &self,

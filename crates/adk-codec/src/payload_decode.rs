@@ -533,7 +533,7 @@ impl<'de> Deserialize<'de> for RunItemType {
 }
 
 // Scan only to protect raw spans. The JSON decoder remains the syntax authority.
-fn string_end(input: &[u8], start: usize) -> usize {
+pub(crate) fn string_end(input: &[u8], start: usize) -> usize {
     let mut i = start + 1;
     while i < input.len() {
         match input[i] {

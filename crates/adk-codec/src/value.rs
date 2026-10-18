@@ -1,4 +1,7 @@
-//! Bounded decoding of untyped SDK JSON values.
+//! Decoding and byte-oriented capture of untyped SDK JSON values.
+
+mod capture;
+pub use capture::redact_json;
 
 use serde::{Deserialize, Deserializer};
 use serde_json::{Map, Value, value::RawValue};

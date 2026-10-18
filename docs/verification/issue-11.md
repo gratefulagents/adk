@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Full-capture raw JSON projection
+
+Raw tool inputs and typed generation snapshots now use a flat, iterative JSON
+representation before capture. Parsing validates every duplicate value before
+redaction, rounds numbers through finite binary64, repairs strings with Go rules,
+and retains the last duplicate key. Encoding sorts keys and applies host-owned
+redactors to string values without recursively owning or traversing deep Values.
+Explicit top-level RawValue fields preserve the resulting bytes in trace records;
+there are no globally substituted tokens or raw overrides for arbitrary fields.
+
+The actual pinned Go writer adds 38 independent capture cases. Native tests
+compare exact persisted tool-input bytes for all 38 and response bytes in both
+spans and llm_calls for 32 marshalable snapshots. Coverage includes invalid UTF-8,
+unpaired surrogates, overflow/fallback, large-integer rounding, negative zero,
+operator/key-based redaction and array/object depths through 10,001. Go can encode
+a depth-10,000 raw field inside a deeper record that its whole-record decoder
+rejects; oracle extraction and native assertions therefore inspect raw fields
+without recursively decoding their enclosing records.
+
+Limitations remain explicit: six non-marshalable typed responses are rejected by
+the native constructor rather than reproducing Go fmt fallback. Host redactors
+receive native UTF-8 text; unchanged invalid-UTF8 fallback preserves Go escape
+spelling, while rewritten fallback is a native UTF-8 string. No whole trace or
+snapshot declaration is promoted. The ledger remains 1,330 verified /7,561
+unresolved /251 excluded.
+
 ### Typed trace metadata byte integration
 
 Trace snapshots now offer typed request/response constructors using the sealed
@@ -16,8 +42,9 @@ raw cases are rejected. This includes invalid raw UTF-8, duplicate keys, numeric
 lexical forms and the raw depth-10,000 boundary. Metadata capture no longer drops
 a valid typed snapshot merely because serde Value cannot represent it.
 
-Full-capture generic JSON projection still differs from Go binary64 decoding,
-Unicode repair and deep JSON handling; it is not promoted by this metadata test.
+At this checkpoint full-capture generic JSON projection still differed from Go
+binary64 decoding, Unicode repair and deep JSON handling; the later full-capture
+continuation above addresses those paths with separately executed writer cases.
 Whole snapshot declarations and complete trace compatibility remain unresolved.
 
 ### Shared lossless snapshot settings

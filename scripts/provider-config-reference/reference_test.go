@@ -18,6 +18,9 @@ func TestNativeProviderConfigReference(t *testing.T) {
 	inputs := []string{
 		`{}`,
 		`{"provider":"local"}`,
+		`{"provider":"copilot"}`,
+		`{"provider":"multi","default_provider":"copilot","api_key":"fixture-copilot"}`,
+		`{"provider":"anthropic","api_key":"parent","routes":[{"provider":"copilot","prefix":"team","api_key":"fixture-copilot","base_url":"https://custom.example/v1"}]}`,
 		`{"provider":" XAI "}`,
 		`{"provider":"multi"}`,
 		`{"provider":"multi","default_provider":" ANTHROPIC ","model":"openrouter/a/b","api_key":" top ","base_url":" https://example.test/v1 ","auth_mode":"oauth"}`,
@@ -55,6 +58,10 @@ func TestNativeProviderConfigReference(t *testing.T) {
 		protocol := apiModeForProvider(spec, kind, defaultOpenAICompatibleAPIMode(kind, false))
 		auth := "api-key"
 		switch kind {
+		case "copilot":
+			protocol = "copilot"
+			auth = "copilot"
+			base = firstNonEmpty(base, defaultCopilotBaseURL)
 		case "openai":
 			protocol = apiModeForProvider(spec, kind, "")
 			if base == "" || base == DefaultCodexBackendBaseURL {
@@ -72,7 +79,7 @@ func TestNativeProviderConfigReference(t *testing.T) {
 			base = firstNonEmpty(base, defaultBaseURLForProvider(kind))
 			key = firstNonEmpty(key, defaultAPIKeyForProvider(kind))
 		}
-		if kind != "anthropic" && strings.ToLower(strings.TrimSpace(protocol)) != "chat-completions" {
+		if kind != "anthropic" && kind != "copilot" && strings.ToLower(strings.TrimSpace(protocol)) != "chat-completions" {
 			protocol = "responses"
 		} else {
 			protocol = strings.ToLower(strings.TrimSpace(protocol))
@@ -103,7 +110,7 @@ func TestNativeProviderConfigReference(t *testing.T) {
 		kinds := []string{kind}
 		if kind == "multi" || len(spec.Routes) > 0 {
 			def = defaultProviderForSpec(spec)
-			kinds = []string{"openai", "anthropic", "openrouter", "gemini", "groq", "xai", "local"}
+			kinds = []string{"openai", "anthropic", "openrouter", "gemini", "groq", "xai", "local", "copilot"}
 		}
 		routes := map[string]map[string]any{}
 		for _, k := range kinds {
@@ -182,7 +189,7 @@ func TestNativeProviderConfigReference(t *testing.T) {
 		_, err := NewProviderFromConfig(spec)
 		errors[name] = err != nil
 	}
-	result := map[string]any{"schema_version": 1, "cases": cases, "wire": wire, "errors": errors, "fallbacks": nativeFallbackObservations(t)}
+	result := map[string]any{"schema_version": 1, "cases": cases, "wire": wire, "errors": errors, "fallbacks": nativeFallbackObservations(t), "copilot": nativeCopilotObservations(t)}
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

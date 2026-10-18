@@ -54,7 +54,7 @@ pub struct ResolvedConfig {
     pub routes: Vec<ResolvedRoute>,
 }
 
-const CANONICAL: [Kind; 7] = [
+const CANONICAL: [Kind; 8] = [
     Kind::OpenAi,
     Kind::Anthropic,
     Kind::OpenRouter,
@@ -62,26 +62,17 @@ const CANONICAL: [Kind; 7] = [
     Kind::Groq,
     Kind::Xai,
     Kind::Local,
+    Kind::Copilot,
 ];
 
 fn normalize(value: &str) -> String {
     value.trim().to_ascii_lowercase()
 }
 
-fn supported_kind(value: &str) -> Result<Kind, Error> {
-    let kind: Kind = value.parse()?;
-    if kind == Kind::Copilot {
-        return Err(crate::invalid(
-            "Copilot configuration is unsupported by this resolver",
-        ));
-    }
-    Ok(kind)
-}
-
 fn normalized(values: &BTreeMap<String, String>) -> Result<BTreeMap<String, String>, Error> {
     let mut result = BTreeMap::new();
     for (key, value) in values {
-        let key = supported_kind(key)?.name().to_owned();
+        let key = key.parse::<Kind>()?.name().to_owned();
         if result.insert(key, value.trim().to_owned()).is_some() {
             return Err(crate::invalid(
                 "ambiguous normalized provider override keys",
@@ -111,7 +102,7 @@ impl Config {
         let kind = if provider.is_empty() || provider == "multi" {
             Kind::OpenAi
         } else {
-            supported_kind(&provider)?
+            provider.parse::<Kind>()?
         };
         // Go spreads these values across canonical legs when Provider is empty.
         // Reject ambiguity instead of widening secret scope.
@@ -140,10 +131,10 @@ impl Config {
         let modes = normalized(&self.provider_api_modes)?;
         let auth = normalized(&self.provider_auth_modes)?;
         for (provider, mode) in &auth {
-            auth_mode(supported_kind(provider)?, mode)?;
+            auth_mode(provider.parse()?, mode)?;
         }
         for (provider, mode) in &modes {
-            api_mode(supported_kind(provider)?, mode)?;
+            api_mode(provider.parse()?, mode)?;
         }
         let mut routes = BTreeMap::new();
         for kind in if multi {
@@ -172,7 +163,7 @@ impl Config {
             if route.provider.trim().is_empty() || normalize(&route.provider) == "multi" {
                 return Err(crate::invalid("named route requires a non-multi provider"));
             }
-            let kind = supported_kind(&route.provider)?;
+            let kind = route.provider.parse::<Kind>()?;
             let prefix = if route.prefix.trim().is_empty() {
                 kind.name().to_owned()
             } else {
@@ -188,11 +179,6 @@ impl Config {
             )?;
             routes.insert(prefix, resolved);
         }
-        if default == "copilot" && !routes.contains_key(&default) {
-            return Err(crate::invalid(
-                "Copilot configuration is unsupported by this resolver",
-            ));
-        }
         Ok(ResolvedConfig {
             default,
             routes: routes.into_values().collect(),
@@ -202,6 +188,7 @@ impl Config {
 
 fn auth_mode(kind: Kind, value: &str) -> Result<AuthMode, Error> {
     match normalize(value).as_str() {
+        "" | "api-key" | "api_key" | "oauth" if kind == Kind::Copilot => Ok(AuthMode::CopilotOAuth),
         "" | "api-key" | "api_key" => Ok(AuthMode::ApiKey),
         "oauth" if kind == Kind::Anthropic => Ok(AuthMode::AnthropicOAuth),
         _ => Err(crate::invalid(
@@ -213,8 +200,12 @@ fn auth_mode(kind: Kind, value: &str) -> Result<AuthMode, Error> {
 fn api_mode(kind: Kind, value: &str) -> Result<Protocol, Error> {
     match normalize(value).as_str() {
         "" => Ok(kind.protocol()),
-        "auto" | "responses" if kind != Kind::Anthropic => Ok(Protocol::Responses),
-        "chat-completions" if kind != Kind::Anthropic => Ok(Protocol::Chat),
+        "auto" | "responses" if !matches!(kind, Kind::Anthropic | Kind::Copilot) => {
+            Ok(Protocol::Responses)
+        }
+        "chat-completions" if !matches!(kind, Kind::Anthropic | Kind::Copilot) => {
+            Ok(Protocol::Chat)
+        }
         _ => Err(crate::invalid("unsupported provider API mode")),
     }
 }
@@ -231,7 +222,7 @@ fn resolve_route(
     let protocol = api_mode(kind, api)?;
     let mut spec = RouteSpec::new(kind, mode);
     spec.prefix = Some(prefix.to_owned());
-    spec.protocol = Some(protocol);
+    spec.protocol = (kind != Kind::Copilot).then_some(protocol);
     spec.endpoint = Some(
         if endpoint.is_empty()
             || (kind == Kind::OpenAi && endpoint == Kind::OpenAi.endpoint(AuthMode::OpenAiOAuth))

@@ -23,6 +23,7 @@ def main():
     env = dict(os.environ, GOROOT=os.environ.get('GOROOT', '/usr/local/go'),
                GOTOOLCHAIN='local', GOTELEMETRY='off', GOWORK='off',
                GOFLAGS='-mod=readonly', GOARCH='amd64', CGO_ENABLED='0')
+    env['GRATEFULAGENTS_COPILOT_CHAT_COMPLETIONS'] = ''
     env.setdefault('GOCACHE', '/workspace/scratch/go-cache')
     env.setdefault('GOMODCACHE', '/workspace/scratch/go/pkg/mod')
     go = str(Path(env['GOROOT']) / 'bin/go')
@@ -31,8 +32,8 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ['pkg/agentsdk/providers/factory.go', 'pkg/agentsdk/providers/factory_test.go', 'pkg/agentsdk/providers/audit_fixes_test.go', 'internal/openai/client.go', 'internal/anthropic/client.go', 'go.mod', 'go.sum']
-        harness = ['scripts/provider-config-reference/run.py', 'scripts/provider-config-reference/reference_test.go', 'scripts/provider-config-reference/fallback_test.go']
+        paths = ['pkg/agentsdk/providers/factory.go', 'pkg/agentsdk/providers/factory_test.go', 'pkg/agentsdk/providers/factory_copilot_test.go', 'pkg/agentsdk/providers/audit_fixes_test.go', 'internal/openai/client.go', 'internal/anthropic/client.go', 'go.mod', 'go.sum']
+        harness = ['scripts/provider-config-reference/run.py', 'scripts/provider-config-reference/reference_test.go', 'scripts/provider-config-reference/fallback_test.go', 'scripts/provider-config-reference/copilot_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk',
             'commit': SHA,
@@ -46,6 +47,7 @@ def main():
         }
         shutil.copyfile(ROOT / harness[1], source / 'pkg/agentsdk/providers/native_provider_config_reference_test.go')
         shutil.copyfile(ROOT / harness[2], source / 'pkg/agentsdk/providers/native_provider_fallback_reference_test.go')
+        shutil.copyfile(ROOT / harness[3], source / 'pkg/agentsdk/providers/native_copilot_config_reference_test.go')
         output = source / 'provider-config-observations.json'
         env['PROVIDER_CONFIG_OUTPUT'] = str(output)
         execution = subprocess.run(

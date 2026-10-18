@@ -31,6 +31,185 @@
       ]
     },
     {
+      "default": "copilot",
+      "input": {
+        "provider": "copilot"
+      },
+      "routes": [
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        }
+      ]
+    },
+    {
+      "default": "copilot",
+      "input": {
+        "api_key": "fixture-copilot",
+        "default_provider": "copilot",
+        "provider": "multi"
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "fixture-copilot",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
+      "default": "anthropic",
+      "input": {
+        "api_key": "parent",
+        "provider": "anthropic",
+        "routes": [
+          {
+            "api_key": "fixture-copilot",
+            "base_url": "https://custom.example/v1",
+            "prefix": "team",
+            "provider": "copilot"
+          }
+        ]
+      },
+      "routes": [
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.anthropic.com",
+          "key": "parent",
+          "kind": "anthropic",
+          "prefix": "anthropic",
+          "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
+          "key": "",
+          "kind": "gemini",
+          "prefix": "gemini",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.groq.com/openai/v1",
+          "key": "",
+          "kind": "groq",
+          "prefix": "groq",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "http://localhost:11434/v1",
+          "key": "local-key",
+          "kind": "local",
+          "prefix": "local",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.openai.com/v1",
+          "key": "",
+          "kind": "openai",
+          "prefix": "openai",
+          "protocol": "responses"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://openrouter.ai/api/v1",
+          "key": "",
+          "kind": "openrouter",
+          "prefix": "openrouter",
+          "protocol": "chat-completions"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://custom.example/v1",
+          "key": "fixture-copilot",
+          "kind": "copilot",
+          "prefix": "team",
+          "protocol": "copilot"
+        },
+        {
+          "auth": "api-key",
+          "endpoint": "https://api.x.ai/v1",
+          "key": "",
+          "kind": "xai",
+          "prefix": "xai",
+          "protocol": "responses"
+        }
+      ]
+    },
+    {
       "default": "xai",
       "input": {
         "provider": " XAI "
@@ -59,6 +238,14 @@
           "kind": "anthropic",
           "prefix": "anthropic",
           "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
         },
         {
           "auth": "api-key",
@@ -130,6 +317,14 @@
           "protocol": "anthropic"
         },
         {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
           "auth": "api-key",
           "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
           "key": "",
@@ -195,6 +390,14 @@
           "kind": "anthropic",
           "prefix": "anthropic",
           "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
         },
         {
           "auth": "api-key",
@@ -266,6 +469,14 @@
           "kind": "anthropic",
           "prefix": "anthropic",
           "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
         },
         {
           "auth": "api-key",
@@ -354,6 +565,14 @@
           "protocol": "anthropic"
         },
         {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
           "auth": "api-key",
           "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
           "key": "",
@@ -431,6 +650,14 @@
           "protocol": "anthropic"
         },
         {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
           "auth": "api-key",
           "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
           "key": "",
@@ -498,6 +725,14 @@
           "kind": "anthropic",
           "prefix": "anthropic",
           "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
         },
         {
           "auth": "api-key",
@@ -568,6 +803,14 @@
           "protocol": "anthropic"
         },
         {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
           "auth": "api-key",
           "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
           "key": "",
@@ -635,6 +878,14 @@
           "kind": "anthropic",
           "prefix": "anthropic",
           "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
         },
         {
           "auth": "api-key",
@@ -720,6 +971,14 @@
           "protocol": "anthropic"
         },
         {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
           "auth": "api-key",
           "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
           "key": "",
@@ -795,6 +1054,14 @@
           "kind": "anthropic",
           "prefix": "anthropic",
           "protocol": "anthropic"
+        },
+        {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
         },
         {
           "auth": "api-key",
@@ -888,6 +1155,14 @@
           "protocol": "anthropic"
         },
         {
+          "auth": "copilot",
+          "endpoint": "https://api.individual.githubcopilot.com",
+          "key": "",
+          "kind": "copilot",
+          "prefix": "copilot",
+          "protocol": "copilot"
+        },
+        {
           "auth": "api-key",
           "endpoint": "https://generativelanguage.googleapis.com/v1beta/openai",
           "key": "",
@@ -936,6 +1211,38 @@
           "protocol": "responses"
         }
       ]
+    }
+  ],
+  "copilot": [
+    {
+      "api_version": "2026-06-01",
+      "authorization": "Bearer fixture-copilot",
+      "content_type": "application/json",
+      "input_model": "gpt-4.1",
+      "integration": "vscode-chat",
+      "model": "gpt-4.1",
+      "path": "/v1/chat/completions",
+      "reply": "{\"id\":\"fixture\",\"model\":\"gpt-4.1\",\"choices\":[{\"index\":0,\"message\":{\"role\":\"assistant\",\"content\":\"ok\"},\"finish_reason\":\"stop\"}],\"usage\":{\"prompt_tokens\":1,\"completion_tokens\":1}}"
+    },
+    {
+      "api_version": "2026-06-01",
+      "authorization": "Bearer fixture-copilot",
+      "content_type": "text/event-stream",
+      "input_model": "gpt-5.2",
+      "integration": "vscode-chat",
+      "model": "gpt-5.2",
+      "path": "/v1/responses",
+      "reply": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp_1\",\"model\":\"gpt-5.2\",\"usage\":{\"input_tokens\":1}}}\n\ndata: {\"type\":\"response.content_part.added\",\"output_index\":0,\"part\":{\"type\":\"output_text\"}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"delta\":\"ok\"}\n\ndata: {\"type\":\"response.output_text.done\",\"output_index\":0}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp_1\",\"model\":\"gpt-5.2\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1},\"output\":[]}}\n\ndata: [DONE]\n\n"
+    },
+    {
+      "api_version": "2026-06-01",
+      "authorization": "Bearer fixture-copilot",
+      "content_type": "application/json",
+      "input_model": "claude-opus-4.8",
+      "integration": "vscode-chat",
+      "model": "claude-opus-4.8",
+      "path": "/v1/messages",
+      "reply": "{\"id\":\"msg_1\",\"type\":\"message\",\"role\":\"assistant\",\"model\":\"claude-opus-4.8\",\"content\":[{\"type\":\"text\",\"text\":\"ok\"}],\"stop_reason\":\"end_turn\",\"usage\":{\"input_tokens\":1,\"output_tokens\":1}}"
     }
   ],
   "errors": {
@@ -1037,9 +1344,10 @@
     "goOS": "linux",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
+      "scripts/provider-config-reference/copilot_test.go": "8ea5dbd61b3e6cc0ef9061953c60a8bc4767893388f3efde82f3fea27615065b",
       "scripts/provider-config-reference/fallback_test.go": "a00dca2bd5655f6ae15a7c58172c953e3d7a02047ebd7273cd9f58e659de4cc4",
-      "scripts/provider-config-reference/reference_test.go": "09c7812a5fd0dec2b8a96352b14ff217fbdf570a5a9d877ef45c4551f939420d",
-      "scripts/provider-config-reference/run.py": "9a03e91a6171ee7647cdbc0c29be9ee002bd537717ae4ea839625062a9e19dd7"
+      "scripts/provider-config-reference/reference_test.go": "1e1b1d63d868e7edf0f4ec8ac1a578ae15f3a4f2c45b199158465abc735a5f7d",
+      "scripts/provider-config-reference/run.py": "e0c980e922b3f9ec0b1c0878215dccaaa8db83cc46327713c81af37b7d6298f3"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",
@@ -1050,6 +1358,7 @@
       "internal/openai/client.go": "a306feeaad2929f44bd63700b41931e2ecf05d794f64b12a4e8172c843c0f68a",
       "pkg/agentsdk/providers/audit_fixes_test.go": "c8942ecc70a539c0586b29eb1a105f594f788fcd140ee307163724aaccc80f03",
       "pkg/agentsdk/providers/factory.go": "3cff648f22544444882583b0134fb4c7da1f3582310457b4fb9ac764fd009b79",
+      "pkg/agentsdk/providers/factory_copilot_test.go": "a5dfc7d211db95800ed77f8d6bd230d804030bf2e8d83e7a4941db10cd1f16e3",
       "pkg/agentsdk/providers/factory_test.go": "b0da0d150f03dae84ee8e688a357504e3c0bbbd40ddfa42f6850d293d0f5a580"
     }
   },

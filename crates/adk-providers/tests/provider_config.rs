@@ -9,6 +9,8 @@ use std::{
     time::Duration,
 };
 
+#[path = "provider_config/copilot.rs"]
+mod copilot;
 #[path = "provider_config/fallbacks.rs"]
 mod fallbacks;
 
@@ -34,8 +36,8 @@ fn pinned_configuration_observations() {
             let scope = route.spec.scope().unwrap();
             json!({"prefix": scope.route, "kind": route.spec.kind.name(), "endpoint": scope.endpoint,
                 "key": route.api_key.as_ref().map_or("", Secret::expose),
-                "auth": if scope.mode == AuthMode::AnthropicOAuth { "oauth" } else { "api-key" },
-                "protocol": match route.spec.protocol.unwrap() { Protocol::Chat => "chat-completions", Protocol::Responses => "responses", Protocol::Anthropic => "anthropic" }})
+                "auth": match scope.mode { AuthMode::AnthropicOAuth => "oauth", AuthMode::CopilotOAuth => "copilot", _ => "api-key" },
+                "protocol": match route.spec.protocol { Some(Protocol::Chat) => "chat-completions", Some(Protocol::Responses) => "responses", Some(Protocol::Anthropic) => "anthropic", None => "copilot" }})
         }).collect();
         assert_eq!(json!(routes), case["routes"]);
     }
@@ -44,7 +46,7 @@ fn pinned_configuration_observations() {
 #[test]
 fn unsupported_and_ambiguous_inputs_are_explicit_and_redacted() {
     for input in [
-        json!({"provider":"copilot"}),
+        json!({"provider":"copilot","api_mode":"responses"}),
         json!({"provider":"bogus"}),
         json!({"routes":[{"prefix":"missing"}]}),
         json!({"routes":[{"provider":"multi"}]}),
@@ -53,11 +55,10 @@ fn unsupported_and_ambiguous_inputs_are_explicit_and_redacted() {
         json!({"provider":"groq","auth_mode":"oauth"}),
         json!({"provider":"anthropic","provider_auth_modes":{"openai":"oauth"}}),
         json!({"provider":"anthropic","provider_api_modes":{"groq":"typo"}}),
-        json!({"provider":"multi","default_provider":"copilot"}),
         json!({"provider":"openai","api_mode":"typo"}),
         json!({"provider":"anthropic","api_mode":"responses"}),
         json!({"provider_api_keys":{"OpenAI":"one"," openai ":"two"}}),
-        json!({"provider_api_keys":{"copilot":"unsupported"}}),
+        json!({"provider_api_keys":{"unknown":"unsupported"}}),
         json!({"api_key":"do-not-print-secret","routes":[{"provider":"anthropic"}]}),
         json!({"base_url":"http://external.test"}),
         json!({"base_url":"https://user:do-not-print-secret@example.test"}),

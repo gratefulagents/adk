@@ -10,7 +10,12 @@ instances do not inherit parent credentials or endpoints; selected scopes acquir
 credentials lazily. Ambiguous empty-provider configurations that would spread
 parent settings across canonical Go legs are rejected, not silently treated as
 source-equivalent behavior. Unsupported credential-file/OAuth acquisition
-and Copilot configuration remain explicit limitations. A follow-up adds configured
+and declarative Copilot token exchange remain explicit limitations. Static,
+host-owned Copilot bearer configuration now composes with the existing native
+model-family router. Three additional pinned Go and native loopback calls verify
+Chat, Responses and Messages selection, exact scoped bearer/integration headers,
+and deferred missing credentials. No credential-file acquisition or force-chat
+environment behavior is claimed. A follow-up adds configured
 fallback lists to canonical OpenRouter only, with nine independent Go loopback
 observations and native completion/stream request checks. Named routes and other
 providers do not inherit these lists; Responses requests omit the extension.
@@ -20,7 +25,7 @@ The immutable Go oracle in `scripts/provider-config-reference` compares supporte
 configuration projections and real loopback named-route requests. Independent
 Rust checks cover the resolver, request headers and opaque gateway model IDs,
 lazy scoped credential acquisition, actual facade Builder execution, and the
-providers-only facade without builder/runtime features. Eight targeted tests
+providers-only facade without builder/runtime features. Ten targeted tests
 passed, followed by a full Rust 1.88 workspace test run and strict workspace
 Clippy. This is not a live-provider check or complete `ProviderSpec`/factory
 closure. No additional ledger entries are promoted by this implementation slice.

@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Mode verification-group closure
+
+Manually reviewed all91 constituent records of sdk::mode:72 APIs,12 defaults,
+three files, one data-only package, two original tests and one subtest record.
+Their independently verified codec, routing and original-regression proofs now
+support the aggregate group claim. This is not automatic propagation from a
+module name: the combined evidence includes template/state/byte cases,294 routing
+inputs with1,764 top/role results and72 settings combinations. Existing owned-label
+and data-only template boundaries remain; provider construction, builder application
+and runtime constraint enforcement remain separate obligations.
+
+Fresh bound native tests and independently reproduced Go references, all56
+validators, separate artifact proof, overlay/audit and immutable source locks
+passed. Production code is unchanged from439b711, whose1,769 workspace +10 docs,
+strict lint/docs/format, full matrix/consumer and20 offline examples passed.
+Ledger: **1,105 verified /7,786 unresolved /251 excluded**. The mode group is
+closed; full retained issue acceptance remains incomplete.
+
 ### Analysis snapshot settings decoding
 
 Fixed the separate analysis ModelSettings representation to accept folded keys,

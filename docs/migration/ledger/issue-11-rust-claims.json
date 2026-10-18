@@ -20161,6 +20161,49 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-F7CD5C0C9BFBEA39": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ModeReasoningLevel",
+        "crates/adk-codec/src/dto.rs::ModeTextVerbosity",
+        "crates/adk-codec/src/dto.rs::ModeRouting",
+        "crates/adk-codec/src/dto.rs::ModeRoleRouting",
+        "crates/adk-codec/src/mode.rs::ModeRoutingResolution",
+        "crates/adk-codec/src/mode.rs::resolve_mode_routing",
+        "crates/adk-codec/src/mode.rs::resolve_role_mode_routing",
+        "crates/adk-codec/src/mode.rs::resolve_fallbacks",
+        "crates/adk-runtime/src/settings.rs::reasoning_settings",
+        "crates/adk-runtime/src/settings.rs::verbosity_settings",
+        "crates/adk-runtime/src/settings.rs::routing_settings",
+        "crates/adk-codec/src/dto.rs::ModeTemplateSpec",
+        "crates/adk-codec/src/dto.rs::ModeConstraints",
+        "crates/adk-codec/src/payload_decode.rs::from_go_json",
+        "crates/adk-codec/src/payload_decode.rs::to_go_json_bytes"
+      ],
+      "rust_test_identifiers": [
+        "pinned_mode_codec_oracle",
+        "pinned_mode_and_role_routing_oracle",
+        "named_mode_labels_preserve_constants_unknown_values_and_string_identity",
+        "named_mode_labels_flow_into_native_routing_settings",
+        "routing_labels_and_budgets_match_independently_executed_sdk_helpers",
+        "original_mode_reasoning_settings_regression",
+        "original_resolve_role_mode_routing_regression",
+        "explicit_none_clears_budget_and_blank_fallback_entries_clear_inheritance",
+        "routing_results_own_fallbacks_and_do_not_share_mutations",
+        "pointer_objects_merge_and_null_resets_them",
+        "repeated_pointer_objects_retain_slice_backing_slots",
+        "maps_merge_but_each_key_value_decodes_from_zero",
+        "mode_nil_empty_and_zero_fields_have_exact_go_bytes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestResolveRoleModeRouting",
+      "rationale": "Manual closure review of the sdk::mode verification group, not automatic propagation from a shared module name. All91 constituent records have independently bound claims:72 API declarations,12 branch defaults,3 files,1 data-only package,2 original tests and1 subtest record. Rechecked the template data source, full routing file review and both original regression assertions. The aggregate combines exact mode/template/settings byte and state checks,294 routing inputs with1764 top/role outcomes,72 settings combinations, original source regression counterparts and ownership/isolation regressions. It retains each constituent boundary: owned valid-UTF8 labels instead of Go any/fmt.Sprint, explicit compatibility DTOs and no Go pointer alias identity. Mode template fields are data contracts; provider construction, builder application and runtime constraint enforcement belong to their separate groups and are not closed here. No constituent acceptance ID is excluded or silently removed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime"
+      ]
     }
   }
 }

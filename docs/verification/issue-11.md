@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### Nullable analysis snapshot slices
+
+Request input/tool arrays, response item/text/reasoning/tool arrays and run-item
+message-image arrays now use `Option<Vec<_>>`, preserving nil versus allocated
+empty while retaining Go omitempty serialization. Existing GoSlice machinery
+owns null/empty resets and duplicate-field updates. Native builders produce nil
+for empty collections as the pinned builders do; execution/restart adapters
+explicitly project optional image lists into their existing native Vec fields.
+
+Independent Go observations now record nil state for 38 accepted request records
+and 58 accepted response records, alongside unchanged encoded-byte assertions.
+Four additional request cases cover allocated-empty arrays and reuse/reset.
+Actual builder observations cover five request variants and four response variants;
+Rust checks four ordinary native requests and all four response variants. The
+minimal compat-only facade checks the 96 accepted field-record nil states too.
+
+This is not whole envelope closure. Nested ToolOutputData image representation
+and retained nested-array decoder state still require their own audit; snapshot
+helper functions and full trace fallback contracts remain unresolved. No new
+acceptance IDs are promoted by these representation changes.
+
 ### Full-capture raw JSON projection
 
 Raw tool inputs and typed generation snapshots now use a flat, iterative JSON

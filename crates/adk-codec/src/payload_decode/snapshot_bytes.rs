@@ -147,10 +147,10 @@ impl Document for RequestSnapshot {
         &mut self,
         visit: &mut impl FnMut(&mut RawJson) -> Result<(), serde_json::Error>,
     ) -> Result<(), serde_json::Error> {
-        for item in &mut self.input_items {
+        for item in self.input_items.iter_mut().flatten() {
             visit_raw(item, &mut *visit)?;
         }
-        for tool in &mut self.tools {
+        for tool in self.tools.iter_mut().flatten() {
             visit(&mut tool.input_schema)?;
         }
         if let Some(schema) = &mut self.output_schema {
@@ -166,10 +166,10 @@ impl Document for ResponseSnapshot {
         &mut self,
         visit: &mut impl FnMut(&mut RawJson) -> Result<(), serde_json::Error>,
     ) -> Result<(), serde_json::Error> {
-        for item in &mut self.items {
+        for item in self.items.iter_mut().flatten() {
             visit_raw(item, &mut *visit)?;
         }
-        for call in &mut self.tool_calls {
+        for call in self.tool_calls.iter_mut().flatten() {
             visit(&mut call.input)?;
         }
         visit(&mut self.raw)

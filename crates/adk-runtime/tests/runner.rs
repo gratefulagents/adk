@@ -3010,13 +3010,17 @@ async fn generation_snapshots_use_actual_attempts_and_declared_timeouts_without_
             if known {
                 let snapshot = record.request_snapshot.as_ref().unwrap();
                 assert_eq!(snapshot.model, if index < 2 { "primary" } else { "backup" });
-                assert_eq!(snapshot.tools[0].timeout_seconds, 7);
+                assert_eq!(snapshot.tools.as_ref().unwrap()[0].timeout_seconds, 7);
                 assert_eq!(
                     snapshot.total_token_estimate,
                     snapshot.input_token_estimate + snapshot.request_overhead_token_estimate
                 );
                 assert!(snapshot.input_token_estimate > 0);
-                assert!(snapshot.input_items[0].agent_name.is_empty());
+                assert!(
+                    snapshot.input_items.as_ref().unwrap()[0]
+                        .agent_name
+                        .is_empty()
+                );
                 assert_eq!(
                     snapshot,
                     &adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(

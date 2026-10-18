@@ -82,7 +82,12 @@ pub fn replay(operation: &str, input: &Value) -> Result<Value, Error> {
         match item.kind {
             SnapshotType::Message => {
                 out.message = Some(MessageOutput {
-                    text: if item.message_text.is_empty() && !item.message_images.is_empty() {
+                    text: if item.message_text.is_empty()
+                        && item
+                            .message_images
+                            .as_ref()
+                            .is_some_and(|images| !images.is_empty())
+                    {
                         "[image attachment omitted from restart snapshot]".into()
                     } else {
                         item.message_text

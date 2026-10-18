@@ -6,7 +6,10 @@ fn repeated_snapshot_images_retain_hidden_nonempty_slots() {
     let snapshot: RequestSnapshot = serde_json::from_str(
         r#"{"input_items":[{"message_images":[{"media_type":"image/png","data":"one"},{"media_type":"image/jpeg","data":"two"}],"MESSAGE_IMAGES":[{}],"message_images":[null,null]}]}"#,
     ).unwrap();
-    let images = &snapshot.input_items[0].message_images;
+    let images = snapshot.input_items.as_ref().unwrap()[0]
+        .message_images
+        .as_ref()
+        .unwrap();
     assert_eq!(images.len(), 2);
     assert_eq!(images[0].media_type, "image/png");
     assert_eq!(images[0].data, "one");
@@ -27,6 +30,16 @@ fn request_snapshot_field_records_match_independent_pinned_go() {
             "{input}: {decoded:?}"
         );
         if let Ok(snapshot) = decoded {
+            assert_eq!(
+                serde_json::json!({
+                    "input_items": snapshot.input_items.is_none(),
+                    "tools": snapshot.tools.is_none(),
+                    "stop_sequences": snapshot.settings.stop_sequences.is_none(),
+                    "message_images": snapshot.input_items.iter().flatten().map(|item| item.message_images.is_none()).collect::<Vec<_>>()
+                }),
+                case["nil_slices"],
+                "nil slices: {input}"
+            );
             assert_eq!(
                 adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
                 case["encoded"].as_str().unwrap().as_bytes(),
@@ -153,11 +166,11 @@ fn raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
     let schema = serde_json::from_str(fixture["raw_input_schema"].as_str().unwrap()).unwrap();
     let snapshot = RequestSnapshot {
-        tools: vec![ToolSnapshot {
+        tools: Some(vec![ToolSnapshot {
             name: "raw".into(),
             input_schema: schema,
             ..Default::default()
-        }],
+        }]),
         ..Default::default()
     };
     let expected = fixture["raw_request_json"].as_str().unwrap();
@@ -168,7 +181,11 @@ fn raw_json_preserves_order_duplicate_keys_and_numbers_but_compacts_and_escapes_
 fn raw_json_null_remains_distinct_from_missing_schema() {
     let explicit = r#"{"tools":[{"name":"raw","input_schema":null,"read_only":false,"needs_approval":false}],"settings":{},"output_schema":{"name":"output","schema":null,"strict":false}}"#;
     let snapshot: RequestSnapshot = serde_json::from_str(explicit).unwrap();
-    assert!(!snapshot.tools[0].input_schema.is_missing());
+    assert!(
+        !snapshot.tools.as_ref().unwrap()[0]
+            .input_schema
+            .is_missing()
+    );
     assert_eq!(
         adk_codec::snapshots::to_go_json(&snapshot).unwrap(),
         explicit.as_bytes()

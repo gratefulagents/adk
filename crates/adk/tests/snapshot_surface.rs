@@ -10,6 +10,45 @@ use adk::codec::{
     to_go_json_bytes,
 };
 
+#[test]
+fn public_snapshot_slice_state_matches_pinned_go() {
+    use serde_json::{Value, json};
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
+    for case in fixture["request_record_cases"].as_array().unwrap() {
+        if case["accepted"] != true {
+            continue;
+        }
+        let snapshot: RequestSnapshot =
+            from_go_json(case["input"].as_str().unwrap().as_bytes()).unwrap();
+        assert_eq!(
+            json!({
+                "input_items": snapshot.input_items.is_none(),
+                "tools": snapshot.tools.is_none(),
+                "stop_sequences": snapshot.settings.stop_sequences.is_none(),
+                "message_images": snapshot.input_items.iter().flatten().map(|item| item.message_images.is_none()).collect::<Vec<_>>()
+            }),
+            case["nil_slices"]
+        );
+    }
+    for case in fixture["response_record_cases"].as_array().unwrap() {
+        if case["accepted"] != true {
+            continue;
+        }
+        let snapshot: ResponseSnapshot =
+            from_go_json(case["input"].as_str().unwrap().as_bytes()).unwrap();
+        assert_eq!(
+            json!({
+                "items": snapshot.items.is_none(), "texts": snapshot.texts.is_none(),
+                "reasoning": snapshot.reasoning.is_none(), "reasoning_texts": snapshot.reasoning_texts.is_none(),
+                "thinking_texts": snapshot.thinking_texts.is_none(), "tool_calls": snapshot.tool_calls.is_none(),
+                "message_images": snapshot.items.iter().flatten().map(|item| item.message_images.is_none()).collect::<Vec<_>>()
+            }),
+            case["nil_slices"]
+        );
+    }
+}
+
 fn unhex(text: &str) -> Vec<u8> {
     text.as_bytes()
         .chunks_exact(2)

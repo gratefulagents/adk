@@ -176,7 +176,14 @@ async fn seeded_history_preserves_snapshot_order_and_provenance_without_replayin
         .unwrap()
     );
     assert_eq!(
-        record.request_snapshot.as_ref().unwrap().input_items.len(),
+        record
+            .request_snapshot
+            .as_ref()
+            .unwrap()
+            .input_items
+            .as_ref()
+            .unwrap()
+            .len(),
         4
     );
 }
@@ -294,6 +301,8 @@ async fn durable_restore_retains_historical_only_markers_without_republishing() 
             .as_ref()
             .unwrap()
             .input_items
+            .as_ref()
+            .unwrap()
             .len(),
         4
     );

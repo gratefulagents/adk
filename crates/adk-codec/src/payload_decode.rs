@@ -301,13 +301,15 @@ go_object!(ResponseSnapshot,
     "end_turn" => end_turn: raw,
     "raw" => raw: raw,
     "raw_available" => raw_available: scalar,
-    "raw_error" => raw_error: scalar;
-    "items" => items,
-    "texts" => texts,
-    "reasoning" => reasoning,
-    "reasoning_texts" => reasoning_texts,
-    "thinking_texts" => thinking_texts,
-    "tool_calls" => tool_calls
+    "raw_error" => raw_error: scalar
+    preserve_nil {
+        "items" => items,
+        "texts" => texts,
+        "reasoning" => reasoning,
+        "reasoning_texts" => reasoning_texts,
+        "thinking_texts" => thinking_texts,
+        "tool_calls" => tool_calls
+    }
     objects { "usage" => usage }
 );
 
@@ -333,8 +335,8 @@ go_object!(RunItemSnapshot,
     "message_text" => message_text: scalar,
     "message_phase" => message_phase: scalar,
     "reasoning_text" => reasoning_text: scalar,
-    "thinking_text" => thinking_text: scalar;
-    "message_images" => message_images
+    "thinking_text" => thinking_text: scalar
+    preserve_nil { "message_images" => message_images }
     pointers {
         "tool_call" => tool_call,
         "tool_output" => tool_output,
@@ -352,9 +354,8 @@ go_object!(RequestSnapshot,
     "instructions" => instructions: scalar,
     "input_token_estimate" => input_token_estimate: integer,
     "request_overhead_token_estimate" => request_overhead_token_estimate: integer,
-    "total_token_estimate" => total_token_estimate: integer;
-    "input_items" => input_items,
-    "tools" => tools
+    "total_token_estimate" => total_token_estimate: integer
+    preserve_nil { "input_items" => input_items, "tools" => tools }
     pointers { "output_schema" => output_schema }
     objects { "settings" => settings }
 );

@@ -68,6 +68,16 @@ fn native_requests_match_pinned_builder_bytes_and_token_estimates() {
         ("negative_max", negative, vec![]),
     ] {
         let snapshot = RequestSnapshot::from_native("B", &request, &timeouts).unwrap();
+        assert_eq!(
+            json!({
+                "input_items": snapshot.input_items.is_none(),
+                "tools": snapshot.tools.is_none(),
+                "stop_sequences": snapshot.settings.stop_sequences.is_none(),
+                "message_images": snapshot.input_items.iter().flatten().map(|item| item.message_images.is_none()).collect::<Vec<_>>()
+            }),
+            fixture["native_request_nil_slices"][name],
+            "nil slices: {name}"
+        );
         let bytes = to_go_json(&snapshot).unwrap();
         assert_eq!(
             std::str::from_utf8(&bytes).unwrap(),
@@ -79,8 +89,12 @@ fn native_requests_match_pinned_builder_bytes_and_token_estimates() {
             snapshot.input_token_estimate + snapshot.request_overhead_token_estimate
         );
         if name == "full" {
-            assert!(snapshot.input_items[0].agent_name.is_empty());
-            assert_eq!(snapshot.input_items[1].agent_name, "A");
+            assert!(
+                snapshot.input_items.as_ref().unwrap()[0]
+                    .agent_name
+                    .is_empty()
+            );
+            assert_eq!(snapshot.input_items.as_ref().unwrap()[1].agent_name, "A");
             assert_eq!(snapshot.agent_name, "B");
             assert!(
                 !String::from_utf8(bytes)
@@ -113,7 +127,9 @@ fn unknown_or_malformed_provenance_is_not_inferred_from_current_agent() {
     assert!(
         RequestSnapshot::from_native("current", &request, &[])
             .unwrap()
-            .input_items[0]
+            .input_items
+            .as_ref()
+            .unwrap()[0]
             .agent_name
             .is_empty()
     );
@@ -126,7 +142,7 @@ fn unsupported_settings_timeouts_and_items_fail_without_silent_loss() {
         assert!(RequestSnapshot::from_native("B", &request, &[Some(timeout)]).is_err());
     }
     let zero = RequestSnapshot::from_native("B", &request, &[None]).unwrap();
-    assert_eq!(zero.tools[0].timeout_seconds, 0);
+    assert_eq!(zero.tools.as_ref().unwrap()[0].timeout_seconds, 0);
     for (key, value) in [
         ("adapter_extra", json!(true)),
         ("max_tokens", json!(u64::MAX)),
@@ -190,8 +206,11 @@ fn approval_markers_keep_order_authorship_and_estimates() {
             .as_str()
             .unwrap()
     );
-    assert_eq!(snapshot.input_items[3].kind, SnapshotType::ToolApproval);
-    assert_eq!(snapshot.input_items[3].agent_name, "A");
+    assert_eq!(
+        snapshot.input_items.as_ref().unwrap()[3].kind,
+        SnapshotType::ToolApproval
+    );
+    assert_eq!(snapshot.input_items.as_ref().unwrap()[3].agent_name, "A");
     let mut denied = boundary.clone();
     denied.marker.phase = ApprovalPhase::Denied;
     denied.marker.data.approved = false;
@@ -203,9 +222,21 @@ fn approval_markers_keep_order_authorship_and_estimates() {
         &[boundary.clone(), denied.clone()],
     )
     .unwrap();
-    assert!(both.input_items[3].tool_approval.as_ref().unwrap().approved);
-    assert!(!both.input_items[4].tool_approval.as_ref().unwrap().approved);
-    assert!(both.input_items[4].agent_name.is_empty());
+    assert!(
+        both.input_items.as_ref().unwrap()[3]
+            .tool_approval
+            .as_ref()
+            .unwrap()
+            .approved
+    );
+    assert!(
+        !both.input_items.as_ref().unwrap()[4]
+            .tool_approval
+            .as_ref()
+            .unwrap()
+            .approved
+    );
+    assert!(both.input_items.as_ref().unwrap()[4].agent_name.is_empty());
     denied.before_item = 2;
     assert!(
         RequestSnapshot::from_native_with_approvals(

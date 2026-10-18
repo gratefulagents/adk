@@ -77,6 +77,18 @@ fn response() -> ModelResponse {
     }
 }
 
+fn nil_slices(snapshot: &ResponseSnapshot) -> Value {
+    json!({
+        "items": snapshot.items.is_none(),
+        "texts": snapshot.texts.is_none(),
+        "reasoning": snapshot.reasoning.is_none(),
+        "reasoning_texts": snapshot.reasoning_texts.is_none(),
+        "thinking_texts": snapshot.thinking_texts.is_none(),
+        "tool_calls": snapshot.tool_calls.is_none(),
+        "message_images": snapshot.items.iter().flatten().map(|item| item.message_images.is_none()).collect::<Vec<_>>()
+    })
+}
+
 #[test]
 fn response_snapshot_field_records_match_independent_pinned_go() {
     let fixture: Value =
@@ -90,6 +102,11 @@ fn response_snapshot_field_records_match_independent_pinned_go() {
             "{input}: {decoded:?}"
         );
         if let Ok(snapshot) = decoded {
+            assert_eq!(
+                nil_slices(&snapshot),
+                case["nil_slices"],
+                "nil slices: {input}"
+            );
             assert_eq!(
                 to_go_json(&snapshot).unwrap(),
                 case["encoded"].as_str().unwrap().as_bytes(),
@@ -110,14 +127,28 @@ fn native_response_snapshot_bytes_match_independent_pinned_go() {
         response.raw = raw;
         let snapshot = ResponseSnapshot::try_from(&response).unwrap();
         assert_eq!(
+            nil_slices(&snapshot),
+            fixture["native_response_nil_slices"][index]
+        );
+        assert_eq!(
             to_go_json(&snapshot).unwrap(),
             variants[index].as_str().unwrap().as_bytes()
         );
-        assert!(snapshot.items.iter().all(|item| item.agent_name.is_empty()));
+        assert!(
+            snapshot
+                .items
+                .iter()
+                .flatten()
+                .all(|item| item.agent_name.is_empty())
+        );
     }
     response.items.clear();
     response.usage = Usage::default();
     response.end_turn = None;
+    assert_eq!(
+        nil_slices(&ResponseSnapshot::try_from(&response).unwrap()),
+        fixture["native_response_nil_slices"][3]
+    );
     assert_eq!(
         to_go_json(&ResponseSnapshot::try_from(&response).unwrap()).unwrap(),
         variants[3].as_str().unwrap().as_bytes()

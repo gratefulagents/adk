@@ -984,7 +984,8 @@ pub(crate) fn generation_span(
         generation.input_token_estimate = snapshot.input_token_estimate;
         generation.request_overhead_token_estimate = snapshot.request_overhead_token_estimate;
         generation.total_request_token_estimate = snapshot.total_token_estimate;
-        generation.input_item_count = snapshot.input_items.len() as i64;
+        generation.input_item_count =
+            snapshot.input_items.as_deref().unwrap_or_default().len() as i64;
     }
     if record.fallback_model.is_some() {
         let reason = record

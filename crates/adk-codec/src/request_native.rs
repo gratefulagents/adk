@@ -188,8 +188,8 @@ impl RequestSnapshot {
             agent_name: agent_name.into(),
             model: request.model.clone(),
             instructions: request.instructions.clone(),
-            input_items,
-            tools,
+            input_items: (!input_items.is_empty()).then_some(input_items),
+            tools: (!tools.is_empty()).then_some(tools),
             settings,
             output_schema: request.output_schema.as_ref().map(|schema| OutputSchema {
                 name: request.output_schema_name.clone(),

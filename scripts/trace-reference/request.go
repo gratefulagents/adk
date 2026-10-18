@@ -8,7 +8,7 @@ import (
 )
 
 // Uses the pinned SDK builder, not copied snapshot or estimation logic.
-func nativeRequestCases() map[string]string {
+func nativeRequests() map[string]agent.ModelRequest {
 	a := &agent.Agent{Name: "A"}
 	temperature, parallel := 0.5, false
 	full := agent.ModelRequest{
@@ -35,11 +35,23 @@ func nativeRequestCases() map[string]string {
 		"compaction_cap": {Input: []agent.RunItem{{Type: agent.RunItemCompaction, Agent: a, Compaction: &agent.CompactionData{EncryptedContent: strings.Repeat("x", 80004)}}}},
 		"negative_max":   {Settings: agent.ModelSettings{MaxTokens: -1, ThinkingBudget: 20000}},
 	}
+	return cases
+}
+
+func nativeRequestCases() map[string]string {
 	result := map[string]string{}
-	for name, request := range cases {
+	for name, request := range nativeRequests() {
 		encoded, err := json.Marshal(agent.BuildLLMRequestSnapshot("B", request))
 		must(err)
 		result[name] = string(encoded)
+	}
+	return result
+}
+
+func nativeRequestNilCases() map[string]any {
+	result := map[string]any{}
+	for name, request := range nativeRequests() {
+		result[name] = requestSliceState(*agent.BuildLLMRequestSnapshot("B", request))
 	}
 	return result
 }

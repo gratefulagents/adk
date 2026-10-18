@@ -62,6 +62,7 @@ func responseRecordCases() []map[string]any {
 			encoded, err := json.Marshal(snapshot)
 			must(err)
 			item["encoded"] = string(encoded)
+			item["nil_slices"] = responseSliceState(snapshot)
 		}
 		cases = append(cases, item)
 	}
@@ -70,6 +71,10 @@ func responseRecordCases() []map[string]any {
 
 func requestRecordCases() []map[string]any {
 	inputs := []string{
+		`{"input_items":[],"tools":[],"settings":{"stop_sequences":[]}}`,
+		`{"input_items":[{"message_images":[]}],"input_items":[null]}`,
+		`{"input_items":[{"message_images":[]}],"input_items":[{"message_images":null}]}`,
+		`{"tools":[],"tools":null,"settings":{"stop_sequences":[]},"settings":{}}`,
 		`{}`,
 		`{"agent_name":null,"model":null,"instructions":null,"input_items":null,"tools":null,"settings":null,"output_schema":null,"input_token_estimate":null,"request_overhead_token_estimate":null,"total_token_estimate":null}`,
 		`{"input_items":[null,{}, {"type":"future_kind"}]}`,
@@ -141,6 +146,7 @@ func requestRecordCases() []map[string]any {
 			encoded, err := json.Marshal(snapshot)
 			must(err)
 			item["encoded"] = string(encoded)
+			item["nil_slices"] = requestSliceState(snapshot)
 		}
 		cases = append(cases, item)
 	}
@@ -255,16 +261,23 @@ func writerFixture() {
 		Raw:     map[string]any{"answer": "<>&", "extra": []any{nil, false, 1}},
 	}
 	var responseVariants []string
+	var responseNilVariants []map[string]any
 	for _, raw := range []any{nativeResponse.Raw, json.RawMessage(`null`), nil} {
 		nativeResponse.Raw = raw
-		encoded, err := json.Marshal(agent.BuildLLMResponseSnapshot(nativeResponse))
+		snapshot := agent.BuildLLMResponseSnapshot(nativeResponse)
+		responseNilVariants = append(responseNilVariants, responseSliceState(*snapshot))
+		encoded, err := json.Marshal(snapshot)
 		must(err)
 		responseVariants = append(responseVariants, string(encoded))
 	}
-	emptyResponse, err := json.Marshal(agent.BuildLLMResponseSnapshot(&agent.ModelResponse{}))
+	emptySnapshot := agent.BuildLLMResponseSnapshot(&agent.ModelResponse{})
+	responseNilVariants = append(responseNilVariants, responseSliceState(*emptySnapshot))
+	emptyResponse, err := json.Marshal(emptySnapshot)
 	must(err)
 	responseVariants = append(responseVariants, string(emptyResponse))
 	result["native_response_variants"] = responseVariants
+	result["native_response_nil_slices"] = responseNilVariants
+	result["native_request_nil_slices"] = nativeRequestNilCases()
 	result["response_record_cases"] = responseRecordCases()
 	result["request_record_cases"] = requestRecordCases()
 	result["merged_settings_cases"] = mergedSettingsCases()

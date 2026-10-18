@@ -88,11 +88,14 @@ fn tagged_mapping_preserves_signed_usage_empty_items_and_raw_numbers() {
     ] {
         for response in roundtrips(response(raw, Some(projection))) {
             let snapshot = ResponseSnapshot::try_from(&response).unwrap();
-            assert_eq!(snapshot.items.len(), 6);
-            assert_eq!(snapshot.items[0].kind, SnapshotType::Message);
-            assert_eq!(snapshot.items[0].message_text, "");
+            assert_eq!(snapshot.items.as_ref().unwrap().len(), 6);
             assert_eq!(
-                snapshot.items[0].message_phase,
+                snapshot.items.as_ref().unwrap()[0].kind,
+                SnapshotType::Message
+            );
+            assert_eq!(snapshot.items.as_ref().unwrap()[0].message_text, "");
+            assert_eq!(
+                snapshot.items.as_ref().unwrap()[0].message_phase,
                 if projection == SnapshotProjection::GoOpenAiMessage {
                     "commentary"
                 } else {
@@ -107,9 +110,9 @@ fn tagged_mapping_preserves_signed_usage_empty_items_and_raw_numbers() {
                     None
                 }
             );
-            assert_eq!(snapshot.texts, ["answer"]);
-            assert_eq!(snapshot.reasoning_texts, ["reason"]);
-            assert_eq!(snapshot.thinking_texts, ["reason"]);
+            assert_eq!(snapshot.texts.as_deref().unwrap(), ["answer"]);
+            assert_eq!(snapshot.reasoning_texts.as_deref().unwrap(), ["reason"]);
+            assert_eq!(snapshot.thinking_texts.as_deref().unwrap(), ["reason"]);
             assert_eq!(
                 serde_json::to_value(&snapshot.reasoning).unwrap(),
                 json!([
@@ -118,18 +121,22 @@ fn tagged_mapping_preserves_signed_usage_empty_items_and_raw_numbers() {
                 ])
             );
             assert_eq!(
-                serde_json::to_value(&snapshot.items[5].compaction).unwrap(),
+                serde_json::to_value(&snapshot.items.as_ref().unwrap()[5].compaction).unwrap(),
                 json!({"id":"c","content":"summary","encrypted_content":"compact","created_by":"gateway"})
             );
             assert_eq!(
                 serde_json::to_value(&snapshot.usage).unwrap(),
                 json!({"requests":1,"input_tokens":-1,"output_tokens":-2,"cache_read_tokens":-3,"cache_create_tokens":-4})
             );
-            assert_eq!(snapshot.tool_calls[0].id, "t");
-            assert_eq!(snapshot.tool_calls[0].name, "lookup");
+            assert_eq!(snapshot.tool_calls.as_ref().unwrap()[0].id, "t");
+            assert_eq!(snapshot.tool_calls.as_ref().unwrap()[0].name, "lookup");
             for tool_input in [
-                &snapshot.tool_calls[0].input,
-                &snapshot.items[2].tool_call.as_ref().unwrap().input,
+                &snapshot.tool_calls.as_ref().unwrap()[0].input,
+                &snapshot.items.as_ref().unwrap()[2]
+                    .tool_call
+                    .as_ref()
+                    .unwrap()
+                    .input,
             ] {
                 let RawJson::Encoded(encoded) = tool_input else {
                     panic!("encoded input")
@@ -220,7 +227,7 @@ fn nullable_content_optional_end_turn_and_tool_input_follow_normalized_shape() {
             let snapshot =
                 ResponseSnapshot::try_from(&response(&value.to_string(), Some(projection)))
                     .unwrap();
-            assert!(snapshot.items.is_empty());
+            assert!(snapshot.items.is_none());
             assert_eq!(snapshot.usage.requests, 1);
             assert_eq!(
                 snapshot.end_turn,
@@ -234,8 +241,8 @@ fn nullable_content_optional_end_turn_and_tool_input_follow_normalized_shape() {
         let value = normalized(json!([{"type":"tool_use"},{"type":"tool_use","input":null}]));
         let snapshot =
             ResponseSnapshot::try_from(&response(&value.to_string(), Some(projection))).unwrap();
-        assert!(snapshot.tool_calls[0].input.is_missing());
-        let RawJson::Encoded(input) = &snapshot.tool_calls[1].input else {
+        assert!(snapshot.tool_calls.as_ref().unwrap()[0].input.is_missing());
+        let RawJson::Encoded(input) = &snapshot.tool_calls.as_ref().unwrap()[1].input else {
             panic!("encoded null")
         };
         assert_eq!(input.get(), "null");
@@ -250,7 +257,7 @@ fn untagged_normalized_shape_is_opaque_not_inferred() {
     response.usage = Default::default();
     for response in roundtrips(response) {
         let snapshot = ResponseSnapshot::try_from(&response).unwrap();
-        assert!(snapshot.items.is_empty());
+        assert!(snapshot.items.is_none());
         assert_eq!(snapshot.usage.requests, 0);
         assert_eq!(snapshot.end_turn, Some(true));
         let RawJson::Encoded(encoded) = snapshot.raw else {

@@ -18,10 +18,10 @@ pub struct RequestSnapshot {
     pub model: String,
     #[serde(skip_serializing_if = "String::is_empty")]
     pub instructions: String,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub input_items: Vec<RunItemSnapshot>,
-    #[serde(skip_serializing_if = "Vec::is_empty")]
-    pub tools: Vec<ToolSnapshot>,
+    #[serde(skip_serializing_if = "crate::dto::empty_slice")]
+    pub input_items: Option<Vec<RunItemSnapshot>>,
+    #[serde(skip_serializing_if = "crate::dto::empty_slice")]
+    pub tools: Option<Vec<ToolSnapshot>>,
     pub settings: ModelSettings,
     #[serde(skip_serializing_if = "Option::is_none")]
     pub output_schema: Option<OutputSchema>,

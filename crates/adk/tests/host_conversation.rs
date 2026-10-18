@@ -401,7 +401,7 @@ mod oracle {
                         message: Some(dto::MessageOutput {
                             text: snapshot.message_text,
                             phase: snapshot.message_phase,
-                            images: snapshot.message_images,
+                            images: snapshot.message_images.unwrap_or_default(),
                         }),
                         ..Default::default()
                     },

@@ -29,8 +29,12 @@ fn item_raw(prefix: &str, items: &[RunItemSnapshot], raw: &mut BTreeMap<String, 
 }
 fn request_raw(item: &RequestSnapshot) -> BTreeMap<String, RawJson> {
     let mut raw = BTreeMap::new();
-    item_raw("input_items", &item.input_items, &mut raw);
-    for (i, tool) in item.tools.iter().enumerate() {
+    item_raw(
+        "input_items",
+        item.input_items.as_deref().unwrap_or_default(),
+        &mut raw,
+    );
+    for (i, tool) in item.tools.iter().flatten().enumerate() {
         raw.insert(format!("tools/{i}"), tool.input_schema.clone());
     }
     if let Some(schema) = &item.output_schema {
@@ -40,8 +44,8 @@ fn request_raw(item: &RequestSnapshot) -> BTreeMap<String, RawJson> {
 }
 fn response_raw(item: &ResponseSnapshot) -> BTreeMap<String, RawJson> {
     let mut raw = BTreeMap::new();
-    item_raw("items", &item.items, &mut raw);
-    for (i, call) in item.tool_calls.iter().enumerate() {
+    item_raw("items", item.items.as_deref().unwrap_or_default(), &mut raw);
+    for (i, call) in item.tool_calls.iter().flatten().enumerate() {
         raw.insert(format!("tool_calls/{i}"), call.input.clone());
     }
     raw.insert("raw".into(), item.raw.clone());
@@ -114,10 +118,10 @@ fn envelope_direct_raw_encoding_matches_go_depth_and_omission() {
         };
         let encoded = match case["location"].as_str().unwrap() {
             "request_tool" => to_go_json_bytes(&RequestSnapshot {
-                tools: vec![ToolSnapshot {
+                tools: Some(vec![ToolSnapshot {
                     input_schema: raw,
                     ..Default::default()
-                }],
+                }]),
                 ..Default::default()
             }),
             "request_schema" => to_go_json_bytes(&RequestSnapshot {
@@ -128,23 +132,23 @@ fn envelope_direct_raw_encoding_matches_go_depth_and_omission() {
                 ..Default::default()
             }),
             "request_call" => to_go_json_bytes(&RequestSnapshot {
-                input_items: vec![RunItemSnapshot {
+                input_items: Some(vec![RunItemSnapshot {
                     tool_call: Some(ToolCallSnapshot {
                         input: raw,
                         ..Default::default()
                     }),
                     ..Default::default()
-                }],
+                }]),
                 ..Default::default()
             }),
             "request_approval" => to_go_json_bytes(&RequestSnapshot {
-                input_items: vec![RunItemSnapshot {
+                input_items: Some(vec![RunItemSnapshot {
                     tool_approval: Some(ToolApprovalSnapshot {
                         input: raw,
                         ..Default::default()
                     }),
                     ..Default::default()
-                }],
+                }]),
                 ..Default::default()
             }),
             "response_raw" => to_go_json_bytes(&ResponseSnapshot {
@@ -152,30 +156,30 @@ fn envelope_direct_raw_encoding_matches_go_depth_and_omission() {
                 ..Default::default()
             }),
             "response_call" => to_go_json_bytes(&ResponseSnapshot {
-                tool_calls: vec![ToolCallSnapshot {
+                tool_calls: Some(vec![ToolCallSnapshot {
                     input: raw,
                     ..Default::default()
-                }],
+                }]),
                 ..Default::default()
             }),
             "response_item_call" => to_go_json_bytes(&ResponseSnapshot {
-                items: vec![RunItemSnapshot {
+                items: Some(vec![RunItemSnapshot {
                     tool_call: Some(ToolCallSnapshot {
                         input: raw,
                         ..Default::default()
                     }),
                     ..Default::default()
-                }],
+                }]),
                 ..Default::default()
             }),
             "response_approval" => to_go_json_bytes(&ResponseSnapshot {
-                items: vec![RunItemSnapshot {
+                items: Some(vec![RunItemSnapshot {
                     tool_approval: Some(ToolApprovalSnapshot {
                         input: raw,
                         ..Default::default()
                     }),
                     ..Default::default()
-                }],
+                }]),
                 ..Default::default()
             }),
             other => panic!("unexpected raw location {other}"),

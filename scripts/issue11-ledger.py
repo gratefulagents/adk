@@ -172,7 +172,7 @@ RUST_INPUTS = ["scripts/payload-reference/envelope_test.go", "crates/adk-codec/t
                "fixtures/mcp/builder-peer.py", "fixtures/mcp/runtime-inputs.json",
                "fixtures/mcp/runtime-observations.json", "scripts/mcp-runtime-reference/run.py",
                "scripts/mcp-runtime-reference/reference_test.go",
-               "scripts/trace-reference/settings.go", "scripts/trace-reference/capture.go", "crates/adk-codec/src/value/capture.rs",
+               "scripts/trace-reference/settings.go", "scripts/trace-reference/capture.go", "scripts/trace-reference/slice_state.go", "crates/adk-codec/src/value/capture.rs",
                "fixtures/tracestore/sdk-writer.json", "scripts/trace-reference/writer.go",
                "fixtures/tracestore/sdk-store.json", "scripts/trace-reference/main.go",
                "scripts/trace-reference/check.py",

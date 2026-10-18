@@ -91,7 +91,7 @@ pub fn snapshot_items(items: &[RunItem]) -> Vec<RunItemSnapshot> {
                     if let Some(v) = &item.message {
                         out.message_text = v.text.clone();
                         out.message_phase = v.phase.clone();
-                        out.message_images = v.images.clone();
+                        out.message_images = (!v.images.is_empty()).then(|| v.images.clone());
                     }
                 }
                 SnapshotType::ToolCall => {
@@ -156,20 +156,26 @@ pub fn response_snapshot(response: &ModelResponse) -> ResponseSnapshot {
     };
     for item in &items {
         if !item.message_text.is_empty() {
-            out.texts.push(item.message_text.clone());
+            out.texts
+                .get_or_insert_with(Vec::new)
+                .push(item.message_text.clone());
         }
         if let Some(v) = &item.reasoning {
-            out.reasoning.push(v.clone());
+            out.reasoning.get_or_insert_with(Vec::new).push(v.clone());
         }
         if !item.reasoning_text.is_empty() {
-            out.reasoning_texts.push(item.reasoning_text.clone());
-            out.thinking_texts.push(item.thinking_text.clone());
+            out.reasoning_texts
+                .get_or_insert_with(Vec::new)
+                .push(item.reasoning_text.clone());
+            out.thinking_texts
+                .get_or_insert_with(Vec::new)
+                .push(item.thinking_text.clone());
         }
         if let Some(v) = &item.tool_call {
-            out.tool_calls.push(v.clone());
+            out.tool_calls.get_or_insert_with(Vec::new).push(v.clone());
         }
     }
-    out.items = items;
+    out.items = (!items.is_empty()).then_some(items);
     out
 }
 

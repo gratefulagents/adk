@@ -1574,6 +1574,26 @@ async fn costs() {
     assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
 }
 async fn policy() {
+    use adk::codec::policy as legacy;
+    let default_policy = legacy::RuntimePolicy::default().normalize();
+    assert_eq!(
+        default_policy.permission_mode,
+        legacy::PERMISSION_MODE_WORKSPACE_WRITE
+    );
+    assert!(!default_policy.enable_mcp);
+    let read_only = legacy::RuntimePolicy {
+        permission_mode: legacy::PERMISSION_MODE_READ_ONLY.into(),
+        ..Default::default()
+    };
+    assert!(!legacy::ToolPolicy::new(&read_only).allows_write_tools());
+    assert!(!legacy::allows_mcp_tool(
+        legacy::PERMISSION_MODE_READ_ONLY,
+        false
+    ));
+    assert!(legacy::allows_mcp_tool(
+        legacy::PERMISSION_MODE_DANGER_FULL_ACCESS,
+        false
+    ));
     let mut tool = definition("write", true);
     tool.read_only = false;
     let mut policy = ToolPolicy::default();
@@ -1863,6 +1883,11 @@ mod tests {
     #[tokio::test]
     async fn original_memory_examples() {
         super::memory().await;
+    }
+
+    #[tokio::test]
+    async fn original_policy_primitives_example() {
+        super::policy().await;
     }
 
     #[cfg(target_os = "linux")]

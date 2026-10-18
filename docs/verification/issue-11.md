@@ -2,6 +2,32 @@
 
 ## Current continuation evidence
 
+### Explicit legacy policy projections
+
+Added `adk::codec::policy`: legacy permission/remote-write labels, normalizers,
+mutability/MCP hints, RuntimePolicy/ToolPolicy value helpers and public access/
+approval sentinel mappings. Empty legacy inputs retain workspace-write/Git-enabled
+defaults only in this explicit projection module. Native ToolPolicy remains
+ReadOnly; native authorization, builders and permission ceilings are unchanged.
+The offline original policy primitive example now runs alongside native safety
+assertions. Whole types/Go JSON decoding, mutable package aliases and the wider
+policy/authorization group remain unclaimed.
+
+Independent immutable-Go execution covers496 label cases,960 optional-feature/
+list combinations and all1,112,064 Unicode scalars for whitespace. All six original
+helper tests and the offline example execute;37 precise function/method/constant/
+field/test records are reviewed. Initial harness generation had a pluralized path
+typo; corrected before oracle execution. Initial targeted validator class name and
+module formatting were corrected before final checks.
+
+Fresh Rust1.88 Linux: **1,797 workspace +10 doctests +6 example tests passed;
+0 failed,30 ignored**. Minimal compat facade test, strict whole-workspace lint/
+typecheck/rustdoc/format, full matrix/standalone consumer/purity,20 offline scenarios
+and host session passed. Go reference:949 passing records,5 skips,46 packages.
+Bound independent references,56 validators/artifact review and source locks pass.
+Ledger: **1,255 verified /7,636 unresolved /251 excluded**. Full acceptance is not
+complete; live provider and broader non-Linux behavior remain unverified.
+
 ### Original memory and category trace-store examples
 
 Native memory now reproduces all three original tests: namespace/tag/delete

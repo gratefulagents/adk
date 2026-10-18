@@ -23,6 +23,8 @@ class ReferenceSelectionTests(unittest.TestCase):
         selected = {"internal/agent": {"TestHistorical"}}
         claims = {"claims": {str(i): {"reference_test": name} for i, name in enumerate([
             "github.com/gratefulagents/sdk/internal/agent/TestRunner",
+            "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+            "github.com/gratefulagents/sdk/examples/features/policy/TestPolicyExample",
             "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
             "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample",
             "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample",
@@ -45,6 +47,8 @@ class ReferenceSelectionTests(unittest.TestCase):
                                     "examples/features/tools_registry": {"TestSDKToolRegistryExample"},
                                     "examples/features/memory": {"TestInMemoryStoreSemanticsExample", "TestNoopEmbedderIsDeterministicExample", "TestCustomStoreCanBackMemoryToolExample"},
                                     "examples/features/tracestore": {"TestFilesystemTraceStoreExample"},
+                                    "internal/agent/policy": {"TestNormalizePermissionMode"},
+                                    "examples/features/policy": {"TestPolicyExample"},
                                     "internal/agent/agents": {"TestBuiltInKindsAreStable"},
                                     "internal/openai": {"TestMetadata"},
                                     "internal/modelactivity": {"TestReadActivity"},
@@ -98,6 +102,7 @@ class EvidenceTests(unittest.TestCase):
     def test_builder_fixture_execution_markers_are_required(self):
         original = self.evidence["reference_fixture_check"]
         for marker in ("Pinned tool schemas reproduced exactly",
+                   "Pinned policy observations reproduced exactly",
                        "272 SDK lifecycle results and resulting filesystem trees verified",
                        "1176 SDK ApplyPatch results and resulting filesystem trees verified",
                        "Pinned SDK MCP prompt observations reproduced exactly",

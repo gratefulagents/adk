@@ -102,3 +102,34 @@ Pattern detection handles the tested ANSI/Unicode obfuscations, not arbitrary
 encoding or deliberate data exfiltration; it is not a comprehensive DLP system.
 See the [security crate](../crates/adk-security/README.md) and
 [sandbox crate](../crates/adk-sandbox/README.md) for API-specific restrictions.
+
+## Legacy SDK policy projections
+
+`adk::codec::policy` (facade `compat` feature) exposes the SDK's pure permission,
+Git-remote-write and runtime-surface helpers. These values are **not execution
+authorization** and are not automatically installed into builders or tool contexts.
+`normalize_permission_mode("")` returns `workspace-write`, and
+`normalize_git_remote_writes("")` returns `enabled`, matching legacy defaults.
+Unknown labels fail closed; normalization trims Go-compatible Unicode whitespace
+but does not lowercase or accept underscore aliases. This differs deliberately
+from host/chat-loop normalization and native `security::normalize_access`.
+
+`RuntimePolicy::normalize` preserves optional-feature flags and allowed-kind/skill
+lists, including absent versus allocated-empty lists. It enables no optional feature
+in a default policy. `ToolPolicy::new` derives its normalized mutability label.
+PermissionMode/GitRemoteWrites are owned string aliases; source label methods map
+to free functions `allows_write_tools` and `allows_mcp_tool`. Owned clones replace
+Go slice sharing. The module provides no Go JSON decoder or mutable package-level
+function variables.
+
+The separate public mapping helpers return `full`/`read-only` access labels and
+`Option<config::ToolPolicySentinels>`: danger-full-access maps to None; other modes
+require mutating-tool approval and leave timeout unset (zero sentinel). None is a
+legacy projection, not permission to bypass a host restriction. Do not interpret
+the approval flag as requiring approval for every native tool: source policy only
+requires it for mutating, non-control-flow tools.
+
+Native `core::ToolPolicy` still defaults to ReadOnly; `security::normalize_access`
+still fails closed on empty/unknown input. Hosts must explicitly resolve legacy
+configuration against their native permission ceiling. These helpers do not grant
+network, remote-write, MCP or sandbox authority.

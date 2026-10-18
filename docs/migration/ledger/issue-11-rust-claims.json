@@ -23042,6 +23042,717 @@
         "project-state",
         "observability"
       ]
+    },
+    "SDK-118DE1E2135A39FF": {
+      "source": "internal/agent/policy/git_remote_writes.go",
+      "source_name": "GitRemoteWritesDisabled",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::GIT_REMOTE_WRITES_DISABLED"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed apis record GitRemoteWritesDisabled. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0DD7AC428DA5F7A2": {
+      "source": "internal/agent/policy/git_remote_writes.go",
+      "source_name": "GitRemoteWritesEnabled",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::GIT_REMOTE_WRITES_ENABLED"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed apis record GitRemoteWritesEnabled. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7125E4CDD6F9C3D0": {
+      "source": "internal/agent/policy/tool_policy.go",
+      "source_name": "NewToolPolicy",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::ToolPolicy::new"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record NewToolPolicy. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BACFA36D57B969A3": {
+      "source": "internal/agent/policy/git_remote_writes.go",
+      "source_name": "NormalizeGitRemoteWrites",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_git_remote_writes"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed apis record NormalizeGitRemoteWrites. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-93F078706B0ABEBE": {
+      "source": "internal/agent/policy/permission_mode.go",
+      "source_name": "NormalizePermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record NormalizePermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D561E5BA29A7AC10": {
+      "source": "internal/agent/policy/permission_mode.go",
+      "source_name": "PermissionMode.AllowsMCPTool",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::allows_mcp_tool"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionMode.AllowsMCPTool. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C27248AA5FE08049": {
+      "source": "internal/agent/policy/permission_mode.go",
+      "source_name": "PermissionMode.AllowsWriteTools",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::allows_write_tools"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionMode.AllowsWriteTools. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C24AE9F64E56B499": {
+      "source": "internal/agent/policy/permission_mode.go",
+      "source_name": "PermissionModeDangerFullAccess",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::PERMISSION_MODE_DANGER_FULL_ACCESS"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionModeDangerFullAccess. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F3903DC419225E3C": {
+      "source": "internal/agent/policy/permission_mode.go",
+      "source_name": "PermissionModeReadOnly",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::PERMISSION_MODE_READ_ONLY"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionModeReadOnly. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BB8511A314182737": {
+      "source": "internal/agent/policy/permission_mode.go",
+      "source_name": "PermissionModeWorkspaceWrite",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::PERMISSION_MODE_WORKSPACE_WRITE"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionModeWorkspaceWrite. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-CC3E13910955C5C7": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.AllowedAgentKinds",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.AllowedAgentKinds. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-90C35E1C3DA104F5": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.AllowedSkills",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.AllowedSkills. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8669CE8BA9658E3A": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.EnableHooks",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.EnableHooks. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C18FA05931184785": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.EnableMCP",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.EnableMCP. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-D39799DF1551307A": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.EnablePlugins",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.EnablePlugins. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C8E7CAEC3D8795B8": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.GitRemoteWrites",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.GitRemoteWrites. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C45C1EF3B54778F5": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.Normalize",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.Normalize. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-0B6A479BE3D5AEB1": {
+      "source": "internal/agent/policy/runtime_policy.go",
+      "source_name": "RuntimePolicy.PermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::RuntimePolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record RuntimePolicy.PermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7E4CC4530AD1FDA6": {
+      "source": "internal/agent/policy/tool_policy.go",
+      "source_name": "ToolPolicy.AllowsWriteTools",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::ToolPolicy::allows_write_tools"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record ToolPolicy.AllowsWriteTools. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-826A2DEF5FC5D972": {
+      "source": "internal/agent/policy/tool_policy.go",
+      "source_name": "ToolPolicy.PermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::ToolPolicy"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed apis record ToolPolicy.PermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-7BA49314AA134CB6": {
+      "source": "pkg/agentsdk/policy/policy.go",
+      "source_name": "GitRemoteWritesDisabled",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::GIT_REMOTE_WRITES_DISABLED"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed apis record GitRemoteWritesDisabled. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-A200B84DDC712EB1": {
+      "source": "pkg/agentsdk/policy/policy.go",
+      "source_name": "GitRemoteWritesEnabled",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::GIT_REMOTE_WRITES_ENABLED"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed apis record GitRemoteWritesEnabled. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-45F89C91D0E88EC9": {
+      "source": "pkg/agentsdk/policy/policy.go",
+      "source_name": "PermissionModeDangerFullAccess",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::PERMISSION_MODE_DANGER_FULL_ACCESS"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionModeDangerFullAccess. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-706D208F9B9054C7": {
+      "source": "pkg/agentsdk/policy/policy.go",
+      "source_name": "PermissionModeReadOnly",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::PERMISSION_MODE_READ_ONLY"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionModeReadOnly. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-765DB47043F266CF": {
+      "source": "pkg/agentsdk/policy/policy.go",
+      "source_name": "PermissionModeWorkspaceWrite",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::PERMISSION_MODE_WORKSPACE_WRITE"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed apis record PermissionModeWorkspaceWrite. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3B5BE9F7DC480792": {
+      "source": "pkg/agentsdk/policy/mapping.go",
+      "source_name": "ToolAccessLevelFromPermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::tool_access_level_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/policy/TestToolPolicyFromPermissionMode",
+      "rationale": "Reviewed apis record ToolAccessLevelFromPermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DFDE18F1D27BF714": {
+      "source": "pkg/agentsdk/policy/mapping.go",
+      "source_name": "ToolPolicyFromPermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/policy/TestToolPolicyFromPermissionMode",
+      "rationale": "Reviewed apis record ToolPolicyFromPermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1F013A50DABD64C4": {
+      "source": "internal/agent/policy/git_remote_writes_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed files record files:internal/agent/policy/git_remote_writes_test.go. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-486BA0AC69404833": {
+      "source": "internal/agent/policy/permission_mode_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed files record files:internal/agent/policy/permission_mode_test.go. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-1D6288E83CB1B9AF": {
+      "source": "pkg/agentsdk/policy/mapping_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface",
+        "legacy_policy_whitespace_matches_every_go_scalar",
+        "legacy_policy_projections_are_available_without_authorization_changes"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/policy/TestToolPolicyFromPermissionMode",
+      "rationale": "Reviewed files record files:pkg/agentsdk/policy/mapping_test.go. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4DC3832FF01A2E7C": {
+      "source": "examples/features/policy/policy_test.go",
+      "source_name": "TestPolicyExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::policy"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_policy_primitives_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/policy/TestPolicyExample",
+      "rationale": "Reviewed tests record TestPolicyExample. This closes only the original offline primitive example, not its live runner sibling or enclosing file/group. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-AA832D8CE63FAB3C": {
+      "source": "internal/agent/policy/git_remote_writes_test.go",
+      "source_name": "TestNormalizeGitRemoteWrites",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites",
+      "rationale": "Reviewed tests record TestNormalizeGitRemoteWrites. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FC1DBF7CC9B29D6C": {
+      "source": "internal/agent/policy/git_remote_writes_test.go",
+      "source_name": "TestRuntimePolicyNormalizesGitRemoteWrites",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites",
+      "rationale": "Reviewed tests record TestRuntimePolicyNormalizesGitRemoteWrites. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-FFF7260E5951DB67": {
+      "source": "internal/agent/policy/permission_mode_test.go",
+      "source_name": "TestNormalizePermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode",
+      "rationale": "Reviewed tests record TestNormalizePermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8943477A26FBE57B": {
+      "source": "internal/agent/policy/permission_mode_test.go",
+      "source_name": "TestPermissionModeAllowsMCPTool",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/policy/TestPermissionModeAllowsMCPTool",
+      "rationale": "Reviewed tests record TestPermissionModeAllowsMCPTool. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AD5FAC7211569EC1": {
+      "source": "pkg/agentsdk/policy/mapping_test.go",
+      "source_name": "TestToolAccessLevelFromPermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/policy/TestToolAccessLevelFromPermissionMode",
+      "rationale": "Reviewed tests record TestToolAccessLevelFromPermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9D85137440798330": {
+      "source": "pkg/agentsdk/policy/mapping_test.go",
+      "source_name": "TestToolPolicyFromPermissionMode",
+      "implementation_symbols": [
+        "crates/adk-codec/src/policy.rs::normalize_permission_mode",
+        "crates/adk-codec/src/policy.rs::RuntimePolicy::normalize",
+        "crates/adk-codec/src/policy.rs::tool_policy_from_permission_mode"
+      ],
+      "rust_test_identifiers": [
+        "legacy_policy_labels_match_pinned_go",
+        "runtime_policy_normalization_preserves_optional_surface"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/policy/TestToolPolicyFromPermissionMode",
+      "rationale": "Reviewed tests record TestToolPolicyFromPermissionMode. 496 independently executed Go label cases compare normalization, unknown/case/underscore/control inputs, mutability, MCP hints, approval sentinel and access-tier mappings. All1112064 Unicode scalars verify Go TrimSpace parity.960 runtime cases cross all optional feature flags and nil/empty/populated/duplicate allowed lists, preserving input fields and normalization idempotence. Constants use exact source strings; String labels and Option<Vec<String>> preserve open values and nil/empty list projections. Source label methods map to free functions; owned clones replace Go slice sharing. Pure projections are not native authorization: default native ToolPolicy remains ReadOnly, legacy empty defaults remain workspace-write/Git enabled only in this explicit module, and no builder/execution authority is changed. No whole-type/Go JSON decoding, mutable package variable, invalid-UTF8 string identity or package closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

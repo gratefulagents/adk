@@ -31,6 +31,15 @@
       "test",
       "-count=1",
       "-json",
+      "./examples/features/policy",
+      "-run",
+      "^(TestPolicyExample)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
       "./examples/features/settings_routing",
       "-run",
       "^(TestSettingsAndModeRoutingExample)$"
@@ -76,6 +85,15 @@
       "test",
       "-count=1",
       "-json",
+      "./internal/agent/policy",
+      "-run",
+      "^(TestNormalizeGitRemoteWrites|TestNormalizePermissionMode|TestPermissionModeAllowsMCPTool|TestRuntimePolicyNormalizesGitRemoteWrites)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
       "./internal/anthropic",
       "-run",
       "^(TestStreamAssemblerAssemblesCompactionBlocks|TestStreamAssemblerHandlesCompactionEncryptedContentDelta|TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem|TestStreamAssemblerPreservesEndTurnFalse|TestToSDKParamsSendsOutputFormatForOutputSchema)$"
@@ -100,7 +118,7 @@
     ]
   ],
   "counts": {
-    "pass": 944,
+    "pass": 949,
     "skip": 5
   },
   "exit_code": 0,
@@ -108,11 +126,13 @@
   "packages": {
     "github.com/gratefulagents/sdk/examples/features/context_compaction": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory": "pass",
+    "github.com/gratefulagents/sdk/examples/features/policy": "pass",
     "github.com/gratefulagents/sdk/examples/features/settings_routing": "pass",
     "github.com/gratefulagents/sdk/examples/features/tools_registry": "pass",
     "github.com/gratefulagents/sdk/examples/features/tracestore": "pass",
     "github.com/gratefulagents/sdk/internal/agent": "pass",
     "github.com/gratefulagents/sdk/internal/agent/agents": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/policy": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic": "pass",
     "github.com/gratefulagents/sdk/internal/modelactivity": "pass",
     "github.com/gratefulagents/sdk/internal/openai": "pass",
@@ -153,12 +173,13 @@
   },
   "purpose": "Independent Go reference execution only; does not verify any Rust acceptance ID.",
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
-  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n\n\n\n\n\n\n\n\n\n",
+  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n\n\n\n\n\n\n\n\n\n\n\n",
   "tests": {
     "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory/TestCustomStoreCanBackMemoryToolExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory/TestInMemoryStoreSemanticsExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory/TestNoopEmbedderIsDeterministicExample": "pass",
+    "github.com/gratefulagents/sdk/examples/features/policy/TestPolicyExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample": "pass",
@@ -278,6 +299,10 @@
     "github.com/gratefulagents/sdk/internal/agent/agents/TestIsAllowedResolvesAliases": "pass",
     "github.com/gratefulagents/sdk/internal/agent/agents/TestResolveKindSupportsLegacyAliases": "pass",
     "github.com/gratefulagents/sdk/internal/agent/agents/TestResolveKindUnknown": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizeGitRemoteWrites": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/policy/TestNormalizePermissionMode": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/policy/TestPermissionModeAllowsMCPTool": "pass",
+    "github.com/gratefulagents/sdk/internal/agent/policy/TestRuntimePolicyNormalizesGitRemoteWrites": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerAssemblesCompactionBlocks": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerHandlesCompactionEncryptedContentDelta": "pass",
     "github.com/gratefulagents/sdk/internal/anthropic/TestStreamAssemblerKeepsInputTokensWhenMessageDeltaOmitsThem": "pass",

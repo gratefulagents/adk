@@ -204,3 +204,25 @@ fn modelsdev_resolver_options_are_available_through_facade() {
     };
     assert!(Resolver::new(options).is_ok());
 }
+
+#[test]
+fn legacy_policy_projections_are_available_without_authorization_changes() {
+    use adk::codec::policy::{self, RuntimePolicy, ToolPolicy};
+    let legacy = RuntimePolicy::default().normalize();
+    assert_eq!(legacy.permission_mode, "workspace-write");
+    assert_eq!(legacy.git_remote_writes, "enabled");
+    assert!(!legacy.enable_mcp);
+    assert!(ToolPolicy::new(&legacy).allows_write_tools());
+    assert!(!policy::allows_mcp_tool("read-only", false));
+    assert!(policy::allows_mcp_tool("danger-full-access", false));
+    assert!(
+        policy::tool_policy_from_permission_mode("read-only")
+            .unwrap()
+            .approval_required
+    );
+    assert!(policy::tool_policy_from_permission_mode("danger-full-access").is_none());
+    assert_eq!(
+        adk::core::ToolPolicy::default().access,
+        adk::core::AccessMode::ReadOnly
+    );
+}

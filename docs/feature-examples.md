@@ -190,3 +190,9 @@ by tag/limit. Assertions verify tool-configured namespace/source run/repo metada
 the returned memory ID and exactly one backend store/search call. This is explicit
 host injection, not an automatically provisioned database. These tests do not
 claim the separate Postgres/pgvector documentation sketch or a live vector service.
+
+The `policy` scenario now also reproduces the original offline TestPolicyExample
+using `adk::codec::policy` projections before exercising native fail-closed tool
+policy. This does not claim the separate live TestRunnerToolPolicyExample; see
+[execution security](execution-security.md#legacy-sdk-policy-projections) for the
+legacy-default/native-authorization distinction.

@@ -53,7 +53,7 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["docs/feature-examples.md","scripts/mode-routing-reference/run.py", "scripts/mode-routing-reference/reference_test.go",
+RUST_INPUTS = ["crates/adk-codec/src/policy.rs", "crates/adk-codec/tests/policy.rs", "scripts/policy-reference/run.py", "scripts/policy-reference/reference_test.go", "scripts/policy-reference/README.md", "fixtures/policy/observations.json", "docs/execution-security.md","docs/feature-examples.md","scripts/mode-routing-reference/run.py", "scripts/mode-routing-reference/reference_test.go",
                "scripts/mode-routing-reference/README.md", "fixtures/mode-routing/observations.json",
                "crates/adk-codec/tests/mode_routing.rs", "crates/adk-codec/src/mode.rs", "scripts/mode-codec-reference/run.py", "scripts/mode-codec-reference/reference_test.go",
                "scripts/mode-codec-reference/README.md", "fixtures/mode-codec/observations.json",
@@ -603,7 +603,8 @@ def verify_rust() -> None:
                                        cwd=ROOT, text=True, capture_output=True, check=True)
     userinput_check = subprocess.run([sys.executable, str(ROOT / "scripts/userinput-reference/run.py"), "--check"],
                                     cwd=ROOT, text=True, capture_output=True, check=True)
-    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "agents", "--test", "baseline", "--test", "roles", "--test", "modes", "--test", "mode_routing", "--test", "userinput", "--test", "runner_codecs", "-p", "adk-platform", "-p", "adk-runtime",
+    policy_check = subprocess.run([sys.executable, "scripts/policy-reference/run.py", "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
+    command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "policy", "--test", "agents", "--test", "baseline", "--test", "roles", "--test", "modes", "--test", "mode_routing", "--test", "userinput", "--test", "runner_codecs", "-p", "adk-platform", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "assembler", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity", "--test", "openai_cost_reference", "--test", "modelsdev",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host,mcp,project-state,execution,observability", "--example", "features", "--test", "resolution", "--test", "host", "--test", "host_cursor", "--test", "host_config", "--test", "host_rules",
@@ -647,7 +648,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + patch_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + provider_check.stdout + assembler_check.stdout + metadata_check.stdout + item_helpers_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + modelsdev_check.stdout + agent_kinds_check.stdout + specialist_tools_check.stdout + specialist_catalog_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + registry_check.stdout + payload_check.stdout + role_catalog_check.stdout + mode_codec_check.stdout + mode_routing_check.stdout + subagent_check.stdout + progress_check.stdout + cost_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
+        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + patch_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + provider_check.stdout + assembler_check.stdout + metadata_check.stdout + item_helpers_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + modelsdev_check.stdout + policy_check.stdout + agent_kinds_check.stdout + specialist_tools_check.stdout + specialist_catalog_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + registry_check.stdout + payload_check.stdout + role_catalog_check.stdout + mode_codec_check.stdout + mode_routing_check.stdout + subagent_check.stdout + progress_check.stdout + cost_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -680,6 +681,7 @@ def apply_rust_evidence(entries, records, reference):
     if f"builtin guardrails reference verified at {BASELINE_REVISION}" not in evidence.get("reference_fixture_check", ""):
         raise SystemExit("Rust builtin guardrail evidence requires independently executed pinned fixtures")
     for marker in ("Pinned tool schemas reproduced exactly",
+                   "Pinned policy observations reproduced exactly",
                    "272 SDK lifecycle results and resulting filesystem trees verified",
                    "1176 SDK ApplyPatch results and resulting filesystem trees verified",
                    "Pinned agent-kind observations reproduced exactly",

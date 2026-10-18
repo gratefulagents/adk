@@ -21039,6 +21039,270 @@
         "mcp",
         "project-state"
       ]
+    },
+    "SDK-59A8F4E71DD0C7C2": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "CatalogURL",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed apis record CatalogURL. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-370CFED0EC27877B": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "ModelLimits.ContextTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed apis record ModelLimits.ContextTokens. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-9D6503BE2BB15BCB": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "ModelLimits.OutputTokens",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed apis record ModelLimits.OutputTokens. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-2142B5BFAF917B67": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "ModelLimits",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed apis record ModelLimits. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-FCCCF608A70E19CC": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev.go",
+      "source_name": "ParseCatalog",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed apis record ParseCatalog. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-4B27BFF89AB1463B": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed files record pkg/agentsdk/modelsdev/modelsdev_test.go. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-3851A85CFE5B7D74": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev_test.go",
+      "source_name": "TestCatalogCachedInMemoryAndOnDisk",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCatalogCachedInMemoryAndOnDisk",
+      "rationale": "Reviewed tests record TestCatalogCachedInMemoryAndOnDisk. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-D5864C102986906D": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev_test.go",
+      "source_name": "TestCompactionResolverFuncUsesModelPrefixAsProvider",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCompactionResolverFuncUsesModelPrefixAsProvider",
+      "rationale": "Reviewed tests record TestCompactionResolverFuncUsesModelPrefixAsProvider. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-1466F8DF39A2A92B": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev_test.go",
+      "source_name": "TestCompactionThresholdsDerivation",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestCompactionThresholdsDerivation",
+      "rationale": "Reviewed tests record TestCompactionThresholdsDerivation. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-17DD0DDCAB6A732F": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev_test.go",
+      "source_name": "TestLookupProviderAliasesAndPrefixes",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestLookupProviderAliasesAndPrefixes",
+      "rationale": "Reviewed tests record TestLookupProviderAliasesAndPrefixes. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
+    },
+    "SDK-EF3A8A5A7E823DD0": {
+      "source": "pkg/agentsdk/modelsdev/modelsdev_test.go",
+      "source_name": "TestParseCatalogRejectsEmpty",
+      "implementation_symbols": [
+        "crates/adk-codec/src/modelsdev.rs::ModelLimits",
+        "crates/adk-codec/src/modelsdev.rs::parse_catalog",
+        "crates/adk-providers/src/modelsdev.rs::CATALOG_URL",
+        "crates/adk-providers/src/modelsdev.rs::Resolver"
+      ],
+      "rust_test_identifiers": [
+        "modelsdev::tests::catalog_parser_matches_pinned_go",
+        "modelsdev::tests::catalog_case_normalization_matches_every_go_unicode_scalar",
+        "original_lookup_thresholds_and_prefix_regressions_match_go",
+        "memory_disk_stale_fallback_and_cancelled_cache_hits",
+        "modelsdev_catalog_is_available_without_provider_transport"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/modelsdev/TestParseCatalogRejectsEmpty",
+      "rationale": "Reviewed tests record TestParseCatalogRejectsEmpty. Signed64-bit limits, catalog URL and catalog parsing are checked against31 independent pinned-Go inputs including null/duplicate/folded fields, integer limits, surrogate replacement and nesting boundaries. The complete Unicode scalar domain checks Go lowercase normalization (Unicode15 versus native16 mappings explicitly reconciled).126 original-Go lookup/threshold/prefix cases and actual local HTTP/cache tests cover all five original regressions; original test-file closure does not close the implementation file. Native maps choose deterministic outcomes for normalized collisions/tied suffixes where Go iteration is unspecified. Returned data is owned. No full resolver/cache-envelope codec, cache-byte identity, live service, non-Linux default-cache or automatic builder-installation claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "providers-runtime"
+      ]
     }
   }
 }

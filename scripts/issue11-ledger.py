@@ -85,6 +85,7 @@ RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-re
                "crates/adk-codec/src/value.rs",
                "fixtures/item-helpers/observations.json", "scripts/item-helpers-reference/run.py",
                "scripts/item-helpers-reference/reference_test.go",
+               "crates/adk-codec/src/modelsdev.rs", "crates/adk-providers/src/modelsdev.rs", "crates/adk-providers/tests/modelsdev.rs", "scripts/modelsdev-reference/run.py", "scripts/modelsdev-reference/reference_test.go", "fixtures/modelsdev/observations.json",
                "crates/adk-codec/src/agents.rs", "crates/adk-codec/tests/agents.rs", "scripts/agent-kinds-reference/run.py", "scripts/agent-kinds-reference/reference_test.go", "fixtures/agent-kinds/observations.json",
                "crates/adk-codec/src/cost.rs", "crates/adk-codec/tests/baseline.rs", "crates/adk-platform/src/codec.rs",
                "crates/adk-codec/tests/request_snapshot.rs", "crates/adk/tests/tracewriter.rs",
@@ -581,6 +582,7 @@ def verify_rust() -> None:
     registry_check = subprocess.run([sys.executable, str(ROOT / "scripts/registry-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     content_event_check = subprocess.run([sys.executable, str(ROOT / "scripts/content-event-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     autoloop_check = subprocess.run([sys.executable, str(ROOT / "scripts/autoloop-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
+    modelsdev_check = subprocess.run([sys.executable, str(ROOT / "scripts/modelsdev-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     agent_kinds_check = subprocess.run([sys.executable, str(ROOT / "scripts/agent-kinds-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     specialist_tools_check = subprocess.run([sys.executable, str(ROOT / "scripts/specialist-tools-reference/run.py"), "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
     specialist_catalog_check = subprocess.run([sys.executable, str(ROOT / "scripts/specialist-tools-reference/run.py"), "--catalog", "--check"], cwd=ROOT, text=True, capture_output=True, check=True)
@@ -602,7 +604,7 @@ def verify_rust() -> None:
     userinput_check = subprocess.run([sys.executable, str(ROOT / "scripts/userinput-reference/run.py"), "--check"],
                                     cwd=ROOT, text=True, capture_output=True, check=True)
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "agents", "--test", "baseline", "--test", "roles", "--test", "modes", "--test", "mode_routing", "--test", "userinput", "--test", "runner_codecs", "-p", "adk-platform", "-p", "adk-runtime",
-               "-p", "adk-providers", "--test", "assembler", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity", "--test", "openai_cost_reference",
+               "-p", "adk-providers", "--test", "assembler", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity", "--test", "openai_cost_reference", "--test", "modelsdev",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
                "--features", "otel,builder,host,mcp,project-state", "--test", "resolution", "--test", "host", "--test", "host_cursor", "--test", "host_config", "--test", "host_rules",
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
@@ -645,7 +647,7 @@ def verify_rust() -> None:
         "command": ["cargo", *command[1:]],
         "environment": {"ADK_TEST_GO": "1"},
         "exit_code": result.returncode,
-        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + patch_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + provider_check.stdout + assembler_check.stdout + metadata_check.stdout + item_helpers_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + agent_kinds_check.stdout + specialist_tools_check.stdout + specialist_catalog_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + registry_check.stdout + payload_check.stdout + role_catalog_check.stdout + mode_codec_check.stdout + mode_routing_check.stdout + subagent_check.stdout + progress_check.stdout + cost_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
+        "reference_fixture_check": "Pinned tool schemas reproduced exactly\n" + lifecycle_check.stdout + patch_check.stdout + fixture_check.stdout + record_check.stdout + host_check.stdout + fileconfig_check.stdout + handoff_check.stdout + mcp_check.stdout + project_state_check.stdout + workspace_check.stdout + instructions_check.stdout + mcp_prompt_check.stdout + provider_check.stdout + assembler_check.stdout + metadata_check.stdout + item_helpers_check.stdout + llm_summary_check.stdout + userinput_check.stdout + confirmation_check.stdout + verifier_check.stdout + critic_check.stdout + dynamic_instructions_check.stdout + tool_stopping_check.stdout + handoff_constructor_check.stdout + handoff_callback_check.stdout + handoff_enabled_check.stdout + handoff_filter_check.stdout + handoff_input_type_check.stdout + handoff_compaction_check.stdout + handoff_tracing_check.stdout + modelsdev_check.stdout + agent_kinds_check.stdout + specialist_tools_check.stdout + specialist_catalog_check.stdout + image_analysis_check.stdout + autoloop_check.stdout + registry_check.stdout + payload_check.stdout + role_catalog_check.stdout + mode_codec_check.stdout + mode_routing_check.stdout + subagent_check.stdout + progress_check.stdout + cost_check.stdout + content_event_check.stdout + line_writer_check.stdout + content_stream_check.stdout + content_logger_check.stdout,
         "stdout": result.stdout,
         "stderr": result.stderr,
         "files": {path: sha256(ROOT / path) for path in RUST_INPUTS},
@@ -681,6 +683,7 @@ def apply_rust_evidence(entries, records, reference):
                    "272 SDK lifecycle results and resulting filesystem trees verified",
                    "1176 SDK ApplyPatch results and resulting filesystem trees verified",
                    "Pinned agent-kind observations reproduced exactly",
+                   "Pinned models.dev observations reproduced exactly",
                    "Pinned specialist tools observations reproduced exactly",
                    "Pinned specialist catalog observations reproduced exactly",
                    "Pinned SDK MCP prompt observations reproduced exactly",

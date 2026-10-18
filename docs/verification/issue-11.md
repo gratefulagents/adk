@@ -2,6 +2,38 @@
 
 ## Current continuation evidence
 
+### Explicit models.dev catalog resolution
+
+Added separate codec/provider modelsdev modules: signed model limits and catalog
+parsing; provider aliases/model-prefix/suffix lookup; lazy bounded HTTP fetching;
+serialized memory/disk TTL cache with stale fallback; explicit transport/cache
+options; source signed threshold helpers and an opt-in native compaction adapter.
+Existing authenticated provider metadata and automatic builder selection are not
+changed. Native adapter cancellation and rejection of unrepresentable negative
+thresholds are explicit; lookup retains source cached/stale cancellation behavior.
+
+Independent pinned-Go evidence covers31 parse inputs,126 lookup/threshold/routing
+cases and all1,112,064 Unicode scalars. It found27 RustUnicode16/GoUnicode15
+lowercase mismatches, now reconciled. Local HTTP tests verify request coalescing,
+disk fallback, failed fetches, timeout/cancellation and native threshold adaptation.
+Review found the initial in-memory TTL used wall time; a regression failed with
+Elapsed against that logic and passes with monotonic memory time and integer disk
+nanosecond comparison. Initial test compilation used the wrong Context/Error API;
+corrected before final verification.
+
+All five original Go modelsdev regressions have native counterparts. Eleven exact
+records are reviewed: limits fields/type,URL,ParseCatalog,five tests and test file.
+Full cache-envelope folded/duplicate/null/timestamp decoding, exact cache bytes,
+whole resolver/group and live/non-Linux defaults remain unclaimed.
+
+Final Rust1.88 Linux: **1,786 workspace +10 doctests passed;0 failed,30 ignored**.
+Strict whole-workspace Clippy/typecheck/rustdoc/format, facade matrix/standalone
+consumer/purity, all20 offline scenarios/host session, independently reproduced
+bound references,56 validators, artifact/overlay/audit and source locks passed.
+Ledger: **1,154 verified /7,737 unresolved /251 excluded**. Full retained issue
+acceptance remains incomplete. All46 remote CI checks passed at preceding5550940;
+that result is not attributed to this new implementation.
+
 ### Subagent selector capability facets
 
 Separately reviewed the Async and GenericFallback capability records against the

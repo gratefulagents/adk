@@ -177,3 +177,17 @@ fn governed_kinds_are_available_through_compat_facade() {
         br#"{"kind":"planner","readOnly":true,"aliases":["Plan"]}"#
     );
 }
+
+#[test]
+fn modelsdev_catalog_is_available_without_provider_transport() {
+    let catalog = adk::codec::modelsdev::parse_catalog(
+        br#"{"openai":{"models":{"m":{"limit":{"context":100,"output":20}}}}}"#,
+    )
+    .unwrap();
+    assert_eq!(
+        adk::codec::modelsdev::lookup(&catalog, " OPENAI ", "openai/m")
+            .unwrap()
+            .context_tokens,
+        100
+    );
+}

@@ -342,3 +342,38 @@ starts and stops, missing message starts, encrypted reasoning/compaction, raw
 arguments and signed/nonzero usage updates. Regenerate or verify via
 `python3 scripts/anthropic-assembler-reference/run.py [--check]`. These are bounded
 assembly semantics, not complete provider or JSON-decoder equivalence.
+
+## models.dev catalog resolver
+
+`adk::providers::modelsdev::{Resolver, Options}` is a separate, unauthenticated
+catalog resolver, not the provider backend `/models` metadata resolver. Construct
+it explicitly; it is not silently installed into existing builders. Construction
+performs no I/O. `Options::default()` uses `https://models.dev/api.json`, a20-second
+HTTP timeout,24-hour TTL, and the OS cache directory's
+`gratefulagents/modelsdev.json`. Set `cache_path: None` to disable disk access;
+provide `client` to own transport policy and `url` for a local catalog.
+
+Lookup serializes concurrent refreshes, caches successes in memory/on disk,
+uses monotonic in-memory TTLs (wall timestamps only for disk loads),
+and serves stale data on failed refreshes. Failed fetches are not cached. A fresh
+cache hit ignores cancellation; cancellation during refresh returns stale data,
+matching the source helper. Lock acquisition is serialized rather than cancelled.
+The optional `providers-runtime` `CompactionResolver` adapter instead honors native
+cancellation/deadlines around the whole operation and rejects negative signed
+thresholds that the native runner cannot represent. It has no durable replay key.
+
+The catalog parser and pure lookup are also available without HTTP/runtime through
+`adk::codec::modelsdev`. Limits are signed64-bit values. Models with nonpositive
+windows or empty normalized IDs are dropped. Lookup supports Copilot/Anthropic
+aliases, strips model route prefixes, and selects the longest matching model ID;
+`openai-oauth` is deliberately not an OpenAI alias. Direct threshold helpers use
+the SDK's wrapping signed arithmetic. Normalized-key collisions and equal-length
+suffix ties have deterministic native map ordering instead of Go map iteration.
+
+The pinned oracle checks31 parsing inputs,126 lookup/threshold/routing cases and
+all1,112,064 Unicode scalars against Go's lowercase table. Native local-HTTP tests
+cover coalescing, stale disk fallback, cancellation, timeout, parse failures and
+signed-overflow adaptation. Linux is verified; other OS cache defaults and live
+models.dev service behavior remain unverified. The disk reader currently accepts
+ordinary canonical cache envelopes; full Go folded/duplicate/null envelope decoding
+is not claimed, nor is exact cache-byte or complete resolver/group parity.

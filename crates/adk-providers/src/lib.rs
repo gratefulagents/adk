@@ -27,6 +27,7 @@ pub mod error;
 pub mod factory;
 pub mod material;
 pub mod metadata;
+pub mod modelsdev;
 pub mod oauth;
 mod openai;
 pub mod routing;

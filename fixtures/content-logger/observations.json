@@ -651,7 +651,7 @@
     "harnessSHA256": {
       "scripts/content-logger-reference/agent_reference_test.go": "7ee3bc7414b723c338722243bc32e7df9dd684f667a19f12eb3bdf22522689a0",
       "scripts/content-logger-reference/reference_test.go": "87070f80b9c79f1d35ff3f5c11111b5e04e5a2f8704dc0c592c9001e1d986afc",
-      "scripts/content-logger-reference/run.py": "d522dbe31c9559a794ba8b6b5dccaaa4a75b7926817f2dbab91fc85179b29f44"
+      "scripts/content-logger-reference/run.py": "1c65f45cdc00131cf454bb9010e3f7012ab97312947d6d6c54b240c7080149d0"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",

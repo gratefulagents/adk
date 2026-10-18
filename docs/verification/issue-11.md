@@ -2,6 +2,36 @@
 
 ## Current continuation evidence
 
+### Exact MCP text projections and provider/MCP offline examples
+
+Added explicit legacy MCP approval-display/model-description projections, sharing
+the existing pinned printable Unicode table with the facade logger. Both helpers
+return bytes so512/1024-byte cuts preserve partial UTF-8, retain source unbounded
+names/fallbacks/quoting, and accept UTF-8 inputs. Native bounded/quoted MCP framing
+is unchanged. Independent Go checks cover160 byte cases and1,112,064 scalars;
+existing logger observations remain unchanged after table relocation. Initial
+oracle generation used the wrong package copy path; corrected before verification.
+
+Original provider configuration now exercises OpenAI/Anthropic/OpenRouter route
+construction, identities and chat-model validation with credential doubles that
+panic on access. MCP uses original notes/query/result and, on Unix, private config
+snapshot/hash/path/unchanged/mutation/reload assertions. No provider calls or MCP
+processes run. Remote/server MCP documentation and live examples remain unclaimed.
+Fourteen precise API/example/file/test records are reviewed.
+
+Fresh Rust1.88 Linux: **1,809 workspace +10 doctests +10 example tests passed;
+0 failed,30 ignored**. Strict lint/typecheck/docs/format, facade matrix/standalone
+consumer,20 scenarios/host session, all56 validators, independent references and
+source locks/purity pass. Go reference:968 passing records,5 skips,49 packages.
+Ledger: **1,295 verified /7,596 unresolved /251 excluded**.
+
+Credential availability was checked without reading values: OPENAI_API_KEY,
+OPENAI_OAUTH_AUTH_JSON_PATH, ANTHROPIC_API_KEY and OPENROUTER_API_KEY are absent;
+the source-default ~/.codex/auth.json file is absent too. External live provider
+acceptance therefore remains unverified, not covered by these offline checks.
+Remaining unblocked work continues, next including the original local HTTP
+streaming and read-only-registry examples. Full issue acceptance is not complete.
+
 ### Standalone retry helpers and original offline examples
 
 Added explicit `adk::codec::retry` value helpers: the SDK suggested retry policy

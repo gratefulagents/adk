@@ -31,6 +31,15 @@
       "test",
       "-count=1",
       "-json",
+      "./examples/features/mcp",
+      "-run",
+      "^(TestMCPConfigSnapshotAndSanitizeExample|TestMCPToolBuilderExample)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
       "./examples/features/memory",
       "-run",
       "^(TestCustomStoreCanBackMemoryToolExample|TestInMemoryStoreSemanticsExample|TestNoopEmbedderIsDeterministicExample)$"
@@ -43,6 +52,15 @@
       "./examples/features/policy",
       "-run",
       "^(TestPolicyExample)$"
+    ],
+    [
+      "go",
+      "test",
+      "-count=1",
+      "-json",
+      "./examples/features/providers",
+      "-run",
+      "^(TestProviderConfigurationExample)$"
     ],
     [
       "go",
@@ -127,7 +145,7 @@
     ]
   ],
   "counts": {
-    "pass": 965,
+    "pass": 968,
     "skip": 5
   },
   "exit_code": 0,
@@ -135,8 +153,10 @@
   "packages": {
     "github.com/gratefulagents/sdk/examples/features/context_compaction": "pass",
     "github.com/gratefulagents/sdk/examples/features/errors_retries": "pass",
+    "github.com/gratefulagents/sdk/examples/features/mcp": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory": "pass",
     "github.com/gratefulagents/sdk/examples/features/policy": "pass",
+    "github.com/gratefulagents/sdk/examples/features/providers": "pass",
     "github.com/gratefulagents/sdk/examples/features/settings_routing": "pass",
     "github.com/gratefulagents/sdk/examples/features/tools_registry": "pass",
     "github.com/gratefulagents/sdk/examples/features/tracestore": "pass",
@@ -183,16 +203,19 @@
   },
   "purpose": "Independent Go reference execution only; does not verify any Rust acceptance ID.",
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
-  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
+  "stderr": "failed to start telemetry sidecar: os.Executable: readlink /proc/self/exe: no such file or directory\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n\n",
   "tests": {
     "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/errors_retries/TestProviderRetryAdviceExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/errors_retries/TestRunConfigRetryPolicyExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample": "pass",
+    "github.com/gratefulagents/sdk/examples/features/mcp/TestMCPConfigSnapshotAndSanitizeExample": "pass",
+    "github.com/gratefulagents/sdk/examples/features/mcp/TestMCPToolBuilderExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory/TestCustomStoreCanBackMemoryToolExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory/TestInMemoryStoreSemanticsExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/memory/TestNoopEmbedderIsDeterministicExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/policy/TestPolicyExample": "pass",
+    "github.com/gratefulagents/sdk/examples/features/providers/TestProviderConfigurationExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/settings_routing/TestSettingsAndModeRoutingExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/tools_registry/TestSDKToolRegistryExample": "pass",
     "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample": "pass",

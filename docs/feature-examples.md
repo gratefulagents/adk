@@ -223,3 +223,38 @@ Implement `Model::retry_advice` for provider-directed recovery. Set
 `RunError.error.info.category` (including MaxTurns, Guardrail and DeadlineExceeded)
 and preserve partial run state, rather than Go errors.As concrete-type matching.
 The scenario additionally verifies that a cancelled run never invokes the model.
+
+## Original provider configuration and MCP assertions
+
+`providers` constructs OpenAI chat-completions, Anthropic and OpenRouter model
+bindings with the original endpoints/model names via `providers::factory::RouteSpec`.
+It checks provider identities, runner construction, chat support for gpt-4.1-mini
+and rejection of DEFAULT_CHAT_MINI_MODEL. Host-owned credential/refresh doubles
+panic if accessed: no key, network request or live service is used. This does not
+verify the separate live provider examples.
+
+`mcp` now uses the original mcp__notes__lookup name, query=sdk and note found result.
+On Unix it also writes a private .mcp.json, loads a ConfigSnapshot with nonempty
+hash/absolute path/echo server, verifies unchanged bytes, rejects a trailing edit,
+and restores/reloads the original command. No MCP process is spawned. Native
+ConfigSnapshot preserves bounded/no-follow validation and returns ConfigChanged
+rather than matching Go error prose. Non-Unix safe snapshots remain unsupported;
+the original snapshot example regression is explicitly Unix-gated.
+
+`adk::codec::text::sanitize_mcp_display` provides the explicit legacy approval-UI
+byte projection. It strips nonprintable Go Unicode scalars, flattens control
+whitespace and adds the original provenance tag. The original hostile description
+and hostile server-name examples verify preserved legitimate words and removed
+controls. The512-byte body cut can split UTF-8, so the result is Vec<u8>, not String;
+UI adapters must choose their own decoding policy. Input strings are valid UTF-8.
+The source server tag is not length-bounded and is not an authenticated identity.
+Native `mcp::tools::sanitize_description` remains a separate bounded, quoted,
+untrusted-description formatter; it is not replaced or weakened by this projection.
+Remote MCP client/server policy features and their README are not closed by these
+local examples.
+
+The separate `codec::text::sanitize_mcp_tool_description` retains the SDK's
+1024-byte body cutoff, quoted names, unnamed/empty-body fallbacks and explicit
+untrusted-text framing as bytes. Names remain unbounded in this legacy projection.
+It too is separate from the stricter native MCP formatter. Both pure helpers are
+checked against160 independently executed cases and every Unicode scalar.

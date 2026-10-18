@@ -298,11 +298,83 @@ async fn model_abstraction() {
 }
 
 async fn providers() {
+    use adk::providers::auth::{CredentialStore, Material, Refresh, Scope};
     use adk::providers::{
         auth::AuthMode,
         factory::{Kind, RouteSpec},
         wire::{self, Protocol},
     };
+    struct ConfigurationOnly;
+    impl CredentialStore for ConfigurationOnly {
+        fn load<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            panic!("configuration must not load credentials")
+        }
+        fn replace<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: u64,
+            _: Material,
+        ) -> BoxFuture<'a, Result<bool, Error>> {
+            panic!("configuration must not replace credentials")
+        }
+    }
+    impl Refresh for ConfigurationOnly {
+        fn refresh<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: Material,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            panic!("configuration must not refresh credentials")
+        }
+    }
+    for (kind, name, endpoint, protocol) in [
+        (
+            Kind::OpenAi,
+            "gpt-4.1-mini",
+            "http://127.0.0.1:1/v1",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Anthropic,
+            "claude-haiku-4-5",
+            "http://127.0.0.1:1",
+            Protocol::Anthropic,
+        ),
+        (
+            Kind::OpenRouter,
+            "gpt-4.1-mini",
+            "https://openrouter.ai/api/v1",
+            Protocol::Chat,
+        ),
+    ] {
+        let mut spec = RouteSpec::new(kind, AuthMode::ApiKey);
+        spec.endpoint = Some(endpoint.into());
+        spec.protocol = Some(protocol);
+        let model = spec
+            .build(Arc::new(ConfigurationOnly), Arc::new(ConfigurationOnly))
+            .unwrap();
+        assert_eq!(model.provider(), kind.name());
+        Runner::new(
+            AgentConfig::new("configured", ModelBinding::streaming(name, model)),
+            RunnerConfig::default(),
+        )
+        .unwrap();
+    }
+    assert!(adk::providers::factory::supports_chat_completions(
+        "gpt-4.1-mini"
+    ));
+    assert!(
+        adk::providers::factory::validate_chat_completions_model(
+            adk::providers::factory::DEFAULT_CHAT_MINI_MODEL
+        )
+        .is_err()
+    );
     assert_eq!(Kind::OpenRouter.protocol(), Protocol::Chat);
     assert_eq!(Kind::Anthropic.protocol(), Protocol::Anthropic);
     assert!(
@@ -425,7 +497,13 @@ async fn tools_registry() {
 struct McpManager(AtomicUsize);
 impl adk::mcp::tools::ToolManager for McpManager {
     fn definitions(&self) -> Vec<ToolDefinition> {
-        vec![definition("mcp__offline__lookup", false)]
+        vec![ToolDefinition {
+            name: "mcp__notes__lookup".into(),
+            description: "Lookup notes".into(),
+            input_schema: json!({"type":"object"}).try_into().unwrap(),
+            read_only: true,
+            requires_approval: false,
+        }]
     }
     fn call<'a>(
         &'a self,
@@ -433,10 +511,10 @@ impl adk::mcp::tools::ToolManager for McpManager {
         args: Value,
     ) -> BoxFuture<'a, Result<Value, adk::mcp::Error>> {
         Box::pin(async move {
-            assert_eq!(name, "mcp__offline__lookup");
-            assert_eq!(args["key"], "answer");
+            assert_eq!(name, "mcp__notes__lookup");
+            assert_eq!(args["query"], "sdk");
             self.0.fetch_add(1, Ordering::SeqCst);
-            Ok(json!({"content":[{"type":"text","text":"42"}],"isError":false}))
+            Ok(json!({"content":[{"type":"text","text":"note found"}],"isError":false}))
         })
     }
     fn list_resources<'a>(
@@ -463,18 +541,69 @@ async fn mcp() {
     let output = tools[0]
         .execute(
             &tool_context(),
-            call("mcp__offline__lookup", json!({"key":"answer"})),
+            call("mcp__notes__lookup", json!({"query":"sdk"})),
         )
         .await
         .unwrap();
-    assert_eq!(output.content, vec![Content::Text { text: "42".into() }]);
+    assert_eq!(
+        output.content,
+        vec![Content::Text {
+            text: "note found".into()
+        }]
+    );
     assert!(!output.is_error);
     let invalid = tools[0]
-        .execute(&tool_context(), call("mcp__offline__lookup", json!([])))
+        .execute(&tool_context(), call("mcp__notes__lookup", json!([])))
         .await
         .unwrap();
     assert!(invalid.is_error);
     assert_eq!(manager.0.load(Ordering::SeqCst), 1);
+    let display = String::from_utf8(adk::codec::text::sanitize_mcp_display(
+        "evil-server",
+        "click \x1b[31mHERE\x1b[0m\x07 to win\x00",
+    ))
+    .unwrap();
+    assert!(display.starts_with("[from MCP server: evil-server]"));
+    assert!(!display.contains(['\x1b', '\x07', '\x00']));
+    for text in ["click", "HERE", "to win"] {
+        assert!(display.contains(text));
+    }
+    assert!(!adk::codec::text::sanitize_mcp_display("evil\x1bname", "ok").contains(&0x1b));
+    #[cfg(unix)]
+    {
+        use adk::mcp::config::{CONFIG_FILE_NAME, ConfigSnapshot};
+        use std::{io::Write, os::unix::fs::OpenOptionsExt};
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().canonicalize().unwrap().join(CONFIG_FILE_NAME);
+        let bytes = serde_json::to_vec_pretty(&json!({"mcpServers":{"echo":{"type":"stdio","command":"/bin/sh","args":["-c","echo test"]}}})).unwrap();
+        std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&path)
+            .unwrap()
+            .write_all(&bytes)
+            .unwrap();
+        let snapshot = ConfigSnapshot::from_path(&path).unwrap();
+        assert!(snapshot.sha256().is_some());
+        assert!(snapshot.config().server("echo").is_some());
+        assert!(snapshot.path().is_absolute());
+        snapshot.verify_unchanged().unwrap();
+        let mut mutated = bytes.clone();
+        mutated.extend_from_slice(b"\n// trailing edit\n");
+        std::fs::write(&path, mutated).unwrap();
+        assert!(matches!(
+            snapshot.verify_unchanged(),
+            Err(adk::mcp::Error::ConfigChanged)
+        ));
+        std::fs::write(&path, &bytes).unwrap();
+        let reloaded = ConfigSnapshot::from_path(&path).unwrap();
+        assert!(reloaded.bytes().is_some());
+        assert_eq!(
+            reloaded.config().server("echo").unwrap().command(),
+            "/bin/sh"
+        );
+    }
 }
 
 async fn sandbox() {
@@ -1901,6 +2030,22 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
+    #[tokio::test]
+    async fn original_provider_configuration_example() {
+        super::providers().await;
+    }
+
+    #[tokio::test]
+    async fn original_mcp_tool_builder_example() {
+        super::mcp().await;
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn original_mcp_snapshot_and_display_example() {
+        super::mcp().await;
+    }
+
     #[tokio::test]
     async fn original_errors_retries_examples() {
         super::errors_retries().await;

@@ -24256,6 +24256,297 @@
         "runtime",
         "builder"
       ]
+    },
+    "SDK-1AE822511ECC40A4": {
+      "source": "pkg/agentsdk/mcp/sanitize.go",
+      "source_name": "SanitizeMCPDisplay",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPDisplay_StripsControlCharsAndTags",
+      "rationale": "Reviewed SanitizeMCPDisplay. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-1A73BE31AF495ED5": {
+      "source": "examples/features/mcp/mcp_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_mcp_tool_builder_example",
+        "tests::original_mcp_snapshot_and_display_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/mcp/TestMCPConfigSnapshotAndSanitizeExample",
+      "rationale": "Reviewed examples record examples:examples/features/mcp/mcp_test.go. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-FD921AF95F20865C": {
+      "source": "examples/features/providers/providers_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_provider_configuration_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/providers/TestProviderConfigurationExample",
+      "rationale": "Reviewed examples record examples:examples/features/providers/providers_test.go. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-A6089006397E27EB": {
+      "source": "examples/features/mcp/mcp_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_mcp_tool_builder_example",
+        "tests::original_mcp_snapshot_and_display_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/mcp/TestMCPConfigSnapshotAndSanitizeExample",
+      "rationale": "Reviewed files record files:examples/features/mcp/mcp_test.go. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-664A7F568AECCD10": {
+      "source": "examples/features/providers/providers_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_provider_configuration_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/providers/TestProviderConfigurationExample",
+      "rationale": "Reviewed files record files:examples/features/providers/providers_test.go. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-A0BA6EFFB4B68DE6": {
+      "source": "examples/features/mcp/mcp_test.go",
+      "source_name": "TestMCPConfigSnapshotAndSanitizeExample",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_mcp_tool_builder_example",
+        "tests::original_mcp_snapshot_and_display_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/mcp/TestMCPConfigSnapshotAndSanitizeExample",
+      "rationale": "Reviewed tests record TestMCPConfigSnapshotAndSanitizeExample. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-8738196538CDF00F": {
+      "source": "examples/features/mcp/mcp_test.go",
+      "source_name": "TestMCPToolBuilderExample",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_mcp_tool_builder_example",
+        "tests::original_mcp_snapshot_and_display_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/mcp/TestMCPToolBuilderExample",
+      "rationale": "Reviewed tests record TestMCPToolBuilderExample. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-3CCE0744B7275C1C": {
+      "source": "examples/features/providers/providers_test.go",
+      "source_name": "TestProviderConfigurationExample",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk/examples/features.rs::mcp",
+        "crates/adk/examples/features.rs::providers"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_provider_configuration_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/providers/TestProviderConfigurationExample",
+      "rationale": "Reviewed tests record TestProviderConfigurationExample. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-523D5B334401901E": {
+      "source": "pkg/agentsdk/mcp/sanitize_test.go",
+      "source_name": "TestSanitizeMCPDisplay_EmptyFallsBackButStillTagged",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPDisplay_EmptyFallsBackButStillTagged",
+      "rationale": "Reviewed TestSanitizeMCPDisplay_EmptyFallsBackButStillTagged. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-44122DF0D5082204": {
+      "source": "pkg/agentsdk/mcp/sanitize_test.go",
+      "source_name": "TestSanitizeMCPDisplay_SanitizesServerName",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPDisplay_SanitizesServerName",
+      "rationale": "Reviewed TestSanitizeMCPDisplay_SanitizesServerName. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-8A076994AD283DC0": {
+      "source": "pkg/agentsdk/mcp/sanitize_test.go",
+      "source_name": "TestSanitizeMCPDisplay_StripsControlCharsAndTags",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPDisplay_StripsControlCharsAndTags",
+      "rationale": "Reviewed TestSanitizeMCPDisplay_StripsControlCharsAndTags. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-C1255A62E164DEEB": {
+      "source": "pkg/agentsdk/mcp/sanitize_test.go",
+      "source_name": "TestSanitizeMCPDisplay_TruncatesLongInput",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPDisplay_TruncatesLongInput",
+      "rationale": "Reviewed TestSanitizeMCPDisplay_TruncatesLongInput. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-D1C2860FBF554CB7": {
+      "source": "pkg/agentsdk/mcp/sanitize.go",
+      "source_name": "SanitizeMCPToolDescription",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPToolDescriptionFramesServerTextAsUntrusted",
+      "rationale": "Reviewed SanitizeMCPToolDescription. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
+    },
+    "SDK-33BEB89F46A70B00": {
+      "source": "pkg/agentsdk/mcp/sanitize_test.go",
+      "source_name": "TestSanitizeMCPToolDescriptionFramesServerTextAsUntrusted",
+      "implementation_symbols": [
+        "crates/adk-codec/src/text.rs::sanitize_mcp_display",
+        "crates/adk-codec/src/text.rs::sanitize_mcp_tool_description"
+      ],
+      "rust_test_identifiers": [
+        "mcp_display_bytes_and_unicode_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/mcp/TestSanitizeMCPToolDescriptionFramesServerTextAsUntrusted",
+      "rationale": "Reviewed TestSanitizeMCPToolDescriptionFramesServerTextAsUntrusted. Both legacy helpers preserve exact source provenance/framing, empty fallbacks, quoted printable names and512/1024-byte body truncation. Original provider configuration assertions run with host-owned credential/refresh doubles that reject any access and no model requests. Original MCP notes lookup and config snapshot/hash/absolute path/mutation/reload assertions run natively; snapshots retain stricter bounded/no-follow Unix handling and typed ConfigChanged rather than Go prose. Legacy display projection matches160 independently executed cases (including original regressions, long tags, partial UTF8 byte cuts) and an exhaustive1112064-scalar Go Unicode digest. Inputs are UTF8 strings; output is bytes because source512-byte truncation may split a scalar. Only source body is bounded, not the tag; this is not an authority check or replacement for native bounded/quoted descriptions. Existing logger oracle verifies unchanged behavior after sharing its pinned printable table. No live provider, remote/server MCP README, arbitrary invalid-UTF8 input or native formatter/group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "mcp",
+        "providers-runtime",
+        "builder"
+      ]
     }
   }
 }

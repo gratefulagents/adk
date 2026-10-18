@@ -1,5 +1,4 @@
 //! Host-owned SDK content-event log bodies, without process-global logging state.
-mod printable;
 
 use adk_codec::dto::ContentEvent;
 use std::{
@@ -137,10 +136,7 @@ pub(crate) fn quote(mut bytes: &[u8]) -> String {
             .chars()
         {
             let rune = u32::from(ch);
-            let index = printable::PRINTABLE.partition_point(|(_, end)| *end < rune);
-            let printable = printable::PRINTABLE
-                .get(index)
-                .is_some_and(|(start, _)| *start <= rune);
+            let printable = adk_codec::text::is_go_printable(ch);
             match ch {
                 '"' | '\\' => {
                     out.push('\\');

@@ -50,7 +50,7 @@ def main():
         table += ''.join(f'    (0x{low:x}, 0x{high:x}),\n' for low, high in ranges)
         table += '];\n'
         products = {'fixtures/content-logger/observations.json': json.dumps(dict(provenance=provenance, **observed), indent=2, sort_keys=True) + '\n',
-                    'crates/adk/src/content_logger/printable.rs': table,
+                    'crates/adk-codec/src/printable.rs': table,
                     'docs/migration/licenses/go-LICENSE.txt': (goroot / 'LICENSE').read_text()}
         for path, text in products.items():
             destination = ROOT / path

@@ -24617,6 +24617,22 @@
         "builder",
         "tools"
       ]
+    },
+    "SDK-56A717624C7CC090": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "ExpandSafe",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::expand_safe"
+      ],
+      "rust_test_identifiers": [
+        "explicit_environment_expansion_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only explicit-map ExpandSafe is closed. Independent pinned Go oracle verifies540 byte cases including every byte after dollar and inside braces, malformed/empty braces, special and numbered variables, unknown names, no recursive expansion, embedded NUL and invalid UTF-8 in keys/values/literal text. Rust uses byte slices and an explicit byte map, never ambient environment or shell execution. Original SafeEnv secret-isolation regression is supplemental reference evidence, not a claim of the whole SafeEnv helper, inherited variables, config defaults, native sandbox grant expansion or executor parity.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

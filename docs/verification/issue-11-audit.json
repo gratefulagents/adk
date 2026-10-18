@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7592,
-    "verified": 1299
+    "unresolved": 7591,
+    "verified": 1300
   },
   "groups": [
     {
@@ -6497,7 +6497,8 @@
     },
     {
       "counts": {
-        "apis:unresolved": 90,
+        "apis:unresolved": 89,
+        "apis:verified": 1,
         "configuration:unresolved": 21,
         "defaults:unresolved": 4,
         "environment:unresolved": 15,
@@ -6581,7 +6582,6 @@
         "SDK-53B3EBA505AECFBB",
         "SDK-5421C70E83D81B99",
         "SDK-55DEEC601AFF0E30",
-        "SDK-56A717624C7CC090",
         "SDK-5707375F9134BC39",
         "SDK-580E354BF2526E13",
         "SDK-5B58561F79CC3BEB",
@@ -6729,7 +6729,9 @@
         "SDK-FEB9D1B5F8B1F430",
         "SDK-FEFBB5A32A34E654"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-56A717624C7CC090"
+      ]
     },
     {
       "counts": {
@@ -10983,8 +10985,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "1f7470f1bf627c100c7572c173bc07cb6887229b7710b1f275c89c8da6485183",
-    "docs/migration/ledger/issue-11-rust-claims.json": "fe4a0d6e1dd10da875e3801cad3694ef4dc9e78493926e91136e2ce897ed355e",
+    "docs/migration/ledger/issue-11-overlay.json": "bd232e1f400e424697bd4d608a779fe8ac6e7def89a08d76f6ad07d0840d5737",
+    "docs/migration/ledger/issue-11-rust-claims.json": "5d6f2cee39dca306a1df165ac161f57460e86404612903f430bd4bfe6155fbd1",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10993,6 +10995,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1297
+    "rust_test": 1298
   }
 }

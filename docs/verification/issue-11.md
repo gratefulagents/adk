@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Explicit-map sandbox expansion
+
+Added `adk::codec::sandbox_env::expand_safe` (compat feature), an explicit byte-map
+projection of the SDK helper. It never reads ambient variables, invokes a shell,
+recursively expands substituted values, or installs grants in the native executor.
+Byte inputs/results preserve invalid UTF-8 as well as NUL. Independent pinned Go
+execution verifies540 inputs, including every byte after dollar/in braces,
+malformed and empty braces, special/numbered variables, missing names, and binary
+names/values. Fixture provenance binds the SDK, harness and Go stdlib hashes.
+
+Fresh full workspace tests pass with0 failures/30 ignored (including the ambient
+credential subprocess regression); strict all-target workspace lint/typecheck,
+rustdoc warnings, formatting, bound Rust/Go evidence,56 audit validators, source
+locks and dependency purity pass. Original reference reports972 passing records,
+5 skips across53 packages. One exact ExpandSafe API record is closed; ledger
+**1,300 verified /7,591 unresolved /251 excluded**. This is not SafeEnv inheritance,
+configuration or executor parity, and issue11 remains incomplete.
+
+
 ### Original four-phase tripwire example
 
 Added native custom input/output/tool-input/tool-output callbacks reproducing

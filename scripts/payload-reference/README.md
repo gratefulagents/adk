@@ -14,6 +14,12 @@ exact reproducibility; changing the toolchain intentionally changes provenance.
 
 ## Stable fixture schema (version 1)
 
+The fixture includes 221 `LLMReasoning` and 153 `LLMCompaction` observations.
+These are plain-string analysis records, distinct from the runtime item payloads.
+Both are supported by the native sealed byte-codec API; the minimal compat-only
+facade runs all 374 comparisons. This does not add whole request/response byte
+decoding or infer nested/raw-field compatibility from the leaf records.
+
 Output: `fixtures/payloads/observations.json`.
 
 - `schema_version`: 1.
@@ -23,7 +29,7 @@ Output: `fixtures/payloads/observations.json`.
   source file hashes, harness hashes, Go version, GOOS, and GOARCH.
 - `cases`: ordered records, each containing:
   - `id`: unique stable descriptive identifier.
-  - `type`: one of the nine Go struct names or `RunItemType`.
+  - `type`: an observed Go record name or `RunItemType`.
   - `input_hex`: original JSON input bytes, including malformed UTF-8.
   - `decode_ok`, `decode_error`: `json.Unmarshal` result; error is empty on success.
   - `decoded_fields`: fields keyed by JSON tag, including zero values and fields

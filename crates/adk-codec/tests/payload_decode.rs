@@ -49,6 +49,22 @@ fields!(
     encrypted_content
 );
 fields!(CompactionData, id, content, encrypted_content, created_by);
+fields!(
+    ReasoningSnapshot,
+    id,
+    text,
+    thinking,
+    signature,
+    redacted_data,
+    encrypted_content
+);
+fields!(
+    CompactionSnapshot,
+    id,
+    content,
+    encrypted_content,
+    created_by
+);
 fields!(ToolApprovalData, tool_name, call_id, approved; input);
 impl Observation for MessageOutput {
     fn fields(&self) -> Value {
@@ -141,7 +157,7 @@ fn pinned_payload_decode_oracle() {
         assert_eq!(fixture["enum_values"][name], kind.0);
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 1905);
+    assert_eq!(cases.len(), 2279);
     for case in cases {
         match case["type"].as_str().unwrap() {
             "ModelSettings" => compare::<SnapshotModelSettings>(case),
@@ -155,6 +171,8 @@ fn pinned_payload_decode_oracle() {
             "HandoffOutputData" => compare::<HandoffOutputData>(case),
             "ReasoningData" => compare::<ReasoningData>(case),
             "CompactionData" => compare::<CompactionData>(case),
+            "LLMReasoning" => compare::<ReasoningSnapshot>(case),
+            "LLMCompaction" => compare::<CompactionSnapshot>(case),
             "ToolApprovalData" => compare::<ToolApprovalData>(case),
             "RunItemType" => compare::<RunItemType>(case),
             other => panic!("unknown oracle type: {other}"),

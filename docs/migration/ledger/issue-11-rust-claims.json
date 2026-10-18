@@ -24980,6 +24980,74 @@
         "x86_64-unknown-linux-gnu",
         "providers"
       ]
+    },
+    "SDK-87E2895B639D776C": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMCompaction",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-AD2E841B0463B3D9": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMReasoning",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-235F0087A4BF4816": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMCompaction",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::CompactionSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-2C2BB8C09AEB7801": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMReasoning",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ReasoningSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete plain-string analysis record and its public facade mapping, not request/response envelope closure. Actual immutable Go types contribute 221 reasoning and 153 compaction byte cases: all fields, omission, populated/zero values, null preservation, folded/duplicate keys, invalid UTF8 and lone-surrogate replacement, wrong-type rejection and exact encoded bytes. Native sealed byte codecs operate on complete records; the compat-only facade independently runs all 374 cases. The original response-builder test is supplemental source evidence, not the sole compaction proof. No raw-field or nested envelope behavior is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

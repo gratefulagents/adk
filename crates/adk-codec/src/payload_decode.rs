@@ -144,6 +144,8 @@ target!(
     HandoffOutputData,
     ReasoningData,
     CompactionData,
+    ReasoningSnapshot,
+    CompactionSnapshot,
     RunItemType
 );
 impl sealed::Sealed for ToolCallData {
@@ -188,6 +190,20 @@ impl GoJsonEncode for ToolApprovalData {}
 impl sealed::Sealed for SnapshotModelSettings {}
 impl GoJsonDecode for SnapshotModelSettings {}
 impl GoJsonEncode for SnapshotModelSettings {}
+
+go_object!(ResponseSnapshot,
+    "end_turn" => end_turn: raw,
+    "raw" => raw: raw,
+    "raw_available" => raw_available: scalar,
+    "raw_error" => raw_error: scalar;
+    "items" => items,
+    "texts" => texts,
+    "reasoning" => reasoning,
+    "reasoning_texts" => reasoning_texts,
+    "thinking_texts" => thinking_texts,
+    "tool_calls" => tool_calls
+    objects { "usage" => usage }
+);
 
 go_object!(ToolCallSnapshot,
     "id" => id: scalar, "name" => name: scalar, "input" => input: raw

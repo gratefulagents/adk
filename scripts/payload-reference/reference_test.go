@@ -155,6 +155,7 @@ func TestNativePayloadReference(t *testing.T) {
 		reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolOutputData{}),
 		reflect.TypeOf(HandoffCallData{}), reflect.TypeOf(HandoffOutputData{}),
 		reflect.TypeOf(ReasoningData{}), reflect.TypeOf(CompactionData{}),
+		reflect.TypeOf(LLMReasoning{}), reflect.TypeOf(LLMCompaction{}),
 		reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{}),
 	}
 	for _, typ := range types {

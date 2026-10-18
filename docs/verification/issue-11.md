@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Response envelope and complete plain-string leaf snapshots
+
+Response snapshot Serde decoding now reuses the Go-style object decoder for
+folded/duplicate keys, usage-object merging, nullable end-turn/raw fields and
+backing-slot reuse across all response slice fields. Eighteen added pinned-Go
+cases exercise these behaviors. The now-unused derived slice-null helper was
+removed rather than retained with a warning suppression. Whole response
+byte/depth parity remains unresolved.
+
+`ReasoningSnapshot` and `CompactionSnapshot` additionally support the sealed
+byte-codec API. Their actual Go types contribute 221 and 153 oracle cases covering
+all plain-string fields, invalid UTF-8/lone-surrogate replacement, null/folded/
+duplicate semantics, rejection, omission and exact serialization. A compat-only
+public facade test runs all 374 cases. Four precise type/alias records are mapped:
+`SDK-AD2E841B0463B3D9`, `SDK-87E2895B639D776C`, `SDK-2C2BB8C09AEB7801`, and
+`SDK-235F0087A4BF4816`. These do not promote request/response envelopes or files.
+The resulting ledger is **1,326 verified /7,565 unresolved /251 excluded**.
+
 ### Nested request snapshot decoding
 
 The nested run-item, tool-call, reasoning, compaction and tool-approval analysis

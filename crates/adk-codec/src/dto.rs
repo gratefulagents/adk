@@ -210,15 +210,6 @@ pub(crate) fn null_default<'de, D: Deserializer<'de>, T: Deserialize<'de> + Defa
 ) -> Result<T, D::Error> {
     Ok(Option::<T>::deserialize(d)?.unwrap_or_default())
 }
-pub(crate) fn null_default_elements<'de, D: Deserializer<'de>, T: Deserialize<'de> + Default>(
-    d: D,
-) -> Result<Vec<T>, D::Error> {
-    Ok(Option::<Vec<Option<T>>>::deserialize(d)?
-        .unwrap_or_default()
-        .into_iter()
-        .map(Option::unwrap_or_default)
-        .collect())
-}
 pub fn serialize_go_float<S: serde::Serializer>(v: &f64, s: S) -> Result<S::Ok, S::Error> {
     if !v.is_finite() {
         return Err(serde::ser::Error::custom("nonfinite Go float"));
@@ -613,48 +604,24 @@ impl Usage {
     }
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ResponseSnapshot {
-    #[serde(
-        rename = "items",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "items", skip_serializing_if = "Vec::is_empty")]
     pub items: Vec<RunItemSnapshot>,
     #[serde(rename = "usage", deserialize_with = "null_default")]
     pub usage: Usage,
     #[serde(rename = "end_turn", skip_serializing_if = "Option::is_none")]
     pub end_turn: Option<bool>,
-    #[serde(
-        rename = "texts",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "texts", skip_serializing_if = "Vec::is_empty")]
     pub texts: Vec<String>,
-    #[serde(
-        rename = "reasoning",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "reasoning", skip_serializing_if = "Vec::is_empty")]
     pub reasoning: Vec<ReasoningSnapshot>,
-    #[serde(
-        rename = "reasoning_texts",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "reasoning_texts", skip_serializing_if = "Vec::is_empty")]
     pub reasoning_texts: Vec<String>,
-    #[serde(
-        rename = "thinking_texts",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "thinking_texts", skip_serializing_if = "Vec::is_empty")]
     pub thinking_texts: Vec<String>,
-    #[serde(
-        rename = "tool_calls",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "tool_calls", skip_serializing_if = "Vec::is_empty")]
     pub tool_calls: Vec<ToolCallSnapshot>,
     #[serde(rename = "raw", skip_serializing_if = "RawJson::is_missing")]
     pub raw: RawJson,
@@ -691,11 +658,7 @@ pub struct RunItemSnapshot {
         skip_serializing_if = "String::is_empty"
     )]
     pub message_phase: String,
-    #[serde(
-        rename = "message_images",
-        deserialize_with = "null_default_elements",
-        skip_serializing_if = "Vec::is_empty"
-    )]
+    #[serde(rename = "message_images", skip_serializing_if = "Vec::is_empty")]
     pub message_images: Vec<ImageAttachment>,
     #[serde(rename = "tool_call", skip_serializing_if = "Option::is_none")]
     pub tool_call: Option<ToolCallSnapshot>,

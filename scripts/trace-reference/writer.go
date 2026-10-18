@@ -29,7 +29,26 @@ func responseRecordCases() []map[string]any {
 		{"raw_available", []string{`null`, `false`, `true`, `1`}},
 		{"raw_error", []string{`null`, `""`, `"cannot encode <value>"`, `[]`}},
 	}
-	inputs := []string{`{}`}
+	inputs := []string{
+		`{}`, `null`,
+		`{"RAW_AVAILABLE":true,"raw_available":null,"RAW_ERROR":"retained","raw_error":null}`,
+		`{"END_TURN":true,"end_turn":null}`,
+		`{"end_turn":false,"END_TURN":true}`,
+		`{"USAGE":{"input_tokens":7},"usage":{"output_tokens":3},"usage":null}`,
+		`{"texts":["first","second"],"TEXTS":["new"],"texts":[null,null]}`,
+		`{"texts":["old"],"texts":[],"texts":[null]}`,
+		`{"texts":["old"],"texts":null,"texts":[null]}`,
+		`{"ITEMS":[{"TYPE":"message","MESSAGE_TEXT":"old"}],"items":[{"message_text":null,"message_phase":"final"}]}`,
+		`{"reasoning":[{"id":"one","text":"retained"},{"id":"two"}],"REASONING":[{"text":"new"}],"reasoning":[null,null]}`,
+		`{"reasoning_texts":["one","two"],"REASONING_TEXTS":[null]}`,
+		`{"thinking_texts":["one","two"],"THINKING_TEXTS":[null]}`,
+		`{"tool_calls":[{"id":"one","name":"tool","input":{"x":1,"x":2}},{"id":"two"}],"TOOL_CALLS":[{"name":null}],"tool_calls":[null,null]}`,
+		`{"RAW":{"x":1,"x":2},"raw":null}`,
+		`{"raw":null,"RAW":{"x":1,"x":2}}`,
+		`{"usage":{"input_tokens":1.5},"usage":null}`,
+		`{"raw_available":1,"raw_available":null}`,
+		`{"tool_calls":[{"name":1}],"tool_calls":null}`,
+	}
 	for _, field := range fields {
 		for _, value := range field.values {
 			inputs = append(inputs, `{"`+field.name+`":`+value+`}`)

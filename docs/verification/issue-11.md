@@ -9,8 +9,12 @@ into scoped native routes and binds them to host-owned credential stores. Named
 instances do not inherit parent credentials or endpoints; selected scopes acquire
 credentials lazily. Ambiguous empty-provider configurations that would spread
 parent settings across canonical Go legs are rejected, not silently treated as
-source-equivalent behavior. Unsupported credential-file/OAuth acquisition,
-Copilot configuration and model fallbacks remain explicit limitations.
+source-equivalent behavior. Unsupported credential-file/OAuth acquisition
+and Copilot configuration remain explicit limitations. A follow-up adds configured
+fallback lists to canonical OpenRouter only, with nine independent Go loopback
+observations and native completion/stream request checks. Named routes and other
+providers do not inherit these lists; Responses requests omit the extension.
+Explicit native request-level settings take precedence, including an empty list.
 
 The immutable Go oracle in `scripts/provider-config-reference` compares supported
 configuration projections and real loopback named-route requests. Independent

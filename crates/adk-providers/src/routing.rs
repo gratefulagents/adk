@@ -48,9 +48,18 @@ impl Routes {
         store: Arc<dyn CredentialStore>,
         refresh: Arc<dyn Refresh>,
     ) -> Result<(), Error> {
+        self.register_spec_with_model_fallbacks(spec, store, refresh, &[])
+    }
+    pub(crate) fn register_spec_with_model_fallbacks(
+        &mut self,
+        spec: &RouteSpec,
+        store: Arc<dyn CredentialStore>,
+        refresh: Arc<dyn Refresh>,
+        fallbacks: &[String],
+    ) -> Result<(), Error> {
         self.insert(
             &spec.prefix(),
-            spec.build(store, refresh)?,
+            spec.build_with_model_fallbacks(store, refresh, fallbacks)?,
             Some(spec.kind),
             spec.protocol,
         )

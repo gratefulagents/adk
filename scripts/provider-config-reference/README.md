@@ -4,7 +4,7 @@ Run `python3 scripts/provider-config-reference/run.py` to regenerate, or add
 `--check` to reproduce and compare the checked-in observations byte-for-byte.
 The harness uses `git archive` of `repos/sdk` at immutable commit
 `1dc92b73900fac74dc357a938e4b5eee6392b418`, not the mutable checkout. It injects
-`reference_test.go` only into a disposable extraction. No production Go source
+`reference_test.go` and `fallback_test.go` only into a disposable extraction. No production Go source
 is rewritten. Go dependencies must already be available for readonly module mode.
 
 The output is `fixtures/provider-config/observations.json`, with archive, source,
@@ -28,8 +28,12 @@ Reviewed source anchors in `pkg/agentsdk/providers/factory.go`: 119–143,
 
 This is a **bounded configuration slice**, not whole `ProviderSpec`,
 `ProviderRoute`, or `NewProviderFromConfig` parity. In particular it excludes
-OAuth file loading/reload, OpenAI OAuth/session material, Copilot, model fallback
-arrays and eager source credential loading. Native unsupported-input and
+OAuth file loading/reload, OpenAI OAuth/session material, Copilot and eager
+source credential loading. Nine additional real loopback factory calls observe
+configured fallback arrays for canonical OpenRouter, Groq, and named OpenRouter:
+ordered deduplication, blank removal, omission, and non-inheritance. Native tests
+also inspect streaming request bodies and Responses exclusion; request-level
+fallback overrides are a native extension, not a source parity claim. Native unsupported-input and
 scope-security tests are not Go parity claims. Ambiguous normalized map keys are
 excluded from oracle inputs: Go map iteration does not define a deterministic
 winner. Empty-provider promoted configurations with top-level values are also

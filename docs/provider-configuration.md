@@ -81,6 +81,15 @@ explicit static bearer path needs no refresh material or exchange.
   `responses`, `auto` (Responses), or `chat-completions`. Canonical endpoints come
   from `Kind::endpoint`; an empty Local key supplies the source's `local-key` seed.
   OpenAI API-key mode resets the exact default Codex backend URL to the public API.
+- Top-level `model_fallbacks` configures only the canonical OpenRouter route.
+  Chat Completions requests send the primary model followed by trimmed, nonempty,
+  deduplicated fallbacks in order, omitting `models` when fewer than two distinct
+  candidates remain. Responses never receives this extension. Other providers
+  ignore this top-level list, and named routes (including an OpenRouter override)
+  do not inherit it. Named-route `model_fallbacks` fields are rejected, matching
+  the source declaration's lack of that field. Native explicit request-level
+  `model_fallbacks` settings take precedence, including an empty list disabling
+  configured fallbacks; this request-level override is a native extension.
 - Named routes apply last, in declaration order; the final declaration replaces a
   canonical or earlier named prefix. Empty prefix defaults to its provider.
   Missing provider and nested `multi` are errors. Named routes use **only their
@@ -97,8 +106,8 @@ This is a bounded native API, **not whole `ProviderSpec`, `ProviderRoute`, or
 `1dc92b73900fac74dc357a938e4b5eee6392b418` in `gratefulagents/sdk`.
 
 - OAuth files, account paths, injected OpenAI auth sessions, automatic OAuth
-  material inference/reload, Copilot configuration and model-fallback arrays are
-  unsupported. Their document fields are rejected, including inside named routes;
+  material inference/reload and Copilot configuration are unsupported. Their
+  document fields are rejected, including inside named routes;
   OpenAI OAuth and Copilot provider selections are rejected. Unsupported auth/API
   mode overrides are rejected even when their canonical leg is not registered.
   Arbitrary named prefixes may still spell `copilot` if their *base provider* is
@@ -119,9 +128,9 @@ This is a bounded native API, **not whole `ProviderSpec`, `ProviderRoute`, or
 - Existing endpoint validation requires HTTPS except explicit loopback HTTP and
   rejects embedded credentials, queries, fragments, and slash-bearing route
   prefixes. Errors do not interpolate untrusted endpoint or credential values.
-- Request-shaping details, cache behavior, retries, refresh, Copilot routing,
-  OpenRouter fallback arrays and general factory lifecycle are not established by
-  this slice. The existing transport supplies behavior beyond the assertions below.
+- General request-shaping details, cache behavior, retries, refresh, Copilot routing,
+  and factory lifecycle are not established by this slice. The existing transport
+  supplies behavior beyond the assertions below.
 
 ## Verification boundary
 

@@ -174,6 +174,14 @@ impl RouteSpec {
         store: Arc<dyn CredentialStore>,
         refresh: Arc<dyn Refresh>,
     ) -> Result<Arc<dyn adk_core::StreamingModel>, Error> {
+        self.build_with_model_fallbacks(store, refresh, &[])
+    }
+    pub(crate) fn build_with_model_fallbacks(
+        &self,
+        store: Arc<dyn CredentialStore>,
+        refresh: Arc<dyn Refresh>,
+        fallbacks: &[String],
+    ) -> Result<Arc<dyn adk_core::StreamingModel>, Error> {
         let scope = self.scope()?;
         let protocol = self.protocol.unwrap_or(self.kind.protocol());
         if (self.kind == Kind::Anthropic && protocol != Protocol::Anthropic)
@@ -187,7 +195,9 @@ impl RouteSpec {
         if self.kind == Kind::Copilot && self.protocol.is_none() {
             Ok(Arc::new(crate::copilot::Copilot::new(name, session)?))
         } else {
-            Ok(Arc::new(Provider::new(name, protocol, session)?))
+            Ok(Arc::new(
+                Provider::new(name, protocol, session)?.with_model_fallbacks(fallbacks.to_vec()),
+            ))
         }
     }
 }

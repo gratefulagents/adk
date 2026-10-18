@@ -32,7 +32,7 @@ def main():
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
         paths = ['pkg/agentsdk/providers/factory.go', 'pkg/agentsdk/providers/factory_test.go', 'pkg/agentsdk/providers/audit_fixes_test.go', 'internal/openai/client.go', 'internal/anthropic/client.go', 'go.mod', 'go.sum']
-        harness = ['scripts/provider-config-reference/run.py', 'scripts/provider-config-reference/reference_test.go']
+        harness = ['scripts/provider-config-reference/run.py', 'scripts/provider-config-reference/reference_test.go', 'scripts/provider-config-reference/fallback_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk',
             'commit': SHA,
@@ -45,6 +45,7 @@ def main():
             'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in harness},
         }
         shutil.copyfile(ROOT / harness[1], source / 'pkg/agentsdk/providers/native_provider_config_reference_test.go')
+        shutil.copyfile(ROOT / harness[2], source / 'pkg/agentsdk/providers/native_provider_fallback_reference_test.go')
         output = source / 'provider-config-observations.json'
         env['PROVIDER_CONFIG_OUTPUT'] = str(output)
         execution = subprocess.run(

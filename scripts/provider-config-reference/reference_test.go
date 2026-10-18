@@ -182,7 +182,7 @@ func TestNativeProviderConfigReference(t *testing.T) {
 		_, err := NewProviderFromConfig(spec)
 		errors[name] = err != nil
 	}
-	result := map[string]any{"schema_version": 1, "cases": cases, "wire": wire, "errors": errors}
+	result := map[string]any{"schema_version": 1, "cases": cases, "wire": wire, "errors": errors, "fallbacks": nativeFallbackObservations(t)}
 	data, err := json.MarshalIndent(result, "", "  ")
 	if err != nil {
 		t.Fatal(err)

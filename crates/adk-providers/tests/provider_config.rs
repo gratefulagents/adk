@@ -9,6 +9,9 @@ use std::{
     time::Duration,
 };
 
+#[path = "provider_config/fallbacks.rs"]
+mod fallbacks;
+
 fn fixture() -> Value {
     serde_json::from_str(include_str!(
         "../../../fixtures/provider-config/observations.json"
@@ -71,7 +74,6 @@ fn unsupported_and_ambiguous_inputs_are_explicit_and_redacted() {
         "openai_auth_session",
         "anthropic_oauth_path",
         "copilot_oauth_path",
-        "model_fallbacks",
     ] {
         assert!(serde_json::from_value::<Config>(json!({field:"unsupported"})).is_err());
         assert!(
@@ -81,6 +83,13 @@ fn unsupported_and_ambiguous_inputs_are_explicit_and_redacted() {
             .is_err()
         );
     }
+    assert!(serde_json::from_value::<Config>(json!({"model_fallbacks":"not-an-array"})).is_err());
+    assert!(
+        serde_json::from_value::<Config>(
+            json!({"routes":[{"provider":"openrouter", "model_fallbacks":["backup"]}]})
+        )
+        .is_err()
+    );
     assert_eq!(
         format!("{:?}", Secret::new("do-not-print-secret")),
         "[REDACTED]"

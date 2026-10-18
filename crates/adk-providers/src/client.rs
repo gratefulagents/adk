@@ -23,6 +23,7 @@ pub struct Provider {
     protocol: Protocol,
     session: Arc<Session>,
     client: Client,
+    model_fallbacks: Vec<String>,
     thinking_overrides: Mutex<BTreeMap<String, (String, bool)>>,
 }
 /// An explicit image-analysis call, separate from the attachment-loading tool.
@@ -114,6 +115,7 @@ impl Provider {
             protocol: Protocol::Responses,
             session: self.session.clone(),
             client: self.client.clone(),
+            model_fallbacks: Vec::new(),
             thinking_overrides: Mutex::default(),
         };
         let response = transport
@@ -189,8 +191,16 @@ impl Provider {
             protocol,
             session,
             client,
+            model_fallbacks: Vec::new(),
             thinking_overrides: Mutex::new(BTreeMap::new()),
         })
+    }
+    /// Configure ordered Chat Completions fallback models. Responses and
+    /// Anthropic requests never receive the `models` extension. An explicit
+    /// request-level `model_fallbacks` setting takes precedence.
+    pub fn with_model_fallbacks(mut self, models: Vec<String>) -> Self {
+        self.model_fallbacks = models;
+        self
     }
     /// Explicit native Responses compaction. No local summary is substituted when
     /// the selected protocol or endpoint does not support this operation.
@@ -254,6 +264,13 @@ impl Provider {
             request
         };
         let mut body = wire::request(wire_request, self.protocol, stream)?;
+        if self.protocol == Protocol::Chat && !request.settings.contains_key("model_fallbacks") {
+            if let Some(models) =
+                crate::openai::model_fallbacks(&request.model, &self.model_fallbacks)
+            {
+                body["models"] = json!(models);
+            }
+        }
         let scope = self.session.scope();
         if scope.mode == AuthMode::OpenAiOAuth {
             crate::openai::codex(&mut body);

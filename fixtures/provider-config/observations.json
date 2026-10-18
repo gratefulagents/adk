@@ -943,6 +943,93 @@
     "nested": true,
     "unknown": true
   },
+  "fallbacks": [
+    {
+      "configured": [],
+      "kind": "openrouter",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [
+        " primary ",
+        " backup ",
+        "",
+        "backup",
+        "other"
+      ],
+      "kind": "openrouter",
+      "models": [
+        "primary",
+        "backup",
+        "other"
+      ],
+      "present": true
+    },
+    {
+      "configured": [
+        "primary",
+        " "
+      ],
+      "kind": "openrouter",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [],
+      "kind": "groq",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [
+        " primary ",
+        " backup ",
+        "",
+        "backup",
+        "other"
+      ],
+      "kind": "groq",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [
+        "primary",
+        " "
+      ],
+      "kind": "groq",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [],
+      "kind": "named",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [
+        " primary ",
+        " backup ",
+        "",
+        "backup",
+        "other"
+      ],
+      "kind": "named",
+      "models": null,
+      "present": false
+    },
+    {
+      "configured": [
+        "primary",
+        " "
+      ],
+      "kind": "named",
+      "models": null,
+      "present": false
+    }
+  ],
   "provenance": {
     "archiveSHA256": "02efd0112edea295795df8d2435f10d2f7dcbf639defcc386e5cc68fe3194741",
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
@@ -950,8 +1037,9 @@
     "goOS": "linux",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/provider-config-reference/reference_test.go": "1e97caa46d1c53719893e885116dbf98e2ca0fa0566edbd88acbdaa61bd25c81",
-      "scripts/provider-config-reference/run.py": "e6157ab11b30b247ac4f99b210b3cf2efe59b5a5e4e826ad5fe245d0ee7db6f2"
+      "scripts/provider-config-reference/fallback_test.go": "a00dca2bd5655f6ae15a7c58172c953e3d7a02047ebd7273cd9f58e659de4cc4",
+      "scripts/provider-config-reference/reference_test.go": "09c7812a5fd0dec2b8a96352b14ff217fbdf570a5a9d877ef45c4551f939420d",
+      "scripts/provider-config-reference/run.py": "9a03e91a6171ee7647cdbc0c29be9ee002bd537717ae4ea839625062a9e19dd7"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",

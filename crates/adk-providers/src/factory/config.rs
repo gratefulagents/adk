@@ -9,8 +9,8 @@ use adk_core::Error;
 use serde::Deserialize;
 use std::{collections::BTreeMap, sync::Arc};
 
-/// Supported factory subset. Unknown fields (including OAuth files and model
-/// fallbacks) are rejected on deserialization. Intentionally not `Debug`.
+/// Supported factory subset. Unknown fields (including OAuth files) are rejected
+/// on deserialization. Intentionally not `Debug`.
 #[derive(Clone, Default, Deserialize)]
 #[serde(default, deny_unknown_fields)]
 pub struct Config {
@@ -25,6 +25,7 @@ pub struct Config {
     pub provider_base_urls: BTreeMap<String, String>,
     pub provider_api_modes: BTreeMap<String, String>,
     pub provider_auth_modes: BTreeMap<String, String>,
+    pub model_fallbacks: Vec<String>,
     pub routes: Vec<NamedRoute>,
 }
 
@@ -42,6 +43,8 @@ pub struct NamedRoute {
 
 pub struct ResolvedRoute {
     pub spec: RouteSpec,
+    /// Canonical OpenRouter configuration only; named routes do not inherit it.
+    pub model_fallbacks: Vec<String>,
     /// Optional seed for the host store, not an eagerly acquired credential.
     pub api_key: Option<Secret>,
 }
@@ -152,7 +155,7 @@ impl Config {
                 || provider == kind.name()
                 || (provider == "multi" && default == kind.name());
             let auth_scoped = provider == kind.name() || default == kind.name();
-            let route = resolve_route(
+            let mut route = resolve_route(
                 *kind,
                 kind.name(),
                 selected(&urls, *kind, &self.base_url, scoped),
@@ -160,6 +163,9 @@ impl Config {
                 selected(&auth, *kind, &self.auth_mode, auth_scoped),
                 selected(&modes, *kind, &self.api_mode, scoped),
             )?;
+            if *kind == Kind::OpenRouter {
+                route.model_fallbacks = self.model_fallbacks.clone();
+            }
             routes.insert(kind.name().to_owned(), route);
         }
         for route in &self.routes {
@@ -243,6 +249,7 @@ fn resolve_route(
     };
     Ok(ResolvedRoute {
         spec,
+        model_fallbacks: Vec::new(),
         api_key: (!key.is_empty()).then(|| Secret::new(key)),
     })
 }
@@ -260,7 +267,12 @@ impl ResolvedConfig {
         for route in &self.routes {
             let scope = route.spec.scope()?;
             let store = bind(&scope, route.api_key.as_ref())?;
-            routes.register_spec(&route.spec, store, refresh.clone())?;
+            routes.register_spec_with_model_fallbacks(
+                &route.spec,
+                store,
+                refresh.clone(),
+                &route.model_fallbacks,
+            )?;
         }
         Ok(routes)
     }

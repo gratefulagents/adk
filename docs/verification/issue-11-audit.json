@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7803,
-    "verified": 1088
+    "unresolved": 7801,
+    "verified": 1090
   },
   "groups": [
     {
@@ -1529,7 +1529,8 @@
     },
     {
       "counts": {
-        "apis:unresolved": 82,
+        "apis:unresolved": 80,
+        "apis:verified": 2,
         "configuration:unresolved": 1,
         "defaults:unresolved": 1,
         "files:unresolved": 4,
@@ -1611,7 +1612,6 @@
         "SDK-9F74C366DA384E22",
         "SDK-9FDA649C7E2CF91C",
         "SDK-A14FAFB611391EFD",
-        "SDK-A211F84C9FCF4078",
         "SDK-A251070F0CCEF298",
         "SDK-A4435504A2940934",
         "SDK-A564B6AEE0177B5B",
@@ -1621,7 +1621,6 @@
         "SDK-B366D28FDD70780F",
         "SDK-B5869A0174E596CF",
         "SDK-B690DD7A4BF47F52",
-        "SDK-CE7D580DDC2EBDFB",
         "SDK-CF83306E29879FF7",
         "SDK-DDCB78C654C8D13F",
         "SDK-E4D92D759CC7597B",
@@ -1636,7 +1635,10 @@
         "SDK-FE152D82A16D3C64",
         "SDK-FF43D31A6725B631"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-A211F84C9FCF4078",
+        "SDK-CE7D580DDC2EBDFB"
+      ]
     },
     {
       "counts": {
@@ -10958,8 +10960,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "68923c76e23df6659c9494a6ecd76184c51a83f6613002b033d13923b504eec2",
-    "docs/migration/ledger/issue-11-rust-claims.json": "4fe4f3dc017b6c734bfc1d5b8e256deed1979b07de1eaa38f8aa6f3686796f12",
+    "docs/migration/ledger/issue-11-overlay.json": "a0f294533605ed5146d3b79427c57a19e475d5d3ef9b817e8e2f796bdfffd46c",
+    "docs/migration/ledger/issue-11-rust-claims.json": "fd06d01d30b525c483ebbc8d4d0daf987dd8255cd3df689899425317d94dfeeb",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10968,6 +10970,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1086
+    "rust_test": 1088
   }
 }

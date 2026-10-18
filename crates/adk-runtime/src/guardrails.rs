@@ -6,6 +6,7 @@ use adk_core::{
 };
 use futures_util::FutureExt;
 use serde_json::Value;
+use unicode_general_category::{GeneralCategory, get_general_category};
 
 #[derive(Debug, Clone, Default)]
 pub struct GuardrailResult {
@@ -72,22 +73,57 @@ impl std::fmt::Display for GuardrailTripwire {
             GuardrailPhase::ToolInput => "tool input",
             GuardrailPhase::ToolOutput => "tool output",
         };
-        write!(f, "{phase} guardrail {:?} tripwire triggered", self.name)?;
+        write!(f, "{phase} guardrail ")?;
+        quote_label(f, &self.name)?;
+        write!(f, " tripwire triggered")?;
         if matches!(
             self.phase,
             GuardrailPhase::ToolInput | GuardrailPhase::ToolOutput
         ) {
-            write!(
-                f,
-                " for tool {:?}",
-                self.tool_name.as_deref().unwrap_or_default()
-            )?;
+            write!(f, " for tool ")?;
+            quote_label(f, self.tool_name.as_deref().unwrap_or_default())?;
         }
         // Diagnostic output can contain secrets and must not enter serialized ErrorInfo.
         Ok(())
     }
 }
 impl std::error::Error for GuardrailTripwire {}
+
+fn quote_label(f: &mut std::fmt::Formatter<'_>, value: &str) -> std::fmt::Result {
+    f.write_str("\"")?;
+    for ch in value.chars() {
+        match ch {
+            '"' => f.write_str("\\\"")?,
+            '\\' => f.write_str("\\\\")?,
+            '\x07' => f.write_str("\\a")?,
+            '\x08' => f.write_str("\\b")?,
+            '\t' => f.write_str("\\t")?,
+            '\n' => f.write_str("\\n")?,
+            '\x0b' => f.write_str("\\v")?,
+            '\x0c' => f.write_str("\\f")?,
+            '\r' => f.write_str("\\r")?,
+            ch if ch < ' ' || ch == '\x7f' => write!(f, "\\x{:02x}", ch as u32)?,
+            ch if ch == ' '
+                || !matches!(
+                    get_general_category(ch),
+                    GeneralCategory::Control
+                        | GeneralCategory::Format
+                        | GeneralCategory::Unassigned
+                        | GeneralCategory::PrivateUse
+                        | GeneralCategory::Surrogate
+                        | GeneralCategory::SpaceSeparator
+                        | GeneralCategory::LineSeparator
+                        | GeneralCategory::ParagraphSeparator
+                ) =>
+            {
+                write!(f, "{ch}")?
+            }
+            ch if ch as u32 <= 0xffff => write!(f, "\\u{:04x}", ch as u32)?,
+            ch => write!(f, "\\U{:08x}", ch as u32)?,
+        }
+    }
+    f.write_str("\"")
+}
 
 pub struct GuardrailOutcome {
     pub reports: Vec<GuardrailReport>,

@@ -4,6 +4,59 @@ use serde_json::json;
 use std::sync::{Arc, Mutex};
 
 #[test]
+fn tripwire_labels_match_pinned_go_messages_and_every_unicode_scalar() {
+    use sha2::{Digest, Sha256};
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/handoff/sdk-tripwire-errors.json"
+    ))
+    .unwrap();
+    assert_eq!(fixture["unicode_version"], "15.0.0");
+    assert_eq!(unicode_general_category::UNICODE_VERSION, (15, 0, 0));
+    for case in fixture["cases"].as_array().unwrap() {
+        let phase = match case["phase"].as_str().unwrap() {
+            "input" => GuardrailPhase::Input,
+            "output" => GuardrailPhase::Output,
+            "tool input" => GuardrailPhase::ToolInput,
+            "tool output" => GuardrailPhase::ToolOutput,
+            other => panic!("unexpected phase {other}"),
+        };
+        let error = GuardrailTripwire {
+            phase,
+            name: case["name"].as_str().unwrap().into(),
+            tool_name: Some(case["tool"].as_str().unwrap().into()),
+            output: serde_json::Value::Null,
+        };
+        assert_eq!(error.to_string(), case["message"].as_str().unwrap());
+    }
+    let mut hash = Sha256::new();
+    let mut count = 0;
+    for ch in (0..=0x10ffff).filter_map(char::from_u32) {
+        let label = format!("a{ch}b");
+        for error in [
+            GuardrailTripwire {
+                phase: GuardrailPhase::Input,
+                name: label.clone(),
+                tool_name: None,
+                output: serde_json::Value::Null,
+            },
+            GuardrailTripwire {
+                phase: GuardrailPhase::ToolOutput,
+                name: "guard".into(),
+                tool_name: Some(label),
+                output: serde_json::Value::Null,
+            },
+        ] {
+            let message = error.to_string();
+            hash.update((message.len() as u32).to_le_bytes());
+            hash.update(message.as_bytes());
+        }
+        count += 1;
+    }
+    assert_eq!(fixture["scalar_count"], count);
+    assert_eq!(fixture["scalar_sha256"], format!("{:x}", hash.finalize()));
+}
+
+#[test]
 fn tripwire_messages_identify_phase_without_serializing_diagnostic_data() {
     for (phase, expected) in [
         (

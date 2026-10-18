@@ -19855,6 +19855,42 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-CE7D580DDC2EBDFB": {
+      "source": "internal/agent/errors.go",
+      "source_name": "InputGuardrailTripwireTriggered.Error",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire",
+        "crates/adk-runtime/src/guardrails.rs::quote_label"
+      ],
+      "rust_test_identifiers": [
+        "tripwire_labels_match_pinned_go_messages_and_every_unicode_scalar",
+        "tripwire_messages_identify_phase_without_serializing_diagnostic_data"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestGuardrailTripwireErrors",
+      "rationale": "Only the input/output Error string method for owned UTF-8 labels is closed. Native Display preserves exact phase text and Go %q escapes. Independently executed pinned SDK messages cover36 cases across all four phases; a length-delimited SHA256 comparison checks every1,112,064 valid Unicode scalar in both a guardrail and tool label. Unicode15.0 classification is pinned. Diagnostic data remains absent from input/output messages as in Go. No invalid-UTF8 Go strings, nil receivers, full error structs, tool-error diagnostic suffixes or whole guardrail parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-A211F84C9FCF4078": {
+      "source": "internal/agent/errors.go",
+      "source_name": "OutputGuardrailTripwireTriggered.Error",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/guardrails.rs::GuardrailTripwire",
+        "crates/adk-runtime/src/guardrails.rs::quote_label"
+      ],
+      "rust_test_identifiers": [
+        "tripwire_labels_match_pinned_go_messages_and_every_unicode_scalar",
+        "tripwire_messages_identify_phase_without_serializing_diagnostic_data"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestGuardrailTripwireErrors",
+      "rationale": "Only the input/output Error string method for owned UTF-8 labels is closed. Native Display preserves exact phase text and Go %q escapes. Independently executed pinned SDK messages cover36 cases across all four phases; a length-delimited SHA256 comparison checks every1,112,064 valid Unicode scalar in both a guardrail and tool label. Unicode15.0 classification is pinned. Diagnostic data remains absent from input/output messages as in Go. No invalid-UTF8 Go strings, nil receivers, full error structs, tool-error diagnostic suffixes or whole guardrail parity is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

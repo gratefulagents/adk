@@ -93,8 +93,10 @@ func main() {
 		b, err = generatePromptCache()
 	case len(os.Args) == 2 && os.Args[1] == "builtin-guardrails":
 		b, err = generateBuiltinGuardrails()
+	case len(os.Args) == 2 && os.Args[1] == "tripwire-errors":
+		b, err = generateTripwireErrors()
 	default:
-		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input|immediate-signal|prompt-cache|builtin-guardrails]")
+		err = fmt.Errorf("usage: handoff-reference [catalog|subagents|final-summary|immediate-input|immediate-signal|prompt-cache|builtin-guardrails|tripwire-errors]")
 	}
 	if err == nil {
 		_, err = os.Stdout.Write(b)

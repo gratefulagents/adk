@@ -243,6 +243,7 @@ RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-re
                "scripts/handoff-reference/main_test.go", "scripts/handoff-reference/check.py",
                "scripts/handoff-reference/go.mod", "scripts/handoff-reference/go.sum",
                "fixtures/handoff/sdk-handoff-filter.json",
+               "scripts/handoff-reference/tripwire_errors.go", "fixtures/handoff/sdk-tripwire-errors.json",
                "scripts/handoff-reference/catalog.go", "scripts/handoff-reference/catalog_scenarios.go",
                "scripts/handoff-reference/catalog_test.go", "fixtures/handoff/sdk-catalog-handoffs.json",
                "scripts/handoff-reference/subagents.go", "scripts/handoff-reference/subagents_test.go",

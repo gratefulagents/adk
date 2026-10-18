@@ -588,3 +588,13 @@ Perl/Unicode/POSIX atoms and escaped hex/octal characters are distinguished.
 Two-character inputs expose literal brackets used as range endpoints rather than
 incorrectly recognized POSIX atoms. Descending ranges reject as invalid input;
 valid consecutive-hyphen expressions no longer fail as unsupported set syntax.
+
+## Tripwire labels
+
+`tripwire-errors` invokes all four original tripwire Error methods with nil
+output. The36 cases cover empty/escaped/control/Unicode/long labels; a
+length-delimited SHA256 digest covers all1,112,064 valid Unicode scalars in
+both an input guardrail label and an output-tool label. The check script
+regenerates the fixture twice from the clean pin. Native tests assert Unicode15.0
+and the exact messages/digest. This does not cover invalid UTF-8 Go strings or
+Go tool-error diagnostic suffixes; native errors intentionally redact diagnostics.

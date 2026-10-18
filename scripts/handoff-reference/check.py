@@ -130,6 +130,16 @@ def main():
     check_sdk()
     print(f"Verified sdk-prompt-cache.json twice, byte-for-byte: {len(fixture['cases'])} cases")
     print(f"subagent selection reference verified at {PIN}")
+    expected = (ROOT / "fixtures/handoff/sdk-tripwire-errors.json").read_bytes()
+    fixture = json.loads(expected)
+    if fixture["sdk_revision"] != PIN or fixture["schema_version"] != 1:
+        sys.exit("Unexpected tripwire-error fixture revision/schema")
+    for attempt in range(2):
+        check_sdk()
+        if run([GO, "run", "-mod=readonly", ".", "tripwire-errors"]) != expected:
+            sys.exit(f"sdk-tripwire-errors.json differs from pinned Go regeneration (pass {attempt + 1})")
+    check_sdk()
+    print(f"Verified tripwire errors twice: {len(fixture['cases'])} cases, {fixture['scalar_count']} scalars")
     print(f"handoff reference verified at {PIN}")
 
 

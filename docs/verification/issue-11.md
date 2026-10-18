@@ -2,6 +2,33 @@
 
 ## Current continuation evidence
 
+### Go-compatible guardrail label formatting
+
+Fixed `GuardrailTripwire` Display to use Go-style quoted labels instead of Rust
+Debug escapes, retaining diagnostic redaction. The new regression failed before
+the fix on NUL, bell, backspace, vertical-tab, form-feed and DEL spellings.
+An independently executed pinned SDK fixture checks36 messages across all four
+phases and a length-delimited digest of every1,112,064 valid Unicode scalar in
+both guardrail and tool labels. Both implementations use Unicode15.0. Native
+verification passes the exact cases/digest; Go regeneration matched twice.
+
+Only the input/output Error string methods are newly mapped. Go tool-error
+methods append nonempty diagnostic output, whereas native ErrorInfo deliberately
+does not; those full methods remain unresolved. Invalid-UTF8 Go strings, nil
+receivers and whole error-struct/runtime closure are not inferred.
+
+Fresh Rust1.88 Linux: **1,760 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**. Default-feature workspace also passed (1,343 +5 doctests).
+Formatting, strict default/all-feature Clippy/typecheck, strict rustdoc, full
+facade matrix and standalone consumer/dependency-purity checks passed.
+All20 offline feature scenarios and the host-session example passed using the
+documented direct-driver Clippy workaround. Independent bound references,
+all56 validators, artifact/overlay/audit and immutable source locks passed.
+All46 remote checks passed at preceding `aaf698b`; new-head CI is not implied.
+Ledger: **1,090 verified /7,801 unresolved /251 excluded**. Full retained
+acceptance remains incomplete.
+
+
 ### Agent name/instruction value mappings
 
 Mapped six exact records: the name/static-instruction fields and their internal

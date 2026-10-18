@@ -13,6 +13,10 @@ use std::{
 mod copilot;
 #[path = "provider_config/fallbacks.rs"]
 mod fallbacks;
+#[path = "provider_config/http_fixture.rs"]
+mod http_fixture;
+#[path = "provider_config/openai_oauth.rs"]
+mod openai_oauth;
 
 fn fixture() -> Value {
     serde_json::from_str(include_str!(
@@ -51,9 +55,10 @@ fn unsupported_and_ambiguous_inputs_are_explicit_and_redacted() {
         json!({"routes":[{"prefix":"missing"}]}),
         json!({"routes":[{"provider":"multi"}]}),
         json!({"routes":[{"provider":"openai","prefix":"bad/route"}]}),
-        json!({"provider":"openai","auth_mode":"oauth"}),
+        json!({"provider":"openai","auth_mode":"oauth","api_key":"ambiguous-secret"}),
+        json!({"provider":"openai","auth_mode":"oauth","api_mode":"chat-completions"}),
         json!({"provider":"groq","auth_mode":"oauth"}),
-        json!({"provider":"anthropic","provider_auth_modes":{"openai":"oauth"}}),
+        json!({"provider":"anthropic","provider_auth_modes":{"openai":"typo"}}),
         json!({"provider":"anthropic","provider_api_modes":{"groq":"typo"}}),
         json!({"provider":"openai","api_mode":"typo"}),
         json!({"provider":"anthropic","api_mode":"responses"}),
@@ -71,7 +76,6 @@ fn unsupported_and_ambiguous_inputs_are_explicit_and_redacted() {
     }
     for field in [
         "openai_oauth_path",
-        "openai_oauth_account_id",
         "openai_auth_session",
         "anthropic_oauth_path",
         "copilot_oauth_path",
@@ -142,7 +146,7 @@ impl CredentialStore for Store {
                 refresh_token: None,
                 id_token: None,
                 email: None,
-                account: None,
+                account: scope.account.clone(),
                 expires_at: None,
                 last_refresh: None,
                 revision: 0,

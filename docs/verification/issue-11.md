@@ -21,11 +21,20 @@ observations and native completion/stream request checks. Named routes and other
 providers do not inherit these lists; Responses requests omit the extension.
 Explicit native request-level settings take precedence, including an empty list.
 
+OpenAI OAuth configuration now accepts an explicit account binding and host-owned
+credential store, requiring Responses and refusing ambiguous inline API-key seeds.
+A real in-memory Go OAuth session supplies the independent bearer/account header
+observation; native tests verify named-account isolation, no eager reads, and
+missing/mismatched-account refusal. This does not claim credential-file/session
+acquisition parity: Go otherwise treats a nonblank APIKey as an API-key session,
+even when OAuth mode is selected, while the native configuration rejects that
+combination rather than silently interpreting it as an OAuth access token.
+
 The immutable Go oracle in `scripts/provider-config-reference` compares supported
 configuration projections and real loopback named-route requests. Independent
 Rust checks cover the resolver, request headers and opaque gateway model IDs,
 lazy scoped credential acquisition, actual facade Builder execution, and the
-providers-only facade without builder/runtime features. Ten targeted tests
+providers-only facade without builder/runtime features. Eleven targeted tests
 passed, followed by a full Rust 1.88 workspace test run and strict workspace
 Clippy. This is not a live-provider check or complete `ProviderSpec`/factory
 closure. No additional ledger entries are promoted by this implementation slice.

@@ -21,6 +21,7 @@ pub struct Config {
     pub api_key: String,
     pub auth_mode: String,
     pub api_mode: String,
+    pub openai_oauth_account_id: String,
     pub provider_api_keys: BTreeMap<String, String>,
     pub provider_base_urls: BTreeMap<String, String>,
     pub provider_api_modes: BTreeMap<String, String>,
@@ -39,6 +40,7 @@ pub struct NamedRoute {
     pub api_key: String,
     pub auth_mode: String,
     pub api_mode: String,
+    pub openai_oauth_account_id: String,
 }
 
 pub struct ResolvedRoute {
@@ -153,6 +155,7 @@ impl Config {
                 selected(&keys, *kind, &self.api_key, scoped),
                 selected(&auth, *kind, &self.auth_mode, auth_scoped),
                 selected(&modes, *kind, &self.api_mode, scoped),
+                &self.openai_oauth_account_id,
             )?;
             if *kind == Kind::OpenRouter {
                 route.model_fallbacks = self.model_fallbacks.clone();
@@ -176,6 +179,7 @@ impl Config {
                 route.api_key.trim(),
                 route.auth_mode.trim(),
                 route.api_mode.trim(),
+                &route.openai_oauth_account_id,
             )?;
             routes.insert(prefix, resolved);
         }
@@ -191,6 +195,7 @@ fn auth_mode(kind: Kind, value: &str) -> Result<AuthMode, Error> {
         "" | "api-key" | "api_key" | "oauth" if kind == Kind::Copilot => Ok(AuthMode::CopilotOAuth),
         "" | "api-key" | "api_key" => Ok(AuthMode::ApiKey),
         "oauth" if kind == Kind::Anthropic => Ok(AuthMode::AnthropicOAuth),
+        "oauth" if kind == Kind::OpenAi => Ok(AuthMode::OpenAiOAuth),
         _ => Err(crate::invalid(
             "unsupported provider authentication configuration",
         )),
@@ -217,10 +222,19 @@ fn resolve_route(
     key: &str,
     auth: &str,
     api: &str,
+    account: &str,
 ) -> Result<ResolvedRoute, Error> {
     let mode = auth_mode(kind, auth)?;
     let protocol = api_mode(kind, api)?;
+    if mode == AuthMode::OpenAiOAuth && (!key.is_empty() || protocol != Protocol::Responses) {
+        return Err(crate::invalid(
+            "OpenAI OAuth requires host-owned credentials and Responses protocol",
+        ));
+    }
     let mut spec = RouteSpec::new(kind, mode);
+    if mode == AuthMode::OpenAiOAuth && !account.trim().is_empty() {
+        spec.account = Some(account.trim().to_owned());
+    }
     spec.prefix = Some(prefix.to_owned());
     spec.protocol = (kind != Kind::Copilot).then_some(protocol);
     spec.endpoint = Some(

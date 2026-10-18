@@ -1337,6 +1337,13 @@
       "present": false
     }
   ],
+  "openai_oauth": {
+    "account": "selected-account",
+    "authorization": "Bearer fixture-openai-oauth",
+    "model": "gpt-5.2",
+    "path": "/v1/responses",
+    "reply": "data: {\"type\":\"response.created\",\"response\":{\"id\":\"resp_fixture\",\"model\":\"gpt-5.2\"}}\n\ndata: {\"type\":\"response.content_part.added\",\"output_index\":0,\"part\":{\"type\":\"output_text\"}}\n\ndata: {\"type\":\"response.output_text.delta\",\"output_index\":0,\"delta\":\"ok\"}\n\ndata: {\"type\":\"response.output_text.done\",\"output_index\":0}\n\ndata: {\"type\":\"response.completed\",\"response\":{\"id\":\"resp_fixture\",\"model\":\"gpt-5.2\",\"output\":[],\"usage\":{\"input_tokens\":1,\"output_tokens\":1}}}\n\ndata: [DONE]\n\n"
+  },
   "provenance": {
     "archiveSHA256": "02efd0112edea295795df8d2435f10d2f7dcbf639defcc386e5cc68fe3194741",
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
@@ -1346,8 +1353,9 @@
     "harnessSHA256": {
       "scripts/provider-config-reference/copilot_test.go": "8ea5dbd61b3e6cc0ef9061953c60a8bc4767893388f3efde82f3fea27615065b",
       "scripts/provider-config-reference/fallback_test.go": "a00dca2bd5655f6ae15a7c58172c953e3d7a02047ebd7273cd9f58e659de4cc4",
-      "scripts/provider-config-reference/reference_test.go": "1e1b1d63d868e7edf0f4ec8ac1a578ae15f3a4f2c45b199158465abc735a5f7d",
-      "scripts/provider-config-reference/run.py": "e0c980e922b3f9ec0b1c0878215dccaaa8db83cc46327713c81af37b7d6298f3"
+      "scripts/provider-config-reference/openai_oauth_test.go": "c539d6523fe4f2bf09d46427b234f981c873da54769efd880ce43481fe49f287",
+      "scripts/provider-config-reference/reference_test.go": "630f0775d91ca0df463d44aa7b69eec1fbe979ac8f5fece681660ef0a1f38c43",
+      "scripts/provider-config-reference/run.py": "aa94e877550aa301886039cb1fb75deecad3d392aae8ed7fa586f101913db534"
     },
     "license": "GPL-3.0-only",
     "repository": "https://github.com/gratefulagents/sdk",
@@ -1355,11 +1363,13 @@
       "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
       "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
       "internal/anthropic/client.go": "c2ac78f759ee433498f967cf2df2487c88d9c1e3f0e56f21c20abb922da1249a",
+      "internal/openai/auth_session.go": "7ab20ec8d4ca09e319f0e8d6904f0b1eb370a6e586629c94d45fce5d6f6a7193",
       "internal/openai/client.go": "a306feeaad2929f44bd63700b41931e2ecf05d794f64b12a4e8172c843c0f68a",
       "pkg/agentsdk/providers/audit_fixes_test.go": "c8942ecc70a539c0586b29eb1a105f594f788fcd140ee307163724aaccc80f03",
       "pkg/agentsdk/providers/factory.go": "3cff648f22544444882583b0134fb4c7da1f3582310457b4fb9ac764fd009b79",
       "pkg/agentsdk/providers/factory_copilot_test.go": "a5dfc7d211db95800ed77f8d6bd230d804030bf2e8d83e7a4941db10cd1f16e3",
-      "pkg/agentsdk/providers/factory_test.go": "b0da0d150f03dae84ee8e688a357504e3c0bbbd40ddfa42f6850d293d0f5a580"
+      "pkg/agentsdk/providers/factory_test.go": "b0da0d150f03dae84ee8e688a357504e3c0bbbd40ddfa42f6850d293d0f5a580",
+      "pkg/agentsdk/providers/openai/model.go": "55031b55d8a18bc645e32562befad9e842e742650bd7a7e7aa11bd0c78b1b0b8"
     }
   },
   "schema_version": 1,

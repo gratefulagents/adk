@@ -32,8 +32,8 @@ def main():
         archive = subprocess.check_output(['git', 'archive', SHA], cwd=ROOT / 'repos/sdk')
         with tarfile.open(fileobj=io.BytesIO(archive)) as tar:
             tar.extractall(source, filter='data')
-        paths = ['pkg/agentsdk/providers/factory.go', 'pkg/agentsdk/providers/factory_test.go', 'pkg/agentsdk/providers/factory_copilot_test.go', 'pkg/agentsdk/providers/audit_fixes_test.go', 'internal/openai/client.go', 'internal/anthropic/client.go', 'go.mod', 'go.sum']
-        harness = ['scripts/provider-config-reference/run.py', 'scripts/provider-config-reference/reference_test.go', 'scripts/provider-config-reference/fallback_test.go', 'scripts/provider-config-reference/copilot_test.go']
+        paths = ['pkg/agentsdk/providers/factory.go', 'pkg/agentsdk/providers/factory_test.go', 'pkg/agentsdk/providers/factory_copilot_test.go', 'pkg/agentsdk/providers/audit_fixes_test.go', 'internal/openai/client.go', 'internal/openai/auth_session.go', 'pkg/agentsdk/providers/openai/model.go', 'internal/anthropic/client.go', 'go.mod', 'go.sum']
+        harness = ['scripts/provider-config-reference/run.py', 'scripts/provider-config-reference/reference_test.go', 'scripts/provider-config-reference/fallback_test.go', 'scripts/provider-config-reference/copilot_test.go', 'scripts/provider-config-reference/openai_oauth_test.go']
         provenance = {
             'repository': 'https://github.com/gratefulagents/sdk',
             'commit': SHA,
@@ -45,9 +45,8 @@ def main():
             'sourceSHA256': {p: hashlib.sha256((source / p).read_bytes()).hexdigest() for p in paths},
             'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in harness},
         }
-        shutil.copyfile(ROOT / harness[1], source / 'pkg/agentsdk/providers/native_provider_config_reference_test.go')
-        shutil.copyfile(ROOT / harness[2], source / 'pkg/agentsdk/providers/native_provider_fallback_reference_test.go')
-        shutil.copyfile(ROOT / harness[3], source / 'pkg/agentsdk/providers/native_copilot_config_reference_test.go')
+        for index, path in enumerate(harness[1:]):
+            shutil.copyfile(ROOT / path, source / f'pkg/agentsdk/providers/native_provider_config_{index}_test.go')
         output = source / 'provider-config-observations.json'
         env['PROVIDER_CONFIG_OUTPUT'] = str(output)
         execution = subprocess.run(

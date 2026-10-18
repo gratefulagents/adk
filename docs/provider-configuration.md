@@ -80,6 +80,14 @@ explicit static bearer path needs no refresh material or exchange.
   supplies its current Copilot API token, not a GitHub OAuth token requiring
   exchange. Copilot model-family protocol routing remains automatic; declarative
   API mode overrides for Copilot are rejected rather than silently ignored.
+- OpenAI `auth_mode: "oauth"` binds host-owned OAuth material and requires Responses.
+  `openai_oauth_account_id` optionally pins the account in the credential scope;
+  named instances use only their own account field. The host store must return a
+  nonblank account and matching material when pinned. No inline `api_key` seed is
+  accepted for OpenAI OAuth. This avoids confusing Go's `APIKey` fallback (which
+  constructs an API-key session even with OAuth mode) with an injected OAuth
+  session. The reference comparison injects a real in-memory Go OAuth session.
+  Native credentials remain lazy and host-owned, not automatically discovered.
 - OpenAI and xAI default to Responses; OpenRouter, Gemini, Groq, and Local default
   to Chat Completions; Anthropic uses Messages. Compatible providers accept
   `responses`, `auto` (Responses), or `chat-completions`. Canonical endpoints come
@@ -109,10 +117,11 @@ This is a bounded native API, **not whole `ProviderSpec`, `ProviderRoute`, or
 `NewProviderFromConfig` parity**. The immutable source pin is
 `1dc92b73900fac74dc357a938e4b5eee6392b418` in `gratefulagents/sdk`.
 
-- OAuth files, account paths, injected OpenAI auth sessions, automatic OAuth
+- OAuth files, account paths, serialized OpenAI auth sessions, automatic OAuth
   material inference/reload and declarative Copilot token exchange are unsupported.
-  Their document fields are rejected, including inside named routes; OpenAI OAuth
-  selections are rejected. Unsupported auth/API mode overrides are rejected even
+  Their document fields are rejected, including inside named routes. OpenAI OAuth
+  requires an explicit host store, not a session object in JSON. Unsupported
+  auth/API mode overrides are rejected even
   when their canonical leg is not registered. Copilot uses existing native
   model-family routing and host-owned token refresh; no environment force-chat
   flag is read. Arbitrary named prefixes remain distinct from base provider kinds.
@@ -147,6 +156,10 @@ ports and includes only synthetic credentials. Three additional static Copilot
 calls compare Chat, Responses and Messages route selection plus exact bearer,
 integration and API-version headers. Native checks additionally prove the
 unselected parent store is not read and missing named credentials fail at use.
+An additional OpenAI OAuth request uses a real in-memory Go OAuth session and a
+native host store, comparing bearer/account headers and Responses routing. The
+native regression checks account trimming/isolation, the default Codex endpoint,
+no credential reads during construction, and missing-account refusal at use.
 
 `crates/adk-providers/tests/provider_config.rs` compares resolution with those
 observations and performs real loopback requests, canonical replacement,

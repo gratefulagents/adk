@@ -4,7 +4,8 @@ Run `python3 scripts/provider-config-reference/run.py` to regenerate, or add
 `--check` to reproduce and compare the checked-in observations byte-for-byte.
 The harness uses `git archive` of `repos/sdk` at immutable commit
 `1dc92b73900fac74dc357a938e4b5eee6392b418`, not the mutable checkout. It injects
-`reference_test.go`, `fallback_test.go`, and `copilot_test.go` only into a disposable
+`reference_test.go`, `fallback_test.go`, `copilot_test.go`, and
+`openai_oauth_test.go` only into a disposable
 extraction. No production Go source
 is rewritten. Go dependencies must already be available for readonly module mode.
 
@@ -29,8 +30,12 @@ Reviewed source anchors in `pkg/agentsdk/providers/factory.go`: 119–143,
 
 This is a **bounded configuration slice**, not whole `ProviderSpec`,
 `ProviderRoute`, or `NewProviderFromConfig` parity. In particular it excludes
-OAuth file loading/reload, OpenAI OAuth/session material, Copilot token exchange
-and eager source credential loading. Static Copilot bearer routes are observed
+OAuth file loading/reload, Copilot token exchange and eager source credential
+loading. An explicit in-memory Go OpenAI OAuth session supplies a synthetic token
+and account for one request comparison; native configuration binds equivalent
+host-owned material lazily. It does not interpret `APIKey` as an OpenAI OAuth
+access token: Go otherwise selects an API-key session despite OAuth mode.
+Static Copilot bearer routes are observed
 through three actual protocol-selected calls (Chat, Responses, Messages), including
 bearer/integration headers. The harness clears the source force-chat environment
 flag explicitly; its opt-in legacy behavior is not claimed by native configuration.

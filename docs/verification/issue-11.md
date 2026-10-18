@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Explicit sandbox application grants
+
+Sandbox Config now accepts explicit host-owned application environment values,
+with redacted Debug, construction-time validation, protected policy/Git variables,
+and no new model-request authority. All backends use the same environment builder.
+The original local `printf hello` and `CUSTOM=value` checks run in the facade example.
+A separate parent subprocess injects dummy OpenAI/AWS/database secrets and verifies
+that the actual execution child receives none; no global environment mutation is
+used. Local restricted requests remain rejected. This is a native explicit-grant
+adaptation, not a claim of complete legacy SafeEnv parity.
+
+Fresh Rust1.88 verification: **1,811 workspace tests +10 doctests +13 example tests
+passed; 0 failed,30 ignored**, plus the subsequently added ambient-secret subprocess
+regression passed. Strict whole-workspace all-target lint/typecheck, rustdoc warnings,
+format, feature matrix/standalone consumer/purity, all20 scenarios, source pins,
+source-bound evidence and56 audit validators pass. Ledger remains **1,297 verified /
+7,594 unresolved /251 excluded**; this slice does not assert new baseline closure.
+CI on the preceding `5ba9ca3` head passed46/46 checks; new-head CI remains separate.
+Full retained acceptance and original guardrail example mapping remain unfinished.
+
 ### Original loopback streaming and read-only registry examples
 
 The streaming scenario now sends a real native OpenAI chat request to an owned

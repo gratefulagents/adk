@@ -807,3 +807,62 @@ async fn session_abandoned_readiness_reaps_spawned_child() {
     .unwrap();
     assert_reaped(pid);
 }
+
+#[tokio::test]
+async fn host_application_environment_reaches_child_without_request_authority() {
+    if std::env::var_os("ADK_ENV_TEST_PARENT").is_some() {
+        for key in ["OPENAI_API_KEY", "AWS_SECRET_ACCESS_KEY", "DATABASE_URL"] {
+            assert!(std::env::var_os(key).is_some());
+        }
+    }
+    let temp = Temp::new();
+    let mut config = Config::new(&temp.0);
+    config.backend = Backend::Local;
+    config
+        .application_env
+        .insert("CUSTOM".into(), "value".into());
+    let executor = Executor::new(config).unwrap();
+    let request = shell(
+        "printf '%s|%s|%s|%s' \"$CUSTOM\" \"${OPENAI_API_KEY-unset}\" \"${AWS_SECRET_ACCESS_KEY-unset}\" \"${DATABASE_URL-unset}\"",
+    );
+    let output = executor
+        .run(&context(CancellationToken::new()), request.clone())
+        .await
+        .unwrap();
+    assert!(output.status.success());
+    assert_eq!(output.stdout, b"value|unset|unset|unset");
+    let mut override_request = request.clone();
+    override_request
+        .env
+        .insert("CUSTOM".into(), "replacement".into());
+    assert!(
+        executor
+            .run(&context(CancellationToken::new()), override_request)
+            .await
+            .is_err()
+    );
+    let mut restricted_request = request;
+    restricted_request.access = AccessMode::ReadOnly;
+    assert!(
+        executor
+            .run(&context(CancellationToken::new()), restricted_request)
+            .await
+            .is_err()
+    );
+}
+
+#[test]
+fn ambient_credentials_are_not_implicitly_granted() {
+    let status = std::process::Command::new(std::env::args_os().next().unwrap())
+        .args([
+            "--exact",
+            "host_application_environment_reaches_child_without_request_authority",
+        ])
+        .env("ADK_ENV_TEST_PARENT", "1")
+        .env("OPENAI_API_KEY", "dummy-openai")
+        .env("AWS_SECRET_ACCESS_KEY", "dummy-aws")
+        .env("DATABASE_URL", "dummy-database")
+        .status()
+        .unwrap();
+    assert!(status.success());
+}

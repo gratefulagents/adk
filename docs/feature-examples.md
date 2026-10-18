@@ -277,3 +277,15 @@ tools as a sanity check. Native feature selection remains explicit rather than
 implicitly enabling every legacy registry tool. The existing mocked approval/
 resume assertions remain; this does not claim the original live FunctionTool or
 live approval-wrapper test has run.
+
+### Sandbox application environment
+
+The sandbox example executes the original local `printf hello` case and checks
+`CUSTOM=value` alongside absent ambient OpenAI/AWS/database credentials. Rust uses
+explicit host-owned `sandbox::Config::application_env` rather than copying the
+host environment or permitting arbitrary model-request overrides. Grants cannot
+replace policy-owned variables or Git settings; values are omitted from Config
+Debug but are visible to children (and potentially backend argv), so this is not
+a credential-delivery API. Local execution still requires FullAccess/network Allow.
+The lifecycle subprocess regression injects dummy ambient secrets into a separate
+parent process and checks the actual child's environment without global mutation.

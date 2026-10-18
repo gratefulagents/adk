@@ -644,6 +644,9 @@ async fn sandbox() {
     let mut config = Config::new(temp.path());
     config.backend = Backend::Local;
     config.output_limit = 64;
+    config
+        .application_env
+        .insert("CUSTOM".into(), "value".into());
     let executor = Executor::new(config).unwrap();
     let mut req = Request::new("/bin/sh");
     req.args = vec![
@@ -653,6 +656,16 @@ async fn sandbox() {
     req.access = AccessMode::FullAccess;
     req.network = Network::Allow;
     req.timeout = Some(Duration::from_secs(5));
+    let mut hello = req.clone();
+    hello.args = vec!["-c".into(), "printf hello".into()];
+    let output = executor.run(&context(), hello).await.unwrap();
+    assert!(output.status.success());
+    assert_eq!(output.stdout, b"hello");
+    let mut env = req.clone();
+    env.args = vec!["-c".into(), "printf '%s|%s|%s|%s' \"$CUSTOM\" \"${OPENAI_API_KEY-unset}\" \"${AWS_SECRET_ACCESS_KEY-unset}\" \"${DATABASE_URL-unset}\"".into()];
+    let output = executor.run(&context(), env).await.unwrap();
+    assert!(output.status.success());
+    assert_eq!(output.stdout, b"value|unset|unset|unset");
     let output = executor.run(&context(), req.clone()).await.unwrap();
     assert_eq!(output.completion, Completion::Exited);
     assert!(output.status.success());
@@ -2202,6 +2215,11 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
+    #[tokio::test]
+    async fn original_sandbox_local_executor_and_explicit_environment() {
+        super::sandbox().await;
+    }
+
     #[tokio::test]
     async fn original_local_http_streaming_example() {
         super::streaming().await;

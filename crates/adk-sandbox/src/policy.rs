@@ -136,12 +136,13 @@ pub(crate) fn validate(config: &Config, mut request: Request) -> Result<Request,
             "FullAccess requires explicit Local backend".into(),
         ));
     }
-    environment(&request.env, Path::new("/tmp"))?;
+    environment(&request.env, &config.application_env, Path::new("/tmp"))?;
     Ok(request)
 }
 
 pub(crate) fn environment(
     overrides: &BTreeMap<String, String>,
+    application: &BTreeMap<String, String>,
     private: &Path,
 ) -> Result<BTreeMap<String, String>, Error> {
     let mut env = BTreeMap::from([
@@ -164,13 +165,29 @@ pub(crate) fn environment(
         ("GIT_CONFIG_KEY_1".into(), "core.hooksPath".into()),
         ("GIT_CONFIG_VALUE_1".into(), "/dev/null".into()),
     ]);
+    for (key, value) in application {
+        if key.is_empty()
+            || !key.bytes().enumerate().all(|(index, byte)| {
+                byte == b'_' || byte.is_ascii_alphabetic() || (index > 0 && byte.is_ascii_digit())
+            })
+            || value.contains('\0')
+            || env.contains_key(key)
+            || key.starts_with("GIT_")
+        {
+            return Err(Error::Invalid(
+                "invalid or policy-owned application environment key/value".into(),
+            ));
+        }
+        env.insert(key.clone(), value.clone());
+    }
     for (key, value) in overrides {
         // An allowlist also excludes loader injection, config/search paths,
         // proxy URLs, credential variables, and future unknown secret names.
         if !matches!(
             key.as_str(),
             "LANG" | "LC_ALL" | "LC_CTYPE" | "LC_MESSAGES" | "TERM" | "COLORTERM"
-        ) || value.len() > 128
+        ) || application.contains_key(key)
+            || value.len() > 128
             || !value
                 .bytes()
                 .all(|b| b.is_ascii_alphanumeric() || b"_-.@".contains(&b))
@@ -187,6 +204,57 @@ pub(crate) fn environment(
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn application_grants_preserve_policy_and_request_boundaries() {
+        let application = BTreeMap::from([("CUSTOM".into(), "value with spaces 猫".into())]);
+        let environment =
+            environment(&BTreeMap::new(), &application, Path::new("/tmp/private")).unwrap();
+        assert_eq!(environment["CUSTOM"], "value with spaces 猫");
+        assert_eq!(environment["PATH"], "/usr/bin:/bin");
+        for key in ["CUSTOM", "OTHER", "PATH", "LD_PRELOAD", "OPENAI_API_KEY"] {
+            assert!(
+                super::environment(
+                    &BTreeMap::from([(key.into(), "replacement".into())]),
+                    &application,
+                    Path::new("/tmp/private")
+                )
+                .is_err()
+            );
+        }
+        for key in [
+            "PATH",
+            "HOME",
+            "TMPDIR",
+            "GIT_CONFIG_COUNT",
+            "",
+            "1BAD",
+            "A=B",
+            "BAD\nKEY",
+        ] {
+            assert!(
+                super::environment(
+                    &BTreeMap::new(),
+                    &BTreeMap::from([(key.into(), "x".into())]),
+                    Path::new("/tmp/private")
+                )
+                .is_err()
+            );
+        }
+        assert!(
+            super::environment(
+                &BTreeMap::new(),
+                &BTreeMap::from([("CUSTOM".into(), "x\0y".into())]),
+                Path::new("/tmp/private")
+            )
+            .is_err()
+        );
+        let mut config = Config::new("/tmp/example");
+        config.application_env = application;
+        let debug = format!("{config:?}");
+        assert!(debug.contains("CUSTOM"));
+        assert!(!debug.contains("value with spaces"));
+    }
+
     #[test]
     fn environment_rejects_paths_credentials_and_injection() {
         for key in [
@@ -206,6 +274,7 @@ mod tests {
             assert!(
                 environment(
                     &BTreeMap::from([(key.into(), "x".into())]),
+                    &BTreeMap::new(),
                     Path::new("/tmp/private")
                 )
                 .is_err(),
@@ -216,12 +285,18 @@ mod tests {
             assert!(
                 environment(
                     &BTreeMap::from([("LANG".into(), value.into())]),
+                    &BTreeMap::new(),
                     Path::new("/tmp/private")
                 )
                 .is_err()
             );
         }
-        let env = environment(&BTreeMap::new(), Path::new("/tmp/private")).unwrap();
+        let env = environment(
+            &BTreeMap::new(),
+            &BTreeMap::new(),
+            Path::new("/tmp/private"),
+        )
+        .unwrap();
         assert_eq!(env["PATH"], "/usr/bin:/bin");
         assert_eq!(
             env["HOME"],

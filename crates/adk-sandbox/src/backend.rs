@@ -54,8 +54,11 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
             }
             let mut cmd = Command::new(&request.program);
             cmd.args(&request.args).current_dir(&request.cwd);
-            cmd.env_clear()
-                .envs(policy::environment(&request.env, &private.0)?);
+            cmd.env_clear().envs(policy::environment(
+                &request.env,
+                &config.application_env,
+                &private.0,
+            )?);
             cmd
         }
         Backend::Bubblewrap if cfg!(target_os = "linux") => {
@@ -109,7 +112,9 @@ pub(crate) fn build(config: &Config, request: &Request) -> Result<Built, Error> 
                 ));
             }
             cmd.args(["--", "/usr/bin/env", "-i"]);
-            for (key, value) in policy::environment(&request.env, &private.0)? {
+            for (key, value) in
+                policy::environment(&request.env, &config.application_env, &private.0)?
+            {
                 cmd.arg(format!("{key}={value}"));
             }
             cmd.arg(&request.program).args(&request.args);
@@ -293,7 +298,9 @@ fn bwrap_args(
             path.into_os_string(),
         ]);
     }
-    for (key, value) in policy::environment(&request.env, Path::new("/tmp"))? {
+    for (key, value) in
+        policy::environment(&request.env, &config.application_env, Path::new("/tmp"))?
+    {
         args.extend(["--setenv".into(), key.into(), value.into()]);
     }
     args.extend([

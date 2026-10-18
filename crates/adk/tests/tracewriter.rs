@@ -756,6 +756,108 @@ async fn actual_runner_writes_ordered_generation_attempts_without_otel() {
 }
 
 #[test]
+fn typed_snapshot_metadata_preserves_pinned_envelope_bytes() {
+    use adk::codec::{
+        dto::{RawJson, ResponseSnapshot},
+        from_go_json,
+        snapshots::{OutputSchema, RequestSnapshot},
+    };
+    use sha2::{Digest, Sha256};
+    fn unhex(text: &str) -> Vec<u8> {
+        text.as_bytes()
+            .chunks_exact(2)
+            .map(|pair| u8::from_str_radix(std::str::from_utf8(pair).unwrap(), 16).unwrap())
+            .collect()
+    }
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let root = tempfile::tempdir().unwrap();
+    let store = Arc::new(FilesystemTraceStore::new(root.path()).unwrap());
+    let writer = TraceWriter::new(store, "run", Options::default());
+    let path = writer
+        .init_run(&RunMetadata {
+            run_id: "run".into(),
+            ..Default::default()
+        })
+        .unwrap();
+    let mut expected = Vec::new();
+    let mut persist = |key: &str, snapshot: Snapshot, case: &Value| {
+        let mut generation = Generation::default();
+        match key {
+            "request" => generation.request = Some(snapshot),
+            "response" => generation.response = Some(snapshot),
+            _ => unreachable!(),
+        }
+        writer.span_start(&Span::new(
+            "generation",
+            "run",
+            Some(SpanData::Generation(Box::new(generation))),
+        ));
+        expected.push((key.to_owned(), unhex(case["marshal_hex"].as_str().unwrap())));
+    };
+    for case in fixture["envelope_byte_cases"].as_array().unwrap() {
+        if case["decode_ok"] != true || case["marshal_ok"] != true {
+            continue;
+        }
+        let input = unhex(case["input_hex"].as_str().unwrap());
+        let key = case["type"].as_str().unwrap();
+        let snapshot = match key {
+            "request" => Snapshot::from_request(&from_go_json::<RequestSnapshot>(&input).unwrap()),
+            "response" => {
+                Snapshot::from_response(&from_go_json::<ResponseSnapshot>(&input).unwrap())
+            }
+            _ => unreachable!(),
+        };
+        persist(key, snapshot.unwrap(), case);
+    }
+    // Direct construction reaches raw marshal depth 10,000 even when the
+    // containing document exceeds the whole-input decode depth limit.
+    for case in fixture["envelope_encode_cases"].as_array().unwrap() {
+        let raw = if case["raw_nil"].as_bool().unwrap() {
+            RawJson::Missing
+        } else {
+            RawJson::EncodedBytes(unhex(case["raw_hex"].as_str().unwrap()))
+        };
+        let (key, snapshot) = match case["location"].as_str().unwrap() {
+            "request_schema" => (
+                "request",
+                Snapshot::from_request(&RequestSnapshot {
+                    output_schema: Some(OutputSchema {
+                        schema: raw,
+                        ..Default::default()
+                    }),
+                    ..Default::default()
+                }),
+            ),
+            "response_raw" => (
+                "response",
+                Snapshot::from_response(&ResponseSnapshot {
+                    raw,
+                    ..Default::default()
+                }),
+            ),
+            _ => continue,
+        };
+        assert_eq!(snapshot.is_ok(), case["marshal_ok"].as_bool().unwrap());
+        if let Ok(snapshot) = snapshot {
+            persist(key, snapshot, case);
+        }
+    }
+    let calls = records(&path, "llm_calls");
+    assert_eq!(calls.as_array().unwrap().len(), expected.len());
+    assert_eq!(expected.len(), 109);
+    for (index, (key, bytes)) in expected.into_iter().enumerate() {
+        assert_eq!(
+            calls[index][&key],
+            json!({"captured": false,
+            "sha256": format!("{:x}", Sha256::digest(&bytes)), "bytes": bytes.len()}),
+            "persisted case {index}"
+        );
+    }
+    assert_eq!(writer.health().write_errors, 0);
+}
+
+#[test]
 fn typed_request_metadata_digests_match_pinned_go_serialized_bytes() {
     use sha2::{Digest, Sha256};
     let fixture: Value =

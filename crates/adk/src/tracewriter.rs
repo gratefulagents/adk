@@ -42,15 +42,42 @@ pub struct Health {
 #[derive(Debug, Clone)]
 pub struct Snapshot {
     bytes: Vec<u8>,
-    value: Value,
+    instructions: Option<String>,
 }
 impl Snapshot {
     pub fn from_json(bytes: Vec<u8>) -> Result<Self, serde_json::Error> {
-        let value = serde_json::from_slice(&bytes)?;
-        Ok(Self { bytes, value })
+        let value: Value = serde_json::from_slice(&bytes)?;
+        let instructions = value
+            .get("instructions")
+            .and_then(Value::as_str)
+            .map(str::to_owned);
+        Ok(Self {
+            bytes,
+            instructions,
+        })
     }
     pub fn from_serializable(value: &impl Serialize) -> Result<Self, serde_json::Error> {
         Self::from_json(adk_codec::snapshots::to_go_json(value)?)
+    }
+
+    /// Preserve typed request bytes without requiring a generic JSON projection.
+    pub fn from_request(
+        value: &adk_codec::snapshots::RequestSnapshot,
+    ) -> Result<Self, serde_json::Error> {
+        Ok(Self {
+            bytes: adk_codec::to_go_json_bytes(value)?,
+            instructions: Some(value.instructions.clone()),
+        })
+    }
+
+    /// Preserve typed response bytes, including opaque raw provider JSON.
+    pub fn from_response(
+        value: &adk_codec::dto::ResponseSnapshot,
+    ) -> Result<Self, serde_json::Error> {
+        Ok(Self {
+            bytes: adk_codec::to_go_json_bytes(value)?,
+            instructions: None,
+        })
     }
 }
 
@@ -472,8 +499,7 @@ impl State {
                 if let Some(instructions) = generation
                     .request
                     .as_ref()
-                    .and_then(|request| request.value.get("instructions"))
-                    .and_then(Value::as_str)
+                    .and_then(|request| request.instructions.as_deref())
                     .filter(|text| !text.is_empty())
                 {
                     self.instructions(
@@ -793,7 +819,7 @@ pub(crate) fn generation_end_span(
     let mut errors = Vec::new();
     if let Some(SpanData::Generation(data)) = &mut span.data {
         match &record.request_snapshot {
-            Ok(snapshot) => match Snapshot::from_serializable(snapshot) {
+            Ok(snapshot) => match Snapshot::from_request(snapshot) {
                 Ok(snapshot) => data.request = Some(snapshot),
                 Err(cause) => errors.push(format!("snapshot request: {cause}")),
             },
@@ -804,7 +830,7 @@ pub(crate) fn generation_end_span(
         let snapshot = adk_codec::dto::ResponseSnapshot::try_from(response)
             .map_err(|error| error.to_string())
             .and_then(|snapshot| {
-                Snapshot::from_serializable(&snapshot).map_err(|error| error.to_string())
+                Snapshot::from_response(&snapshot).map_err(|error| error.to_string())
             });
         match snapshot {
             Ok(snapshot) => data.response = Some(snapshot),

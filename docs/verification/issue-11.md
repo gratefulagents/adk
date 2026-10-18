@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Typed trace metadata byte integration
+
+Trace snapshots now offer typed request/response constructors using the sealed
+byte codecs. Runtime generation producers use them, and resolved instructions
+are retained separately rather than extracted from a required generic JSON
+projection. Existing generic JSON/Serialize constructors keep their behavior.
+
+The filesystem trace regression persists 95 successful pinned envelope decode
+cases and 14 direct raw marshal cases, checking all 109 SHA-256 digests and byte
+lengths against independently produced Go bytes. Six malformed/over-depth direct
+raw cases are rejected. This includes invalid raw UTF-8, duplicate keys, numeric
+lexical forms and the raw depth-10,000 boundary. Metadata capture no longer drops
+a valid typed snapshot merely because serde Value cannot represent it.
+
+Full-capture generic JSON projection still differs from Go binary64 decoding,
+Unicode repair and deep JSON handling; it is not promoted by this metadata test.
+Whole snapshot declarations and complete trace compatibility remain unresolved.
+
 ### Shared lossless snapshot settings
 
 Analysis `snapshots::ModelSettings` now re-exports the existing lossless DTO instead
@@ -29,7 +47,8 @@ limits. The minimal compat-only facade runs all 130 decode comparisons.
 No whole declaration or trace-writer closure is promoted: analysis Vec fields
 still require a complete nil/empty representation audit, and
 `tracewriter::Snapshot::from_json` still requires a serde JSON Value projection.
-Generic trace serialization is not automatically switched to the new byte codecs.
+The later typed metadata integration above switches runtime producers to explicit
+byte-codec constructors, not arbitrary generic Serialize callers.
 These are explicit remaining integration/contracts, not inferred completion.
 Ledger remains **1,330 verified /7,561 unresolved /251 excluded**.
 

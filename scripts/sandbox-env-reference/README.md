@@ -10,3 +10,12 @@ explicit-map projection, not SafeEnv inheritance, configuration or execution.
 The oracle also records all nine public configuration-name constants through the
 ordered SandboxConfigEnvNames result and separate SandboxModeEnv value. The list
 intentionally excludes mode and GOROOT, and Rust returns fresh owned names.
+
+The POSIX base-environment projection additionally compares106 hermetic cases.
+Only the disposable Go test subprocess changes its own environment; snapshots
+contain fixture-owned dummy values, never live host values. Cases cover inherited
+identity/locale variables, secret exclusion, fallback/configured/inherited PATH,
+prepend/append precedence, lexical cleanup/deduplication, GOROOT, sorted extra
+variable expansion, original configuration-test inputs, all25 Go whitespace
+scalars and non-whitespace/invalid UTF-8 controls. Native execution policy and
+request-override ordering are not changed or claimed by this projection.

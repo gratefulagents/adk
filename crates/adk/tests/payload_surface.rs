@@ -226,3 +226,26 @@ fn legacy_policy_projections_are_available_without_authorization_changes() {
         adk::core::AccessMode::ReadOnly
     );
 }
+
+#[test]
+fn sandbox_environment_projections_are_standalone_and_explicit() {
+    use adk::codec::sandbox_env::{
+        EnvironmentConfig, config_env_names, expand_safe, safe_environment_map_posix,
+    };
+    use std::collections::BTreeMap;
+    let parent = BTreeMap::from([
+        (b"PATH".to_vec(), b"/usr/bin".to_vec()),
+        (b"OPENAI_API_KEY".to_vec(), b"dummy-secret".to_vec()),
+    ]);
+    let config = EnvironmentConfig {
+        extra_env: BTreeMap::from([(b"CUSTOM".to_vec(), b"$PATH".to_vec())]),
+        ..Default::default()
+    };
+    let environment = safe_environment_map_posix(&parent, &config);
+    assert_eq!(
+        expand_safe(b"$CUSTOM/${OPENAI_API_KEY}", &environment),
+        b"/usr/bin/"
+    );
+    assert!(!environment.contains_key(b"OPENAI_API_KEY".as_slice()));
+    assert_eq!(config_env_names().len(), 8);
+}

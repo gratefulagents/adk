@@ -34,9 +34,10 @@ def main():
                       'license': 'GPL-3.0-only',
                       'goVersion': subprocess.check_output([go, 'version'], env=env, text=True).strip(),
                       'sourceSHA256': {p: hashlib.sha256((source / p).read_bytes()).hexdigest() for p in paths},
-                      'stdlibSHA256': {'src/os/env.go': hashlib.sha256((Path(env['GOROOT']) / 'src/os/env.go').read_bytes()).hexdigest()},
-                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/sandbox-env-reference/run.py', 'scripts/sandbox-env-reference/reference_test.go']}}
+                      'stdlibSHA256': {p: hashlib.sha256((Path(env['GOROOT']) / p).read_bytes()).hexdigest() for p in ['src/os/env.go', 'src/strings/strings.go', 'src/unicode/graphic.go', 'src/unicode/tables.go', 'src/path/filepath/path.go', 'src/internal/filepathlite/path.go', 'src/internal/filepathlite/path_unix.go']},
+                      'harnessSHA256': {p: hashlib.sha256((ROOT / p).read_bytes()).hexdigest() for p in ['scripts/sandbox-env-reference/run.py', 'scripts/sandbox-env-reference/reference_test.go', 'scripts/sandbox-env-reference/environment_test.go']}}
         shutil.copyfile(ROOT / 'scripts/sandbox-env-reference/reference_test.go', source / 'pkg/agentsdk/sandbox/native_expansion_reference_test.go')
+        shutil.copyfile(ROOT / 'scripts/sandbox-env-reference/environment_test.go', source / 'pkg/agentsdk/sandbox/native_environment_reference_test.go')
         output = source / 'observations.json'
         env['EXPANSION_OUTPUT'] = str(output)
         execution = subprocess.run([go, 'test', '-count=1', '-v', '-run', '^(TestNativeExpansionReference)$', './pkg/agentsdk/sandbox'], cwd=source, env=env, stdout=subprocess.PIPE, stderr=subprocess.STDOUT)

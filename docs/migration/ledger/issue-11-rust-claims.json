@@ -24809,6 +24809,74 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-20264AB04BB4BCA2": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SafeEnvMap",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
+        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
+      ],
+      "rust_test_identifiers": [
+        "posix_environment_projection_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvInheritsSystemVarsOnly",
+      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DCF109F148404596": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SafeEnvMapWithConfig",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
+        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
+      ],
+      "rust_test_identifiers": [
+        "posix_environment_projection_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvSandboxConfiguration",
+      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-C46CF0DD7263D870": {
+      "source": "pkg/agentsdk/sandbox/executor_test.go",
+      "source_name": "TestSafeEnvSandboxConfiguration",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
+        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
+      ],
+      "rust_test_identifiers": [
+        "posix_environment_projection_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvSandboxConfiguration",
+      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-8CED05AB91BF32FF": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SafeEnvMapWithConfig",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::safe_environment_map_posix",
+        "crates/adk-codec/src/sandbox_env.rs::EnvironmentConfig"
+      ],
+      "rust_test_identifiers": [
+        "posix_environment_projection_matches_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvSandboxConfiguration",
+      "rationale": "POSIX base-environment projection only, with a host-supplied parent snapshot instead of implicit ambient acquisition and EnvironmentConfig::default for the no-config form.106 hermetic pinned-Go observations compare complete maps: system/locale selection and unknown-secret exclusion, fallback/configured/inherited PATH, precedence/dedup/lexical cleanup, GOROOT, sorted extra-variable expansion, trimmed duplicate keys, all25 Go whitespace scalars and invalid UTF8/NUL. Includes exact original TestSafeEnvSandboxConfiguration input and all output fields. Fresh outputs cannot mutate the inputs. Does not close whole Config/JSON fields, Windows path behavior, request-override ordering, SafeEnv flattened output, ConfigFromEnv, execution, or implicit installation into native policy. Separately reviewed configuration-constructor facet executor.go1160–1180: the exact same pure map-construction body, not executor installation or ConfigFromEnv.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

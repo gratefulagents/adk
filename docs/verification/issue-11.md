@@ -2,6 +2,27 @@
 
 ## Current continuation evidence
 
+### POSIX base-environment projection
+
+Added `codec::sandbox_env::EnvironmentConfig` and `safe_environment_map_posix`.
+The host supplies a parent snapshot; the helper never acquires ambient values,
+spawns a process or installs native sandbox grants.106 hermetic pinned-Go cases
+verify complete maps, original configuration-test inputs, identity/locale selection,
+secret exclusion, configured/inherited/fallback PATH, prepend/append precedence,
+lexical cleanup/deduplication, GOROOT, sorted extra expansion, trimmed duplicate
+keys, all25 Go whitespace scalars and byte-preserving NUL/invalid UTF-8 behavior.
+The compatibility-only facade regression runs without host/runtime features.
+
+Full workspace tests and rustdoc passed with0 failures/30 ignored; subsequent
+minimal-facade tests (11 passed), full feature matrix/standalone consumer,20 scenarios,
+strict all-target lint/typecheck/format, refreshed bound evidence,56 validators,
+source locks and purity pass. Four exact API/test/configuration facets are closed;
+ledger **1,315 verified /7,576 unresolved /251 excluded**. No whole Config/JSON,
+Windows path, request-override-ordering, flattened SafeEnv or ConfigFromEnv claim.
+CI for preceding c72f913 passed46/46; this continuation's CI is tracked separately.
+Full issue11 acceptance remains incomplete.
+
+
 ### Sandbox configuration-name metadata
 
 Added the nine public SDK sandbox environment-name constants and the ordered,

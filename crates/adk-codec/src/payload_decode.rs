@@ -189,6 +189,41 @@ impl sealed::Sealed for SnapshotModelSettings {}
 impl GoJsonDecode for SnapshotModelSettings {}
 impl GoJsonEncode for SnapshotModelSettings {}
 
+go_object!(ToolCallSnapshot,
+    "id" => id: scalar, "name" => name: scalar, "input" => input: raw
+);
+go_object!(ReasoningSnapshot,
+    "id" => id: scalar, "text" => text: scalar, "thinking" => thinking: scalar,
+    "signature" => signature: scalar, "redacted_data" => redacted_data: scalar,
+    "encrypted_content" => encrypted_content: scalar
+);
+go_object!(CompactionSnapshot,
+    "id" => id: scalar, "content" => content: scalar,
+    "encrypted_content" => encrypted_content: scalar, "created_by" => created_by: scalar
+);
+go_object!(ToolApprovalSnapshot,
+    "tool_name" => tool_name: scalar, "input" => input: raw,
+    "call_id" => call_id: scalar, "approved" => approved: scalar
+);
+go_object!(RunItemSnapshot,
+    "type" => kind: scalar,
+    "agent_name" => agent_name: scalar,
+    "message_text" => message_text: scalar,
+    "message_phase" => message_phase: scalar,
+    "reasoning_text" => reasoning_text: scalar,
+    "thinking_text" => thinking_text: scalar;
+    "message_images" => message_images
+    pointers {
+        "tool_call" => tool_call,
+        "tool_output" => tool_output,
+        "handoff_call" => handoff_call,
+        "handoff_output" => handoff_output,
+        "reasoning" => reasoning,
+        "compaction" => compaction,
+        "tool_approval" => tool_approval
+    }
+);
+
 go_object!(RequestSnapshot,
     "agent_name" => agent_name: scalar,
     "model" => model: scalar,

@@ -2,6 +2,19 @@
 
 ## Current continuation evidence
 
+### Nested request snapshot decoding
+
+The nested run-item, tool-call, reasoning, compaction and tool-approval analysis
+records now reuse the same Go-style object decoder. Fourteen further pinned-Go
+request cases verify folded field names, repeated pointer objects, null resets,
+raw-input replacement, retained run-item/image slice slots and malformed values
+that cannot be erased by a later null. Existing serialization and schema derives
+remain intact. Twelve request-snapshot tests cover these new observations,
+including a direct assertion that both nonempty image slots survive shrinking.
+This is incremental decoding evidence, not complete arbitrary-byte/depth parity;
+the reopened whole request declaration and public alias stay unresolved. Ledger
+counts remain **1,322 verified /7,569 unresolved /251 excluded**.
+
 ### Request snapshot decoding correction
 
 Reopened `SDK-41DC0B1C66C9BF51`: its prior serialization-only rationale does not

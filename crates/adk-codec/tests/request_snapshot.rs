@@ -2,6 +2,19 @@ use adk_codec::snapshots::{ModelSettings, RequestSnapshot};
 use serde_json::Value;
 
 #[test]
+fn repeated_snapshot_images_retain_hidden_nonempty_slots() {
+    let snapshot: RequestSnapshot = serde_json::from_str(
+        r#"{"input_items":[{"message_images":[{"media_type":"image/png","data":"one"},{"media_type":"image/jpeg","data":"two"}],"MESSAGE_IMAGES":[{}],"message_images":[null,null]}]}"#,
+    ).unwrap();
+    let images = &snapshot.input_items[0].message_images;
+    assert_eq!(images.len(), 2);
+    assert_eq!(images[0].media_type, "image/png");
+    assert_eq!(images[0].data, "one");
+    assert_eq!(images[1].media_type, "image/jpeg");
+    assert_eq!(images[1].data, "two");
+}
+
+#[test]
 fn request_snapshot_field_records_match_independent_pinned_go() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();

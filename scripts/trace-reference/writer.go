@@ -98,6 +98,20 @@ func requestRecordCases() []map[string]any {
 		`{"model":3,"model":"later"}`,
 		`{"settings":{"max_tokens":1.5},"settings":null}`,
 		`{"output_schema":{"strict":1},"output_schema":null}`,
+		`{"input_items":[{"TYPE":"message","MESSAGE_TEXT":"retained","message_text":null,"AGENT_NAME":"agent","MESSAGE_PHASE":"commentary","REASONING_TEXT":"reason","THINKING_TEXT":"thought"}]}`,
+		`{"input_items":[{"type":"message","message_text":"one"},{"type":"custom","message_text":"two"}],"INPUT_ITEMS":[{"message_phase":"final"}],"input_items":[null,null]}`,
+		`{"input_items":[{"message_text":"old"}],"input_items":[],"input_items":[null]}`,
+		`{"input_items":[{"message_text":"old"}],"input_items":null,"input_items":[null]}`,
+		`{"input_items":[{"tool_call":{"ID":"call","NAME":"tool","INPUT":{"x":1,"x":2}},"TOOL_CALL":{"name":null,"input":null}}]}`,
+		`{"input_items":[{"tool_call":{"id":"old"},"tool_call":null,"tool_call":{"name":"new"}}]}`,
+		`{"input_items":[{"reasoning":{"ID":"r","TEXT":"text","THINKING":"thinking","SIGNATURE":"sig","REDACTED_DATA":"data","ENCRYPTED_CONTENT":"enc"},"REASONING":{"text":null,"signature":"new"}}]}`,
+		`{"input_items":[{"compaction":{"ID":"c","CONTENT":"text","ENCRYPTED_CONTENT":"enc","CREATED_BY":"host"},"COMPACTION":{"content":null}}]}`,
+		`{"input_items":[{"tool_approval":{"TOOL_NAME":"tool","CALL_ID":"call","APPROVED":true,"INPUT":[1,null]},"TOOL_APPROVAL":{"approved":null,"input":false}}]}`,
+		`{"input_items":[{"message_images":[{"media_type":"image/png","data":"one"},{"media_type":"image/jpeg","data":"two"}],"MESSAGE_IMAGES":[{}],"message_images":[null,null]}]}`,
+		`{"input_items":[{"tool_call":{"name":1},"tool_call":null}]}`,
+		`{"input_items":[{"reasoning":{"text":1},"reasoning":null}]}`,
+		`{"input_items":[{"compaction":{"content":1},"compaction":null}]}`,
+		`{"input_items":[{"tool_approval":{"approved":1},"tool_approval":null}]}`,
 	}
 	cases := []map[string]any{}
 	for _, input := range inputs {

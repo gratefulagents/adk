@@ -668,7 +668,7 @@ pub struct ResponseSnapshot {
     pub raw_error: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct RunItemSnapshot {
     #[serde(rename = "type", deserialize_with = "null_default")]
@@ -725,7 +725,7 @@ pub struct RunItemSnapshot {
     pub tool_approval: Option<ToolApprovalSnapshot>,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolCallSnapshot {
     #[serde(
@@ -744,7 +744,7 @@ pub struct ToolCallSnapshot {
     pub input: RawJson,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ReasoningSnapshot {
     #[serde(
@@ -785,7 +785,7 @@ pub struct ReasoningSnapshot {
     pub encrypted_content: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct CompactionSnapshot {
     #[serde(
@@ -814,7 +814,7 @@ pub struct CompactionSnapshot {
     pub created_by: String,
 }
 
-#[derive(Clone, Debug, Default, PartialEq, Serialize, Deserialize, JsonSchema)]
+#[derive(Clone, Debug, Default, PartialEq, Serialize, JsonSchema)]
 #[serde(default)]
 pub struct ToolApprovalSnapshot {
     #[serde(

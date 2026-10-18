@@ -1403,3 +1403,13 @@ These are **tool-list transformations, not execution authorization**. The separa
 consequence of selecting all tools. Execution remains subject to host policy and
 backend enforcement. Existing bundle/role ceilings are unchanged. Rust empty
 vectors do not preserve Go nil-versus-empty slice identity.
+
+### Programmatic selector representations
+
+The SDK's `AsyncSubAgentFeatures` maps to the three `task`, `status` and `control`
+fields of native `SubagentFeatures`; the enclosing source nesting is flattened.
+`MCPFeatures` maps to `McpFeatures`, with server/tool lists represented by owned
+membership sets. Both selectors default disabled. Clones own their selection
+state rather than sharing Go slice backing arrays. These are typed builder
+configuration capabilities, not Go reflection/JSON record replicas. Enabling a
+selector still requires the corresponding host resources and policy grants.

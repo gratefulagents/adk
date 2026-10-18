@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Programmatic selector type review
+
+Reviewed AsyncSubAgentFeatures and MCPFeatures as complete typed configuration
+selectors: the former maps to three flattened native booleans, the latter to
+four booleans and two owned membership sets. Existing independent eight-way
+managed-tool and MCP selection matrices verify actual registration, prerequisites,
+no disabled connection effects and policy restrictions. A new minimal-builder
+facade test verifies disabled defaults and owned copies. Go reflection/automatic
+JSON serialization, source slice alias identity, enclosing SubAgentFeatures and
+whole scheduler/protocol/builder behavior are not claimed.
+
+Fresh Rust1.88 Linux: **1,772 all-feature workspace +10 doctests passed;0 failed,
+30 ignored**. Minimal-builder test, strict Clippy/typecheck/format, independent
+bound references, all56 validators, artifact/overlay/audit and source locks passed.
+Production is unchanged fromb9bc3ba, whose strict rustdoc, full matrix/consumer
+and20 offline examples/host session passed. Ledger: **1,109 verified /7,782
+unresolved /251 excluded**. Full retained acceptance remains incomplete.
+
 ### Lossless result-cost projection and usage group
 
 Added public `adk::codec::cost::estimate_result_cost` over borrowed signed Usage

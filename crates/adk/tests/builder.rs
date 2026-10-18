@@ -1121,3 +1121,46 @@ async fn tool_only_builder_preserves_explicit_session_ownership() {
     assert!(!handle.is_closed());
     owner.close().await.unwrap();
 }
+
+#[test]
+fn programmatic_selectors_have_disabled_defaults_and_owned_copies() {
+    let subagents = SubagentFeatures::default();
+    assert_eq!(
+        (subagents.task, subagents.status, subagents.control),
+        (false, false, false)
+    );
+    let mut selected = subagents.clone();
+    selected.task = true;
+    selected.status = true;
+    selected.control = true;
+    assert_eq!(
+        (subagents.task, subagents.status, subagents.control),
+        (false, false, false)
+    );
+    assert_eq!(
+        (selected.task, selected.status, selected.control),
+        (true, true, true)
+    );
+    let mcp = McpFeatures::default();
+    assert!(!mcp.enabled && !mcp.allow_all_servers && !mcp.allow_all_tools && !mcp.resource_tools);
+    assert!(mcp.allowed_servers.is_empty() && mcp.allowed_tools.is_empty());
+    let mut selected = mcp.clone();
+    selected.enabled = true;
+    selected.allow_all_servers = true;
+    selected.allow_all_tools = true;
+    selected.resource_tools = true;
+    selected.allowed_servers.insert("chosen".into());
+    selected.allowed_tools.insert("raw tool".into());
+    let mut copied = selected.clone();
+    copied.allowed_servers.clear();
+    copied.allowed_tools.clear();
+    assert!(selected.allowed_servers.contains("chosen"));
+    assert!(selected.allowed_tools.contains("raw tool"));
+    assert!(
+        selected.enabled
+            && selected.allow_all_servers
+            && selected.allow_all_tools
+            && selected.resource_tools
+    );
+    assert!(!mcp.enabled && mcp.allowed_servers.is_empty() && mcp.allowed_tools.is_empty());
+}

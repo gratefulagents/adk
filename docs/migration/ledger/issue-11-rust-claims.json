@@ -20260,6 +20260,47 @@
         "compat",
         "runtime"
       ]
+    },
+    "SDK-224B0D82DA9F9221": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "AsyncSubAgentFeatures",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures"
+      ],
+      "rust_test_identifiers": [
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy",
+        "programmatic_selectors_have_disabled_defaults_and_owned_copies"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Reviewed the complete three-boolean programmatic selector declaration. All eight independently executed pinned public-builder combinations compare actual native registration, disabled behavior, scheduler prerequisites and independent exact-name policy enforcement. The source nested Async record is flattened into the three task/status/control fields of native SubagentFeatures; the native generic_fallback field is not part of this source declaration. The facade test verifies disabled defaults and owned value copies. This is typed configuration capability closure, not Go reflection/automatic JSON serialization, enclosing SubAgentFeatures, whole scheduler initialization or lifecycle equivalence.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-CA1E7756C873CD4C": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "MCPFeatures",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::McpFeatures"
+      ],
+      "rust_test_identifiers": [
+        "mcp_composition::runtime_selection_matches_pinned_sdk_builder_observations",
+        "mcp_composition::disabled_empty_and_absent_server_selections_have_no_connection_effects",
+        "mcp_composition::composed_mcp_tools_obey_readonly_specialist_and_prepared_policy",
+        "programmatic_selectors_have_disabled_defaults_and_owned_copies"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuildToolBundleUsesProvidedMCPConfig",
+      "rationale": "Reviewed the complete six-field programmatic selector declaration: enable/all-server/all-tool/resource booleans and server/tool membership. Independent pinned builder cases compare selected servers, raw/final tool names and catalogs; disabled/empty/absent selections have no connection effects, and selection cannot bypass host policy or readonly specialists. The public facade test verifies zero/default values and owned cloned sets. Native membership sets deliberately do not preserve source slice allocation/alias identity or ordering outside the observed catalog. This closes typed selector capability, not Go reflection/automatic JSON serialization, MCP protocol, credentials/transport resources or the entire runtime builder.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
     }
   }
 }

@@ -5,6 +5,9 @@
 zero and negative inputs resolve to 100/50, while positive 12/40/120 overrides
 are retained. The native scheduler regression inspects dispatched child policies
 for the 50-turn default, lower submission limits, and explicit lower/higher caps.
+`TestPinnedAgentStringOverrides` independently checks five exact field/setter cases
+(empty, whitespace, Unicode, NUL, escaped quotes and slash content), including
+preservation of the original agent; the native clone regression uses the same inputs.
 
 ## Prompt-cache request observations
 

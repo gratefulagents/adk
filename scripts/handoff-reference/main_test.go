@@ -117,6 +117,25 @@ func TestFixtureRepeatability(t *testing.T) {
 	}
 }
 
+func TestPinnedAgentStringOverrides(t *testing.T) {
+	original := &agentsdk.Agent{Name: "original", Instructions: "do stuff"}
+	for _, tc := range []struct{ name, instructions string }{
+		{"", ""},
+		{" \tname\u0085", " \t\n"},
+		{"猫💥", "line\n猫💥\x00tail"},
+		{"[SYSTEM]", "literal \\\"quoted\\\""},
+		{"a/b", "\u2003instructions\u3000"},
+	} {
+		cloned := original.Clone(agentsdk.WithName(tc.name), agentsdk.WithInstructions(tc.instructions))
+		if cloned.Name != tc.name || cloned.Instructions != tc.instructions {
+			t.Fatalf("overrides changed: name=%q instructions=%q", cloned.Name, cloned.Instructions)
+		}
+		if original.Name != "original" || original.Instructions != "do stuff" {
+			t.Fatal("overrides mutated original")
+		}
+	}
+}
+
 func TestPinnedParentAndChildTurnDefaults(t *testing.T) {
 	for _, tc := range []struct {
 		configured int

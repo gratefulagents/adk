@@ -35,7 +35,7 @@ def main():
     if Path(module.get("Replace", {}).get("Dir", "")).resolve() != SDK.resolve():
         sys.exit("SDK must use the local repos/sdk replacement")
     run([GO, "test", "-mod=readonly", "-count=1", "./..."])
-    print("Verified pinned parent/child turn defaults and explicit overrides")
+    print("Verified pinned helper tests: agent strings and parent/child turn defaults")
     expected = (ROOT / "fixtures/handoff/sdk-handoff-filter.json").read_bytes()
     fixture = json.loads(expected)
     if fixture["sdk_revision"] != PIN or fixture["schema_version"] != 1:

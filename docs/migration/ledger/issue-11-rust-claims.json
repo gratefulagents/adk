@@ -19753,6 +19753,108 @@
         "x86_64-unknown-linux-gnu",
         "providers-runtime"
       ]
+    },
+    "SDK-96C48A346662485D": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.Instructions",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only UTF-8 name/static-instruction value fields and the corresponding simple setter effects (including thin public aliases) are closed. Rust uses public owned AgentConfig strings and direct updates on an explicitly cloned value instead of Go AgentOption closure wrappers. Original clone assertions plus independently executed Go/native empty, whitespace, Unicode, NUL, escaped-quote and slash cases preserve exact values and the original object. Existing request comparisons verify static/dynamic precedence and active-agent names. No whole Agent/Clone type, arbitrary Go callback composition/identity, invalid-UTF8 strings, slice backing-array aliasing or complete trace producer behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-9CCE9CC1EF5A5C22": {
+      "source": "internal/agent/agent.go",
+      "source_name": "Agent.Name",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only UTF-8 name/static-instruction value fields and the corresponding simple setter effects (including thin public aliases) are closed. Rust uses public owned AgentConfig strings and direct updates on an explicitly cloned value instead of Go AgentOption closure wrappers. Original clone assertions plus independently executed Go/native empty, whitespace, Unicode, NUL, escaped-quote and slash cases preserve exact values and the original object. Existing request comparisons verify static/dynamic precedence and active-agent names. No whole Agent/Clone type, arbitrary Go callback composition/identity, invalid-UTF8 strings, slice backing-array aliasing or complete trace producer behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-6087BD78C721A73B": {
+      "source": "internal/agent/agent.go",
+      "source_name": "WithInstructions",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only UTF-8 name/static-instruction value fields and the corresponding simple setter effects (including thin public aliases) are closed. Rust uses public owned AgentConfig strings and direct updates on an explicitly cloned value instead of Go AgentOption closure wrappers. Original clone assertions plus independently executed Go/native empty, whitespace, Unicode, NUL, escaped-quote and slash cases preserve exact values and the original object. Existing request comparisons verify static/dynamic precedence and active-agent names. No whole Agent/Clone type, arbitrary Go callback composition/identity, invalid-UTF8 strings, slice backing-array aliasing or complete trace producer behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-F14E37CB6D88B04D": {
+      "source": "internal/agent/agent.go",
+      "source_name": "WithName",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only UTF-8 name/static-instruction value fields and the corresponding simple setter effects (including thin public aliases) are closed. Rust uses public owned AgentConfig strings and direct updates on an explicitly cloned value instead of Go AgentOption closure wrappers. Original clone assertions plus independently executed Go/native empty, whitespace, Unicode, NUL, escaped-quote and slash cases preserve exact values and the original object. Existing request comparisons verify static/dynamic precedence and active-agent names. No whole Agent/Clone type, arbitrary Go callback composition/identity, invalid-UTF8 strings, slice backing-array aliasing or complete trace producer behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-7D80973AF7715578": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "WithInstructions",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only UTF-8 name/static-instruction value fields and the corresponding simple setter effects (including thin public aliases) are closed. Rust uses public owned AgentConfig strings and direct updates on an explicitly cloned value instead of Go AgentOption closure wrappers. Original clone assertions plus independently executed Go/native empty, whitespace, Unicode, NUL, escaped-quote and slash cases preserve exact values and the original object. Existing request comparisons verify static/dynamic precedence and active-agent names. No whole Agent/Clone type, arbitrary Go callback composition/identity, invalid-UTF8 strings, slice backing-array aliasing or complete trace producer behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-09A6BBD3F6051E34": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "WithName",
+      "implementation_symbols": [
+        "crates/adk-runtime/src/runner.rs::AgentConfig"
+      ],
+      "rust_test_identifiers": [
+        "agent_clone_overrides_match_original_sdk_example",
+        "dynamic_instructions_match_pinned_static_precedence_usage_composition_and_handoff"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestAgentClone",
+      "rationale": "Only UTF-8 name/static-instruction value fields and the corresponding simple setter effects (including thin public aliases) are closed. Rust uses public owned AgentConfig strings and direct updates on an explicitly cloned value instead of Go AgentOption closure wrappers. Original clone assertions plus independently executed Go/native empty, whitespace, Unicode, NUL, escaped-quote and slash cases preserve exact values and the original object. Existing request comparisons verify static/dynamic precedence and active-agent names. No whole Agent/Clone type, arbitrary Go callback composition/identity, invalid-UTF8 strings, slice backing-array aliasing or complete trace producer behavior is claimed.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Agent name/instruction value mappings
+
+Mapped six exact records: the name/static-instruction fields and their internal
+and public setter effects. Public owned `AgentConfig` strings and direct updates
+on an explicitly cloned value replace the Go option closures. Independent Go and
+native cases preserve empty values, whitespace, Unicode, NULs, escaped quotes and
+slash content, while leaving the original unchanged. Existing model-request
+comparisons retain static/dynamic precedence and active-agent naming. These are
+UTF-8 field/setter claims, not whole Agent/Clone, callback identity/composition,
+slice aliasing, invalid-Go-string or complete trace-producer closure.
+
+Fresh native verification: **1,759 workspace +10 doctests passed; 0 failed,
+30 ignored**; strict Clippy/typecheck/format passed. Independent bound references,
+all56 validators, artifact/overlay/audit and immutable source locks passed.
+Ledger: **1,088 verified /7,803 unresolved /251 excluded**. Full retained acceptance
+remains incomplete.
+
 ### Complete original type-test file
 
 Reviewed all281 lines and all21 original tests in `internal/agent/types_test.go`.

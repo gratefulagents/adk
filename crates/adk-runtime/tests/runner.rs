@@ -276,6 +276,21 @@ fn agent_clone_overrides_match_original_sdk_example() {
     assert_eq!(cloned.instructions, "do other stuff");
     assert_eq!(original.name, "original");
     assert_eq!(original.instructions, "do stuff");
+    for (name, instructions) in [
+        ("", ""),
+        (" \tname\u{0085}", " \t\n"),
+        ("猫💥", "line\n猫💥\0tail"),
+        ("[SYSTEM]", "literal \\\"quoted\\\""),
+        ("a/b", "\u{2003}instructions\u{3000}"),
+    ] {
+        let mut cloned = original.clone();
+        cloned.name = name.into();
+        cloned.instructions = instructions.into();
+        assert_eq!(cloned.name, name);
+        assert_eq!(cloned.instructions, instructions);
+        assert_eq!(original.name, "original");
+        assert_eq!(original.instructions, "do stuff");
+    }
 }
 
 #[test]

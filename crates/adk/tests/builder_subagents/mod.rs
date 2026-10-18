@@ -16,7 +16,17 @@ async fn automatic_catalog_and_managed_tools_match_pinned_builder_stages() {
         "../../../../fixtures/run-instructions/observations.json"
     ))
     .unwrap();
-    for case in fixture["auto_subagent_cases"].as_array().unwrap() {
+    let cases = fixture["auto_subagent_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 26);
+    for generic in [false, true] {
+        for mask in 0..8 {
+            assert!(cases.iter().any(|case| case["mask"] == mask
+                && case["generic"] == generic
+                && case["roles"].is_null()
+                && case["handoffs"] == false));
+        }
+    }
+    for case in cases {
         let mask = case["mask"].as_u64().unwrap();
         let roles = case["roles"]
             .as_array()

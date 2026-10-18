@@ -1129,7 +1129,9 @@ fn programmatic_selectors_have_disabled_defaults_and_owned_copies() {
         (subagents.task, subagents.status, subagents.control),
         (false, false, false)
     );
+    assert!(!subagents.generic_fallback);
     let mut selected = subagents.clone();
+    selected.generic_fallback = true;
     selected.task = true;
     selected.status = true;
     selected.control = true;
@@ -1141,6 +1143,7 @@ fn programmatic_selectors_have_disabled_defaults_and_owned_copies() {
         (selected.task, selected.status, selected.control),
         (true, true, true)
     );
+    assert!(!subagents.generic_fallback && selected.generic_fallback);
     let mcp = McpFeatures::default();
     assert!(!mcp.enabled && !mcp.allow_all_servers && !mcp.allow_all_tools && !mcp.resource_tools);
     assert!(mcp.allowed_servers.is_empty() && mcp.allowed_tools.is_empty());

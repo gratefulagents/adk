@@ -20301,6 +20301,72 @@
         "mcp",
         "project-state"
       ]
+    },
+    "SDK-61B222584E48119C": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "SubAgentFeatures.Async",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures",
+        "crates/adk/src/builder.rs::Builder::build"
+      ],
+      "rust_test_identifiers": [
+        "automatic_subagents::automatic_catalog_and_managed_tools_match_pinned_builder_stages",
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy",
+        "programmatic_selectors_have_disabled_defaults_and_owned_copies"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Complete programmatic subagent selector review: GenericFallback plus nested Async task/status/control flatten into the four native SubagentFeatures booleans.26 independently executed actual-SDK builder/attachment cases now cover all eight empty-catalog masks with fallback both off/on, plus named catalogs and handoff coexistence. Native comparison verifies catalogs, model/instructions, tools, delegation guide, scheduler presence, actual child dispatch/counts and owner close. Generic fallback alone enables nothing; with selected groups and no roles it supplies the generic agent, while existing catalogs retain their names/default choice. Separate eight-way registration/policy tests and zero/default/owned-copy assertions remain. No Go reflection or automatic JSON shape, source nesting identity, entire scheduler/lifecycle, durable recovery or complete builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-F7C19BC85A3F092B": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "SubAgentFeatures.GenericFallback",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures",
+        "crates/adk/src/builder.rs::Builder::build"
+      ],
+      "rust_test_identifiers": [
+        "automatic_subagents::automatic_catalog_and_managed_tools_match_pinned_builder_stages",
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy",
+        "programmatic_selectors_have_disabled_defaults_and_owned_copies"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Complete programmatic subagent selector review: GenericFallback plus nested Async task/status/control flatten into the four native SubagentFeatures booleans.26 independently executed actual-SDK builder/attachment cases now cover all eight empty-catalog masks with fallback both off/on, plus named catalogs and handoff coexistence. Native comparison verifies catalogs, model/instructions, tools, delegation guide, scheduler presence, actual child dispatch/counts and owner close. Generic fallback alone enables nothing; with selected groups and no roles it supplies the generic agent, while existing catalogs retain their names/default choice. Separate eight-way registration/policy tests and zero/default/owned-copy assertions remain. No Go reflection or automatic JSON shape, source nesting identity, entire scheduler/lifecycle, durable recovery or complete builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
+    },
+    "SDK-7A03AC87AEC16C10": {
+      "source": "pkg/agentsdk/runtime/features.go",
+      "source_name": "SubAgentFeatures",
+      "implementation_symbols": [
+        "crates/adk/src/builder.rs::SubagentFeatures",
+        "crates/adk/src/builder.rs::Builder::build"
+      ],
+      "rust_test_identifiers": [
+        "automatic_subagents::automatic_catalog_and_managed_tools_match_pinned_builder_stages",
+        "managed_subagent_feature_matrix_matches_pinned_public_builder",
+        "managed_subagent_selection_never_bypasses_host_name_policy",
+        "programmatic_selectors_have_disabled_defaults_and_owned_copies"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/runtime/TestBuilderReusesSessionStateSubAgentSchedulerAcrossBuilds",
+      "rationale": "Complete programmatic subagent selector review: GenericFallback plus nested Async task/status/control flatten into the four native SubagentFeatures booleans.26 independently executed actual-SDK builder/attachment cases now cover all eight empty-catalog masks with fallback both off/on, plus named catalogs and handoff coexistence. Native comparison verifies catalogs, model/instructions, tools, delegation guide, scheduler presence, actual child dispatch/counts and owner close. Generic fallback alone enables nothing; with selected groups and no roles it supplies the generic agent, while existing catalogs retain their names/default choice. Separate eight-way registration/policy tests and zero/default/owned-copy assertions remain. No Go reflection or automatic JSON shape, source nesting identity, entire scheduler/lifecycle, durable recovery or complete builder claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "mcp",
+        "project-state"
+      ]
     }
   }
 }

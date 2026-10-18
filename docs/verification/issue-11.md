@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Enclosing subagent selector and generic fallback
+
+Extended the original-Go automatic-builder oracle from12 to26 cases, preserving
+all earlier sections/observations. Every empty-catalog async mask now runs with
+generic fallback both false and true, including fallback enabled by itself.
+The native comparator checks the full matrix exists, then compares actual tools,
+catalog models/instructions, guides, scheduler presence, child dispatch/results,
+request counts and owned close behavior. No production change was required.
+
+Mapped the enclosing SubAgentFeatures selector and its two fields under the
+existing flattened four-boolean native representation, not whole scheduler,
+reflection/automatic JSON shape, durable recovery or builder lifecycle parity.
+Fresh Rust1.88 Linux: **1,772 workspace +10 doctests passed;0 failed,30 ignored**.
+Focused/minimal-builder tests, strict Clippy/typecheck/format, independent bound
+references, all56 validators, artifact/overlay/audit and immutable source locks
+passed. Production remainsb9bc3ba, with its full matrix/consumer/docs/20examples
+checks unchanged. Ledger: **1,112 verified /7,779 unresolved /251 excluded**.
+Full retained issue acceptance remains incomplete.
+
 ### Programmatic selector type review
 
 Reviewed AsyncSubAgentFeatures and MCPFeatures as complete typed configuration

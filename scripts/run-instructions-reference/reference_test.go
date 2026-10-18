@@ -177,7 +177,7 @@ func observeBuilderOutputSchemas(t *testing.T) []map[string]any {
 func observeAutomaticSubagents(t *testing.T) []map[string]any {
 	t.Helper()
 	out := []map[string]any{}
-	for index := 0; index < 12; index++ {
+	for index := 0; index < 26; index++ {
 		mask := index
 		roles := agentsdk.RoleCatalog{{Name: "reviewer", Instructions: "Review only.", ModelOverride: "openai/child", ToolAccess: "read-only"}}
 		generic, handoffs := false, false
@@ -189,6 +189,12 @@ func observeAutomaticSubagents(t *testing.T) []map[string]any {
 		}
 		if index == 11 {
 			roles = agentsdk.RoleCatalog{{Name: "zeta", Instructions: "Work as zeta."}, {Name: "agent", Instructions: "Work as agent."}}
+		}
+		if index >= 12 {
+			mask = (index - 12) % 7
+			roles = nil
+			generic = index >= 19
+			handoffs = false
 		}
 		selected := SubAgentFeatures{GenericFallback: generic, Async: AsyncSubAgentFeatures{Task: mask&1 != 0, Status: mask&2 != 0, Control: mask&4 != 0}}
 		cfg := Config{Model: "openai/base", RoleCatalog: roles, WorkDir: ".", Features: &Features{SubAgents: selected, Handoffs: HandoffFeatures{Enabled: handoffs, GenericFallback: handoffs}}}

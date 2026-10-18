@@ -131,7 +131,9 @@ async fn child_turn_default_and_explicit_caps_are_applied_before_execution() {
         (None, 100, 50),
         (Some(40), 100, 40),
         (None, 12, 12),
+        (None, 400, 50),
         (Some(120), 150, 120),
+        (Some(200), 400, 200),
     ] {
         let mut cfg = config();
         if let Some(limit) = configured {
@@ -150,6 +152,23 @@ async fn child_turn_default_and_explicit_caps_are_applied_before_execution() {
         );
         owner.shutdown().await.unwrap();
     }
+}
+
+#[test]
+fn parent_and_child_turn_defaults_are_independent() {
+    let mut parent = adk_core::RunPolicy::default();
+    assert_eq!(parent.max_turns.get(), 100);
+    assert_eq!(SchedulerConfig::default().max_turns.get(), 50);
+    parent.max_turns = std::num::NonZeroU32::new(50).unwrap();
+    assert_eq!(parent.max_turns.get(), 50);
+    parent.max_turns = std::num::NonZeroU32::new(400).unwrap();
+    assert_eq!(parent.max_turns.get(), 400);
+    assert_eq!(SchedulerConfig::default().max_turns.get(), 50);
+    let child = SchedulerConfig {
+        max_turns: std::num::NonZeroU32::new(200).unwrap(),
+        ..Default::default()
+    };
+    assert_eq!(child.max_turns.get(), 200);
 }
 
 #[tokio::test]

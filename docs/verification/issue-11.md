@@ -2,6 +2,24 @@
 
 ## Current continuation evidence
 
+### Original parent/child turn default regressions
+
+Independently executed the exact `TestRunConfigEffectiveMaxTurns` and
+`TestRunConfigEffectiveSubAgentMaxTurns` originals. Native counterparts cover
+parent100 and explicit50; child50 remains independent of parent400; child200
+is accepted explicitly and reaches scheduler dispatch. Six records now map only
+the fixed default values, their public aliases and those original regressions.
+Rust exposes values through typed `Default` policies and positive fields, not
+Go zero-sentinel getters or duplicate alias names. Whole configuration types,
+other scheduler bounds and all exhaustion behavior remain outside these claims.
+
+Fresh Rust 1.88 Linux: **1,757 workspace +10 doctests passed; 0 failed, 30 ignored**.
+Strict Clippy/typecheck/format, independent bound references, all55 validators,
+artifact/overlay/audit and immutable source locks passed. Original Go report:
+**928 pass /5 skip /38 packages**. Implementation is unchanged from the preceding
+full matrix/docs/consumer and20-example checks. Ledger: **1,074 verified /7,817
+unresolved /251 excluded**. Full retained acceptance remains incomplete.
+
 ### Managed child turn default
 
 Reproduced the native scheduler dispatching a 100-turn default where the pinned

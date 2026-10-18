@@ -19465,6 +19465,114 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-29E81F5FB0EA2DD7": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "DefaultMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig"
+      ],
+      "rust_test_identifiers": [
+        "parent_and_child_turn_defaults_are_independent",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunConfigEffectiveMaxTurns",
+      "rationale": "Only the fixed parent100/child50 default values (including thin public aliases) and original getter regressions are mapped. Rust exposes these through public typed Default policies and NonZeroU32 fields rather than Go zero-sentinel getters or duplicate alias names. Exact original cases cover parent50 override, independent child50 after parent400, and child200 override. Actual scheduler dispatch also verifies default50, explicit40/120/200 and lower request12. The independently executed exported Go resolvers cover zero/negative sentinel and12/40/120 inputs; invalid/nonpositive native limits are unrepresentable rather than silently normalized. This does not close entire RunConfig, policy types, scheduler limits or all turn-exhaustion behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-38EE0E4A3E3E241E": {
+      "source": "internal/agent/run_config.go",
+      "source_name": "DefaultSubAgentMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig"
+      ],
+      "rust_test_identifiers": [
+        "parent_and_child_turn_defaults_are_independent",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunConfigEffectiveSubAgentMaxTurns",
+      "rationale": "Only the fixed parent100/child50 default values (including thin public aliases) and original getter regressions are mapped. Rust exposes these through public typed Default policies and NonZeroU32 fields rather than Go zero-sentinel getters or duplicate alias names. Exact original cases cover parent50 override, independent child50 after parent400, and child200 override. Actual scheduler dispatch also verifies default50, explicit40/120/200 and lower request12. The independently executed exported Go resolvers cover zero/negative sentinel and12/40/120 inputs; invalid/nonpositive native limits are unrepresentable rather than silently normalized. This does not close entire RunConfig, policy types, scheduler limits or all turn-exhaustion behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-71344826BF39E744": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "DefaultMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig"
+      ],
+      "rust_test_identifiers": [
+        "parent_and_child_turn_defaults_are_independent",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunConfigEffectiveMaxTurns",
+      "rationale": "Only the fixed parent100/child50 default values (including thin public aliases) and original getter regressions are mapped. Rust exposes these through public typed Default policies and NonZeroU32 fields rather than Go zero-sentinel getters or duplicate alias names. Exact original cases cover parent50 override, independent child50 after parent400, and child200 override. Actual scheduler dispatch also verifies default50, explicit40/120/200 and lower request12. The independently executed exported Go resolvers cover zero/negative sentinel and12/40/120 inputs; invalid/nonpositive native limits are unrepresentable rather than silently normalized. This does not close entire RunConfig, policy types, scheduler limits or all turn-exhaustion behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-2B48E86E43B88459": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "DefaultSubAgentMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig"
+      ],
+      "rust_test_identifiers": [
+        "parent_and_child_turn_defaults_are_independent",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunConfigEffectiveSubAgentMaxTurns",
+      "rationale": "Only the fixed parent100/child50 default values (including thin public aliases) and original getter regressions are mapped. Rust exposes these through public typed Default policies and NonZeroU32 fields rather than Go zero-sentinel getters or duplicate alias names. Exact original cases cover parent50 override, independent child50 after parent400, and child200 override. Actual scheduler dispatch also verifies default50, explicit40/120/200 and lower request12. The independently executed exported Go resolvers cover zero/negative sentinel and12/40/120 inputs; invalid/nonpositive native limits are unrepresentable rather than silently normalized. This does not close entire RunConfig, policy types, scheduler limits or all turn-exhaustion behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-924BD3519EF9545A": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestRunConfigEffectiveMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig"
+      ],
+      "rust_test_identifiers": [
+        "parent_and_child_turn_defaults_are_independent",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunConfigEffectiveMaxTurns",
+      "rationale": "Only the fixed parent100/child50 default values (including thin public aliases) and original getter regressions are mapped. Rust exposes these through public typed Default policies and NonZeroU32 fields rather than Go zero-sentinel getters or duplicate alias names. Exact original cases cover parent50 override, independent child50 after parent400, and child200 override. Actual scheduler dispatch also verifies default50, explicit40/120/200 and lower request12. The independently executed exported Go resolvers cover zero/negative sentinel and12/40/120 inputs; invalid/nonpositive native limits are unrepresentable rather than silently normalized. This does not close entire RunConfig, policy types, scheduler limits or all turn-exhaustion behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
+    },
+    "SDK-701EF613513580E0": {
+      "source": "internal/agent/types_test.go",
+      "source_name": "TestRunConfigEffectiveSubAgentMaxTurns",
+      "implementation_symbols": [
+        "crates/adk-core/src/policy.rs::RunPolicy",
+        "crates/adk-runtime/src/subagent.rs::SchedulerConfig"
+      ],
+      "rust_test_identifiers": [
+        "parent_and_child_turn_defaults_are_independent",
+        "child_turn_default_and_explicit_caps_are_applied_before_execution"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestRunConfigEffectiveSubAgentMaxTurns",
+      "rationale": "Only the fixed parent100/child50 default values (including thin public aliases) and original getter regressions are mapped. Rust exposes these through public typed Default policies and NonZeroU32 fields rather than Go zero-sentinel getters or duplicate alias names. Exact original cases cover parent50 override, independent child50 after parent400, and child200 override. Actual scheduler dispatch also verifies default50, explicit40/120/200 and lower request12. The independently executed exported Go resolvers cover zero/negative sentinel and12/40/120 inputs; invalid/nonpositive native limits are unrepresentable rather than silently normalized. This does not close entire RunConfig, policy types, scheduler limits or all turn-exhaustion behavior.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "runtime"
+      ]
     }
   }
 }

@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7689,
-    "verified": 1202
+    "unresolved": 7673,
+    "verified": 1218
   },
   "groups": [
     {
@@ -3367,10 +3367,12 @@
     {
       "counts": {
         "artifacts:unresolved": 2,
-        "examples:unresolved": 4,
-        "files:unresolved": 4,
-        "packages:unresolved": 1,
-        "tests:unresolved": 3,
+        "examples:unresolved": 2,
+        "examples:verified": 2,
+        "files:unresolved": 2,
+        "files:verified": 2,
+        "packages:verified": 1,
+        "tests:verified": 3,
         "verification_groups:unresolved": 1
       },
       "group": "verification_groups:sdk::memory::examples",
@@ -3381,23 +3383,24 @@
         "examples/features/memory/postgres_pgvector.md"
       ],
       "unresolved_ids": [
-        "SDK-0423E00D19F896F0",
-        "SDK-187C669216EA2A9F",
-        "SDK-1E0E57D3344B86C6",
-        "SDK-2D027BB342FA9B57",
         "SDK-455B860C28AB9207",
         "SDK-4D6B5D2906851464",
         "SDK-600070C071F1971F",
-        "SDK-6F36C62021555598",
         "SDK-7A4A591640FE690E",
-        "SDK-8773A2BADED57FB9",
-        "SDK-ACAB29AB7B00C981",
-        "SDK-C01E2D0305F6DAB8",
         "SDK-D077855EDA9A879F",
         "SDK-F0682576C1F5EC28",
         "SDK-F438B099DCC466B0"
       ],
-      "verified_ids": []
+      "verified_ids": [
+        "SDK-0423E00D19F896F0",
+        "SDK-187C669216EA2A9F",
+        "SDK-1E0E57D3344B86C6",
+        "SDK-2D027BB342FA9B57",
+        "SDK-6F36C62021555598",
+        "SDK-8773A2BADED57FB9",
+        "SDK-ACAB29AB7B00C981",
+        "SDK-C01E2D0305F6DAB8"
+      ]
     },
     {
       "counts": {
@@ -10768,19 +10771,20 @@
     },
     {
       "counts": {
-        "artifacts:unresolved": 1,
-        "examples:unresolved": 2,
-        "files:unresolved": 2,
-        "packages:unresolved": 1,
-        "tests:unresolved": 1,
-        "verification_groups:unresolved": 1
+        "artifacts:verified": 1,
+        "examples:verified": 2,
+        "files:verified": 2,
+        "packages:verified": 1,
+        "tests:verified": 1,
+        "verification_groups:verified": 1
       },
       "group": "verification_groups:sdk::trace_store::examples",
       "source_files": [
         "examples/features/tracestore/README.md",
         "examples/features/tracestore/tracestore_test.go"
       ],
-      "unresolved_ids": [
+      "unresolved_ids": [],
+      "verified_ids": [
         "SDK-4C5A666701DA1584",
         "SDK-82398D7D59960485",
         "SDK-8B9056EE56A18F55",
@@ -10789,8 +10793,7 @@
         "SDK-AC3564B0407C5916",
         "SDK-DF1FDAE36E0DA074",
         "SDK-FC4DC12AE671C7A0"
-      ],
-      "verified_ids": []
+      ]
     },
     {
       "counts": {
@@ -10957,8 +10960,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "dc1643e7eb74ab43625f1259b312d81d4a47f1c19a555707c8649566b0ddef7d",
-    "docs/migration/ledger/issue-11-rust-claims.json": "1c87b6fd880763193872e9287a28b993f0871e75b727a38945731823d52207c1",
+    "docs/migration/ledger/issue-11-overlay.json": "ee7dd246889d2321e53232b2b6baf3141171cc7717128314c9739639d36995b0",
+    "docs/migration/ledger/issue-11-rust-claims.json": "9d88c1556a7cce4c7085850f5f8b2ed5eb1717fcd13f06fc8257eaeaf87914e7",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10967,6 +10970,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1200
+    "rust_test": 1216
   }
 }

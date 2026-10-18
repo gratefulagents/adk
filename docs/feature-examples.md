@@ -164,3 +164,29 @@ The registry does not grant permission merely because a tool is registered.
 The existing ReadFile bundle and post-close rejection checks remain. These are
 runnable documentation/example counterparts, not closure of every registry tool,
 all routing algorithms, live provider behavior or byte-identical Go prose.
+
+## Trace-store and memory example assertions
+
+Run `tracestore` or `memory` using the same Cargo command above and the desired
+scenario name. On Linux, `tracestore` exercises the original category-store example
+through `adk::tracestore::FilesystemTraceStore`: create metadata, append two
+llm_calls NDJSON records, round-trip Score, update the finish timestamp, and list
+all runs or filter by candidate. Deterministic IDs/timestamps replace the original
+wall clock; the token counts42/58 and all score metrics are unchanged. It additionally
+verifies schema-2 writer/runtime integration, private permissions, redaction and
+invalid-path rejection. `adk::observability::FilesystemTraceStore` is a separate
+native event store; do not confuse it with the compatible category-store API.
+The compatible category-store portion is Linux-only; non-Linux execution of the
+scenario does not verify that portion. The explicit original-example test is
+therefore Linux-gated too.
+
+`memory` reproduces the original SSL-reminder/deploy-guide fixture with
+`adk::project_state::memory::InMemoryStore`: nonnil UUID, namespace isolation,
+tag filtering and deletion. `NoopEmbedder::default()` via the `Embedder` trait
+returns the same nonempty vector on repeated input. The application-owned
+`AuditedMemory` implements `Store`; a canonical Memory registry tool supplied by
+`adk::tools::memory::tool` stores the original smoke-test reminder and searches it
+by tag/limit. Assertions verify tool-configured namespace/source run/repo metadata,
+the returned memory ID and exactly one backend store/search call. This is explicit
+host injection, not an automatically provisioned database. These tests do not
+claim the separate Postgres/pgvector documentation sketch or a live vector service.

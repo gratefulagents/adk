@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Original memory and category trace-store examples
+
+Native memory now reproduces all three original tests: namespace/tag/delete
+semantics, deterministic nonempty NoopEmbedder vectors, and custom Store injection
+through the canonical Memory registry with exact payload metadata, search ID and
+one store/search callback. The category trace-store scenario already covered the
+original assertions; an explicit Linux-gated test now executes that same scenario.
+Documentation distinguishes the native event store from compatible category storage.
+Sixteen example/test/package records are reviewed; memory README/Postgres-pgvector
+sketch/group remain unclaimed. No live database capability is inferred.
+
+Fresh Rust1.88 Linux: **1,793 workspace +10 doctests +5 example tests passed;
+0 failed,30 ignored**. Strict lint/typecheck/docs/format, facade matrix/consumer/
+purity,20 offline examples and host session passed. Original Go reference:
+944 passing records,5 skips,44 packages. Evidence generation initially rejected
+the Memory tool symbol because its implementation file was not hash-bound; added
+that actual source dependency and reran successfully. Bound references,56 validators
+and source locks pass. Ledger: **1,218 verified /7,673 unresolved /251 excluded**.
+Full retained issue acceptance remains incomplete.
+
 ### Original settings-routing and tool-registry examples
 
 The settings scenario now checks all six original Anthropic top-level/writer

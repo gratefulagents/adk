@@ -236,7 +236,7 @@ RUST_INPUTS = ["docs/feature-examples.md","scripts/mode-routing-reference/run.py
                "fixtures/tools/skill-catalog.json", "fixtures/tools/schema-definitions.json",
                "fixtures/tools/schema-generate.go",
                "crates/adk-tools/src/edit.rs", "crates/adk-tools/src/write.rs",
-               "crates/adk-tools/src/lifecycle.rs", "crates/adk-tools/src/lib.rs",
+               "crates/adk-tools/src/lifecycle.rs", "crates/adk-tools/src/lib.rs", "crates/adk-tools/src/memory.rs",
                "crates/adk-tools/examples/lifecycle_replay.rs",
                "fixtures/tools/lifecycle.json", "fixtures/tools/verify-lifecycle.go",
                "crates/adk-tools/tests/bundle.rs", "crates/adk-tools/src/shell.rs",

@@ -22682,6 +22682,366 @@
         "project-state",
         "observability"
       ]
+    },
+    "SDK-82398D7D59960485": {
+      "source": "examples/features/tracestore/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed artifacts record artifacts:examples/features/tracestore/README.md. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-8773A2BADED57FB9": {
+      "source": "examples/features/memory/custom_store_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestCustomStoreCanBackMemoryToolExample",
+      "rationale": "Reviewed examples record examples:examples/features/memory/custom_store_test.go. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-187C669216EA2A9F": {
+      "source": "examples/features/memory/memory_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestInMemoryStoreSemanticsExample",
+      "rationale": "Reviewed examples record examples:examples/features/memory/memory_test.go. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-DF1FDAE36E0DA074": {
+      "source": "examples/features/tracestore/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed examples record examples:examples/features/tracestore/README.md. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-AC3564B0407C5916": {
+      "source": "examples/features/tracestore/tracestore_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed examples record examples:examples/features/tracestore/tracestore_test.go. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-2D027BB342FA9B57": {
+      "source": "examples/features/memory/custom_store_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestCustomStoreCanBackMemoryToolExample",
+      "rationale": "Reviewed files record files:examples/features/memory/custom_store_test.go. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-C01E2D0305F6DAB8": {
+      "source": "examples/features/memory/memory_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestInMemoryStoreSemanticsExample",
+      "rationale": "Reviewed files record files:examples/features/memory/memory_test.go. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-FC4DC12AE671C7A0": {
+      "source": "examples/features/tracestore/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed files record files:examples/features/tracestore/README.md. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-9D4C567DFC61BA6B": {
+      "source": "examples/features/tracestore/tracestore_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed files record files:examples/features/tracestore/tracestore_test.go. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-ACAB29AB7B00C981": {
+      "source": null,
+      "source_name": "memory_test",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestInMemoryStoreSemanticsExample",
+      "rationale": "Reviewed packages record memory_test. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-4C5A666701DA1584": {
+      "source": null,
+      "source_name": "tracestore_test",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed packages record tracestore_test. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-0423E00D19F896F0": {
+      "source": "examples/features/memory/custom_store_test.go",
+      "source_name": "TestCustomStoreCanBackMemoryToolExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestCustomStoreCanBackMemoryToolExample",
+      "rationale": "Reviewed tests record TestCustomStoreCanBackMemoryToolExample. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-6F36C62021555598": {
+      "source": "examples/features/memory/memory_test.go",
+      "source_name": "TestInMemoryStoreSemanticsExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestInMemoryStoreSemanticsExample",
+      "rationale": "Reviewed tests record TestInMemoryStoreSemanticsExample. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-1E0E57D3344B86C6": {
+      "source": "examples/features/memory/memory_test.go",
+      "source_name": "TestNoopEmbedderIsDeterministicExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::memory",
+        "crates/adk/examples/features.rs::AuditedMemory",
+        "crates/adk-project-state/src/memory.rs::InMemoryStore",
+        "crates/adk-project-state/src/memory.rs::NoopEmbedder",
+        "crates/adk-tools/src/memory.rs::tool"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_memory_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/memory/TestNoopEmbedderIsDeterministicExample",
+      "rationale": "Reviewed tests record TestNoopEmbedderIsDeterministicExample. Reviewed both complete Go test files and their three tests. Native scenario reproduces original SSL-reminder/deploy-guide namespaces, UUID/tag/delete assertions and repeated nonempty NoopEmbedder output. Host-owned AuditedMemory is injected into canonical Memory registry and original smoke-test store/search inputs verify namespace/run/repo metadata, matching result ID and exactly one backend store/search. Trait ownership/explicit injection replace Go options and synchronous native store methods replace context callbacks. Existing richer memory-tool isolation/deletion assertions remain. This claims executable examples/test files/package only, not README/Postgres-pgvector sketch or complete memory/helper behavior. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-8B9056EE56A18F55": {
+      "source": "examples/features/tracestore/tracestore_test.go",
+      "source_name": "TestFilesystemTraceStoreExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed tests record TestFilesystemTraceStoreExample. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-93FE95D35BB03CD4": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::tracestore",
+        "crates/adk/src/tracestore.rs::FilesystemTraceStore"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_tracestore_example"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/tracestore/TestFilesystemTraceStoreExample",
+      "rationale": "Reviewed verification_groups record verification_groups:sdk::trace_store::examples. Reviewed all eight records of this example group. The native scenario covers every original assertion: run path under root, metadata persisted, two42/58 token NDJSON records, score success/100 tokens and complete metrics round-trip, updated finish time, singleton run listing and absent-candidate filtering. Deterministic IDs/timestamps replace wall-clock-generated fixture values; native tests also check schema-2/runtime integration and private files. Hash-bound docs/feature-examples.md explains all README usage, distinct store APIs and Linux-only compatible storage. This is runnable documentation migration, not byte-identical prose, non-Linux category-store support or whole storage API closure. Exact original pinned Go tests execute independently through the package/name allowlist; native test calls the runnable facade scenario.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
     }
   }
 }

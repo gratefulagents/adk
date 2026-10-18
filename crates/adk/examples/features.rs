@@ -1635,7 +1635,97 @@ impl adk::project_state::memory::Store for AuditedMemory {
 }
 
 async fn memory() {
-    use adk::project_state::memory::Store;
+    use adk::project_state::memory::{Embedder, InMemoryStore, NoopEmbedder, Store};
+    let original = InMemoryStore::new();
+    let first = original
+        .store(
+            "team-a",
+            "remember to renew SSL certs in November",
+            &["ops".into(), "tls".into()],
+            "run-001",
+            json!({"kind":"reminder"}),
+        )
+        .unwrap();
+    assert!(!first.id.is_nil());
+    original
+        .store(
+            "team-a",
+            "deploy guide is in /runbooks/deploy.md",
+            &["ops".into()],
+            "run-002",
+            Value::Null,
+        )
+        .unwrap();
+    original
+        .store(
+            "team-b",
+            "do not include this in team-a results",
+            &["ops".into()],
+            "run-003",
+            Value::Null,
+        )
+        .unwrap();
+    assert_eq!(original.list("team-a", &[], 10).unwrap().len(), 2);
+    let tagged = original.list("team-a", &["tls".into()], 10).unwrap();
+    assert_eq!(tagged.len(), 1);
+    assert_eq!(tagged[0].id, first.id);
+    original.delete("team-a", first.id).unwrap();
+    assert_eq!(original.list("team-a", &[], 10).unwrap().len(), 1);
+    let embedder = NoopEmbedder::default();
+    let embedded = embedder.embed("hello world").unwrap();
+    assert!(!embedded.is_empty());
+    assert_eq!(embedded, embedder.embed("hello world").unwrap());
+    let custom = Arc::new(AuditedMemory::default());
+    let registry = adk::tools::Registry::build(
+        &adk::tools::Config {
+            features: adk::tools::Features::Strict(["ExtraTools".into()].into()),
+            access: AccessMode::WorkspaceWrite,
+            allowed_names: Some(["Memory".into()].into()),
+            ..Default::default()
+        },
+        [adk::tools::memory::tool(
+            custom.clone(),
+            "team-a",
+            "run-001",
+            "https://example.test/repo",
+        )],
+    )
+    .unwrap();
+    let tool = registry.get("Memory").expect("Memory tool missing");
+    let mut ctx = tool_context();
+    ctx.policy.access = AccessMode::WorkspaceWrite;
+    let stored = tool
+        .execute(
+            &ctx,
+            call("Memory", json!({"action":"store","content":"deploys require a green smoke test","tags":["deploy"]})),
+        )
+        .await
+        .unwrap();
+    assert!(!stored.is_error);
+    let Content::Text { text } = &stored.content[0] else {
+        panic!("expected memory JSON text");
+    };
+    let payload: adk::project_state::memory::Memory = serde_json::from_str(text).unwrap();
+    assert_eq!(payload.namespace, "team-a");
+    assert_eq!(payload.source_run, "run-001");
+    assert_eq!(payload.metadata["repo"], "https://example.test/repo");
+    let found = tool
+        .execute(
+            &ctx,
+            call(
+                "Memory",
+                json!({"action":"search","content":"smoke test","tags":["deploy"],"limit":1}),
+            ),
+        )
+        .await
+        .unwrap();
+    assert!(!found.is_error);
+    assert!(
+        serde_json::to_string(&found)
+            .unwrap()
+            .contains(&payload.id.to_string())
+    );
+    assert_eq!(*custom.operations.lock().unwrap(), ["store", "search"]);
     let store = Arc::new(AuditedMemory::default());
     let memory = store
         .store(
@@ -1768,5 +1858,16 @@ mod tests {
     #[tokio::test]
     async fn original_tools_registry_example() {
         super::tools_registry().await;
+    }
+
+    #[tokio::test]
+    async fn original_memory_examples() {
+        super::memory().await;
+    }
+
+    #[cfg(target_os = "linux")]
+    #[tokio::test]
+    async fn original_tracestore_example() {
+        super::tracestore().await;
     }
 }

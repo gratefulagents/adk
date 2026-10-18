@@ -279,6 +279,8 @@ impl Resolver {
         options.mode(0o644);
         if let Ok(mut file) = options.open(path).await {
             let _ = file.write_all(&bytes).await;
+            // Tokio writes may still be pending when write_all returns.
+            let _ = file.flush().await;
         }
     }
 }

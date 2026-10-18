@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7713,
-    "verified": 1178
+    "unresolved": 7705,
+    "verified": 1186
   },
   "groups": [
     {
@@ -1037,19 +1037,20 @@
     },
     {
       "counts": {
-        "artifacts:unresolved": 1,
-        "examples:unresolved": 2,
-        "files:unresolved": 2,
-        "packages:unresolved": 1,
-        "tests:unresolved": 1,
-        "verification_groups:unresolved": 1
+        "artifacts:verified": 1,
+        "examples:verified": 2,
+        "files:verified": 2,
+        "packages:verified": 1,
+        "tests:verified": 1,
+        "verification_groups:verified": 1
       },
       "group": "verification_groups:sdk::compaction::examples",
       "source_files": [
         "examples/features/context_compaction/README.md",
         "examples/features/context_compaction/context_compaction_test.go"
       ],
-      "unresolved_ids": [
+      "unresolved_ids": [],
+      "verified_ids": [
         "SDK-158C2B6044C77908",
         "SDK-2C78EFE819F9179E",
         "SDK-510B6680277AECFD",
@@ -1058,8 +1059,7 @@
         "SDK-C6DC231E724B72A4",
         "SDK-C8646E0B74CEC994",
         "SDK-F4CC0A9AB02A5531"
-      ],
-      "verified_ids": []
+      ]
     },
     {
       "counts": {
@@ -10957,8 +10957,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "30ec5c0cef821dac123c9f5731d9f25861689f1d7655adbfb67b153a4a19f111",
-    "docs/migration/ledger/issue-11-rust-claims.json": "2a803502a449ec35563962c86a4fe8d30e4b0912dd450dcb06e926bda25e067b",
+    "docs/migration/ledger/issue-11-overlay.json": "e6eb3348f3b2abe198e6fb4cdea77d378598a28dea3146765bbca5260419d0da",
+    "docs/migration/ledger/issue-11-rust-claims.json": "5dd8c1e8b9cfd1175586a75f3328ffc4bb5e829873a8c8dee51fa625d5eefe34",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10967,6 +10967,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1176
+    "rust_test": 1184
   }
 }

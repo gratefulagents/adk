@@ -1,5 +1,5 @@
 #!/usr/bin/env python3
-"""Execute pinned public SDK and explicitly claimed internal tests; retain reference evidence, not Rust closure."""
+"""Execute pinned public SDK and explicitly selected package tests; retain reference evidence, not Rust closure."""
 import argparse
 from collections import Counter
 import hashlib
@@ -14,16 +14,16 @@ ROOT = Path(__file__).resolve().parents[2]
 SDK = ROOT / "repos/sdk"
 PIN = "1dc92b73900fac74dc357a938e4b5eee6392b418"
 
-def add_claimed_internal_tests(claims, selected):
+def add_claimed_tests(claims, selected):
     """Only explicitly supported packages and exact top-level Go test names."""
     for claim in claims["claims"].values():
         reference = claim["reference_test"]
-        for package in ("internal/agent/agents", "internal/agent", "internal/openai", "internal/modelactivity", "internal/anthropic"):
+        for package in ("examples/features/context_compaction", "internal/agent/agents", "internal/agent", "internal/openai", "internal/modelactivity", "internal/anthropic"):
             prefix = "github.com/gratefulagents/sdk/" + package + "/"
             if reference.startswith(prefix):
                 name = reference[len(prefix):]
                 if not re.fullmatch(r"Test[A-Za-z0-9_]+", name):
-                    sys.exit(f"unsupported internal reference identifier: {name}")
+                    sys.exit(f"unsupported reference identifier: {name}")
                 selected.setdefault(package, set()).add(name)
                 break
 
@@ -38,7 +38,7 @@ def main():
     if revision != PIN or subprocess.check_output(["git", "-C", str(SDK), "status", "--porcelain"], text=True).strip():
         sys.exit("reference must be clean at the authoritative pin")
     go = os.environ.get("GO", "go")
-    # Keep the bounded historical regressions and every internal regression
+    # Keep the bounded historical regressions and every explicitly selected regression
     # required by current Rust claims. Refreshing must not silently drop proof
     # added by later slices of the migration.
     internal_tests = {
@@ -58,7 +58,7 @@ def main():
     }
     claims = json.loads((ROOT / "docs/migration/ledger/issue-11-rust-claims.json").read_text())
     selected = {"internal/agent": internal_tests}
-    add_claimed_internal_tests(claims, selected)
+    add_claimed_tests(claims, selected)
 
     commands = [[go, "test", "-count=1", "-json", "./pkg/agentsdk/..."]]
     for package, names in sorted(selected.items()):

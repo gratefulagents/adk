@@ -53,7 +53,7 @@ AUDIT_SDK_CHECKOUT = "63afe2ed8cc5f13ca7469054f2c1cb812fcac801"
 TOTAL = 9142
 EXCLUDED = 251
 RETAINED = 8891
-RUST_INPUTS = ["scripts/mode-routing-reference/run.py", "scripts/mode-routing-reference/reference_test.go",
+RUST_INPUTS = ["docs/feature-examples.md","scripts/mode-routing-reference/run.py", "scripts/mode-routing-reference/reference_test.go",
                "scripts/mode-routing-reference/README.md", "fixtures/mode-routing/observations.json",
                "crates/adk-codec/tests/mode_routing.rs", "crates/adk-codec/src/mode.rs", "scripts/mode-codec-reference/run.py", "scripts/mode-codec-reference/reference_test.go",
                "scripts/mode-codec-reference/README.md", "fixtures/mode-codec/observations.json",
@@ -606,7 +606,7 @@ def verify_rust() -> None:
     command = [os.environ.get("CARGO", "cargo"), "test", "--locked", "-p", "adk", "-p", "adk-codec", "--test", "agents", "--test", "baseline", "--test", "roles", "--test", "modes", "--test", "mode_routing", "--test", "userinput", "--test", "runner_codecs", "-p", "adk-platform", "-p", "adk-runtime",
                "-p", "adk-providers", "--test", "assembler", "--test", "snapshots", "--test", "http", "--test", "routes_cost_parity", "--test", "openai_cost_reference", "--test", "modelsdev",
                "-p", "adk-durable", "-p", "adk-project-state", "--test", "record_codecs",
-               "--features", "otel,builder,host,mcp,project-state", "--test", "resolution", "--test", "host", "--test", "host_cursor", "--test", "host_config", "--test", "host_rules",
+               "--features", "otel,builder,host,mcp,project-state,execution,observability", "--example", "features", "--test", "resolution", "--test", "host", "--test", "host_cursor", "--test", "host_config", "--test", "host_rules",
                "--test", "compat", "--test", "host_history", "-p", "adk-security", "--test", "security",
                "-p", "adk-core", "--test", "contracts", "--test", "result_helpers", "--test", "host_conversation",
                "--test", "usage", "--test", "settings", "--test", "builder", "--test", "catalog_handoffs",

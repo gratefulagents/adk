@@ -95,3 +95,37 @@ follow `adk-runtime/tests/subagent_integration.rs`; local compaction follows
 `adk/tests/execution.rs`, `adk-tools/tests/bundle.rs`,
 `adk-mcp/tests/tool_adapter.rs`, and `adk-sandbox/tests/lifecycle.rs`.
 The example deliberately imports public facade modules and owns all host fixtures.
+
+## Context-compaction helper example
+
+The `context_compaction` scenario includes the original SDK example's24 repeated
+assistant messages and explicit100-token trigger/60-token target, four recent
+items, one initial user message and three summary bullets. It asserts compaction
+runs, both history length and token estimate shrink, the generated summary contains
+`[COMPACTED HISTORY SUMMARY]`, and the `gpt-5.6-sol` default trigger exceeds its
+target. It also retains the richer first-goal/latest-question and disabled-policy
+checks above. Run only this example with:
+
+```sh
+cargo run --offline --locked -p adk \
+  --features builder,execution,mcp,project-state,observability \
+  --example features -- context_compaction
+```
+
+The source README's helper usage maps to these native APIs:
+
+- `DefaultCompactionConfig()` → `LocalCompactionPolicy::default()`.
+- `RunConfig.CompactionConfig` → `RunnerConfig.local_compaction`; use
+  `LocalCompactionPolicy { enabled: true, ..Default::default() }` for normal runs.
+- `CompactionRecorder` / `CompactionFailureReporter` → `RunnerConfig.hooks` with
+  `RunHooks::observe` handling `Observation::CompactionStarted`, `Compacted` and
+  `CompactionFailed`. Hooks are awaited and may fail closed; they must redact
+  sensitive summary/history data before forwarding it.
+- `MaybeCompactRunItems` → `compaction::compact_for_request` for owned stored history.
+- `CompactionDefaultsForModel(model)` → `LocalCompactionPolicy::for_model(model)`.
+- `ExtractCompactionSummary(items)` → `compaction::extract_summary(items)`.
+
+These types/functions are available through `adk::runtime` and its `compaction`
+module. This is a reviewed runnable-documentation counterpart, not byte-identical
+Go Markdown or a claim of live LLM/provider compaction execution. Native runner
+regressions separately verify proactive compaction and failure observations.

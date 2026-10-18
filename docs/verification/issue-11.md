@@ -2,6 +2,26 @@
 
 ## Current continuation evidence
 
+### Original context-compaction example and cache-write completion
+
+The native runnable scenario now checks the pinned Go example's exact24-message
+fixture,100/60 thresholds, summary marker, reduced history/tokens and model-default
+ordering. Public usage documentation maps every original README helper and hook.
+The reference runner selects this exact example package/test; eight reviewed
+example/documentation records are closed without claiming whole compaction parity.
+
+Full-workspace verification exposed an intermittent empty cache read after Tokio
+write_all returned. Awaiting flush before returning fixes the pending-write race;
+the existing exact-byte/permission regression passed ten consecutive reruns.
+
+Fresh Rust1.88 Linux verification: **1,793 workspace tests +10 doctests +1 explicit
+example test passed;0 failed,30 ignored**. Strict Clippy/typecheck/rustdoc/format,
+full facade matrix/consumer/purity,20 offline scenarios and host session passed.
+Pinned Go reference:938 passing test/subtest records,5 skips,40 packages. Bound
+native/Go evidence,56 validators and source locks pass. Ledger: **1,186 verified /
+7,705 unresolved /251 excluded**. Issue acceptance remains incomplete; unavailable
+live service credentials and non-Linux targets remain unverified.
+
 ### models.dev cache compatibility and helper-group review
 
 Fixed cache decoding to retain valid catalogs with missing/null timestamps and nil

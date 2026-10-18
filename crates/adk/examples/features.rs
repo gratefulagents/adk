@@ -1024,6 +1024,24 @@ async fn context_compaction() {
     );
     assert!(!disabled.changed);
     assert_eq!(disabled.history, history);
+
+    let original = vec![message(Role::Assistant, &"important project context ".repeat(20)); 24];
+    let original_policy = LocalCompactionPolicy {
+        enabled: true,
+        use_llm_summary: false,
+        trigger_tokens: 100,
+        target_tokens: 60,
+        preserve_recent_items: 4,
+        preserve_initial_user_messages: 1,
+        summary_bullet_limit: 3,
+    };
+    let compacted = compact_for_request(&original, original_policy, 0);
+    assert!(compacted.changed);
+    assert!(compacted.history.len() < original.len());
+    assert!(compacted.after_tokens < compacted.before_tokens);
+    assert!(extract_summary(&compacted.history).contains(compaction::SUMMARY_MARKER));
+    let defaults = LocalCompactionPolicy::for_model("gpt-5.6-sol");
+    assert!(defaults.trigger_tokens > defaults.target_tokens);
 }
 async fn settings_routing() {
     use adk::builder::{Builder, Config, Features, ModeSpec, ModelRouting, RoleRouting, RoleSpec};
@@ -1682,5 +1700,13 @@ async fn main() {
             _ => unreachable!(),
         }
         println!("PASS {name}");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[tokio::test]
+    async fn original_context_compaction_example() {
+        super::context_compaction().await;
     }
 }

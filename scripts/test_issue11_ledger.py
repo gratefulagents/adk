@@ -19,10 +19,12 @@ class ReferenceSelectionTests(unittest.TestCase):
         self.reference = importlib.util.module_from_spec(spec)
         spec.loader.exec_module(self.reference)
 
-    def test_claimed_internal_tests_keep_exact_package_and_prior_regressions(self):
+    def test_claimed_tests_keep_exact_package_and_prior_regressions(self):
         selected = {"internal/agent": {"TestHistorical"}}
         claims = {"claims": {str(i): {"reference_test": name} for i, name in enumerate([
             "github.com/gratefulagents/sdk/internal/agent/TestRunner",
+            "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+            "github.com/gratefulagents/sdk/examples/features/unrelated/TestNotSelected",
             "github.com/gratefulagents/sdk/internal/agent/agents/TestBuiltInKindsAreStable",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
             "github.com/gratefulagents/sdk/internal/openai/TestMetadata",
@@ -31,8 +33,8 @@ class ReferenceSelectionTests(unittest.TestCase):
             "github.com/gratefulagents/sdk/pkg/agentsdk/TestPublic",
             "github.com/gratefulagents/sdk/internal/unrelated/TestNotSelected",
         ])}}
-        self.reference.add_claimed_internal_tests(claims, selected)
-        self.assertEqual(selected, {"internal/agent": {"TestHistorical", "TestRunner"},
+        self.reference.add_claimed_tests(claims, selected)
+        self.assertEqual(selected, {"examples/features/context_compaction": {"TestContextCompactionExample"}, "internal/agent": {"TestHistorical", "TestRunner"},
                                     "internal/agent/agents": {"TestBuiltInKindsAreStable"},
                                     "internal/openai": {"TestMetadata"},
                                     "internal/modelactivity": {"TestReadActivity"},
@@ -61,12 +63,13 @@ class ReferenceSelectionTests(unittest.TestCase):
         self.assertIn(output, stderr.getvalue())
         self.assertIn("underlying failure", stderr.getvalue())
 
-    def test_internal_reference_patterns_and_subtests_cannot_expand_execution(self):
-        for name in ("TestAny|TestOther", "TestAny/subtest", "TestAny$", "../TestOther", ""):
-            with self.subTest(name=name), self.assertRaises(SystemExit):
-                self.reference.add_claimed_internal_tests({"claims": {
-                    "id": {"reference_test": "github.com/gratefulagents/sdk/internal/openai/" + name}
-                }}, {})
+    def test_reference_patterns_and_subtests_cannot_expand_execution(self):
+        for package in ("internal/openai", "examples/features/context_compaction"):
+            for name in ("TestAny|TestOther", "TestAny/subtest", "TestAny$", "../TestOther", ""):
+                with self.subTest(package=package, name=name), self.assertRaises(SystemExit):
+                    self.reference.add_claimed_tests({"claims": {
+                        "id": {"reference_test": "github.com/gratefulagents/sdk/" + package + "/" + name}
+                    }}, {})
 
 
 class EvidenceTests(unittest.TestCase):

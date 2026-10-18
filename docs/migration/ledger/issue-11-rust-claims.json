@@ -22146,6 +22146,206 @@
         "compat",
         "providers-runtime"
       ]
+    },
+    "SDK-510B6680277AECFD": {
+      "source": "examples/features/context_compaction/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed artifacts record artifacts:examples/features/context_compaction/README.md. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-2C78EFE819F9179E": {
+      "source": "examples/features/context_compaction/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed examples record examples:examples/features/context_compaction/README.md. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-7C67A236AA81AFD9": {
+      "source": "examples/features/context_compaction/context_compaction_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed examples record examples:examples/features/context_compaction/context_compaction_test.go. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-8E1EEDC405C03354": {
+      "source": "examples/features/context_compaction/README.md",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed files record files:examples/features/context_compaction/README.md. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-C6DC231E724B72A4": {
+      "source": "examples/features/context_compaction/context_compaction_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed files record files:examples/features/context_compaction/context_compaction_test.go. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-F4CC0A9AB02A5531": {
+      "source": null,
+      "source_name": "context_compaction_test",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed packages record context_compaction_test. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-158C2B6044C77908": {
+      "source": "examples/features/context_compaction/context_compaction_test.go",
+      "source_name": "TestContextCompactionExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed tests record TestContextCompactionExample. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
+    },
+    "SDK-C8646E0B74CEC994": {
+      "source": null,
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::context_compaction",
+        "crates/adk-runtime/src/compaction.rs::LocalCompactionPolicy",
+        "crates/adk-runtime/src/compaction.rs::compact_for_request",
+        "crates/adk-runtime/src/compaction.rs::extract_summary"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_context_compaction_example",
+        "deterministic_runner_compacts_first_request_and_preserves_cache_transients_and_append_only_items",
+        "recoverable_custom_compactor_failures_fall_back_to_local_or_noop"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/context_compaction/TestContextCompactionExample",
+      "rationale": "Reviewed verification_groups record verification_groups:sdk::compaction::examples. The runnable native context_compaction scenario now executes every original example assertion on24 repeated assistant messages with100/60 token limits,4 recent items,1 initial user and3 bullets: changed flag, reduced length/tokens, summary marker and gpt-5.6-sol default ordering. A test entrypoint calls that same executable scenario; original pinned Go test is independently executed through an exact package/test allowlist. Hash-bound docs/feature-examples.md maps all source README usage bullets and runnable Cargo command to actual native APIs; additional native runner tests verify proactive compaction and failure observations. README artifact closure is runnable-documentation migration, not byte-identical Go prose or an inferred closure of all compaction algorithms/APIs. No paid LLM/provider compaction or Go callback/pointer identity claim. Reviewed all eight example-group records, preserving richer native first/last-message and disabled-policy checks.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "execution",
+        "mcp",
+        "project-state",
+        "observability"
+      ]
     }
   }
 }

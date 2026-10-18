@@ -22,6 +22,8 @@ class ReferenceSelectionTests(unittest.TestCase):
     def test_claimed_tests_keep_exact_package_and_prior_regressions(self):
         selected = {"internal/agent": {"TestHistorical"}}
         claims = {"claims": {str(i): {"reference_test": name} for i, name in enumerate([
+            "github.com/gratefulagents/sdk/examples/features/guardrails/TestDemoTripwireGuardrails",
+            "github.com/gratefulagents/sdk/examples/features/sandbox/TestSandboxLocalExecutorExample",
             "github.com/gratefulagents/sdk/internal/agent/TestRunner",
             "github.com/gratefulagents/sdk/examples/features/streaming/TestSDKOpenAIStreamingViaHTTPTest",
             "github.com/gratefulagents/sdk/examples/features/tools/TestReadOnlyToolsRegistryFiltersMutatingToolsExample",
@@ -47,7 +49,7 @@ class ReferenceSelectionTests(unittest.TestCase):
             "github.com/gratefulagents/sdk/internal/unrelated/TestNotSelected",
         ])}}
         self.reference.add_claimed_tests(claims, selected)
-        self.assertEqual(selected, {"examples/features/streaming": {"TestSDKOpenAIStreamingViaHTTPTest"}, "examples/features/tools": {"TestReadOnlyToolsRegistryFiltersMutatingToolsExample"}, "examples/features/providers": {"TestProviderConfigurationExample"}, "examples/features/mcp": {"TestMCPToolBuilderExample"}, "examples/features/errors_retries": {"TestStandaloneRetryPolicyExample"}, "examples/features/context_compaction": {"TestContextCompactionExample"}, "internal/agent": {"TestHistorical", "TestRunner"},
+        self.assertEqual(selected, {"examples/features/guardrails": {"TestDemoTripwireGuardrails"}, "examples/features/sandbox": {"TestSandboxLocalExecutorExample"}, "examples/features/streaming": {"TestSDKOpenAIStreamingViaHTTPTest"}, "examples/features/tools": {"TestReadOnlyToolsRegistryFiltersMutatingToolsExample"}, "examples/features/providers": {"TestProviderConfigurationExample"}, "examples/features/mcp": {"TestMCPToolBuilderExample"}, "examples/features/errors_retries": {"TestStandaloneRetryPolicyExample"}, "examples/features/context_compaction": {"TestContextCompactionExample"}, "internal/agent": {"TestHistorical", "TestRunner"},
                                     "examples/features/settings_routing": {"TestSettingsAndModeRoutingExample"},
                                     "examples/features/tools_registry": {"TestSDKToolRegistryExample"},
                                     "examples/features/memory": {"TestInMemoryStoreSemanticsExample", "TestNoopEmbedderIsDeterministicExample", "TestCustomStoreCanBackMemoryToolExample"},

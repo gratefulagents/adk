@@ -1059,7 +1059,138 @@ async fn handoffs_subagents() {
     owner.shutdown().await.unwrap();
 }
 
+struct DemoTripwire(&'static str);
+impl Guardrail for DemoTripwire {
+    fn name(&self) -> &str {
+        self.0
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        input: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            let (text, trigger, output) = match input {
+                GuardrailInput::Input(items) => {
+                    let text = items
+                        .iter()
+                        .filter_map(|item| match item {
+                            RunItem::Message { message } => Some(
+                                message
+                                    .content
+                                    .iter()
+                                    .filter_map(|content| match content {
+                                        Content::Text { text } => Some(text.as_str()),
+                                        _ => None,
+                                    })
+                                    .collect::<String>(),
+                            ),
+                            _ => None,
+                        })
+                        .collect::<String>();
+                    (text, "tripwire-input", "checked input")
+                }
+                GuardrailInput::Output(value) => (
+                    value.as_str().unwrap_or_default().into(),
+                    "tripwire-output",
+                    "checked output",
+                ),
+                GuardrailInput::ToolInput(call) => (
+                    call.arguments.to_string(),
+                    "tripwire-tool",
+                    call.name.as_str(),
+                ),
+                GuardrailInput::ToolOutput { call, output } => (
+                    output
+                        .content
+                        .iter()
+                        .filter_map(|content| match content {
+                            Content::Text { text } => Some(text.as_str()),
+                            _ => None,
+                        })
+                        .collect::<String>(),
+                    "tripwire-tool-output",
+                    call.name.as_str(),
+                ),
+            };
+            Ok(Some(GuardrailResult {
+                output: json!(output),
+                tripwire_triggered: text.to_lowercase().contains(trigger),
+                ..Default::default()
+            }))
+        })
+    }
+}
+
+async fn original_tripwire_guardrails() {
+    for triggered in [false, true] {
+        let input = vec![message(
+            Role::User,
+            if triggered {
+                "contains TRIPWIRE-input"
+            } else {
+                "benign"
+            },
+        )];
+        let output = json!(if triggered {
+            "contains TRIPWIRE-output"
+        } else {
+            "benign"
+        });
+        let call = call(
+            "demo",
+            json!({"value": if triggered { "TRIPWIRE-tool" } else { "benign" }}),
+        );
+        let result = ToolOutput {
+            content: vec![Content::Text {
+                text: if triggered {
+                    "TRIPWIRE-tool-output"
+                } else {
+                    "benign"
+                }
+                .into(),
+            }],
+            is_error: false,
+            should_pause: false,
+        };
+        for (name, input, expected) in [
+            (
+                "no-tripwire-input",
+                GuardrailInput::Input(&input),
+                "checked input",
+            ),
+            (
+                "no-tripwire-output",
+                GuardrailInput::Output(&output),
+                "checked output",
+            ),
+            ("tool-input-valid", GuardrailInput::ToolInput(&call), "demo"),
+            (
+                "tool-output-valid",
+                GuardrailInput::ToolOutput {
+                    call: &call,
+                    output: &result,
+                },
+                "demo",
+            ),
+        ] {
+            let guard = DemoTripwire(name);
+            assert_eq!(guard.name(), name);
+            let checked = guard
+                .check(&context(), "example", input)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(checked.tripwire_triggered, triggered);
+            assert_eq!(checked.output, json!(expected));
+            assert!(checked.replacement_content.is_none());
+        }
+    }
+}
+
 async fn guardrails() {
+    original_tripwire_guardrails().await;
     adk::security::check_secrets("public documentation").unwrap();
     let secret = ["ghp_", &"a".repeat(36)].concat();
     let error = adk::security::check_secrets(&secret).unwrap_err();
@@ -2215,6 +2346,11 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
+    #[tokio::test]
+    async fn original_four_phase_tripwire_guardrails() {
+        super::original_tripwire_guardrails().await;
+    }
+
     #[tokio::test]
     async fn original_sandbox_local_executor_and_explicit_environment() {
         super::sandbox().await;

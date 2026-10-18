@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Original four-phase tripwire example
+
+Added native custom input/output/tool-input/tool-output callbacks reproducing
+`TestDemoTripwireGuardrails`, including original names/diagnostic outputs, uppercase
+trigger matching and benign controls. All14 facade example tests pass; strict example
+lint/typecheck and formatting pass. The exact original Go test also passes (Go emitted
+a harmless telemetry-sidecar warning because `/proc/self/exe` is unavailable).
+Refreshed full pinned reference and source-bound Rust evidence, artifact review,
+all56 audit validators, source locks and dependency purity pass. Two exact test
+records (tripwire and the previously verified local executor example) are now closed.
+Ledger: **1,299 verified /7,592 unresolved /251 excluded**. This does not close live
+examples, SafeEnv/Default executor semantics, whole files, or full issue acceptance.
+
+
 ### Explicit sandbox application grants
 
 Sandbox Config now accepts explicit host-owned application environment values,

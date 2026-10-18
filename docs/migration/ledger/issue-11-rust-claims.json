@@ -24583,6 +24583,40 @@
         "tools",
         "builder"
       ]
+    },
+    "SDK-7B9CFB485462DFA5": {
+      "source": "examples/features/guardrails/guardrails_test.go",
+      "source_name": "TestDemoTripwireGuardrails",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::original_tripwire_guardrails"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_four_phase_tripwire_guardrails"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/guardrails/TestDemoTripwireGuardrails",
+      "rationale": "Only the original deterministic callback example: all four native guardrail phases match the case-insensitive substring tripwires, diagnostic outputs and tool name. Both triggering and benign inputs are checked. This does not close provider-backed examples, runtime enforcement, whole source file or package.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "tools"
+      ]
+    },
+    "SDK-D91D5A06ECFC94C0": {
+      "source": "examples/features/sandbox/sandbox_test.go",
+      "source_name": "TestSandboxLocalExecutorExample",
+      "implementation_symbols": [
+        "crates/adk/examples/features.rs::sandbox"
+      ],
+      "rust_test_identifiers": [
+        "tests::original_sandbox_local_executor_and_explicit_environment"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/sandbox/TestSandboxLocalExecutorExample",
+      "rationale": "Only the original local executor example: shell printf hello in a private temporary work directory, FullAccess permission and a five-second bound, with successful status and exact output. Native absolute executable and explicit network grant preserve the stronger host boundary. No Default executor, SafeEnv helper or whole source file closure.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "builder",
+        "tools"
+      ]
     }
   }
 }

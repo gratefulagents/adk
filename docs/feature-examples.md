@@ -289,3 +289,8 @@ Debug but are visible to children (and potentially backend argv), so this is not
 a credential-delivery API. Local execution still requires FullAccess/network Allow.
 The lifecycle subprocess regression injects dummy ambient secrets into a separate
 parent process and checks the actual child's environment without global mutation.
+
+The guardrails scenario also reproduces the original four-phase custom tripwire
+callbacks: input/output and tool input/output, case-insensitive matches, preserved
+diagnostic outputs/tool names, and benign controls. This deterministic example
+needs no provider credentials; it does not stand in for live guardrail examples.

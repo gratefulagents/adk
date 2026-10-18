@@ -1,8 +1,8 @@
 {
   "counts": {
     "excluded": 251,
-    "unresolved": 7565,
-    "verified": 1326
+    "unresolved": 7561,
+    "verified": 1330
   },
   "groups": [
     {
@@ -3525,8 +3525,8 @@
     },
     {
       "counts": {
-        "apis:unresolved": 153,
-        "apis:verified": 63,
+        "apis:unresolved": 149,
+        "apis:verified": 67,
         "configuration:unresolved": 2,
         "files:unresolved": 12,
         "files:verified": 4,
@@ -3602,7 +3602,6 @@
         "SDK-32378354DBDEC56B",
         "SDK-3262A9FB99A7A764",
         "SDK-3370F8883EEF7FAD",
-        "SDK-3378F21F4A489956",
         "SDK-341B179D3A32C25E",
         "SDK-34E56E502A604B94",
         "SDK-35A1DC24EAF5AD4F",
@@ -3619,7 +3618,6 @@
         "SDK-43796827B05B5A54",
         "SDK-43E44E80CD68B157",
         "SDK-44291C95696A1990",
-        "SDK-4431C3974397F230",
         "SDK-4530E5598DD31CFF",
         "SDK-493BE9FD152363B1",
         "SDK-4B1E2EF886EFD076",
@@ -3679,7 +3677,6 @@
         "SDK-960C506658284264",
         "SDK-9B9DB55569E2A4A3",
         "SDK-9C22A26DB50E59D8",
-        "SDK-9CC08E3609D5C80F",
         "SDK-9D01446C5D694765",
         "SDK-9D559C0CB5F24753",
         "SDK-9FAFEB1DC783AD57",
@@ -3702,7 +3699,6 @@
         "SDK-B0F8FE7ECFBB5A4F",
         "SDK-B38C694EA1A4FE95",
         "SDK-B5576ABA3317A280",
-        "SDK-B802C5F86BF828A3",
         "SDK-B93B1F10786E9BF4",
         "SDK-BA7C7E6DA0247698",
         "SDK-BCBBE752505A4E3A",
@@ -3778,10 +3774,12 @@
         "SDK-2BCBAE4C2A215DFD",
         "SDK-2C2BB8C09AEB7801",
         "SDK-2EAEB42136C69657",
+        "SDK-3378F21F4A489956",
         "SDK-3541E186F1507AA2",
         "SDK-3583000397427AED",
         "SDK-39938CB3E2CC378A",
         "SDK-3E92A284AEC34FA8",
+        "SDK-4431C3974397F230",
         "SDK-46013697C58697E4",
         "SDK-4C29C54DE18431B5",
         "SDK-4E89491A45CBD72E",
@@ -3802,6 +3800,7 @@
         "SDK-94C9AE28452DA5DB",
         "SDK-9924B722AB237F80",
         "SDK-9C508D8778C9ED13",
+        "SDK-9CC08E3609D5C80F",
         "SDK-A271E835C93C6F78",
         "SDK-A2A3EBB272F40551",
         "SDK-A2C7AA30BD8A5E90",
@@ -3812,6 +3811,7 @@
         "SDK-B14F46DDDCF78A3E",
         "SDK-B50F8E188B7F058D",
         "SDK-B6F560D95CE7F095",
+        "SDK-B802C5F86BF828A3",
         "SDK-C0480D7EE0A1F15C",
         "SDK-C0CBDEB29F7E126A",
         "SDK-C31744CF85A788DC",
@@ -10989,8 +10989,8 @@
   ],
   "input_hashes": {
     "docs/migration/ledger/issue-11-artifact-claims.json": "842f17203236b8ed1d8b27105674f6ab379e9218bb0667d798efed12535e3234",
-    "docs/migration/ledger/issue-11-overlay.json": "96039d51091829cebabb4e703d946821609ff3537bb4038764ee4fb198fb3a23",
-    "docs/migration/ledger/issue-11-rust-claims.json": "76015e4485454a505082459cc8b1b0771e57ad898edc9f174208ff8220aef2ed",
+    "docs/migration/ledger/issue-11-overlay.json": "482ddb36e37f3369607b829a7942e0dcbdc5677ddb35f7562406ccdc46285cfd",
+    "docs/migration/ledger/issue-11-rust-claims.json": "9647c574be4918cfeb19394e89aeac3b5872689e7697aadf4df1371b633a2ae6",
     "docs/migration/ledger/sdk-v0.0.115/inventory.json": "fe548b9b9fafa200283ec8ce22a6fc41e9e7e28a79eca6c1feeac802da858c98"
   },
   "meaning": "Review queue only. Same-declaration facets have different obligations; no automatic closure, missing-capability inference, or approved divergence.",
@@ -10999,6 +10999,6 @@
   "sdk_revision": "1dc92b73900fac74dc357a938e4b5eee6392b418",
   "verified_by_evidence_kind": {
     "artifact_review": 2,
-    "rust_test": 1324
+    "rust_test": 1328
   }
 }

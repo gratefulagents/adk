@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Raw-bearing leaf snapshot byte codecs
+
+`ToolCallSnapshot` and `ToolApprovalSnapshot` now use the existing single-raw-field
+normalization/restoration boundary and omit-aware byte encoders. They retain raw
+`input` bytes, including malformed UTF-8 and lexical number spelling, while typed
+strings receive Go replacement behavior. Missing/allocated-empty raw values omit
+the field; explicit null remains present. Approval's boolean is always emitted.
+Both encoders reuse syntax/depth validation rather than passing invalid raw data
+through unchecked. No tool execution or authorization policy is changed.
+
+The actual Go types add 319 decode/encode observations (149 call,170 approval)
+and 14 direct marshal observations. The minimal compat-only public facade now
+checks 693 leaf cases. Four precise internal/public records are mapped:
+`SDK-4431C3974397F230`, `SDK-B802C5F86BF828A3`, `SDK-3378F21F4A489956`, and
+`SDK-9CC08E3609D5C80F`. Whole nested request/response byte behavior stays open.
+The ledger is **1,330 verified /7,561 unresolved /251 excluded**.
+
 ### Response envelope and complete plain-string leaf snapshots
 
 Response snapshot Serde decoding now reuses the Go-style object decoder for

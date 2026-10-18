@@ -38,6 +38,8 @@ fields!(ImageAttachment, media_type, data, detail);
 fields!(OutputSchema, name, strict; schema);
 fields!(ToolSnapshot, name, description, read_only, needs_approval, timeout_seconds; input_schema);
 fields!(ToolCallData, id, name; input);
+fields!(ToolCallSnapshot, id, name; input);
+fields!(ToolApprovalSnapshot, tool_name, call_id, approved; input);
 fields!(HandoffCallData, from_agent, to_agent);
 fields!(HandoffOutputData, from_agent, to_agent);
 fields!(
@@ -157,7 +159,7 @@ fn pinned_payload_decode_oracle() {
         assert_eq!(fixture["enum_values"][name], kind.0);
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 2279);
+    assert_eq!(cases.len(), 2598);
     for case in cases {
         match case["type"].as_str().unwrap() {
             "ModelSettings" => compare::<SnapshotModelSettings>(case),
@@ -173,6 +175,8 @@ fn pinned_payload_decode_oracle() {
             "CompactionData" => compare::<CompactionData>(case),
             "LLMReasoning" => compare::<ReasoningSnapshot>(case),
             "LLMCompaction" => compare::<CompactionSnapshot>(case),
+            "LLMToolCall" => compare::<ToolCallSnapshot>(case),
+            "LLMToolApproval" => compare::<ToolApprovalSnapshot>(case),
             "ToolApprovalData" => compare::<ToolApprovalData>(case),
             "RunItemType" => compare::<RunItemType>(case),
             other => panic!("unknown oracle type: {other}"),
@@ -438,7 +442,7 @@ fn snapshot_raw_encoding_matches_go_omission_bytes_and_rejection() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
     let cases = fixture["snapshot_encode_cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 14);
+    assert_eq!(cases.len(), 28);
     for case in cases {
         let raw = if case["raw_nil"].as_bool().unwrap() {
             RawJson::Missing
@@ -452,6 +456,14 @@ fn snapshot_raw_encoding_matches_go_omission_bytes_and_rejection() {
             }),
             "LLMToolSnapshot" => to_go_json_bytes(&ToolSnapshot {
                 input_schema: raw,
+                ..Default::default()
+            }),
+            "LLMToolCall" => to_go_json_bytes(&ToolCallSnapshot {
+                input: raw,
+                ..Default::default()
+            }),
+            "LLMToolApproval" => to_go_json_bytes(&ToolApprovalSnapshot {
+                input: raw,
                 ..Default::default()
             }),
             other => panic!("unknown type {other}"),

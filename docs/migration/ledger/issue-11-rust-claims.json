@@ -25048,6 +25048,78 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-B802C5F86BF828A3": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolApproval",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-4431C3974397F230": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMToolCall",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9CC08E3609D5C80F": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMToolApproval",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolApprovalSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3378F21F4A489956": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMToolCall",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ToolCallSnapshot"
+      ],
+      "rust_test_identifiers": [
+        "pinned_payload_decode_oracle",
+        "snapshot_raw_encoding_matches_go_omission_bytes_and_rejection",
+        "public_leaf_snapshot_byte_codecs_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Complete single-raw-field analysis record and public facade mapping, not nested envelope closure. Actual immutable Go types contribute 149 tool-call and170 approval decode/encode observations plus14 direct marshal observations. Tests cover every field, folded/duplicate/null updates, raw lexical and malformed UTF8 retention, typed-string replacement, missing/empty/null distinctions, exact field order and omission, invalid raw syntax, and depth boundaries. Minimal compat-only facade executes all319 added decode/encode observations. Original response-builder test is supplemental; direct Go type observations establish leaf record behavior. No execution/approval authorization behavior or whole request/response byte semantics is inferred.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

@@ -20,6 +20,14 @@ Both are supported by the native sealed byte-codec API; the minimal compat-only
 facade runs all 374 comparisons. This does not add whole request/response byte
 decoding or infer nested/raw-field compatibility from the leaf records.
 
+`LLMToolCall` and `LLMToolApproval` add 319 decode/encode cases and 14 direct
+marshal cases. Their sealed native codecs preserve a single raw `input` field
+without normalizing its original bytes. Raw omission, empty versus null values,
+invalid UTF-8, duplicate keys, lexical numbers, malformed syntax and depth limits
+are independently observed. The facade now checks 693 leaf decode/encode cases.
+The entire payload fixture contains 2,598 decode cases and 28 direct snapshot
+marshal cases; this still does not implement nested request/response raw bytes.
+
 Output: `fixtures/payloads/observations.json`.
 
 - `schema_version`: 1.

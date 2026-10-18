@@ -156,6 +156,7 @@ func TestNativePayloadReference(t *testing.T) {
 		reflect.TypeOf(HandoffCallData{}), reflect.TypeOf(HandoffOutputData{}),
 		reflect.TypeOf(ReasoningData{}), reflect.TypeOf(CompactionData{}),
 		reflect.TypeOf(LLMReasoning{}), reflect.TypeOf(LLMCompaction{}),
+		reflect.TypeOf(LLMToolCall{}), reflect.TypeOf(LLMToolApproval{}),
 		reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{}),
 	}
 	for _, typ := range types {
@@ -249,7 +250,7 @@ func TestNativePayloadReference(t *testing.T) {
 			add(typ, fmt.Sprintf("image_reuse_%02d", i), input)
 		}
 	}
-	for _, typ := range []reflect.Type{reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{})} {
+	for _, typ := range []reflect.Type{reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{}), reflect.TypeOf(LLMToolCall{}), reflect.TypeOf(LLMToolApproval{})} {
 		field := "input"
 		if typ == reflect.TypeOf(LLMOutputSchema{}) {
 			field = "schema"
@@ -300,7 +301,7 @@ func TestNativePayloadReference(t *testing.T) {
 	}
 	encoding := []map[string]any{}
 	for _, raw := range []json.RawMessage{nil, {}, json.RawMessage(`null`), json.RawMessage(` { "b":1e+09, "a":-0, "b":1.00 } `), json.RawMessage("\"\xff\""), json.RawMessage(` `), json.RawMessage(`[1,]`)} {
-		for _, value := range []any{LLMOutputSchema{Schema: raw}, LLMToolSnapshot{InputSchema: raw}} {
+		for _, value := range []any{LLMOutputSchema{Schema: raw}, LLMToolSnapshot{InputSchema: raw}, LLMToolCall{Input: raw}, LLMToolApproval{Input: raw}} {
 			encoded, err := json.Marshal(value)
 			encoding = append(encoding, map[string]any{"type": reflect.TypeOf(value).Name(), "raw_nil": raw == nil, "raw_hex": hex.EncodeToString(raw), "marshal_ok": err == nil, "marshal_hex": hex.EncodeToString(encoded)})
 		}

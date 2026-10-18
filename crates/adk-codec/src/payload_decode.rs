@@ -166,6 +166,69 @@ impl sealed::Sealed for ToolCallData {
 }
 impl GoJsonDecode for ToolCallData {}
 impl GoJsonEncode for ToolCallData {}
+
+impl sealed::Sealed for ToolCallSnapshot {
+    const RAW_FIELD: Option<&'static str> = Some("input");
+    fn restore_raw(&mut self, raw: RawJson) {
+        self.input = raw;
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        let mut bytes = b"{".to_vec();
+        if !self.id.is_empty() {
+            bytes.extend_from_slice(b"\"id\":");
+            bytes.extend(crate::snapshots::to_go_json(&self.id)?);
+            bytes.push(b',');
+        }
+        if !self.name.is_empty() {
+            bytes.extend_from_slice(b"\"name\":");
+            bytes.extend(crate::snapshots::to_go_json(&self.name)?);
+            bytes.push(b',');
+        }
+        if !self.input.bytes().is_empty() {
+            bytes.extend_from_slice(b"\"input\":");
+            append_raw(&mut bytes, &self.input)?;
+            bytes.push(b',');
+        }
+        if bytes.last() == Some(&b',') {
+            bytes.pop();
+        }
+        bytes.push(b'}');
+        Ok(bytes)
+    }
+}
+impl GoJsonDecode for ToolCallSnapshot {}
+impl GoJsonEncode for ToolCallSnapshot {}
+
+impl sealed::Sealed for ToolApprovalSnapshot {
+    const RAW_FIELD: Option<&'static str> = Some("input");
+    fn restore_raw(&mut self, raw: RawJson) {
+        self.input = raw;
+    }
+    fn encode_bytes(&self) -> Result<Vec<u8>, serde_json::Error> {
+        let mut bytes = b"{".to_vec();
+        if !self.tool_name.is_empty() {
+            bytes.extend_from_slice(b"\"tool_name\":");
+            bytes.extend(crate::snapshots::to_go_json(&self.tool_name)?);
+            bytes.push(b',');
+        }
+        if !self.input.bytes().is_empty() {
+            bytes.extend_from_slice(b"\"input\":");
+            append_raw(&mut bytes, &self.input)?;
+            bytes.push(b',');
+        }
+        if !self.call_id.is_empty() {
+            bytes.extend_from_slice(b"\"call_id\":");
+            bytes.extend(crate::snapshots::to_go_json(&self.call_id)?);
+            bytes.push(b',');
+        }
+        bytes.extend_from_slice(b"\"approved\":");
+        bytes.extend(crate::snapshots::to_go_json(&self.approved)?);
+        bytes.push(b'}');
+        Ok(bytes)
+    }
+}
+impl GoJsonDecode for ToolApprovalSnapshot {}
+impl GoJsonEncode for ToolApprovalSnapshot {}
 impl sealed::Sealed for ToolApprovalData {
     const RAW_FIELD: Option<&'static str> = Some("input");
     fn restore_raw(&mut self, raw: RawJson) {

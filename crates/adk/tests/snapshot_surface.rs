@@ -1,7 +1,7 @@
 #![cfg(feature = "compat")]
 
 use adk::codec::{
-    dto::{CompactionSnapshot, ReasoningSnapshot},
+    dto::{CompactionSnapshot, ReasoningSnapshot, ToolApprovalSnapshot, ToolCallSnapshot},
     from_go_json, to_go_json_bytes,
 };
 
@@ -19,14 +19,18 @@ fn public_leaf_snapshot_byte_codecs_match_pinned_go() {
     let mut seen = 0;
     for case in fixture["cases"].as_array().unwrap() {
         let input = unhex(case["input_hex"].as_str().unwrap());
-        let result = match case["type"].as_str().unwrap() {
-            "LLMReasoning" => {
-                from_go_json::<ReasoningSnapshot>(&input).and_then(|value| to_go_json_bytes(&value))
-            }
-            "LLMCompaction" => from_go_json::<CompactionSnapshot>(&input)
-                .and_then(|value| to_go_json_bytes(&value)),
-            _ => continue,
-        };
+        let result =
+            match case["type"].as_str().unwrap() {
+                "LLMReasoning" => from_go_json::<ReasoningSnapshot>(&input)
+                    .and_then(|value| to_go_json_bytes(&value)),
+                "LLMCompaction" => from_go_json::<CompactionSnapshot>(&input)
+                    .and_then(|value| to_go_json_bytes(&value)),
+                "LLMToolCall" => from_go_json::<ToolCallSnapshot>(&input)
+                    .and_then(|value| to_go_json_bytes(&value)),
+                "LLMToolApproval" => from_go_json::<ToolApprovalSnapshot>(&input)
+                    .and_then(|value| to_go_json_bytes(&value)),
+                _ => continue,
+            };
         seen += 1;
         assert_eq!(
             result.is_ok(),
@@ -44,5 +48,5 @@ fn public_leaf_snapshot_byte_codecs_match_pinned_go() {
             );
         }
     }
-    assert_eq!(seen, 374);
+    assert_eq!(seen, 693);
 }

@@ -2161,6 +2161,16 @@
       "output": "fe7461696c"
     }
   ],
+  "configEnvNames": [
+    "GRATEFULAGENTS_COMMAND_SANDBOX_PATH",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_PATH_PREPEND",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_PATH_APPEND",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_EXTRA_RO_PATHS",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_EXTRA_RW_PATHS",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_EXTRA_ENV",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_EXPOSE_KUBERNETES_SERVICE_ACCOUNT",
+    "GRATEFULAGENTS_COMMAND_SANDBOX_ALLOW_UNSAFE_READONLY_LOCAL"
+  ],
   "environment": {
     "": "6d7573742d6e6f742d657870616e64",
     "24": "646f6c6c6172",
@@ -2177,11 +2187,12 @@
     "e78cab": "756e69636f6465",
     "ff": "fe"
   },
+  "modeEnvName": "GRATEFULAGENTS_COMMAND_SANDBOX",
   "provenance": {
     "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
     "goVersion": "go version go1.26.8 linux/amd64",
     "harnessSHA256": {
-      "scripts/sandbox-env-reference/reference_test.go": "60ea4f01a3e9ed43e0e3b34676209ebe7076cb135df00923209f2bb34d069445",
+      "scripts/sandbox-env-reference/reference_test.go": "880803fce6657bab4d0e8b541f3d86efe9cdb30578d3914f64e0dc11faba7fb3",
       "scripts/sandbox-env-reference/run.py": "a117edc024fb3a015040a73e29ebff357e074def62165c04539d252f6b69e95d"
     },
     "license": "GPL-3.0-only",

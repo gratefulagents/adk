@@ -24633,6 +24633,182 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-E87B426CFA17E40B": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxAllowUnsafeReadOnlyLocalEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_ALLOW_UNSAFE_READ_ONLY_LOCAL_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F02650892F7ADBAA": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxConfigEnvNames",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::config_env_names"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F40F571803B1485E": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxExposeKubernetesServiceAccountEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_EXPOSE_KUBERNETES_SERVICE_ACCOUNT_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-55DEEC601AFF0E30": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxExtraEnvEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_EXTRA_ENV_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-863A466962865C7E": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxExtraReadOnlyPathsEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_EXTRA_READ_ONLY_PATHS_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-9BE559E9FEBF84EC": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxExtraWritablePathsEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_EXTRA_WRITABLE_PATHS_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-BC877F2E54035A63": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxModeEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_MODE_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-065E4CC9B751353F": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxPathAppendEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_PATH_APPEND_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-F40A040076F7BC79": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxPathEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_PATH_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-E7966C0D6C5E9D57": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxPathPrependEnv",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::SANDBOX_PATH_PREPEND_ENV"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-3B1E448055D80199": {
+      "source": "pkg/agentsdk/sandbox/executor.go",
+      "source_name": "SandboxConfigEnvNames",
+      "implementation_symbols": [
+        "crates/adk-codec/src/sandbox_env.rs::config_env_names"
+      ],
+      "rust_test_identifiers": [
+        "sandbox_configuration_names_match_pinned_go_and_are_owned"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/sandbox/TestSafeEnvDoesNotInheritSecrets",
+      "rationale": "Only the public configuration-name constant or ordered name-list helper is closed. The independent immutable SDK oracle executes SandboxConfigEnvNames and records the separate mode constant; native assertions cover all nine values, exact ordering, deliberate mode/GOROOT exclusion, and caller-owned result isolation. This exposes compatibility metadata only, not ambient reads, ConfigFromEnv parsing, path grants, unsafe-local fallback, Kubernetes credentials, environment-variable behavior or native executor configuration. Original SafeEnv test is supplemental reference evidence; direct name observations are source/harness-bound in the sandbox expansion oracle. Reviewed the configuration-constructor/registration facet: it covers exactly executor.go lines93–104, the same pure name-list declaration, not configuration parsing or installation.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

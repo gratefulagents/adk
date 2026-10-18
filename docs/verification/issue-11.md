@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Sandbox configuration-name metadata
+
+Added the nine public SDK sandbox environment-name constants and the ordered,
+caller-owned eight-name list. Independent pinned Go output verifies exact names,
+ordering and the deliberate exclusion of mode/GOROOT from the propagated list;
+mutation of one Rust result does not affect later results. These are compatibility
+metadata only: no native ambient reads, unsafe-local fallback or Kubernetes
+credential exposure was introduced. Eleven exact API/configuration facets closed.
+
+Codec tests, strict all-target workspace lint/typecheck, rustdoc/format, source-bound
+evidence,56 validators, standalone consumer, source locks and dependency purity
+pass. Ledger: **1,311 verified /7,580 unresolved /251 excluded**. Full retained
+acceptance remains incomplete; prior full-workspace results are in the expansion
+section below, rather than claiming a repeated full suite for these constants.
+
+
 ### Explicit-map sandbox expansion
 
 Added `adk::codec::sandbox_env::expand_safe` (compat feature), an explicit byte-map

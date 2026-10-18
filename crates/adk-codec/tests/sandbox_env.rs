@@ -34,3 +34,28 @@ fn explicit_environment_expansion_matches_pinned_go() {
         b"/"
     );
 }
+
+#[test]
+fn sandbox_configuration_names_match_pinned_go_and_are_owned() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/sandbox-env/observations.json"
+    ))
+    .unwrap();
+    let names = adk_codec::sandbox_env::config_env_names();
+    assert_eq!(
+        serde_json::to_value(&names).unwrap(),
+        fixture["configEnvNames"]
+    );
+    assert_eq!(
+        adk_codec::sandbox_env::SANDBOX_MODE_ENV,
+        fixture["modeEnvName"]
+    );
+    assert!(
+        !names
+            .iter()
+            .any(|name| name == adk_codec::sandbox_env::SANDBOX_MODE_ENV || name == "GOROOT")
+    );
+    let mut changed = names.clone();
+    changed[0].clear();
+    assert_eq!(adk_codec::sandbox_env::config_env_names(), names);
+}

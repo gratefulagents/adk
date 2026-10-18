@@ -6,3 +6,7 @@ harness hashes and covers 540 byte inputs: ASCII boundaries, special variables,
 malformed braces, missing values, Unicode, invalid UTF-8, NUL, and nonrecursive substitutions.
 No ambient environment values are included. This checks only the standalone
 explicit-map projection, not SafeEnv inheritance, configuration or execution.
+
+The oracle also records all nine public configuration-name constants through the
+ordered SandboxConfigEnvNames result and separate SandboxModeEnv value. The list
+intentionally excludes mode and GOROOT, and Rust returns fresh owned names.

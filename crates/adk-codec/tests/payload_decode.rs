@@ -1,4 +1,4 @@
-use adk_codec::snapshots::{OutputSchema, ToolSnapshot};
+use adk_codec::snapshots::{ModelSettings as SnapshotModelSettings, OutputSchema, ToolSnapshot};
 use adk_codec::{GoJsonDecode, GoJsonEncode, approval, dto::*, from_go_json, to_go_json_bytes};
 use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
@@ -23,6 +23,16 @@ macro_rules! fields {
             $(fn raw(&self) -> Option<&RawJson> { Some(&self.$raw) })?
         }
     };
+}
+impl Observation for SnapshotModelSettings {
+    fn fields(&self) -> Value {
+        json!({"temperature": self.temperature.map(|v| format!("{:016x}", v.to_bits())),
+            "top_p": self.top_p.map(|v| format!("{:016x}", v.to_bits())),
+            "max_tokens": self.max_tokens, "tool_choice": self.tool_choice,
+            "parallel_tool_calls": self.parallel_tool_calls, "thinking_budget": self.thinking_budget,
+            "reasoning_effort": self.reasoning_effort, "text_verbosity": self.text_verbosity,
+            "stop_sequences": self.stop_sequences})
+    }
 }
 fields!(ImageAttachment, media_type, data, detail);
 fields!(OutputSchema, name, strict; schema);
@@ -73,6 +83,9 @@ fn compare<T: Observation>(case: &Value) {
     // Public Vec fields intentionally collapse nil and empty; both omit on marshal.
     if expected.get("images") == Some(&Value::Null) {
         expected["images"] = json!([]);
+    }
+    if expected.get("stop_sequences") == Some(&Value::Null) {
+        expected["stop_sequences"] = json!([]);
     }
     assert_eq!(decoded.fields(), expected, "decoded fields: {id}");
     match decoded.raw() {
@@ -128,9 +141,10 @@ fn pinned_payload_decode_oracle() {
         assert_eq!(fixture["enum_values"][name], kind.0);
     }
     let cases = fixture["cases"].as_array().unwrap();
-    assert_eq!(cases.len(), 1629);
+    assert_eq!(cases.len(), 1905);
     for case in cases {
         match case["type"].as_str().unwrap() {
+            "ModelSettings" => compare::<SnapshotModelSettings>(case),
             "LLMOutputSchema" => compare::<OutputSchema>(case),
             "LLMToolSnapshot" => compare::<ToolSnapshot>(case),
             "MessageOutput" => compare::<MessageOutput>(case),

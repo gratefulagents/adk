@@ -110,3 +110,20 @@ fn snapshot_schema_and_tool_codecs_are_available_through_facade() {
         br#"{"name":"tool","input_schema":{"z":1,"z":2},"read_only":true,"needs_approval":true}"#
     );
 }
+
+#[test]
+fn snapshot_settings_codec_is_available_through_facade() {
+    let settings: adk::codec::snapshots::ModelSettings = from_go_json(
+        br#"{"MAX_TOKENS":7,"max_tokens":null,"temperature":-0,"stop_sequences":["a"],"STOP_SEQUENCES":[null]}"#,
+    ).unwrap();
+    assert_eq!(settings.max_tokens, 7);
+    assert_eq!(
+        settings.temperature.unwrap().to_bits(),
+        (-0.0_f64).to_bits()
+    );
+    assert_eq!(settings.stop_sequences, ["a"]);
+    assert_eq!(
+        to_go_json_bytes(&settings).unwrap(),
+        br#"{"temperature":-0,"max_tokens":7,"stop_sequences":["a"]}"#
+    );
+}

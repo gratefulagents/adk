@@ -224,3 +224,10 @@ turn boundary gets the same one-turn extension as the Go runner.
 Model-specific threshold lookup and 104 local compaction cases are executed
 against the pinned SDK. Full approval histories/new items and streamed snapshot
 order are now compared in real-engine replay; see the replay README.
+
+The analysis `snapshots::ModelSettings` also supports `from_go_json` and
+`to_go_json_bytes`: scalar nulls retain earlier duplicate values, nullable
+numbers/booleans reset on null, and repeated stop arrays retain Go backing-slot
+values. Its `Vec` intentionally collapses nil and empty stops (both omit on
+encoding); use `dto::ModelSettings` when that distinction matters. This does not
+make the enclosing `RequestSnapshot` byte decoder Go-compatible.

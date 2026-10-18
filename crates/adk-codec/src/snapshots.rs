@@ -3,37 +3,27 @@
 use crate::dto::{RawJson, RunItemSnapshot, null_default, null_default_elements};
 use serde::{Deserialize, Serialize};
 
-#[derive(Debug, Clone, Default, PartialEq, Serialize, Deserialize)]
-#[serde(default)]
+#[derive(Debug, Clone, Default, PartialEq, Serialize)]
 pub struct ModelSettings {
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(deserialize_with = "null_default")]
     #[serde(serialize_with = "finite_optional")]
     pub temperature: Option<f64>,
     #[serde(skip_serializing_if = "is_zero")]
-    #[serde(deserialize_with = "null_default")]
     pub max_tokens: i64,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(deserialize_with = "null_default")]
     #[serde(serialize_with = "finite_optional")]
     pub top_p: Option<f64>,
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub tool_choice: String,
     #[serde(skip_serializing_if = "Option::is_none")]
-    #[serde(deserialize_with = "null_default")]
     pub parallel_tool_calls: Option<bool>,
     #[serde(skip_serializing_if = "is_zero")]
-    #[serde(deserialize_with = "null_default")]
     pub thinking_budget: i64,
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub reasoning_effort: String,
     #[serde(skip_serializing_if = "String::is_empty")]
-    #[serde(deserialize_with = "null_default")]
     pub text_verbosity: String,
     #[serde(skip_serializing_if = "Vec::is_empty")]
-    #[serde(deserialize_with = "null_default_elements")]
     pub stop_sequences: Vec<String>,
 }
 impl ModelSettings {

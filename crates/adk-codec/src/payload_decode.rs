@@ -1,7 +1,7 @@
 use crate::dto::*;
 use crate::go_decode::{ElementSeed, GoSlice, fold_key, go_object, normalize_strings, read_field};
 use crate::mode::ModeRoutingResolution;
-use crate::snapshots::{OutputSchema, ToolSnapshot};
+use crate::snapshots::{ModelSettings as SnapshotModelSettings, OutputSchema, ToolSnapshot};
 use serde::Deserialize;
 
 mod sealed {
@@ -179,6 +179,22 @@ impl sealed::Sealed for ToolApprovalData {
 }
 impl GoJsonDecode for ToolApprovalData {}
 impl GoJsonEncode for ToolApprovalData {}
+
+impl sealed::Sealed for SnapshotModelSettings {}
+impl GoJsonDecode for SnapshotModelSettings {}
+impl GoJsonEncode for SnapshotModelSettings {}
+
+go_object!(SnapshotModelSettings,
+    "temperature" => temperature: raw,
+    "max_tokens" => max_tokens: integer,
+    "top_p" => top_p: raw,
+    "tool_choice" => tool_choice: scalar,
+    "parallel_tool_calls" => parallel_tool_calls: raw,
+    "thinking_budget" => thinking_budget: integer,
+    "reasoning_effort" => reasoning_effort: scalar,
+    "text_verbosity" => text_verbosity: scalar;
+    "stop_sequences" => stop_sequences
+);
 
 impl sealed::Sealed for OutputSchema {
     const RAW_FIELD: Option<&'static str> = Some("schema");

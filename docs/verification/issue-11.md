@@ -2,6 +2,25 @@
 
 ## Current continuation evidence
 
+### Analysis snapshot settings decoding
+
+Fixed the separate analysis ModelSettings representation to accept folded keys,
+retain scalar values on null, reset nullable floats/bools on null and preserve
+repeated stop-array backing slots. The regression failed before the fix with
+`duplicate field stop_sequences`.276 new independently executed Go cases now
+compare decoded state, binary64 bits (including negative zero and subnormals)
+and exact encoded bytes. All1,629 preceding observations remain unchanged;
+the full payload oracle now has1,905 cases. The public facade regression passes.
+The nil-preserving DTO remains separate; analysis Vec collapses nil/empty stops.
+Enclosing RequestSnapshot compatibility is not claimed.
+
+Fresh Rust1.88 Linux: **1,769 all-feature workspace +10 doctests passed; 0 failed,
+30 ignored**. Complete codec suite, strict Clippy/typecheck/rustdoc/format, full
+facade matrix/standalone consumer/purity, all20 offline examples/host session,
+independent bound references, all56 validators, artifact/overlay/audit and source
+locks passed. No new acceptance claim was inferred from this auxiliary fix:
+**1,104 verified /7,787 unresolved /251 excluded**; full acceptance is incomplete.
+
 ### Snapshot schema and tool byte codecs
 
 Fixed folded-key and duplicate/null-update decoding for OutputSchema and

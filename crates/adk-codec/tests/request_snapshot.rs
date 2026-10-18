@@ -165,3 +165,13 @@ fn snapshot_schema_case_folded_null_updates_preserve_previous_values() {
     assert_eq!(schema.name, "first");
     assert!(schema.strict);
 }
+
+#[test]
+fn settings_folded_scalar_null_and_slice_reuse() {
+    let settings: adk_codec::snapshots::ModelSettings = serde_json::from_str(
+        r#"{"max_tokens":7,"MAX_TOKENS":null,"temperature":0.5,"TEMPERATURE":null,"stop_sequences":["a","b"],"STOP_SEQUENCES":[null],"stop_sequences":[null,null]}"#,
+    ).unwrap();
+    assert_eq!(settings.max_tokens, 7);
+    assert_eq!(settings.temperature, None);
+    assert_eq!(settings.stop_sequences, ["a", "b"]);
+}

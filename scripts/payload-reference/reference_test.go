@@ -5,6 +5,7 @@ import (
 	"encoding/hex"
 	"encoding/json"
 	"fmt"
+	"math"
 	"os"
 	"reflect"
 	"strconv"
@@ -16,6 +17,14 @@ var payloadRawType = reflect.TypeOf(json.RawMessage(nil))
 
 func payloadFields(v reflect.Value) any {
 	switch v.Kind() {
+	case reflect.Ptr:
+		if v.IsNil() {
+			return nil
+		}
+		if v.Type().Elem().Kind() == reflect.Float64 {
+			return fmt.Sprintf("%016x", math.Float64bits(v.Elem().Float()))
+		}
+		return v.Interface()
 	case reflect.Struct:
 		fields := map[string]any{}
 		for i := 0; i < v.NumField(); i++ {
@@ -52,6 +61,14 @@ func payloadSample(field reflect.StructField, populated bool) string {
 			return `"value <&>\u2028\u2029\n\"\\"`
 		}
 		return `""`
+	case reflect.Ptr:
+		if !populated {
+			return "null"
+		}
+		if field.Type.Elem().Kind() == reflect.Bool {
+			return "true"
+		}
+		return "0.125"
 	case reflect.Int:
 		if populated {
 			return "-7"
@@ -63,6 +80,12 @@ func payloadSample(field reflect.StructField, populated bool) string {
 		}
 		return `false`
 	case reflect.Slice:
+		if field.Type.Elem().Kind() == reflect.String {
+			if populated {
+				return `["first","tail"]`
+			}
+			return `[]`
+		}
 		if populated {
 			return `[{"media_type":"image/png","data":"AQI=","detail":"high"},{"media_type":"image/jpeg","data":"/w==","detail":"low"}]`
 		}
@@ -128,7 +151,7 @@ func TestNativePayloadReference(t *testing.T) {
 		})
 	}
 	types := []reflect.Type{
-		reflect.TypeOf(MessageOutput{}), reflect.TypeOf(ImageAttachment{}),
+		reflect.TypeOf(ModelSettings{}), reflect.TypeOf(MessageOutput{}), reflect.TypeOf(ImageAttachment{}),
 		reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolOutputData{}),
 		reflect.TypeOf(HandoffCallData{}), reflect.TypeOf(HandoffOutputData{}),
 		reflect.TypeOf(ReasoningData{}), reflect.TypeOf(CompactionData{}),
@@ -191,6 +214,18 @@ func TestNativePayloadReference(t *testing.T) {
 		}
 		add(typ, "unknown_invalid_utf8", "{\"unknown\":\""+string([]byte{0xff})+"\"}")
 		add(typ, "invalid_utf8_key", "{\""+string([]byte{0xff})+"\":true}")
+	}
+	for i, input := range []string{
+		`{"stop_sequences":["a","b"],"stop_sequences":[null],"stop_sequences":[null,null]}`,
+		`{"stop_sequences":["a","b"],"stop_sequences":[],"stop_sequences":[null,null]}`,
+		`{"stop_sequences":["a","b"],"stop_sequences":null,"stop_sequences":[null,null]}`,
+		`{"stop_sequences":["\ud800",null,"<&>"]}`,
+		`{"temperature":-0,"top_p":1e-7}`, `{"temperature":1e309}`, `{"top_p":-1e309}`,
+		`{"temperature":5e-324,"top_p":1.7976931348623157e308}`,
+		`{"temperature":1e-400,"top_p":-1e-400}`,
+		`{"temperature":0.1,"TEMPERATURE":null,"parallel_tool_calls":true,"PARALLEL_TOOL_CALLS":null}`,
+	} {
+		add(reflect.TypeOf(ModelSettings{}), fmt.Sprintf("settings_special_%02d", i), input)
 	}
 	for _, typ := range []reflect.Type{reflect.TypeOf(MessageOutput{}), reflect.TypeOf(ToolOutputData{})} {
 		for i, input := range []string{

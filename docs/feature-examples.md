@@ -196,3 +196,30 @@ using `adk::codec::policy` projections before exercising native fail-closed tool
 policy. This does not claim the separate live TestRunnerToolPolicyExample; see
 [execution security](execution-security.md#legacy-sdk-policy-projections) for the
 legacy-default/native-authorization distinction.
+
+## Original offline retry examples
+
+`errors_retries` now runs the original three assertions: provider advice retries
+one temporary failure and returns recovered after exactly two calls; an explicit
+one-retry policy with zero delay returns policy recovered; the standalone legacy
+default policy has three retries and attempt2 produces four seconds. Both model
+runs use a two-turn limit. These original examples use fakes too: live providers
+cannot deterministically inject their required failures.
+
+`adk::codec::retry::default_retry_policy()` and `RetryPolicy::delay_for_attempt`
+expose the standalone legacy arithmetic. The result is signed Go-duration
+nanoseconds, including pinned64-bit overflow behavior, not a safe sleep Duration.
+Rust Default constructs the source zero value; the explicit function constructs
+the SDK's suggested3/1000ms/30000ms/2x settings. Partial backoff normalization,
+uncapped first delay and fractional multiplier behavior are tested independently.
+These are value helpers, not a Go JSON codec or a native runner configuration
+adapter. In particular native RunnerConfig still defaults to zero policy retries;
+provider advice is a separate bounded retry mechanism. Native retry delays remain
+host-bounded and the native policy does not expose the legacy custom multiplier.
+
+Implement `Model::retry_advice` for provider-directed recovery. Set
+`RunnerConfig::retry` for policy retries, or `RunnerConfig::error_handler` with a
+`ModelErrorHandler` for Retry/Continue/Abort decisions. Native errors use
+`RunError.error.info.category` (including MaxTurns, Guardrail and DeadlineExceeded)
+and preserve partial run state, rather than Go errors.As concrete-type matching.
+The scenario additionally verifies that a cancelled run never invokes the model.

@@ -23941,6 +23941,321 @@
         "x86_64-unknown-linux-gnu",
         "runtime"
       ]
+    },
+    "SDK-3DE977D113E4367B": {
+      "source": "internal/agent/retry.go",
+      "source_name": "DefaultRetryPolicy",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record DefaultRetryPolicy.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-10F2124634C8317B": {
+      "source": "internal/agent/retry.go",
+      "source_name": "RetryBackoffSettings.InitialDelayMS",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record RetryBackoffSettings.InitialDelayMS.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-A564B6AEE0177B5B": {
+      "source": "internal/agent/retry.go",
+      "source_name": "RetryBackoffSettings.MaxDelayMS",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record RetryBackoffSettings.MaxDelayMS.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-1E545E82E7911B17": {
+      "source": "internal/agent/retry.go",
+      "source_name": "RetryBackoffSettings.Multiplier",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record RetryBackoffSettings.Multiplier.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-A4435504A2940934": {
+      "source": "internal/agent/retry.go",
+      "source_name": "RetryPolicy.Backoff",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record RetryPolicy.Backoff.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-B366D28FDD70780F": {
+      "source": "internal/agent/retry.go",
+      "source_name": "RetryPolicy.DelayForAttempt",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record RetryPolicy.DelayForAttempt.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-65743FD0C5A10DD7": {
+      "source": "internal/agent/retry.go",
+      "source_name": "RetryPolicy.MaxRetries",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed apis record RetryPolicy.MaxRetries.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-51E0EDFB26D03D12": {
+      "source": "internal/agent/retry.go",
+      "source_name": "DefaultRetryPolicy",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed configuration record DefaultRetryPolicy.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-58AECD83DBA0C0C0": {
+      "source": "internal/agent/retry.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed defaults record defaults:internal/agent/retry.go:497.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-7BAA2AFAA3538D4F": {
+      "source": "examples/features/errors_retries/errors_retries_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed examples record examples:examples/features/errors_retries/errors_retries_test.go.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-F14B6B253F17F4D8": {
+      "source": "examples/features/errors_retries/errors_retries_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestProviderRetryAdviceExample",
+      "rationale": "Reviewed subtests record subtests:examples/features/errors_retries/errors_retries_test.go:2553.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-E69522F40CA221FA": {
+      "source": "examples/features/errors_retries/errors_retries_test.go",
+      "source_name": null,
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestRunConfigRetryPolicyExample",
+      "rationale": "Reviewed subtests record subtests:examples/features/errors_retries/errors_retries_test.go:3784.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-D759865E5A4FCF5D": {
+      "source": "examples/features/errors_retries/errors_retries_test.go",
+      "source_name": "TestProviderRetryAdviceExample",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestProviderRetryAdviceExample",
+      "rationale": "Reviewed tests record TestProviderRetryAdviceExample.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-743A0D20EAB7DD13": {
+      "source": "examples/features/errors_retries/errors_retries_test.go",
+      "source_name": "TestRunConfigRetryPolicyExample",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestRunConfigRetryPolicyExample",
+      "rationale": "Reviewed tests record TestRunConfigRetryPolicyExample.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
+    },
+    "SDK-CC778CF471E152BB": {
+      "source": "examples/features/errors_retries/errors_retries_test.go",
+      "source_name": "TestStandaloneRetryPolicyExample",
+      "implementation_symbols": [
+        "crates/adk-codec/src/retry.rs::default_retry_policy",
+        "crates/adk-codec/src/retry.rs::RetryPolicy::delay_for_attempt",
+        "crates/adk/examples/features.rs::errors_retries"
+      ],
+      "rust_test_identifiers": [
+        "legacy_retry_backoff_matches_pinned_go",
+        "tests::original_errors_retries_examples"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/examples/features/errors_retries/TestStandaloneRetryPolicyExample",
+      "rationale": "Reviewed tests record TestStandaloneRetryPolicyExample.1890 independently executed pinned Go cases verify standalone signed64-bit delay arithmetic, partial settings, fractional/default/constant multipliers, NaN/infinities, caps and overflow; explicit SDK default3/1000ms/30000ms/2x and four-second attempt2 are compared. Original offline examples run in Go and Rust: provider-advice recovery after two calls, explicit one-retry zero-delay recovery, and standalone default assertions. Native runner remains zero policy retries by default; no automatic legacy policy installation or custom-multiplier runner parity is claimed. Raw nanoseconds are not safe sleep durations. Source subtest inventory rows are Run(context.Background()) expressions, not additional Go subtests. No whole-type/JSON wire or wider error/retry group closure claim.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat",
+        "runtime",
+        "builder"
+      ]
     }
   }
 }

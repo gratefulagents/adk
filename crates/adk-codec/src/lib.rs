@@ -14,6 +14,7 @@ pub mod policy;
 pub use payload_decode::{GoJsonDecode, GoJsonEncode, from_go_json, to_go_json_bytes};
 pub mod line_writer;
 pub mod request_native;
+pub mod retry;
 pub mod snapshots;
 mod state;
 pub mod timestamp;

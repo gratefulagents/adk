@@ -2,6 +2,31 @@
 
 ## Current continuation evidence
 
+### Standalone retry helpers and original offline examples
+
+Added explicit `adk::codec::retry` value helpers: the SDK suggested retry policy
+and zero-indexed backoff calculation with partial-setting normalization. Returns
+signed64-bit Go-duration nanoseconds, including overflow; it is not a safe sleep
+Duration or native execution adapter. Rust Default remains the source zero value;
+native RunnerConfig retains zero policy retries and host-bounded delays. Native
+custom-multiplier and Go JSON wire parity are not claimed.
+
+The original three offline examples now assert provider-advice recovery after two
+calls, explicit one-retry zero-delay recovery and default3/four-second attempt2.
+Independent pinned Go execution verifies1890 arithmetic cases spanning negative/
+zero/large values, fractions, NaN/infinities, caps and overflow. Fifteen precise
+API/default/configuration/example/test records are reviewed. Inventory subtest
+rows here are Run(context.Background()) expressions, not extra Go subtests.
+
+Fresh Rust1.88 Linux: **1,808 workspace +10 doctests +7 example tests passed;
+0 failed,30 ignored**. Strict all-target/all-feature lint/typecheck/docs/format,
+facade matrix/platform-free standalone consumer,20 scenarios/host session,
+source locks/purity and all56 ledger validators pass. Go reference:965 passing
+records,5 skips,47 packages. Ledger: **1,281 verified /7,610 unresolved /251
+excluded**. Full retained acceptance remains incomplete. Live provider and broader
+non-Linux evidence are not inferred from offline examples. Next examined gaps:
+original provider configuration and MCP snapshot/display-sanitization examples.
+
 ### Native ordinary-tool action authorization
 
 Added a host-owned ActionAuthorizer hook, exact fail-closed normalization/open

@@ -105,6 +105,7 @@ fn definition(name: &str, approval: bool) -> ToolDefinition {
 }
 
 struct Scripted {
+    retry_advice: Option<ModelRetryAdvice>,
     replies: Mutex<VecDeque<Result<ModelResponse, Error>>>,
     requests: Mutex<Vec<ModelRequest>>,
 }
@@ -114,12 +115,16 @@ impl Scripted {
     }
     fn results(replies: Vec<Result<ModelResponse, Error>>) -> Arc<Self> {
         Arc::new(Self {
+            retry_advice: None,
             replies: Mutex::new(replies.into()),
             requests: Mutex::new(vec![]),
         })
     }
 }
 impl Model for Scripted {
+    fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+        self.retry_advice.clone()
+    }
     fn provider(&self) -> &str {
         "offline"
     }
@@ -1484,19 +1489,50 @@ async fn tracestore() {
     }
 }
 async fn errors_retries() {
+    let legacy = adk::codec::retry::default_retry_policy();
+    assert_eq!(legacy.max_retries, 3);
+    assert_eq!(legacy.delay_for_attempt(2), 4_000_000_000);
+    assert_eq!(RunnerConfig::default().retry.max_retries, 0);
+    let mut advised = Scripted::results(vec![
+        Err(Error::new(
+            ErrorCategory::Provider,
+            "temporary provider outage",
+        )),
+        Ok(answer("recovered")),
+    ]);
+    Arc::get_mut(&mut advised).unwrap().retry_advice = Some(ModelRetryAdvice {
+        should_retry: true,
+        retry_after: Duration::ZERO,
+        reason: "temporary".into(),
+    });
+    let mut retry_request = request();
+    retry_request.input = vec![message(Role::User, "Try once, then recover.")];
+    retry_request.policy.max_turns = 2.try_into().unwrap();
+    let result = runner(agent(advised.clone()))
+        .run(
+            context(),
+            retry_request.clone(),
+            Arc::new(RecordingHost::default()),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("recovered")));
+    assert_eq!(advised.requests.lock().unwrap().len(), 2);
+    retry_request.input.clear();
     let model = Scripted::results(vec![
         Err(Error::new(ErrorCategory::Provider, "temporary")),
-        Ok(answer("recovered")),
+        Ok(answer("policy recovered")),
     ]);
     let mut config = RunnerConfig::default();
     config.retry.max_retries = 1;
     config.retry.initial_delay = Duration::ZERO;
+    config.retry.max_delay = Duration::ZERO;
     let result = Runner::new(agent(model.clone()), config)
         .unwrap()
-        .run(context(), request(), Arc::new(RecordingHost::default()))
+        .run(context(), retry_request, Arc::new(RecordingHost::default()))
         .await
         .unwrap();
-    assert_eq!(result.result.final_output, Some(json!("recovered")));
+    assert_eq!(result.result.final_output, Some(json!("policy recovered")));
     assert_eq!(model.requests.lock().unwrap().len(), 2);
     assert_eq!(result.result.responses.len(), 1);
     let token = CancellationToken::new();
@@ -1865,6 +1901,11 @@ async fn main() {
 
 #[cfg(test)]
 mod tests {
+    #[tokio::test]
+    async fn original_errors_retries_examples() {
+        super::errors_retries().await;
+    }
+
     #[tokio::test]
     async fn original_context_compaction_example() {
         super::context_compaction().await;

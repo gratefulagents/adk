@@ -18,7 +18,7 @@ def add_claimed_tests(claims, selected):
     """Only explicitly supported packages and exact top-level Go test names."""
     for claim in claims["claims"].values():
         reference = claim["reference_test"]
-        for package in ("examples/features/context_compaction", "examples/features/settings_routing", "examples/features/tools_registry", "examples/features/memory", "examples/features/tracestore", "examples/features/policy", "internal/agent/policy", "internal/agent/agents", "internal/agent", "internal/openai", "internal/modelactivity", "internal/anthropic"):
+        for package in ("examples/features/errors_retries", "examples/features/context_compaction", "examples/features/settings_routing", "examples/features/tools_registry", "examples/features/memory", "examples/features/tracestore", "examples/features/policy", "internal/agent/policy", "internal/agent/agents", "internal/agent", "internal/openai", "internal/modelactivity", "internal/anthropic"):
             prefix = "github.com/gratefulagents/sdk/" + package + "/"
             if reference.startswith(prefix):
                 name = reference[len(prefix):]

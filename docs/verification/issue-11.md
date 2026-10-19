@@ -2,6 +2,20 @@
 
 ## Current continuation evidence
 
+### Run-item snapshot helper projection evidence
+
+Twenty-five additional independent Go helper observations cover every known
+discriminant, negative and unknown kinds, absent payloads, all payload pointers
+present simultaneously, agent names and mixed ordered input. Native and minimal
+compat tests compare complete encoded output and nil state. Together with the
+38 raw-fallback cases and eight image-copy cases, these bind the internal helper
+and public alias to `snapshot_items` (two claims).
+
+The Rust result is explicitly owned: it does not expose Go's shallow backing-array
+aliases from copied tool-output structs. Memory/pointer identity is not claimed.
+Tool callbacks, request/response construction and complete trace capture remain
+separate unresolved capabilities.
+
 ### Snapshot helper raw fallback and empty results
 
 The public `snapshot_items` helper now returns `Option<Vec<RunItemSnapshot>>`,

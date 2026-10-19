@@ -25798,6 +25798,50 @@
         "x86_64-unknown-linux-gnu",
         "compat"
       ]
+    },
+    "SDK-C1A1C2A33A217479": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "SnapshotRunItems",
+      "implementation_symbols": [
+        "crates/adk-codec/src/lib.rs::snapshot_items",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "snapshot_item_projection_matches_pinned_go_all_discriminants",
+        "public_snapshot_helper_projects_all_discriminants",
+        "snapshot_helper_empty_results_match_pinned_go",
+        "snapshot_helper_raw_fallback_matches_pinned_go_without_mutating_input",
+        "public_snapshot_helper_preserves_nil_and_quotes_invalid_raw",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Owned Rust analysis projection of the complete pinned helper, exposed through the compat facade. Twenty-five direct Go observations cover nil/empty input, every known discriminant, negative/unknown discriminants, absent payloads, all payload pointers simultaneously populated, agent names, selection/omission and mixed ordered sequences. Tests compare nil state and exact complete output bytes. Eight image cases establish message-copy empty-to-nil versus tool-output state preservation. Thirty-eight direct raw helper cases establish missing/empty/valid/invalid input behavior, byte-string fallback (including malformed UTF8 versus genuine replacement runes), over-depth fallback and input nonmutation. Native output owns its records rather than exposing Go shallow backing-array aliases; memory/pointer identity is not a Rust capability claim. This does not close tool snapshot callbacks, request/response construction or full trace capture.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-DC4E4E17E170BA24": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "SnapshotRunItems",
+      "implementation_symbols": [
+        "crates/adk-codec/src/lib.rs::snapshot_items",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "snapshot_item_projection_matches_pinned_go_all_discriminants",
+        "public_snapshot_helper_projects_all_discriminants",
+        "snapshot_helper_empty_results_match_pinned_go",
+        "snapshot_helper_raw_fallback_matches_pinned_go_without_mutating_input",
+        "public_snapshot_helper_preserves_nil_and_quotes_invalid_raw",
+        "nullable_image_payloads_and_snapshot_projection_match_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/internal/agent/TestBuildLLMResponseSnapshotCapturesReasoningAndRaw",
+      "rationale": "Owned Rust analysis projection of the complete pinned helper, exposed through the compat facade. Twenty-five direct Go observations cover nil/empty input, every known discriminant, negative/unknown discriminants, absent payloads, all payload pointers simultaneously populated, agent names, selection/omission and mixed ordered sequences. Tests compare nil state and exact complete output bytes. Eight image cases establish message-copy empty-to-nil versus tool-output state preservation. Thirty-eight direct raw helper cases establish missing/empty/valid/invalid input behavior, byte-string fallback (including malformed UTF8 versus genuine replacement runes), over-depth fallback and input nonmutation. Native output owns its records rather than exposing Go shallow backing-array aliases; memory/pointer identity is not a Rust capability claim. This does not close tool snapshot callbacks, request/response construction or full trace capture.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

@@ -88,6 +88,33 @@ fn check_field_case<T: GoJsonDecode + GoJsonEncode>(
 }
 
 #[test]
+fn snapshot_item_projection_matches_pinned_go_all_discriminants() {
+    let fixture = fixture();
+    let cases = fixture["snapshot_item_projection_cases"]
+        .as_array()
+        .unwrap();
+    assert_eq!(cases.len(), 25);
+    for case in cases {
+        let items: Option<Vec<RunItem>> =
+            serde_json::from_str(case["input"].as_str().unwrap()).unwrap();
+        let output = adk_codec::snapshot_items(items.as_deref().unwrap_or_default());
+        assert_eq!(output.is_none(), case["output_nil"]);
+        let mut states = BTreeMap::from([("".into(), output.is_none())]);
+        item_slice_states("", output.as_deref().unwrap_or_default(), &mut states);
+        assert_eq!(
+            serde_json::to_value(states).unwrap(),
+            case["nil_slices"],
+            "{case}"
+        );
+        assert_eq!(
+            adk_codec::snapshots::to_go_json(&output).unwrap(),
+            unhex(case["encoded_hex"].as_str().unwrap()),
+            "{case}"
+        );
+    }
+}
+
+#[test]
 fn field_complete_envelopes_match_pinned_go_bytes_and_slice_state() {
     let fixture = fixture();
     let cases = fixture["envelope_field_cases"].as_array().unwrap();

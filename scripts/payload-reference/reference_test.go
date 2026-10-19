@@ -272,6 +272,43 @@ func runItemEncodeCases() []map[string]any {
 	return cases
 }
 
+func snapshotItemProjectionCases() []map[string]any {
+	typ := reflect.TypeOf(RunItem{})
+	var populated []string
+	populated = append(populated, `"Agent":{"Name":"agent <&>"}`)
+	for _, name := range []string{"Message", "ToolCall", "ToolOutput", "HandoffCall", "HandoffOutput", "Reasoning", "Compaction", "ToolApproval"} {
+		field, ok := typ.FieldByName(name)
+		if !ok {
+			panic(name)
+		}
+		populated = append(populated, strconv.Quote(name)+":"+payloadSample(field, true))
+	}
+	inputs := []string{`null`, `[]`}
+	var mixed []string
+	for _, kind := range []int{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 99} {
+		item := fmt.Sprintf(`{"Type":%d,%s}`, kind, strings.Join(populated, ","))
+		inputs = append(inputs, fmt.Sprintf(`[{"Type":%d}]`, kind), "["+item+"]")
+		mixed = append(mixed, item)
+	}
+	inputs = append(inputs, "["+strings.Join(mixed, ",")+"]")
+	var cases []map[string]any
+	for _, input := range inputs {
+		var items []RunItem
+		if err := json.Unmarshal([]byte(input), &items); err != nil {
+			panic(err)
+		}
+		output := SnapshotRunItems(items)
+		encoded, err := json.Marshal(output)
+		if err != nil {
+			panic(err)
+		}
+		states := map[string]bool{}
+		payloadSliceStates(reflect.ValueOf(output), "", states)
+		cases = append(cases, map[string]any{"input": input, "output_nil": output == nil, "encoded_hex": hex.EncodeToString(encoded), "nil_slices": states})
+	}
+	return cases
+}
+
 func snapshotRawHelperCases() []map[string]any {
 	values := []json.RawMessage{
 		nil, {}, json.RawMessage(`null`), json.RawMessage(`"text"`),
@@ -527,8 +564,9 @@ func TestNativePayloadReference(t *testing.T) {
 	result := map[string]any{
 		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
 		"run_item_byte_cases": runItemByteCases(), "run_item_encode_cases": runItemEncodeCases(),
-		"envelope_field_cases":      envelopeFieldCases(),
-		"snapshot_raw_helper_cases": snapshotRawHelperCases(),
+		"envelope_field_cases":           envelopeFieldCases(),
+		"snapshot_raw_helper_cases":      snapshotRawHelperCases(),
+		"snapshot_item_projection_cases": snapshotItemProjectionCases(),
 		"snapshot_empty_results": map[string]bool{
 			"nil_input_nil":   SnapshotRunItems(nil) == nil,
 			"empty_input_nil": SnapshotRunItems([]RunItem{}) == nil,

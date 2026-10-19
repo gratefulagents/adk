@@ -11,6 +11,27 @@ use adk::codec::{
 };
 
 #[test]
+fn public_snapshot_helper_projects_all_discriminants() {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let cases = fixture["snapshot_item_projection_cases"]
+        .as_array()
+        .unwrap();
+    assert_eq!(cases.len(), 25);
+    for case in cases {
+        let items: Option<Vec<adk::codec::dto::RunItem>> =
+            serde_json::from_str(case["input"].as_str().unwrap()).unwrap();
+        let output = adk::codec::snapshot_items(items.as_deref().unwrap_or_default());
+        assert_eq!(output.is_none(), case["output_nil"]);
+        assert_eq!(
+            adk::codec::snapshots::to_go_json(&output).unwrap(),
+            unhex(case["encoded_hex"].as_str().unwrap()),
+            "{case}"
+        );
+    }
+}
+
+#[test]
 fn public_snapshot_helper_preserves_nil_and_quotes_invalid_raw() {
     use adk::codec::dto::{RawJson, RunItem, RunItemType, ToolCallData};
     assert!(adk::codec::snapshot_items(&[]).is_none());

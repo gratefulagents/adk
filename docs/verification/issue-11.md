@@ -2,6 +2,23 @@
 
 ## Current continuation evidence
 
+### Complete request/response analysis data byte contracts
+
+An additional 522 independently generated Go observations enumerate every field
+of both analysis envelopes and include fully populated/zero records. Native Rust
+checks exact bytes and all nested slice nil states; the minimal standalone facade
+executes the same byte corpus. The existing 130 raw-preservation/decode cases and
+80 direct marshal cases independently cover original raw bytes, malformed UTF8,
+missing/empty/null, invalid syntax, nonmutation and depth boundaries.
+
+The two data declarations and their public aliases now have four explicit
+fresh-value byte-interface claims. This replaces the earlier serialization-only
+request-declaration rationale: lossless settings, nullable arrays, nested object
+backing state and structured raw transport have each been implemented and tested.
+The reusable builders, snapshot helper functions and full trace fallback/capture
+contracts remain separate work. No partial Go mutation state, pointer identity or
+error-text equivalence is claimed. This is not completion of issue #11.
+
 ### Complete run-item analysis record byte contract
 
 The pinned-Go run-item corpus grows from 40 to 421 decode/encode observations.

@@ -48,6 +48,16 @@ func payloadFields(v reflect.Value) any {
 	}
 }
 
+func payloadStructSample(typ reflect.Type, populated bool) string {
+	var fields []string
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		key := strings.Split(field.Tag.Get("json"), ",")[0]
+		fields = append(fields, strconv.Quote(key)+":"+payloadSample(field, populated))
+	}
+	return "{" + strings.Join(fields, ",") + "}"
+}
+
 func payloadSample(field reflect.StructField, populated bool) string {
 	if field.Type == payloadRawType {
 		if populated {
@@ -69,17 +79,12 @@ func payloadSample(field reflect.StructField, populated bool) string {
 			return "true"
 		}
 		if field.Type.Elem().Kind() == reflect.Struct {
-			var fields []string
-			typ := field.Type.Elem()
-			for i := 0; i < typ.NumField(); i++ {
-				nested := typ.Field(i)
-				key := strings.Split(nested.Tag.Get("json"), ",")[0]
-				fields = append(fields, strconv.Quote(key)+":"+payloadSample(nested, true))
-			}
-			return "{" + strings.Join(fields, ",") + "}"
+			return payloadStructSample(field.Type.Elem(), true)
 		}
 		return "0.125"
-	case reflect.Int:
+	case reflect.Struct:
+		return payloadStructSample(field.Type, populated)
+	case reflect.Int, reflect.Int64:
 		if populated {
 			return "-7"
 		}
@@ -97,12 +102,51 @@ func payloadSample(field reflect.StructField, populated bool) string {
 			return `[]`
 		}
 		if populated {
+			if field.Type.Elem().Name() != "ImageAttachment" {
+				item := payloadStructSample(field.Type.Elem(), true)
+				return "[" + item + "," + item + "]"
+			}
 			return `[{"media_type":"image/png","data":"AQI=","detail":"high"},{"media_type":"image/jpeg","data":"/w==","detail":"low"}]`
 		}
 		return `[]`
 	default:
 		panic(field.Type.String())
 	}
+}
+
+func snapshotFieldInputs(typ reflect.Type) []string {
+	var inputs []string
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		key := strings.Split(field.Tag.Get("json"), ",")[0]
+		quoted := strconv.Quote(key)
+		good := payloadSample(field, true)
+		for _, candidate := range []string{good, payloadSample(field, false), `null`, `42`, `1.5`, `true`, `"string"`, `{}`, `[]`} {
+			inputs = append(inputs, "{"+quoted+":"+candidate+"}", "{"+quoted+":"+candidate+","+quoted+":"+good+"}")
+		}
+		inputs = append(inputs,
+			"{"+strconv.Quote(strings.ToUpper(key))+":"+good+"}",
+			"{"+strconv.Quote(field.Name)+":"+good+"}",
+			"{"+quoted+":"+good+","+quoted+":null}",
+			"{"+quoted+":"+good+","+quoted+":"+payloadSample(field, false)+"}",
+		)
+		folded := strings.NewReplacer("k", "K", "s", "ſ").Replace(key)
+		inputs = append(inputs, "{"+strconv.Quote(folded)+":"+good+"}")
+		if field.Type.Kind() == reflect.Ptr && field.Type.Elem().Kind() == reflect.Struct {
+			first := strings.Split(field.Type.Elem().Field(0).Tag.Get("json"), ",")[0]
+			inputs = append(inputs,
+				"{"+quoted+":"+good+","+quoted+":{}}",
+				"{"+quoted+":"+good+","+quoted+":null,"+quoted+":{}}",
+				"{"+quoted+":"+good+","+quoted+":{"+strconv.Quote(first)+":null}}",
+			)
+		}
+		if field.Type.Kind() == reflect.String {
+			for _, candidate := range []string{`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, "\"\xff\"", "\"\xe2\x82\"", "\"\xed\xa0\x80\""} {
+				inputs = append(inputs, "{"+quoted+":"+candidate+"}")
+			}
+		}
+	}
+	return inputs
 }
 
 func runItemByteCases() []map[string]any {
@@ -127,37 +171,7 @@ func runItemByteCases() []map[string]any {
 			inputs = append(inputs, fmt.Sprintf(`{"%s":{"input":%s0%s}}`, field, strings.Repeat("[", depth), strings.Repeat("]", depth)))
 		}
 	}
-	typ := reflect.TypeOf(LLMRunItemSnapshot{})
-	for i := 0; i < typ.NumField(); i++ {
-		field := typ.Field(i)
-		key := strings.Split(field.Tag.Get("json"), ",")[0]
-		quoted := strconv.Quote(key)
-		good := payloadSample(field, true)
-		for _, candidate := range []string{good, payloadSample(field, false), `null`, `42`, `1.5`, `true`, `"string"`, `{}`, `[]`} {
-			inputs = append(inputs, "{"+quoted+":"+candidate+"}", "{"+quoted+":"+candidate+","+quoted+":"+good+"}")
-		}
-		inputs = append(inputs,
-			"{"+strconv.Quote(strings.ToUpper(key))+":"+good+"}",
-			"{"+strconv.Quote(field.Name)+":"+good+"}",
-			"{"+quoted+":"+good+","+quoted+":null}",
-			"{"+quoted+":"+good+","+quoted+":"+payloadSample(field, false)+"}",
-		)
-		folded := strings.NewReplacer("k", "K", "s", "ſ").Replace(key)
-		inputs = append(inputs, "{"+strconv.Quote(folded)+":"+good+"}")
-		if field.Type.Kind() == reflect.Ptr {
-			first := strings.Split(field.Type.Elem().Field(0).Tag.Get("json"), ",")[0]
-			inputs = append(inputs,
-				"{"+quoted+":"+good+","+quoted+":{}}",
-				"{"+quoted+":"+good+","+quoted+":null,"+quoted+":{}}",
-				"{"+quoted+":"+good+","+quoted+":{"+strconv.Quote(first)+":null}}",
-			)
-		}
-		if field.Type.Kind() == reflect.String {
-			for _, candidate := range []string{`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, "\"\xff\"", "\"\xe2\x82\"", "\"\xed\xa0\x80\""} {
-				inputs = append(inputs, "{"+quoted+":"+candidate+"}")
-			}
-		}
-	}
+	inputs = append(inputs, snapshotFieldInputs(reflect.TypeOf(LLMRunItemSnapshot{}))...)
 	inputs = append(inputs,
 		`{"tool_approval":{"input":{"n":1e9999}},"tool_call":{"input":{"n":-0}},"TOOL_APPROVAL":{"approved":true},"TOOL_CALL":{"name":"tool"}}`,
 		"{\"tool_call\":{\"input\":\"\xff\"},\"tool_approval\":{\"input\":\"\xed\xa0\x80\"}}",
@@ -186,6 +200,53 @@ func runItemByteCases() []map[string]any {
 			}
 		}
 		cases = append(cases, row)
+	}
+	return cases
+}
+
+func payloadSliceStates(v reflect.Value, path string, states map[string]bool) {
+	if v.Type() == payloadRawType {
+		return
+	}
+	switch v.Kind() {
+	case reflect.Ptr:
+		if !v.IsNil() {
+			payloadSliceStates(v.Elem(), path, states)
+		}
+	case reflect.Struct:
+		for i := 0; i < v.NumField(); i++ {
+			key := strings.Split(v.Type().Field(i).Tag.Get("json"), ",")[0]
+			if path != "" {
+				key = path + "/" + key
+			}
+			payloadSliceStates(v.Field(i), key, states)
+		}
+	case reflect.Slice:
+		states[path] = v.IsNil()
+		for i := 0; i < v.Len(); i++ {
+			payloadSliceStates(v.Index(i), fmt.Sprintf("%s/%d", path, i), states)
+		}
+	}
+}
+
+func envelopeFieldCases() []map[string]any {
+	var cases []map[string]any
+	for _, typ := range []reflect.Type{reflect.TypeOf(LLMRequestSnapshot{}), reflect.TypeOf(LLMResponseSnapshot{})} {
+		inputs := append([]string{`{}`, `null`, `[]`, `false`, payloadStructSample(typ, true), payloadStructSample(typ, false)}, snapshotFieldInputs(typ)...)
+		for _, input := range inputs {
+			value := reflect.New(typ)
+			err := json.Unmarshal([]byte(input), value.Interface())
+			row := map[string]any{"type": typ.Name(), "input_hex": hex.EncodeToString([]byte(input)), "decode_ok": err == nil}
+			if err == nil {
+				encoded, marshalErr := json.Marshal(value.Interface())
+				row["marshal_ok"] = marshalErr == nil
+				row["marshal_hex"] = hex.EncodeToString(encoded)
+				states := map[string]bool{}
+				payloadSliceStates(value.Elem(), "", states)
+				row["nil_slices"] = states
+			}
+			cases = append(cases, row)
+		}
 	}
 	return cases
 }
@@ -425,7 +486,8 @@ func TestNativePayloadReference(t *testing.T) {
 	result := map[string]any{
 		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
 		"run_item_byte_cases": runItemByteCases(), "run_item_encode_cases": runItemEncodeCases(),
-		"envelope_byte_cases": snapshotEnvelopeCases(), "envelope_encode_cases": snapshotEnvelopeEncodeCases(),
+		"envelope_field_cases": envelopeFieldCases(),
+		"envelope_byte_cases":  snapshotEnvelopeCases(), "envelope_encode_cases": snapshotEnvelopeEncodeCases(),
 		"enum_values": map[string]RunItemType{
 			"RunItemMessage": RunItemMessage, "RunItemToolCall": RunItemToolCall,
 			"RunItemToolOutput": RunItemToolOutput, "RunItemHandoffCall": RunItemHandoffCall,

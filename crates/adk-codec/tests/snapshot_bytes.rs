@@ -17,6 +17,90 @@ fn unhex(text: &str) -> Vec<u8> {
 fn fixture() -> Value {
     serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap()
 }
+fn item_slice_states(prefix: &str, items: &[RunItemSnapshot], states: &mut BTreeMap<String, bool>) {
+    for (index, item) in items.iter().enumerate() {
+        states.insert(
+            format!("{prefix}/{index}/message_images"),
+            item.message_images.is_none(),
+        );
+        if let Some(output) = &item.tool_output {
+            states.insert(
+                format!("{prefix}/{index}/tool_output/images"),
+                output.images.is_none(),
+            );
+        }
+    }
+}
+fn request_slice_states(item: &RequestSnapshot) -> BTreeMap<String, bool> {
+    let mut states = BTreeMap::from([
+        ("input_items".into(), item.input_items.is_none()),
+        ("tools".into(), item.tools.is_none()),
+        (
+            "settings/stop_sequences".into(),
+            item.settings.stop_sequences.is_none(),
+        ),
+    ]);
+    item_slice_states(
+        "input_items",
+        item.input_items.as_deref().unwrap_or_default(),
+        &mut states,
+    );
+    states
+}
+fn response_slice_states(item: &ResponseSnapshot) -> BTreeMap<String, bool> {
+    let mut states = BTreeMap::from([
+        ("items".into(), item.items.is_none()),
+        ("texts".into(), item.texts.is_none()),
+        ("reasoning".into(), item.reasoning.is_none()),
+        ("reasoning_texts".into(), item.reasoning_texts.is_none()),
+        ("thinking_texts".into(), item.thinking_texts.is_none()),
+        ("tool_calls".into(), item.tool_calls.is_none()),
+    ]);
+    item_slice_states(
+        "items",
+        item.items.as_deref().unwrap_or_default(),
+        &mut states,
+    );
+    states
+}
+fn check_field_case<T: GoJsonDecode + GoJsonEncode>(
+    case: &Value,
+    states: fn(&T) -> BTreeMap<String, bool>,
+) {
+    let decoded = from_go_json::<T>(&unhex(case["input_hex"].as_str().unwrap()));
+    assert_eq!(decoded.is_ok(), case["decode_ok"], "{case}");
+    if let Ok(item) = decoded {
+        assert_eq!(
+            serde_json::to_value(states(&item)).unwrap(),
+            case["nil_slices"],
+            "{case}"
+        );
+        let encoded = to_go_json_bytes(&item);
+        assert_eq!(encoded.is_ok(), case["marshal_ok"], "{case}");
+        if let Ok(encoded) = encoded {
+            assert_eq!(
+                encoded,
+                unhex(case["marshal_hex"].as_str().unwrap()),
+                "{case}"
+            );
+        }
+    }
+}
+
+#[test]
+fn field_complete_envelopes_match_pinned_go_bytes_and_slice_state() {
+    let fixture = fixture();
+    let cases = fixture["envelope_field_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 522);
+    for case in cases {
+        match case["type"].as_str().unwrap() {
+            "LLMRequestSnapshot" => check_field_case(case, request_slice_states),
+            "LLMResponseSnapshot" => check_field_case(case, response_slice_states),
+            other => panic!("unexpected envelope {other}"),
+        }
+    }
+}
+
 fn item_raw(prefix: &str, items: &[RunItemSnapshot], raw: &mut BTreeMap<String, RawJson>) {
     for (i, item) in items.iter().enumerate() {
         if let Some(call) = &item.tool_call {

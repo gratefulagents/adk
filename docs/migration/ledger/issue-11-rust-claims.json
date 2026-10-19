@@ -25704,6 +25704,100 @@
       ],
       "source": "pkg/agentsdk/aliases.go",
       "source_name": "LLMRunItemSnapshot"
+    },
+    "SDK-41DC0B1C66C9BF51": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMRequestSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot",
+        "crates/adk-codec/src/payload_decode/snapshot_bytes.rs::Document"
+      ],
+      "rust_test_identifiers": [
+        "field_complete_envelopes_match_pinned_go_bytes_and_slice_state",
+        "public_field_complete_envelopes_match_pinned_go",
+        "envelope_byte_decoding_matches_go_without_mutating_raw",
+        "envelope_direct_raw_encoding_matches_go_depth_and_omission",
+        "public_request_response_snapshot_bytes_match_pinned_go",
+        "public_snapshot_slice_state_matches_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete analysis data declaration and public compat mapping through the sealed fresh-value byte API, not serialization-only evidence. Independent immutable-Go reflection enumerates every field in522 request/response cases, including populated and zero entire records, folded/duplicate/null fields, wrong-type overwritten errors, typed-string replacement, all pointer states and all nested slice nil states. Additional130 envelope byte cases assert original raw bytes, rejection and nonmutation;80 direct marshal cases exercise missing/empty/null, invalid syntax, malformed UTF8 and raw depth independent of document depth. Native and minimal standalone facade tests compare exact bytes; shared lossless ModelSettings and nullable image/snapshot arrays avoid earlier representation gaps, with retained nested slice state covered by request records. No automatic snapshot construction, executable callback behavior, full trace capture/fallback, Go error text or partial mutation/pointer identity is inferred. These functions have separate unresolved acceptance IDs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-573B91B74B37C1C3": {
+      "source": "internal/agent/llm_snapshot.go",
+      "source_name": "LLMResponseSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot",
+        "crates/adk-codec/src/payload_decode/snapshot_bytes.rs::Document"
+      ],
+      "rust_test_identifiers": [
+        "field_complete_envelopes_match_pinned_go_bytes_and_slice_state",
+        "public_field_complete_envelopes_match_pinned_go",
+        "envelope_byte_decoding_matches_go_without_mutating_raw",
+        "envelope_direct_raw_encoding_matches_go_depth_and_omission",
+        "public_request_response_snapshot_bytes_match_pinned_go",
+        "public_snapshot_slice_state_matches_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete analysis data declaration and public compat mapping through the sealed fresh-value byte API, not serialization-only evidence. Independent immutable-Go reflection enumerates every field in522 request/response cases, including populated and zero entire records, folded/duplicate/null fields, wrong-type overwritten errors, typed-string replacement, all pointer states and all nested slice nil states. Additional130 envelope byte cases assert original raw bytes, rejection and nonmutation;80 direct marshal cases exercise missing/empty/null, invalid syntax, malformed UTF8 and raw depth independent of document depth. Native and minimal standalone facade tests compare exact bytes; shared lossless ModelSettings and nullable image/snapshot arrays avoid earlier representation gaps, with retained nested slice state covered by request records. No automatic snapshot construction, executable callback behavior, full trace capture/fallback, Go error text or partial mutation/pointer identity is inferred. These functions have separate unresolved acceptance IDs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-10E200B5FAD0D023": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMRequestSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/snapshots.rs::RequestSnapshot",
+        "crates/adk-codec/src/payload_decode/snapshot_bytes.rs::Document",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "field_complete_envelopes_match_pinned_go_bytes_and_slice_state",
+        "public_field_complete_envelopes_match_pinned_go",
+        "envelope_byte_decoding_matches_go_without_mutating_raw",
+        "envelope_direct_raw_encoding_matches_go_depth_and_omission",
+        "public_request_response_snapshot_bytes_match_pinned_go",
+        "public_snapshot_slice_state_matches_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete analysis data declaration and public compat mapping through the sealed fresh-value byte API, not serialization-only evidence. Independent immutable-Go reflection enumerates every field in522 request/response cases, including populated and zero entire records, folded/duplicate/null fields, wrong-type overwritten errors, typed-string replacement, all pointer states and all nested slice nil states. Additional130 envelope byte cases assert original raw bytes, rejection and nonmutation;80 direct marshal cases exercise missing/empty/null, invalid syntax, malformed UTF8 and raw depth independent of document depth. Native and minimal standalone facade tests compare exact bytes; shared lossless ModelSettings and nullable image/snapshot arrays avoid earlier representation gaps, with retained nested slice state covered by request records. No automatic snapshot construction, executable callback behavior, full trace capture/fallback, Go error text or partial mutation/pointer identity is inferred. These functions have separate unresolved acceptance IDs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
+    },
+    "SDK-6F5725B80171405D": {
+      "source": "pkg/agentsdk/aliases.go",
+      "source_name": "LLMResponseSnapshot",
+      "implementation_symbols": [
+        "crates/adk-codec/src/dto.rs::ResponseSnapshot",
+        "crates/adk-codec/src/payload_decode/snapshot_bytes.rs::Document",
+        "crates/adk/src/lib.rs::codec"
+      ],
+      "rust_test_identifiers": [
+        "field_complete_envelopes_match_pinned_go_bytes_and_slice_state",
+        "public_field_complete_envelopes_match_pinned_go",
+        "envelope_byte_decoding_matches_go_without_mutating_raw",
+        "envelope_direct_raw_encoding_matches_go_depth_and_omission",
+        "public_request_response_snapshot_bytes_match_pinned_go",
+        "public_snapshot_slice_state_matches_pinned_go",
+        "request_snapshot_field_records_match_independent_pinned_go"
+      ],
+      "reference_test": "github.com/gratefulagents/sdk/pkg/agentsdk/tracestore/TestTraceWriterMirrorsGenerationSnapshotsToLLMCalls",
+      "rationale": "Complete analysis data declaration and public compat mapping through the sealed fresh-value byte API, not serialization-only evidence. Independent immutable-Go reflection enumerates every field in522 request/response cases, including populated and zero entire records, folded/duplicate/null fields, wrong-type overwritten errors, typed-string replacement, all pointer states and all nested slice nil states. Additional130 envelope byte cases assert original raw bytes, rejection and nonmutation;80 direct marshal cases exercise missing/empty/null, invalid syntax, malformed UTF8 and raw depth independent of document depth. Native and minimal standalone facade tests compare exact bytes; shared lossless ModelSettings and nullable image/snapshot arrays avoid earlier representation gaps, with retained nested slice state covered by request records. No automatic snapshot construction, executable callback behavior, full trace capture/fallback, Go error text or partial mutation/pointer identity is inferred. These functions have separate unresolved acceptance IDs.",
+      "target_features": [
+        "x86_64-unknown-linux-gnu",
+        "compat"
+      ]
     }
   }
 }

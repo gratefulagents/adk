@@ -11,6 +11,38 @@ use adk::codec::{
 };
 
 #[test]
+fn public_field_complete_envelopes_match_pinned_go() {
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let cases = fixture["envelope_field_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 522);
+    for case in cases {
+        let input = unhex(case["input_hex"].as_str().unwrap());
+        let result = match case["type"].as_str().unwrap() {
+            "LLMRequestSnapshot" => {
+                from_go_json::<RequestSnapshot>(&input).and_then(|item| to_go_json_bytes(&item))
+            }
+            "LLMResponseSnapshot" => {
+                from_go_json::<ResponseSnapshot>(&input).and_then(|item| to_go_json_bytes(&item))
+            }
+            other => panic!("unexpected envelope {other}"),
+        };
+        assert_eq!(
+            result.is_ok(),
+            case["decode_ok"] == true && case["marshal_ok"] == true,
+            "{case}"
+        );
+        if let Ok(encoded) = result {
+            assert_eq!(
+                encoded,
+                unhex(case["marshal_hex"].as_str().unwrap()),
+                "{case}"
+            );
+        }
+    }
+}
+
+#[test]
 fn public_snapshot_slice_state_matches_pinned_go() {
     use serde_json::{Value, json};
     let fixture: Value =

@@ -31,6 +31,7 @@ fn message(text: &str) -> RunItem {
 }
 fn call(id: &str) -> ToolCall {
     ToolCall {
+        raw_arguments: None,
         id: id.into(),
         name: id.into(),
         arguments: json!({}),
@@ -54,6 +55,9 @@ fn result_item(id: &str) -> RunItem {
 }
 fn response(items: Vec<RunItem>) -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items,
         usage: Usage::default(),
         end_turn: None,
@@ -63,6 +67,7 @@ fn response(items: Vec<RunItem>) -> ModelResponse {
 }
 fn request(turns: u32) -> RunRequest {
     RunRequest {
+        input_provenance: Vec::new(),
         input: vec![],
         policy: RunPolicy {
             max_turns: NonZeroU32::new(turns).unwrap(),
@@ -107,12 +112,14 @@ fn agent(replies: Vec<ModelResponse>) -> AgentConfig {
     )
 }
 struct ToolFake {
+    pause: bool,
     definition: ToolDefinition,
     log: Log,
 }
 impl ToolFake {
     fn new(name: &str, approval: bool, log: &Log) -> Arc<Self> {
         Arc::new(Self {
+            pause: false,
             definition: ToolDefinition {
                 name: name.into(),
                 description: name.into(),
@@ -135,7 +142,9 @@ impl Tool for ToolFake {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             self.log.lock().unwrap().push(format!("tool:{}", call.id));
-            Ok(output(&format!("raw {}", call.id)))
+            let mut output = output(&format!("raw {}", call.id));
+            output.should_pause = self.pause;
+            Ok(output)
         })
     }
 }
@@ -858,4 +867,456 @@ async fn model_end_callback_requires_clean_stream_eof() {
             !fail_after_complete
         );
     }
+}
+
+struct DeferredApprovalHost;
+impl Host for DeferredApprovalHost {
+    fn emit<'a>(&'a self, _: &'a Context, _: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async { Ok(()) })
+    }
+    fn approve<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ApprovalRequest,
+    ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+        Box::pin(async { Ok(ApprovalDecision::Defer) })
+    }
+}
+
+#[derive(Default)]
+struct ApprovalBoundaryProbe {
+    log: Log,
+    commits: Mutex<Vec<RunResult>>,
+    fail_commit: bool,
+    fail_publish: bool,
+    fail_tool: Option<(&'static str, bool)>,
+    release: Option<Arc<tokio::sync::Notify>>,
+}
+impl RunHooks for ApprovalBoundaryProbe {
+    fn durable_observer(&self) -> bool {
+        true
+    }
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        observation: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            match observation {
+                Observation::CommittedItems { items, markers, .. } => {
+                    self.log.lock().unwrap().push(format!(
+                        "publish:{}:{}",
+                        items.len(),
+                        markers.len()
+                    ));
+                    if self.fail_publish
+                        && markers
+                            .iter()
+                            .any(|marker| marker.marker.phase != ApprovalPhase::Pending)
+                    {
+                        return Err(Error::new(ErrorCategory::Host, "publication failed"));
+                    }
+                }
+                Observation::ModelAttempt { .. } => {
+                    self.log.lock().unwrap().push("model".into());
+                }
+                Observation::ToolStarted { call, .. }
+                    if self.fail_tool == Some((call.id.as_str(), false)) =>
+                {
+                    return Err(Error::new(ErrorCategory::Host, "tool start failed"));
+                }
+                Observation::RawToolOutput { call, .. }
+                    if self.fail_tool == Some((call.id.as_str(), true)) =>
+                {
+                    return Err(Error::new(ErrorCategory::Host, "tool output failed"));
+                }
+                _ => {}
+            }
+            Ok(())
+        })
+    }
+}
+impl GoApprovalBoundary for ApprovalBoundaryProbe {
+    fn commit<'a>(
+        &'a self,
+        _: &'a Context,
+        result: &'a RunResult,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            self.log.lock().unwrap().push("commit:start".into());
+            self.commits.lock().unwrap().push(result.clone());
+            if let Some(release) = &self.release {
+                release.notified().await;
+            }
+            if self.fail_commit {
+                return Err(Error::new(
+                    ErrorCategory::Host,
+                    "append approval items failed",
+                ));
+            }
+            self.log.lock().unwrap().push("commit:end".into());
+            Ok(())
+        })
+    }
+}
+
+async fn approval_continuation(
+    probe: &Arc<ApprovalBoundaryProbe>,
+    pause: bool,
+    durable: bool,
+) -> Continuation {
+    let mut agent = agent(vec![
+        response(vec![
+            call_item("first"),
+            call_item("free"),
+            call_item("second"),
+        ]),
+        response(vec![message("done")]),
+    ]);
+    let mut first = ToolFake::new("first", true, &probe.log);
+    Arc::get_mut(&mut first).unwrap().pause = pause;
+    agent.tools = vec![
+        first,
+        ToolFake::new("free", false, &probe.log),
+        ToolFake::new("second", true, &probe.log),
+    ];
+    let runner = Runner::new(
+        agent,
+        RunnerConfig {
+            hooks: Some(probe.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let outcome = if durable {
+        runner
+            .run_durable(
+                context(),
+                request(1),
+                Arc::new(DeferredApprovalHost),
+                DurableRun::new(Arc::new(BoundaryStore)),
+            )
+            .await
+    } else {
+        runner
+            .run(context(), request(1), Arc::new(DeferredApprovalHost))
+            .await
+    }
+    .unwrap();
+    assert_eq!(
+        outcome.result.pending_approvals.len(),
+        if durable { 1 } else { 2 }
+    );
+    assert_eq!(
+        probe
+            .log
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|s| *s == "tool:free")
+            .count(),
+        usize::from(!durable)
+    );
+    probe.log.lock().unwrap().clear();
+    outcome.continuation.unwrap()
+}
+
+#[tokio::test]
+async fn approval_boundary_is_awaited_after_all_approvals_before_model_without_replay() {
+    let release = Arc::new(tokio::sync::Notify::new());
+    let probe = Arc::new(ApprovalBoundaryProbe {
+        release: Some(release.clone()),
+        ..Default::default()
+    });
+    let continuation = approval_continuation(&probe, false, false).await;
+    let gate = Gate {
+        log: probe.log.clone(),
+        decisions: Mutex::new(vec![approve(), approve()].into()),
+    };
+    let resume = continuation.resume_go_gate_with_boundary(&gate, probe.as_ref());
+    tokio::pin!(resume);
+    tokio::select! {
+        biased;
+        _ = &mut resume => panic!("resume must wait for persistence"),
+        _ = tokio::task::yield_now() => {}
+    }
+    assert_eq!(
+        *probe.log.lock().unwrap(),
+        [
+            "gate:first",
+            "tool:first",
+            "gate:second",
+            "tool:second",
+            "publish:2:2",
+            "commit:start"
+        ]
+    );
+    release.notify_one();
+    let outcome = resume.await.unwrap();
+    assert_eq!(outcome.result.status, RunStatus::Completed);
+    assert_eq!(outcome.result.final_output, Some(json!("done")));
+    assert_eq!(
+        *probe.log.lock().unwrap(),
+        [
+            "gate:first",
+            "tool:first",
+            "gate:second",
+            "tool:second",
+            "publish:2:2",
+            "commit:start",
+            "commit:end",
+            "model",
+            "publish:1:0"
+        ]
+    );
+    let commits = probe.commits.lock().unwrap();
+    assert_eq!(commits.len(), 1);
+    assert!(commits[0].pending_approvals.is_empty());
+    assert_eq!(commits[0].new_items.len(), 6);
+    assert_eq!(outcome.result.new_items.len(), 7);
+}
+
+#[tokio::test]
+async fn approval_boundary_commits_partial_gate_failure_and_append_error_takes_precedence() {
+    for fail_at in [0, 1] {
+        for fail_commit in [false, true] {
+            let probe = Arc::new(ApprovalBoundaryProbe {
+                fail_commit,
+                ..Default::default()
+            });
+            let continuation = approval_continuation(&probe, false, false).await;
+            let mut decisions = VecDeque::new();
+            if fail_at == 1 {
+                decisions.push_back(approve());
+            }
+            decisions.push_back(Err(Error::new(ErrorCategory::Host, "gate offline")));
+            let gate = Gate {
+                log: probe.log.clone(),
+                decisions: Mutex::new(decisions),
+            };
+            let error = continuation
+                .resume_go_gate_with_boundary(&gate, probe.as_ref())
+                .await
+                .err()
+                .unwrap();
+            assert_eq!(
+                error.error.info.message,
+                if fail_at == 1 && fail_commit {
+                    "append approval items failed"
+                } else {
+                    "gate offline"
+                }
+            );
+            let partial = error.partial.unwrap();
+            assert_eq!(partial.status, RunStatus::Incomplete);
+            assert_eq!(partial.new_items.len(), 4 + fail_at);
+            assert_eq!(probe.commits.lock().unwrap().len(), fail_at);
+            let mut expected = vec!["gate:first"];
+            if fail_at == 1 {
+                expected.extend(["tool:first", "gate:second", "publish:1:1", "commit:start"]);
+                if !fail_commit {
+                    expected.push("commit:end");
+                }
+            }
+            assert_eq!(*probe.log.lock().unwrap(), expected);
+        }
+    }
+}
+
+#[tokio::test]
+async fn approval_boundary_commits_tool_failures_including_marker_only_work() {
+    for after_output in [false, true] {
+        for fail_commit in [false, true] {
+            let probe = Arc::new(ApprovalBoundaryProbe {
+                fail_tool: Some(("first", after_output)),
+                fail_commit,
+                ..Default::default()
+            });
+            let continuation = approval_continuation(&probe, false, false).await;
+            let gate = Gate {
+                log: probe.log.clone(),
+                decisions: Mutex::new(vec![approve()].into()),
+            };
+            let error = continuation
+                .resume_go_gate_with_boundary(&gate, probe.as_ref())
+                .await
+                .err()
+                .unwrap();
+            assert_eq!(
+                error.error.info.message,
+                if fail_commit {
+                    "append approval items failed"
+                } else if after_output {
+                    "tool output failed"
+                } else {
+                    "tool start failed"
+                }
+            );
+            let partial = error.partial.unwrap();
+            assert_eq!(partial.status, RunStatus::Incomplete);
+            assert_eq!(partial.new_items.len(), 4 + usize::from(after_output));
+            let mut expected = vec!["gate:first"];
+            if after_output {
+                expected.push("tool:first");
+            }
+            expected.extend([
+                if after_output {
+                    "publish:1:1"
+                } else {
+                    "publish:0:1"
+                },
+                "commit:start",
+            ]);
+            if !fail_commit {
+                expected.push("commit:end");
+            }
+            assert_eq!(*probe.log.lock().unwrap(), expected);
+            let commits = probe.commits.lock().unwrap();
+            assert_eq!(commits.len(), 1);
+            assert_eq!(commits[0].new_items, partial.new_items);
+        }
+    }
+}
+
+#[tokio::test]
+async fn approval_boundary_failure_prevents_next_model_and_effects() {
+    let probe = Arc::new(ApprovalBoundaryProbe {
+        fail_commit: true,
+        ..Default::default()
+    });
+    let continuation = approval_continuation(&probe, false, false).await;
+    let gate = Gate {
+        log: probe.log.clone(),
+        decisions: Mutex::new(vec![approve(), approve()].into()),
+    };
+    let error = continuation
+        .resume_go_gate_with_boundary(&gate, probe.as_ref())
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.message, "append approval items failed");
+    let partial = error.partial.unwrap();
+    assert_eq!(partial.status, RunStatus::Incomplete);
+    assert!(partial.pending_approvals.is_empty());
+    assert_eq!(partial.new_items.len(), 6);
+    assert_eq!(
+        *probe.log.lock().unwrap(),
+        [
+            "gate:first",
+            "tool:first",
+            "gate:second",
+            "tool:second",
+            "publish:2:2",
+            "commit:start"
+        ]
+    );
+}
+
+#[tokio::test]
+async fn approval_boundary_precedes_tool_pause_and_native_resume_does_not_replay() {
+    let probe = Arc::new(ApprovalBoundaryProbe::default());
+    let continuation = approval_continuation(&probe, true, false).await;
+    let gate = Gate {
+        log: probe.log.clone(),
+        decisions: Mutex::new(vec![approve(), approve()].into()),
+    };
+    let paused = continuation
+        .resume_go_gate_with_boundary(&gate, probe.as_ref())
+        .await
+        .unwrap();
+    assert_eq!(paused.result.status, RunStatus::Paused);
+    assert!(paused.result.pending_approvals.is_empty());
+    assert_eq!(
+        *probe.log.lock().unwrap(),
+        [
+            "gate:first",
+            "tool:first",
+            "gate:second",
+            "tool:second",
+            "publish:2:2",
+            "commit:start",
+            "commit:end"
+        ]
+    );
+    probe.log.lock().unwrap().clear();
+    let outcome = paused.continuation.unwrap().resume(None).await.unwrap();
+    assert_eq!(outcome.result.status, RunStatus::Completed);
+    assert_eq!(*probe.log.lock().unwrap(), ["model", "publish:1:0"]);
+    assert_eq!(probe.commits.lock().unwrap().len(), 1);
+}
+
+struct BoundaryStore;
+impl CheckpointStore for BoundaryStore {
+    fn persist<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a RunnerCheckpoint,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async { Ok(()) })
+    }
+}
+
+#[tokio::test]
+async fn approval_boundary_persists_resolved_work_even_when_publication_fails() {
+    for fail_commit in [false, true] {
+        let probe = Arc::new(ApprovalBoundaryProbe {
+            fail_publish: true,
+            fail_commit,
+            ..Default::default()
+        });
+        let continuation = approval_continuation(&probe, false, false).await;
+        let gate = Gate {
+            log: probe.log.clone(),
+            decisions: Mutex::new(
+                vec![
+                    approve(),
+                    Err(Error::new(ErrorCategory::Host, "gate offline")),
+                ]
+                .into(),
+            ),
+        };
+        let error = continuation
+            .resume_go_gate_with_boundary(&gate, probe.as_ref())
+            .await
+            .err()
+            .unwrap();
+        assert_eq!(
+            error.error.info.message,
+            if fail_commit {
+                "append approval items failed"
+            } else {
+                "publication failed"
+            }
+        );
+        let commits = probe.commits.lock().unwrap();
+        assert_eq!(commits.len(), 1);
+        assert_eq!(commits[0].new_items.len(), 5);
+        assert_eq!(commits[0].pending_approvals.len(), 1);
+        let log = probe.log.lock().unwrap();
+        assert!(log.iter().any(|entry| entry == "tool:first"));
+        assert!(log.iter().any(|entry| entry == "commit:start"));
+        assert!(
+            !log.iter()
+                .any(|entry| entry == "model" || entry == "tool:second")
+        );
+    }
+}
+
+#[tokio::test]
+async fn durable_approval_boundary_is_rejected_before_resolution_or_persistence() {
+    let probe = Arc::new(ApprovalBoundaryProbe::default());
+    let continuation = approval_continuation(&probe, false, true).await;
+    let gate = Gate {
+        log: probe.log.clone(),
+        decisions: Mutex::new(vec![approve(), approve()].into()),
+    };
+    let error = continuation
+        .resume_go_gate_with_boundary(&gate, probe.as_ref())
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Unsupported);
+    assert_eq!(error.partial.unwrap().pending_approvals.len(), 1);
+    assert!(probe.log.lock().unwrap().is_empty());
+    assert!(probe.commits.lock().unwrap().is_empty());
 }

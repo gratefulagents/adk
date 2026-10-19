@@ -13,11 +13,29 @@ that output and decodes the Go-generated OpenRouter reasoning envelope. The
 fixture also includes Go-executed Responses/Chat requests, a Chat reasoning/text/
 tool SSE stream and assembled result, a Responses stream whose sparse terminal
 omits output (including encrypted reasoning and done-only tool arguments),
-81 OpenAI and 12 Anthropic price vectors, and six retry-header vectors.
-The Rust SSE differentials check every byte split. JSON
-member order is not significant; opaque continuation strings are unchanged.
+81 OpenAI and 12 Anthropic price vectors, six retry-header vectors, and 30
+thinking-type/budget/effort cases with both Chat and Responses projections.
+Chat requires the exact nested thinking type `enabled`; Responses intentionally
+uses positive budgets regardless of type. Explicit effort takes precedence in
+both protocols. The native regression compares all 60 reasoning projections.
+Ten further Responses tool-pairing cases compare complete input arrays: orphans,
+matched/prior/future calls, trimmed/generated/blank IDs, repeated results,
+whitespace-only outputs and images attached to matched or orphan results.
+Orphan outputs are omitted without dropping their separate image blocks.
+Five buffered and five streamed Chat cases compare OpenRouter reasoning-details
+signatures byte for byte, including member order, whitespace, number spelling,
+escapes, duplicate fields and HTML/Unicode separators. Buffered conversion retains
+original bytes; streaming compacts and HTML-escapes accumulated raw fragments as
+Go does. Native conversion, loopback buffered HTTP and the SSE decoder compare
+signatures in reasoning items and diagnostic snapshots. Interleaved reasoning
+blocks and outbound structured JSON byte preservation remain unverified.
+The Rust SSE differentials check every byte split. Other JSON comparisons are
+semantic; opaque continuation strings are unchanged.
 Regenerate with `bash scripts/providers/generate.sh /path/to/pinned/sdk`.
-The script checks the source revision and removes its temporary Go test on exit.
+The script checks the source revision and tracked-source cleanliness, and removes
+its temporary Go test on exit. Add `--check` to regenerate into a temporary
+directory and compare without overwriting the fixture. Issue11 evidence binds
+the generator, probe and fixture hashes and requires this independent check.
 
 The provider tests also contain deliberately synthetic SSE and loopback HTTP
 vectors, authored for the Rust implementation. Those other vectors are **not**

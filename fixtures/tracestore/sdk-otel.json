@@ -1,0 +1,213 @@
+{
+  "agent.agent": {
+    "attributes": {
+      "agent.instructions": "instruction",
+      "agent.name": "agent",
+      "duration_ms": 1000,
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "api.retry": {
+    "attributes": {
+      "duration_ms": 1000,
+      "retry.after_ms": 500,
+      "retry.attempt": 2,
+      "retry.error_code": "rate_limit",
+      "retry.max_retries": 3,
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "compaction": {
+    "attributes": {
+      "compaction.tokens_after": 50,
+      "compaction.tokens_before": 100,
+      "duration_ms": 1000,
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "fixture": {
+    "attributes": {
+      "trace.id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "guardrail.guard": {
+    "attributes": {
+      "duration_ms": 1000,
+      "guardrail.name": "guard",
+      "guardrail.triggered": true,
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "handoff": {
+    "attributes": {
+      "duration_ms": 1000,
+      "handoff.from": "a",
+      "handoff.to": "b",
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "llm.generation": {
+    "attributes": {
+      "duration_ms": 1000,
+      "gen.attempt_number": 2,
+      "gen.cache_creation_tokens": 0,
+      "gen.cache_read_tokens": 0,
+      "gen.completion_tokens": 3,
+      "gen.cost_known": false,
+      "gen.cost_usd": 0.5,
+      "gen.error": "",
+      "gen.failure_kind": "",
+      "gen.fallback_from_model": "",
+      "gen.fallback_reason": "",
+      "gen.fallback_scheduled": false,
+      "gen.fallback_to_model": "",
+      "gen.input_item_count": 0,
+      "gen.input_tokens": 12,
+      "gen.input_tokens_include_cache": true,
+      "gen.input_tokens_include_cache_known": true,
+      "gen.instructions_length": 0,
+      "gen.latency_ms": 0,
+      "gen.model_canonical": "",
+      "gen.model_provider": "",
+      "gen.output_item_count": 0,
+      "gen.output_tokens": 3,
+      "gen.prompt_tokens": 12,
+      "gen.requested_model": "requested",
+      "gen.resolved_model": "resolved",
+      "gen.retry_after_ms": 0,
+      "gen.retry_scheduled": false,
+      "gen.scope": "",
+      "gen.status": "completed",
+      "gen.success": true,
+      "gen.task_id": "",
+      "gen.tool_count": 0,
+      "gen.total_tokens": 15,
+      "gen.turn": 3,
+      "gen.usage_available": true,
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "session": {
+    "attributes": {
+      "duration_ms": 1000,
+      "session.cache_creation_tokens": 2,
+      "session.cache_read_tokens": 4,
+      "session.cost_usd": 0.5,
+      "session.duration_ms": 900,
+      "session.input_tokens": 12,
+      "session.model": "model",
+      "session.num_turns": 2,
+      "session.output_tokens": 3,
+      "session.stop_reason": "completed",
+      "span.id": "span",
+      "span.parent_id": "trace"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "subagent.executor": {
+    "attributes": {
+      "duration_ms": 1000,
+      "span.id": "span",
+      "span.parent_id": "trace",
+      "subagent.cache_creation_tokens": 300,
+      "subagent.cache_read_tokens": 1200,
+      "subagent.cost_usd": 0,
+      "subagent.description": "",
+      "subagent.duration_ms": 0,
+      "subagent.input_tokens": 0,
+      "subagent.model": "",
+      "subagent.num_turns": 0,
+      "subagent.output_tokens": 0,
+      "subagent.status": "",
+      "subagent.stop_reason": "",
+      "subagent.task_id": "",
+      "subagent.tool_count": 0,
+      "subagent.total_tokens": 0,
+      "subagent.type": "executor"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "subagent.researcher": {
+    "attributes": {
+      "duration_ms": 1000,
+      "span.id": "span",
+      "span.parent_id": "trace",
+      "subagent.cache_creation_tokens": 2,
+      "subagent.cache_read_tokens": 4,
+      "subagent.cost_usd": 0.5,
+      "subagent.description": "task description",
+      "subagent.duration_ms": 900,
+      "subagent.input_tokens": 12,
+      "subagent.isolation": "worktree",
+      "subagent.model": "model",
+      "subagent.num_turns": 2,
+      "subagent.output_tokens": 3,
+      "subagent.status": "completed",
+      "subagent.stop_reason": "completed",
+      "subagent.task_id": "child",
+      "subagent.tool_count": 1,
+      "subagent.total_tokens": 15,
+      "subagent.type": "researcher"
+    },
+    "status": {
+      "Code": "Unset",
+      "Description": ""
+    }
+  },
+  "tool.Read": {
+    "attributes": {
+      "duration_ms": 1000,
+      "error": true,
+      "span.id": "span",
+      "span.parent_id": "trace",
+      "tool.error": true,
+      "tool.input": "input",
+      "tool.name": "Read",
+      "tool.output": "failure"
+    },
+    "status": {
+      "Code": "Error",
+      "Description": "failure"
+    }
+  }
+}

@@ -1,0 +1,900 @@
+{
+  "cases": [
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": ""
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": ""
+        }
+      ],
+      "events": [],
+      "name": "empty",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 0,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 0,
+          "emitted_count": 0
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "plain\n{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}\n{\"type\":\"subagent_status\",\"task_id\":\"task\",\"parent_call_id\":\"parent\",\"subagent_type\":\"worker\",\"subagent_waiting_on\":[\"dependency\"]}\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 5,
+          "text": "plain",
+          "text_len": 5,
+          "text_sha256": "a116c9ed46d6207734a43317d30fd88f52ac8634c37d904bbf4e41d865f90475"
+        },
+        {
+          "child": {
+            "AgentName": "",
+            "CallID": "child",
+            "DurationMS": 42,
+            "InputRaw": "",
+            "IsError": false,
+            "Output": "result",
+            "ParentCallID": "parent",
+            "Phase": "end",
+            "Tool": "Bash"
+          },
+          "kind": "child_tool"
+        },
+        {
+          "kind": "subagent",
+          "subagent": {
+            "AgentName": "worker",
+            "CostKnown": false,
+            "CostUSD": 0,
+            "CurrentStep": "",
+            "DependsOn": null,
+            "DurationMS": 0,
+            "FilesWritten": 0,
+            "LastParentMessage": "",
+            "LastTool": "",
+            "Message": "",
+            "MessagesReceived": 0,
+            "NumTurns": 0,
+            "ParentCallID": "parent",
+            "ResultText": "",
+            "Status": "",
+            "StopReason": "",
+            "TaskID": "task",
+            "Tokens": 0,
+            "ToolCount": 0,
+            "ToolUseID": "",
+            "WaitingOn": [
+              "dependency"
+            ]
+          }
+        }
+      ],
+      "name": "ordered",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 260,
+          "emitted_count": 3
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "{\"type\":\"tool_end\",\"is_error\":true,\"output\":\"hel"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "lo\"}"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 25,
+          "text": "tool_end error=true hello",
+          "text_len": 25,
+          "text_sha256": "ac2784c4f4f765d860f283e3e9bf5a5a94338760202d954645c9f4360d277a31"
+        }
+      ],
+      "name": "partial",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 48,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 4,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 1,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": ""
+        }
+      ],
+      "events": [
+        {
+          "child": {
+            "AgentName": "",
+            "CallID": "child",
+            "DurationMS": 42,
+            "InputRaw": "",
+            "IsError": false,
+            "Output": "result",
+            "ParentCallID": "parent",
+            "Phase": "end",
+            "Tool": "Bash"
+          },
+          "kind": "child_tool"
+        }
+      ],
+      "name": "empty_write_dispatches",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 121,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 0,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "{\"type\":\"subagent_status\",\"task_id\":\"task\",\"parent_call_id\":\"parent\",\"subagent_type\":\"worker\",\"subagent_waiting_on\":[\"dependency\"]}"
+        }
+      ],
+      "events": [],
+      "name": "drop_retains_partial",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 131,
+          "emitted_count": 0
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "first\r\n\r\n"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "second\r"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 5,
+          "text": "first",
+          "text_len": 5,
+          "text_sha256": "a7937b64b8caa58f03721bb6bacf5c78cb235febe0e70b1b84cd99541461a08e"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 6,
+          "text": "second",
+          "text_len": 6,
+          "text_sha256": "16367aacb67a4a017c8da8ab95682ccb390863780f7114dda0a0e0c55644c7c4"
+        }
+      ],
+      "name": "crlf",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 9,
+          "emitted_count": 1
+        },
+        {
+          "accepted": 7,
+          "emitted_count": 1
+        },
+        {
+          "accepted": 1,
+          "emitted_count": 2
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "first\r"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "second\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 11,
+          "text": "firstsecond",
+          "text_len": 11,
+          "text_sha256": "da83f63e1a473003712c18f5afc5a79044221943d1083c7c5a7ac7236d85e8d2"
+        }
+      ],
+      "name": "cr_is_removed_before_continuation",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 6,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 7,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": " \t\n\u0085\n\u00a0\n"
+        }
+      ],
+      "events": [],
+      "name": "blank",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 9,
+          "emitted_count": 0
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}\nleft"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "over\n{\"type\":\"subagent_status\",\"task_id\":\"task\",\"parent_call_id\":\"parent\",\"subagent_type\":\"worker\",\"subagent_waiting_on\":[\"dependency\"]}\nraw"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": ""
+        }
+      ],
+      "events": [
+        {
+          "child": {
+            "AgentName": "",
+            "CallID": "child",
+            "DurationMS": 42,
+            "InputRaw": "",
+            "IsError": false,
+            "Output": "result",
+            "ParentCallID": "parent",
+            "Phase": "end",
+            "Tool": "Bash"
+          },
+          "kind": "child_tool"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 8,
+          "text": "leftover",
+          "text_len": 8,
+          "text_sha256": "31cc4b41eb116efdfe7aab64e776da686f653042da3259c0bb5ed31de5c05f4e"
+        },
+        {
+          "kind": "subagent",
+          "subagent": {
+            "AgentName": "worker",
+            "CostKnown": false,
+            "CostUSD": 0,
+            "CurrentStep": "",
+            "DependsOn": null,
+            "DurationMS": 0,
+            "FilesWritten": 0,
+            "LastParentMessage": "",
+            "LastTool": "",
+            "Message": "",
+            "MessagesReceived": 0,
+            "NumTurns": 0,
+            "ParentCallID": "parent",
+            "ResultText": "",
+            "Status": "",
+            "StopReason": "",
+            "TaskID": "task",
+            "Tokens": 0,
+            "ToolCount": 0,
+            "ToolUseID": "",
+            "WaitingOn": [
+              "dependency"
+            ]
+          }
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 3,
+          "text": "raw",
+          "text_len": 3,
+          "text_sha256": "d7439bee24773bcbfa2d0a97947ee36227b10d1022b1a55847e928965bb6bfde"
+        }
+      ],
+      "name": "mixed_partial",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 126,
+          "emitted_count": 1
+        },
+        {
+          "accepted": 140,
+          "emitted_count": 3
+        },
+        {
+          "accepted": 0,
+          "emitted_count": 4
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "null\n{}\n{bad}\n{\"type\":\"tool_end\",\"is_error\":true,\"output\":\"bad\\nmore\"}\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 4,
+          "text": "null",
+          "text_len": 4,
+          "text_sha256": "74234e98afe7498fb5daf1f36ac2d78acc339464f950703b8c019892f982b90b"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 2,
+          "text": "{}",
+          "text_len": 2,
+          "text_sha256": "44136fa355b3678a1146ad16f7e8649e94fb4fc21fe77e8310c060f61caaff8a"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 5,
+          "text": "{bad}",
+          "text_len": 5,
+          "text_sha256": "578aa9d10ab9fa1cb438fe80d3ff19b67c49275766380e0c99e63a7f38dee5cb"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 23,
+          "text": "tool_end error=true bad",
+          "text_len": 23,
+          "text_sha256": "e82209877fb3379e2fb548172bab32691023e888de59250c366f14897736b8fb"
+        }
+      ],
+      "name": "malformed_and_nonchild",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 71,
+          "emitted_count": 4
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777215,
+          "tail": "",
+          "text": "x"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": ""
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 16777215,
+          "text_len": 16777215,
+          "text_sha256": "da9f71493037317a9b1cd0cfd7b969788edd0700e056ceaa5118bff96a0e1c07"
+        }
+      ],
+      "name": "below_limit_no_lf",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 16777215,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 0,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777216,
+          "tail": "",
+          "text": "x"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "next\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 16777216,
+          "text_len": 16777216,
+          "text_sha256": "a06c26cbac8b80704f420222dae5658b88ff2da96702d12ef7a4223e9361f7c1"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 4,
+          "text": "next",
+          "text_len": 4,
+          "text_sha256": "c6c1c9a9c8543f1e4cd980064cf1625eeb61a90703b2464fff039f21682508b3"
+        }
+      ],
+      "name": "at_limit_no_lf",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 16777216,
+          "emitted_count": 1
+        },
+        {
+          "accepted": 5,
+          "emitted_count": 2
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777215,
+          "tail": "\n",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 16777215,
+          "text_len": 16777215,
+          "text_sha256": "da9f71493037317a9b1cd0cfd7b969788edd0700e056ceaa5118bff96a0e1c07"
+        }
+      ],
+      "name": "at_limit_with_lf",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 16777216,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777216,
+          "tail": "\n",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 16777216,
+          "text_len": 16777216,
+          "text_sha256": "a06c26cbac8b80704f420222dae5658b88ff2da96702d12ef7a4223e9361f7c1"
+        }
+      ],
+      "name": "over_limit_with_lf",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 16777217,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}\n"
+        },
+        {
+          "repeat": 16777216,
+          "tail": "",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "child": {
+            "AgentName": "",
+            "CallID": "child",
+            "DurationMS": 42,
+            "InputRaw": "",
+            "IsError": false,
+            "Output": "result",
+            "ParentCallID": "parent",
+            "Phase": "end",
+            "Tool": "Bash"
+          },
+          "kind": "child_tool"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 16777216,
+          "text_len": 16777216,
+          "text_sha256": "a06c26cbac8b80704f420222dae5658b88ff2da96702d12ef7a4223e9361f7c1"
+        }
+      ],
+      "name": "prefix_then_oversized",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 122,
+          "emitted_count": 1
+        },
+        {
+          "accepted": 16777216,
+          "emitted_count": 2
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777216,
+          "tail": "\n",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 4,
+          "text": "head",
+          "text_len": 4,
+          "text_sha256": "9f2e6d33a3717ee826353a404ba4618d1aeeb6879ad7936bce8ed5f46814924d"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 4,
+          "text": "head",
+          "text_len": 4,
+          "text_sha256": "9f2e6d33a3717ee826353a404ba4618d1aeeb6879ad7936bce8ed5f46814924d"
+        }
+      ],
+      "name": "oversized_same_write_prefix",
+      "nil_sink": false,
+      "prefix": "head\n",
+      "writes": [
+        {
+          "accepted": 16777222,
+          "emitted_count": 2
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777215,
+          "tail": "",
+          "text": "x"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 16777216,
+          "text_len": 16777216,
+          "text_sha256": "a06c26cbac8b80704f420222dae5658b88ff2da96702d12ef7a4223e9361f7c1"
+        }
+      ],
+      "name": "oversized_partial",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 16777215,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 1,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777216,
+          "tail": "\n",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 18,
+          "text": "tool_end tool=Bash",
+          "text_len": 18,
+          "text_sha256": "841787ee8effc0fb08474ecffaadb2506a8449476c0f955f292eaa8df6a84cb7"
+        },
+        {
+          "kind": "log",
+          "raw_text_len": 121,
+          "text": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}",
+          "text_len": 121,
+          "text_sha256": "5f079c3fcb9fbfc9ecc1dd8846369b10fb61f6f9311d3083fe7e448d82ababe0"
+        }
+      ],
+      "name": "oversized_same_write_child",
+      "nil_sink": false,
+      "prefix": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}\n",
+      "writes": [
+        {
+          "accepted": 16777339,
+          "emitted_count": 2
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 16777216,
+          "tail": "\"}\n",
+          "text": "x"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 16777236,
+          "text_len": 16777236,
+          "text_sha256": "01533a5d7dd10c455117ef28900934353ed822fae6075238d45d373124915621"
+        }
+      ],
+      "name": "oversized_valid_child",
+      "nil_sink": false,
+      "prefix": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"is_error\":true,\"output\":\"",
+      "writes": [
+        {
+          "accepted": 16777290,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "{\"type\":\"tool_end\",\"parent_call_id\":\"parent\",\"tool_use_id\":\"child\",\"tool\":\"Bash\",\"output\":\"result\",\"tool_duration_ms\":42}"
+        },
+        {
+          "repeat": 1,
+          "tail": "",
+          "text": "\n{\"type\":\"subagent_status\",\"task_id\":\"task\",\"parent_call_id\":\"parent\",\"subagent_type\":\"worker\",\"subagent_waiting_on\":[\"dependency\"]}\n"
+        }
+      ],
+      "events": [],
+      "name": "nil_sink",
+      "nil_sink": true,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 121,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 133,
+          "emitted_count": 0
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "bytes": [
+            231
+          ],
+          "repeat": 1,
+          "tail": ""
+        },
+        {
+          "bytes": [
+            149,
+            140,
+            240
+          ],
+          "repeat": 1,
+          "tail": ""
+        },
+        {
+          "bytes": [
+            159,
+            152,
+            128
+          ],
+          "repeat": 1,
+          "tail": "\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 7,
+          "text": "\u754c\ud83d\ude00",
+          "text_len": 7,
+          "text_sha256": "6e218b63b52cc8bb205dc5773e1a58afd3b1bcd24566ea823926aa623d43ffd8"
+        }
+      ],
+      "name": "split_utf8",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 1,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 3,
+          "emitted_count": 0
+        },
+        {
+          "accepted": 4,
+          "emitted_count": 1
+        }
+      ]
+    },
+    {
+      "chunks": [
+        {
+          "bytes": [
+            255,
+            226,
+            130
+          ],
+          "repeat": 1,
+          "tail": "\n"
+        }
+      ],
+      "events": [
+        {
+          "kind": "log",
+          "raw_text_len": 3,
+          "text": "\ufffd\ufffd\ufffd",
+          "text_len": 9,
+          "text_sha256": "a73f4cb996ceb6ee097888d897ae1004c9b1faab6c97629214139b9639aaf1af"
+        }
+      ],
+      "name": "invalid_utf8",
+      "nil_sink": false,
+      "prefix": "",
+      "writes": [
+        {
+          "accepted": 4,
+          "emitted_count": 1
+        }
+      ]
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/line-writer-reference/reference_test.go": "4eb204e210fd9afa43968446c86716b274997fd1fefc28a58c42f44ff6257d6d",
+      "scripts/line-writer-reference/run.py": "598d1cdd6334f7b2d0cd96af3d4db00a7483baa816362db02e8802c4cd111eea"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/event_stream.go": "382a14c0207aa1952510d9003cdb32021082620a9fd8cb0161f8a8a3c61cf6ab",
+      "internal/agent/event_stream_test.go": "84ecfa9b759423060cff649f2c58355afa4a1b2bed1d5daa11656dd709dde60c",
+      "internal/agent/stream_events.go": "bd15743e7a712c41fd2239f9fca07abe1831ab65c61bfb487763d920090f2484",
+      "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
+      "pkg/agentsdk/events/events.go": "bd22ae98200ebbbdc42398feb7a27b777ea716dad806cefac3f06fe4ffa25481",
+      "pkg/agentsdk/events/events_test.go": "74656dc67c90ebd0f0e403d649011a29b0ca16d809a6a40d5a2ebf0182dcf49d",
+      "pkg/agentsdk/session_event_stream.go": "0da3c09dc207fc3fcd9619764e3c5ac9ff9a32a218aee9fe0606212beb45e5c0",
+      "pkg/agentsdk/session_event_stream_test.go": "f99222442c0c91aa3d1f03097afaadb9f30082fb82a47eab6022efa9dc8ba7ee"
+    }
+  }
+}

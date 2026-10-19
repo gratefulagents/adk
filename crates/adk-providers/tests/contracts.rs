@@ -1,3 +1,8 @@
+#[path = "contracts/chat_stream_reference.rs"]
+mod chat_stream_reference;
+#[path = "contracts/compaction_origin.rs"]
+mod compaction_origin;
+
 use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest};
 use adk_providers::{
     auth::*,
@@ -48,6 +53,7 @@ fn scope(mode: AuthMode) -> Scope {
 }
 fn request() -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: "fixture-model".into(),
         instructions: "Be precise".into(),
         input: Vec::new(),
@@ -57,6 +63,71 @@ fn request() -> ModelRequest {
         output_schema_strict: true,
         settings: Default::default(),
     }
+}
+
+#[test]
+fn endpoint_whitespace_does_not_change_credential_or_cache_scope() {
+    let whitespace = "\t\n\u{b}\u{c}\r \u{85}\u{a0}\u{1680}\u{2000}\u{2001}\u{2002}\u{2003}\u{2004}\u{2005}\u{2006}\u{2007}\u{2008}\u{2009}\u{200a}\u{2028}\u{2029}\u{202f}\u{205f}\u{3000}";
+    assert_eq!(whitespace.chars().count(), 25);
+    for mode in [
+        AuthMode::ApiKey,
+        AuthMode::OpenAiOAuth,
+        AuthMode::AnthropicOAuth,
+        AuthMode::CopilotOAuth,
+        AuthMode::Anonymous,
+    ] {
+        for endpoint in [
+            "https://example.test/custom",
+            "https://chatgpt.com/backend-api/responses",
+            "https://chatgpt.com:443/custom/chat/completions",
+            "https://api.githubcopilot.com/custom",
+        ] {
+            let expected = Scope::new("route", endpoint, None, mode).unwrap();
+            for space in whitespace.chars() {
+                let input = format!("{space}{endpoint}{space}");
+                let actual = Scope::new("route", &input, None, mode).unwrap();
+                assert_eq!(actual, expected);
+                assert_eq!(
+                    cache_scope(&actual, &material(), "prompt"),
+                    cache_scope(&expected, &material(), "prompt")
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn explicit_default_ports_remain_distinct_idempotent_credential_scopes() {
+    for (input, expected) in [
+        ("HTTPS://CHATGPT.COM:443/", "https://chatgpt.com:443"),
+        (
+            "https://api.chatgpt.com:00443/custom/",
+            "https://api.chatgpt.com:00443/custom",
+        ),
+        ("https://chatgpt.com:/", "https://chatgpt.com:"),
+        ("http://localhost:80/", "http://localhost:80"),
+        ("https://[::1]:443/custom/", "https://[::1]:443/custom"),
+        ("https://[::1]/custom/", "https://[::1]/custom"),
+    ] {
+        let scope = Scope::new("route", input, None, AuthMode::ApiKey).unwrap();
+        assert_eq!(scope.endpoint, expected);
+        assert_eq!(
+            Scope::new("route", &scope.endpoint, None, AuthMode::ApiKey).unwrap(),
+            scope
+        );
+        let canonical_transport = reqwest::Url::parse(input).unwrap();
+        assert_eq!(
+            reqwest::Url::parse(&scope.endpoint).unwrap().origin(),
+            canonical_transport.origin()
+        );
+    }
+    let implicit = Scope::new("route", "https://chatgpt.com", None, AuthMode::ApiKey).unwrap();
+    let explicit = Scope::new("route", "https://chatgpt.com:443", None, AuthMode::ApiKey).unwrap();
+    assert_ne!(implicit, explicit);
+    assert_ne!(
+        cache_scope(&implicit, &material(), "prompt"),
+        cache_scope(&explicit, &material(), "prompt")
+    );
 }
 
 #[test]
@@ -850,6 +921,97 @@ fn chat_reasoning_precedes_text_and_reused_tool_indices_keep_both_calls() {
 }
 
 #[test]
+fn raw_tool_arguments_match_pinned_go_normalization() {
+    let golden: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    for (index, vector) in golden["normalized_arguments"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .enumerate()
+    {
+        for protocol in [Protocol::Chat, Protocol::Responses] {
+            let body = match protocol {
+                Protocol::Chat => json!({"choices":[{"message":{"tool_calls":[{
+                    "id":"call", "function":{"name":"lookup", "arguments":vector["input"]}
+                }]}, "finish_reason":"tool_calls"}]}),
+                Protocol::Responses => json!({"output":[{"type":"function_call", "call_id":"call",
+                    "name":"lookup", "arguments":vector["input"]}], "status":"completed"}),
+                Protocol::Anthropic => unreachable!(),
+            };
+            let response =
+                wire::response_json(&serde_json::to_vec(&body).unwrap(), protocol).unwrap();
+            let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+                panic!("missing tool call");
+            };
+            assert_eq!(
+                call.argument_text(),
+                vector["normalized"].as_str().unwrap(),
+                "{protocol:?} vector {index}"
+            );
+            call.validate_argument_projection().unwrap();
+            assert!(
+                response
+                    .snapshot_raw
+                    .as_ref()
+                    .unwrap()
+                    .as_str()
+                    .contains(&format!(
+                        "\"input\":{}",
+                        vector["normalized"].as_str().unwrap()
+                    )),
+                "{protocol:?} snapshot vector {index}"
+            );
+            let mut stream = StreamState::new(protocol);
+            let events = match protocol {
+                Protocol::Chat => {
+                    stream.event(&json!({"choices":[{"index":0,"delta":{"tool_calls":[{
+                        "index":0,"id":"call","function":{"name":"lookup","arguments":vector["input"]}
+                    }]},"finish_reason":"tool_calls"}]}).to_string()).unwrap();
+                    stream.event("[DONE]").unwrap()
+                }
+                Protocol::Responses => stream
+                    .event(&json!({"type":"response.completed","response":body}).to_string())
+                    .unwrap(),
+                Protocol::Anthropic => unreachable!(),
+            };
+            let adk_core::ModelEvent::Complete { response: streamed } = events.last().unwrap()
+            else {
+                panic!("missing completed stream");
+            };
+            let adk_core::RunItem::ToolCall {
+                call: streamed_call,
+            } = &streamed.items[0]
+            else {
+                panic!("missing streamed tool call");
+            };
+            assert_eq!(
+                streamed_call.argument_text().trim(),
+                vector["normalized"].as_str().unwrap(),
+                "{protocol:?} vector {index}"
+            );
+            streamed_call.validate_argument_projection().unwrap();
+            let mut input = request();
+            input.input = response.items;
+            let followup = wire::request(&input, protocol, false).unwrap();
+            let arguments = match protocol {
+                Protocol::Chat => {
+                    &followup["messages"][1]["tool_calls"][0]["function"]["arguments"]
+                }
+                Protocol::Responses => &followup["input"][0]["arguments"],
+                Protocol::Anthropic => unreachable!(),
+            };
+            assert_eq!(
+                arguments, &vector["normalized"],
+                "{protocol:?} vector {index}"
+            );
+        }
+    }
+}
+
+#[test]
 fn executed_go_cost_catalog_and_retry_goldens_match() {
     let golden: serde_json::Value = serde_json::from_str(include_str!(
         "../../../fixtures/providers/continuation.json"
@@ -897,6 +1059,96 @@ fn executed_go_cost_catalog_and_retry_goldens_match() {
 }
 
 #[test]
+fn anthropic_ignores_sdk_verbosity_without_losing_reasoning_budget() {
+    let mut input = request();
+    input.model = "claude-sonnet-4-6".into();
+    input.settings = adk_runtime::settings::routing_settings("medium", "medium");
+    let body = wire::request(&input, Protocol::Anthropic, false).unwrap();
+    assert!(body.get("text_verbosity").is_none());
+    assert!(body.get("text").is_none());
+    assert_eq!(
+        body["thinking"],
+        json!({"type":"enabled", "budget_tokens":4096})
+    );
+    input.settings.insert("text_verbosity".into(), json!(7));
+    assert!(wire::request(&input, Protocol::Anthropic, false).is_err());
+    input
+        .settings
+        .insert("text_verbosity".into(), json!("invalid"));
+    assert!(wire::request(&input, Protocol::Anthropic, false).is_ok());
+    for key in ["model_fallbacks", "compaction_threshold"] {
+        let mut invalid = input.clone();
+        invalid.settings.insert(key.into(), json!(1));
+        assert!(wire::request(&invalid, Protocol::Anthropic, false).is_err());
+    }
+}
+
+#[test]
+fn anthropic_output_schema_documents_are_forwarded_without_shape_validation() {
+    for raw in ["null", "\"schema\"", "7", "[]", "true", "{\"type\":27}"] {
+        let mut input = request();
+        input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
+        let expected: serde_json::Value = serde_json::from_str(raw).unwrap();
+        let body = wire::request(&input, Protocol::Anthropic, false).unwrap();
+        assert_eq!(body["output_format"].get("schema"), Some(&expected));
+    }
+}
+
+#[test]
+fn openai_output_schema_map_matches_pinned_go() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["output_schemas"].as_array().unwrap();
+    assert_eq!(cases.len(), 14);
+    for case in cases {
+        let raw = case["raw"].as_str().unwrap();
+        let mut input = request();
+        input.output_schema = Some(adk_core::JsonDocument::new(raw.into()).unwrap());
+        for protocol in [Protocol::Chat, Protocol::Responses] {
+            let result = wire::request(&input, protocol, false);
+            assert_eq!(result.is_err(), case["error"].as_bool().unwrap(), "{raw}");
+            if let Ok(body) = result {
+                let schema = match protocol {
+                    Protocol::Chat => &body["response_format"]["json_schema"]["schema"],
+                    Protocol::Responses => &body["text"]["format"]["schema"],
+                    Protocol::Anthropic => unreachable!(),
+                };
+                assert_eq!(
+                    schema.to_string(),
+                    case["schema_json"].as_str().unwrap(),
+                    "{raw}"
+                );
+            }
+        }
+    }
+}
+
+#[test]
+fn anthropic_output_format_matches_original_sdk_regression() {
+    let mut input = request();
+    input.model = "claude-sonnet-5".into();
+    input.instructions.clear();
+    input.input = vec![adk_core::RunItem::Message {
+        message: adk_core::Message {
+            role: adk_core::Role::User,
+            content: vec![adk_core::Content::Text { text: "hi".into() }],
+        },
+    }];
+    input.settings.insert("max_tokens".into(), json!(100));
+    input.output_schema_name = "final".into();
+    input.output_schema_strict = true;
+    let schema = json!({"type":"object","properties":{"answer":{"type":"string"}}});
+    input.output_schema = Some(adk_core::JsonDocument::new(schema.to_string()).unwrap());
+    let encoded =
+        serde_json::to_vec(&wire::request(&input, Protocol::Anthropic, false).unwrap()).unwrap();
+    let body: serde_json::Value = serde_json::from_slice(&encoded).unwrap();
+    assert_eq!(body["output_format"]["type"], "json_schema");
+    assert_eq!(body["output_format"]["schema"], schema);
+}
+
+#[test]
 fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     let mut input = request();
     input.settings.insert(
@@ -909,7 +1161,10 @@ fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
     input
         .settings
         .insert("compaction_threshold".into(), json!(20000));
-    input.output_schema = Some(json!({"type":"object","properties":{}}).try_into().unwrap());
+    input.output_schema = Some(
+        adk_core::JsonDocument::new((json!({"type":"object","properties":{}})).to_string())
+            .unwrap(),
+    );
     let chat = wire::request(&input, Protocol::Chat, false).unwrap();
     assert_eq!(
         chat["models"],
@@ -924,6 +1179,365 @@ fn fallback_models_verbosity_and_native_compaction_preserve_schema() {
         json!([{"type":"compaction","compact_threshold":20000}])
     );
     assert!(responses.get("models").is_none());
+}
+
+#[test]
+fn model_fallbacks_original_table() {
+    let cases = [
+        ("no fallbacks returns nil", "a", None, None),
+        (
+            "primary first then fallbacks",
+            "openrouter/qwen/qwen3-coder:free",
+            Some(json!([
+                "openrouter/deepseek/deepseek-chat",
+                "openrouter/openrouter/auto"
+            ])),
+            Some(json!([
+                "openrouter/qwen/qwen3-coder:free",
+                "openrouter/deepseek/deepseek-chat",
+                "openrouter/openrouter/auto"
+            ])),
+        ),
+        (
+            "dedupes and drops blanks",
+            "a",
+            Some(json!([" ", "a", "b", "b"])),
+            Some(json!(["a", "b"])),
+        ),
+        (
+            "single distinct model returns nil",
+            "a",
+            Some(json!(["a", "  "])),
+            None,
+        ),
+    ];
+    assert_eq!(cases.len(), 4);
+    for (name, primary, fallbacks, expected) in cases {
+        let mut input = request();
+        input.model = primary.into();
+        if let Some(fallbacks) = fallbacks {
+            input.settings.insert("model_fallbacks".into(), fallbacks);
+        }
+        let body = wire::request(&input, Protocol::Chat, false).unwrap();
+        assert_eq!(body.get("models"), expected.as_ref(), "{name}");
+    }
+}
+
+#[test]
+fn chat_completion_request_original_models_serialization() {
+    let mut input = request();
+    input.model = "a".into();
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert!(!serde_json::to_string(&body).unwrap().contains("\"models\""));
+    input
+        .settings
+        .insert("model_fallbacks".into(), json!(["a", "b"]));
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert!(
+        serde_json::to_string(&body)
+            .unwrap()
+            .contains("\"models\":[\"a\",\"b\"]")
+    );
+}
+
+#[test]
+fn chat_response_original_refusal_is_nonempty_text() {
+    use adk_core::{Content, RunItem};
+    let response = wire::response(
+        &json!({
+            "id":"chatcmpl-1", "model":"gpt-test",
+            "choices":[{"message":{"role":"assistant", "refusal":"I can't help with that."}, "finish_reason":"stop"}]
+        }),
+        Protocol::Chat,
+    ).unwrap();
+    let RunItem::Message { message } = &response.items[0] else {
+        panic!("missing refusal message")
+    };
+    let Content::Text { text } = &message.content[0] else {
+        panic!("missing refusal text")
+    };
+    assert!(text.contains("I can't help with that."));
+}
+
+#[test]
+fn chat_original_stop_reason_prioritizes_truncation() {
+    for (reason, has_tools, expected) in [
+        ("length", true, "max_tokens"),
+        ("tool_calls", true, "tool_use"),
+        ("tool_calls", false, "end_turn"),
+    ] {
+        let mut message = json!({"role":"assistant", "content":"narration"});
+        if has_tools {
+            message["tool_calls"] = json!([{"id":"call_1", "type":"function", "function":{"name":"lookup", "arguments":"{}"}}]);
+        }
+        let response = wire::response(
+            &json!({"choices":[{"message":message,"finish_reason":reason}]}),
+            Protocol::Chat,
+        )
+        .unwrap();
+        let snapshot: serde_json::Value =
+            serde_json::from_str(response.snapshot_raw.unwrap().as_str()).unwrap();
+        assert_eq!(snapshot["stop_reason"], expected, "{reason}, {has_tools}");
+    }
+}
+
+#[test]
+fn chat_original_messages_forward_images() {
+    use adk_core::{Content, Message, Role, RunItem};
+    let mut input = request();
+    input.model = "gpt-test".into();
+    input.instructions.clear();
+    input.input = vec![RunItem::Message {
+        message: Message {
+            role: Role::User,
+            content: vec![
+                Content::Text {
+                    text: "what is in this image?".into(),
+                },
+                Content::Attachment {
+                    media_type: "image/png".into(),
+                    data: "aGVsbG8=".into(),
+                    detail: String::new(),
+                },
+            ],
+        },
+    }];
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    let messages = body["messages"].as_array().unwrap();
+    assert_eq!(messages.len(), 1);
+    let parts = messages[0]["content"].as_array().unwrap();
+    let mut saw_text = false;
+    let mut saw_image = false;
+    for part in parts {
+        match part["type"].as_str() {
+            Some("text") => saw_text = true,
+            Some("image_url") => {
+                assert!(
+                    part["image_url"]["url"]
+                        .as_str()
+                        .unwrap()
+                        .starts_with("data:image/png;base64,aGVsbG8=")
+                );
+                saw_image = true;
+            }
+            _ => {}
+        }
+    }
+    assert!(saw_text && saw_image);
+    serde_json::to_string(messages).unwrap();
+}
+
+#[test]
+fn chat_original_text_only_message_stays_string() {
+    use adk_core::{Content, Message, Role, RunItem};
+    let mut input = request();
+    input.model = "gpt-test".into();
+    input.instructions.clear();
+    input.input = vec![RunItem::Message {
+        message: Message {
+            role: Role::User,
+            content: vec![Content::Text {
+                text: "hello".into(),
+            }],
+        },
+    }];
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    let messages = body["messages"].as_array().unwrap();
+    assert_eq!(messages.len(), 1);
+    assert!(messages[0]["content"].is_string());
+}
+
+#[test]
+fn chat_original_stream_surfaces_refusal_deltas() {
+    use adk_core::{Content, ModelEvent, RunItem};
+    let mut stream = StreamState::new(Protocol::Chat);
+    stream.event(&json!({"id":"chatcmpl-1", "model":"gpt-test", "choices":[{"delta":{"refusal":"I can't "}}]}).to_string()).unwrap();
+    stream
+        .event(
+            &json!({"choices":[{"delta":{"refusal":"help with that."},"finish_reason":"stop"}]})
+                .to_string(),
+        )
+        .unwrap();
+    let events = stream.event("[DONE]").unwrap();
+    let ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("missing complete response")
+    };
+    let text: String = response
+        .items
+        .iter()
+        .filter_map(|item| match item {
+            RunItem::Message { message } => Some(
+                message
+                    .content
+                    .iter()
+                    .filter_map(|part| match part {
+                        Content::Text { text } => Some(text.as_str()),
+                        _ => None,
+                    })
+                    .collect::<String>(),
+            ),
+            _ => None,
+        })
+        .collect();
+    assert!(text.contains("I can't help with that."));
+}
+
+#[test]
+fn chat_reasoning_original_budget_and_effort_cases() {
+    let mut input = request();
+    input.model = "anthropic/claude-sonnet-4.6".into();
+    input.settings.insert("max_tokens".into(), json!(8192));
+    input.settings.insert(
+        "thinking".into(),
+        json!({"type":"enabled", "budget_tokens":2048}),
+    );
+    let body = wire::request(&input, Protocol::Chat, false).unwrap();
+    assert!(
+        serde_json::to_string(&body)
+            .unwrap()
+            .contains("\"reasoning\":{\"max_tokens\":2048}")
+    );
+    let cases = [
+        ("none disables reasoning", "none", Some("none")),
+        ("low", "low", Some("low")),
+        ("high", "high", Some("high")),
+        ("xhigh", "xhigh", Some("xhigh")),
+        ("max", "max", Some("max")),
+        ("empty omits field", "", None),
+        ("whitespace omits field", "   ", None),
+    ];
+    assert_eq!(cases.len(), 7);
+    for (name, effort, expected) in cases {
+        let mut input = request();
+        input.model = "openrouter/some-reasoning-model".into();
+        input.instructions.clear();
+        input.settings.insert("max_tokens".into(), json!(1024));
+        input
+            .settings
+            .insert("reasoning_effort".into(), json!(effort));
+        let body = wire::request(&input, Protocol::Chat, false).unwrap();
+        let text = serde_json::to_string(&body).unwrap();
+        if let Some(expected) = expected {
+            assert!(
+                text.contains(&format!("\"reasoning\":{{\"effort\":\"{expected}\"}}")),
+                "{name}"
+            );
+        } else {
+            assert!(!text.contains("\"reasoning\""), "{name}");
+        }
+    }
+}
+
+#[test]
+fn thinking_type_gate_matches_pinned_chat_and_responses() {
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["reasoning_gates"].as_array().unwrap();
+    assert_eq!(cases.len(), 30);
+    for case in cases {
+        let mut input = request();
+        input.model = "gpt-5.6".into();
+        input.settings.insert("max_tokens".into(), json!(8192));
+        input.settings.insert(
+            "thinking".into(),
+            json!({"type":case["type"], "budget_tokens":case["budget"]}),
+        );
+        input
+            .settings
+            .insert("reasoning_effort".into(), case["effort"].clone());
+        for (protocol, name) in [(Protocol::Chat, "chat"), (Protocol::Responses, "responses")] {
+            let body = wire::request(&input, protocol, false).unwrap();
+            assert_eq!(body["reasoning"], case[name], "{name}: {case}");
+        }
+    }
+}
+
+#[test]
+fn responses_original_skips_orphan_tool_results() {
+    use adk_core::{Content, Message, Role, RunItem, ToolOutput};
+    let mut input = request();
+    input.input = vec![
+        RunItem::ToolResult {
+            call_id: "call_missing".into(),
+            output: ToolOutput {
+                content: vec![Content::Text {
+                    text: "/repo".into(),
+                }],
+                is_error: false,
+                should_pause: false,
+            },
+        },
+        RunItem::Message {
+            message: Message {
+                role: Role::User,
+                content: vec![Content::Text {
+                    text: "continue".into(),
+                }],
+            },
+        },
+    ];
+    let body = wire::request(&input, Protocol::Responses, false).unwrap();
+    let items = body["input"].as_array().unwrap();
+    assert_eq!(items.len(), 1);
+    assert_eq!(items[0]["role"], "user");
+    assert_eq!(items[0]["content"], "continue");
+}
+
+#[test]
+fn responses_tool_pairing_matches_pinned_go() {
+    use adk_core::{Content, Message, Role, RunItem, ToolCall, ToolOutput};
+    let fixture: serde_json::Value = serde_json::from_str(include_str!(
+        "../../../fixtures/providers/continuation.json"
+    ))
+    .unwrap();
+    let cases = fixture["responses_tool_pairs"].as_array().unwrap();
+    assert_eq!(cases.len(), 10);
+    for case in cases {
+        let mut input = request();
+        for op in case["operations"].as_array().unwrap() {
+            let id = op["id"].as_str().unwrap();
+            let text = op["text"].as_str().unwrap();
+            input.input.push(match op["kind"].as_str().unwrap() {
+                "call" => RunItem::ToolCall {
+                    call: ToolCall {
+                        id: id.into(),
+                        name: "Bash".into(),
+                        arguments: json!({"command":"pwd"}),
+                        raw_arguments: None,
+                    },
+                },
+                "result" => {
+                    let mut content = vec![Content::Text { text: text.into() }];
+                    if op["image"] == true {
+                        content.push(Content::Attachment {
+                            media_type: "image/png".into(),
+                            data: "cG5n".into(),
+                            detail: String::new(),
+                        });
+                    }
+                    RunItem::ToolResult {
+                        call_id: id.into(),
+                        output: ToolOutput {
+                            content,
+                            is_error: false,
+                            should_pause: false,
+                        },
+                    }
+                }
+                "text" => RunItem::Message {
+                    message: Message {
+                        role: Role::User,
+                        content: vec![Content::Text { text: text.into() }],
+                    },
+                },
+                kind => panic!("unknown fixture operation {kind}"),
+            });
+        }
+        let body = wire::request(&input, Protocol::Responses, false).unwrap();
+        assert_eq!(body["input"], case["items"], "{}", case["name"]);
+    }
 }
 
 #[test]
@@ -944,6 +1558,19 @@ fn executed_go_chat_stream_matches_at_every_chunk_boundary() {
     let source = golden["chat_sse"].as_str().unwrap().as_bytes();
     let mut expected = wire::response(&golden["chat_sse_response"], Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    // The normalized shape is Anthropic-like, but these are OpenAI adapter results.
+    expected.snapshot_projection = Some(adk_core::SnapshotProjection::GoOpenAiMessage);
+    // Native raw data retains its protocol shape.
+    expected.raw = Some(json!({
+        "id": "chat-fixture",
+        "choices": [{"finish_reason": "tool_calls", "message": {
+            "content": "héllo", "reasoning_content": "why ", "reasoning_details": null,
+            "reasoning_opaque": null, "tool_calls": [{"id": "call-fixture", "type": "function",
+                "function": {"name": "lookup", "arguments": "{\"q\":1}"}}]
+        }}],
+        "usage": {"prompt_tokens": 100, "completion_tokens": 20,
+            "prompt_tokens_details": {"cached_tokens": 70, "cache_write_tokens": 11}}
+    }));
     for split in 0..=source.len() {
         let mut decoder = Decoder::default();
         let mut stream = StreamState::new(Protocol::Chat);
@@ -1011,10 +1638,15 @@ fn compacted_history_and_multimodal_tool_results_replay_without_reordering() {
                 "aW1hZ2U="
             );
         } else {
-            let offset = usize::from(protocol == Protocol::Chat);
-            assert_eq!(entries[offset + 1]["role"], "user");
+            let image_index = if protocol == Protocol::Chat {
+                2
+            } else {
+                assert_eq!(entries.as_array().unwrap().len(), 1);
+                0
+            };
+            assert_eq!(entries[image_index]["role"], "user");
             assert_eq!(
-                entries[offset + 1]["content"][0]["type"],
+                entries[image_index]["content"][0]["type"],
                 if protocol == Protocol::Chat {
                     "image_url"
                 } else {
@@ -1049,6 +1681,20 @@ fn executed_go_sparse_responses_stream_retains_deltas_at_every_boundary() {
     let reference = &golden["responses_sparse_sse_response"];
     let mut expected = wire::response(reference, Protocol::Anthropic).unwrap();
     expected.usage.context_tokens = Some(expected.usage.input_tokens);
+    // The normalized shape is Anthropic-like, but these are OpenAI adapter results.
+    expected.snapshot_projection = Some(adk_core::SnapshotProjection::GoOpenAiMessage);
+    // Native raw data retains its protocol shape.
+    expected.raw = Some(json!({
+        "id": "responses-fixture", "model": "gpt-5.6", "end_turn": false, "status": "completed",
+        "output": [
+            {"type": "reasoning", "id": "reasoning-fixture", "encrypted_content": "opaque",
+                "summary": [{"type": "summary_text", "text": "why"}]},
+            {"type": "message", "role": "assistant", "content": [{"type": "output_text", "text": "héllo"}]},
+            {"type": "function_call", "id": "item-fixture", "call_id": "call-fixture", "name": "lookup", "arguments": "{\"q\":1}"}
+        ],
+        "usage": {"input_tokens": 100, "output_tokens": 20,
+            "input_tokens_details": {"cached_tokens": 70, "cache_write_tokens": 11}}
+    }));
     let adk_core::RunItem::Reasoning { reasoning } = &mut expected.items[0] else {
         panic!()
     };
@@ -1203,4 +1849,103 @@ fn compatible_chat_multipart_narration_and_truncated_tool_arguments_match_refere
         assert_eq!(call.id, "call_0");
         assert_eq!(call.arguments, json!({}));
     }
+}
+
+#[test]
+fn provider_response_retains_whole_body_not_just_metadata() {
+    for (protocol, mut body) in [
+        (
+            Protocol::Chat,
+            json!({"choices": [{"message": {"content": "answer"}, "finish_reason": "stop"}]}),
+        ),
+        (
+            Protocol::Responses,
+            json!({"status": "completed", "output": [{"type": "message", "content": [{"type": "output_text", "text": "answer"}]}]}),
+        ),
+        (
+            Protocol::Anthropic,
+            json!({"content": [{"type": "text", "text": "answer"}], "stop_reason": "end_turn"}),
+        ),
+    ] {
+        body["metadata"] = json!({"key": "value"});
+        body["provider_extension"] = json!({"nested": [null, false, "extra"]});
+        let response = wire::response(&body, protocol).unwrap();
+        assert_eq!(response.usage.requests, 1);
+        assert_eq!(response.raw.as_ref(), Some(&body));
+        assert_eq!(
+            response.metadata,
+            body["metadata"].as_object().unwrap().clone()
+        );
+        assert_eq!(
+            serde_json::from_value::<adk_core::ModelResponse>(
+                serde_json::to_value(&response).unwrap()
+            )
+            .unwrap(),
+            response
+        );
+    }
+}
+
+#[test]
+fn tool_argument_text_survives_provider_normalization_and_request_replay() {
+    for raw in [" { \"n\":1e0, \"n\":2 } ", " ", "{", "null", "[1,2]"] {
+        let response=wire::response(&json!({"choices":[{"message":{"tool_calls":[{"id":"c","function":{"name":"transfer","arguments":raw}}]},"finish_reason":"tool_calls"}]}),Protocol::Chat).unwrap();
+        let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+            panic!("expected call")
+        };
+        let normalized = if serde_json::from_str::<serde_json::Value>(raw).is_ok() {
+            raw.trim()
+        } else {
+            "{}"
+        };
+        assert_eq!(call.argument_text(), normalized);
+        call.validate_argument_projection().unwrap();
+        let mut req = request();
+        req.instructions.clear();
+        req.input = response.items;
+        let replay = wire::request(&req, Protocol::Chat, false).unwrap();
+        assert_eq!(
+            replay["messages"][0]["tool_calls"][0]["function"]["arguments"],
+            normalized
+        );
+        let replay = wire::request(&req, Protocol::Responses, false).unwrap();
+        assert_eq!(replay["input"][0]["arguments"], normalized);
+    }
+    let mut chat = StreamState::new(Protocol::Chat);
+    let streamed_raw = r#" { "n":1e0, "n":2 } "#;
+    chat.event(&json!({"choices":[{"index":0,"delta":{"tool_calls":[{"index":0,"id":"c","function":{"name":"transfer","arguments":streamed_raw}}]},"finish_reason":"tool_calls"}]}).to_string()).unwrap();
+    let events = chat.event("[DONE]").unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("expected completion")
+    };
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), streamed_raw);
+    let response=wire::response_json(br#"{"content":[{"type":"tool_use","id":"c","name":"transfer","input":{ "n":1e0, "n":2 }}],"stop_reason":"tool_use"}"#,Protocol::Anthropic).unwrap();
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), r#"{ "n":1e0, "n":2 }"#);
+    call.validate_argument_projection().unwrap();
+    let mut state = StreamState::new(Protocol::Anthropic);
+    for event in [
+        json!({"type":"message_start","message":{"id":"m","usage":{}}}),
+        json!({"type":"content_block_start","index":0,"content_block":{"type":"tool_use","id":"c","name":"transfer","input":{}}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":"{ \"n\":1e0,"}}),
+        json!({"type":"content_block_delta","index":0,"delta":{"type":"input_json_delta","partial_json":" \"n\":2 }"}}),
+        json!({"type":"content_block_stop","index":0}),
+        json!({"type":"message_delta","delta":{"stop_reason":"tool_use"},"usage":{"output_tokens":2}}),
+    ] {
+        state.event(&event.to_string()).unwrap();
+    }
+    let events = state.event(r#"{"type":"message_stop"}"#).unwrap();
+    let adk_core::ModelEvent::Complete { response } = events.last().unwrap() else {
+        panic!("expected completion")
+    };
+    let adk_core::RunItem::ToolCall { call } = &response.items[0] else {
+        panic!("expected call")
+    };
+    assert_eq!(call.argument_text(), r#"{ "n":1e0, "n":2 }"#);
+    call.validate_argument_projection().unwrap();
 }

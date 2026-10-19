@@ -1,9 +1,13 @@
-use crate::{Capability, json_text, workspace::Workspace};
+use crate::{
+    Capability,
+    fs_input::{self, Kind},
+    json_text,
+    workspace::Workspace,
+};
 use adk_core::{
     BoxFuture, Content, Error, Tool, ToolCall, ToolContext, ToolDefinition, ToolOutput,
 };
-use serde::Serialize;
-use serde_json::Value;
+use serde::{Deserialize, Serialize};
 use std::{
     collections::{BTreeMap, BTreeSet},
     sync::{Arc, Mutex},
@@ -248,40 +252,21 @@ fn preview(patch: &str) -> String {
     encoded.push_str("\\n... [diff truncated]\"");
     encoded
 }
-fn input(arguments: Value) -> Result<(String, bool), String> {
-    let kind = |v: &Value| match v {
-        Value::Bool(_) => "bool",
-        Value::Number(_) => "number",
-        Value::String(_) => "string",
-        Value::Array(_) => "array",
-        _ => "object",
-    };
-    if arguments.is_null() {
-        return Ok((String::new(), false));
-    }
-    let Some(fields) = arguments.as_object() else {
-        return Err(format!(
-            "Invalid input: json: cannot unmarshal {} into Go value of type fs.applyPatchInput",
-            kind(&arguments)
-        ));
-    };
-    let mut patch = String::new();
-    let mut dry_run = false;
-    for (key, value) in fields {
-        if value.is_null() {
-            continue;
-        }
-        if key.eq_ignore_ascii_case("patch") {
-            patch = value.as_str().ok_or_else(|| format!("Invalid input: json: cannot unmarshal {} into Go struct field applyPatchInput.patch of type string",kind(value)))?.into();
-        } else if key.eq_ignore_ascii_case("dry_run") {
-            dry_run = value.as_bool().ok_or_else(|| format!("Invalid input: json: cannot unmarshal {} into Go struct field applyPatchInput.dry_run of type bool",kind(value)))?;
-        }
-    }
-    Ok((patch, dry_run))
+#[derive(Default, Deserialize)]
+#[serde(default)]
+struct Input {
+    patch: String,
+    dry_run: bool,
 }
 impl ApplyPatch {
-    fn run(&self, context: &ToolContext, arguments: Value) -> Result<String, String> {
-        let (patch, dry_run) = input(arguments)?;
+    fn run(&self, context: &ToolContext, call: &ToolCall) -> Result<String, String> {
+        let arguments = fs_input::decode(
+            call,
+            "applyPatchInput",
+            &[("patch", Kind::String), ("dry_run", Kind::Bool)],
+        )?;
+        let Input { patch, dry_run } =
+            serde_json::from_value(arguments).expect("validated patch fields");
         let files = parse::parse(&patch).map_err(|e| format!("Invalid patch: {e}"))?;
         let _guard = if dry_run {
             None
@@ -343,7 +328,7 @@ impl Tool for ApplyPatch {
     ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
         Box::pin(async move {
             context.operation.check_active()?;
-            let (text, is_error) = match self.run(context, call.arguments) {
+            let (text, is_error) = match self.run(context, &call) {
                 Ok(text) => (text, false),
                 Err(text) => (text, true),
             };

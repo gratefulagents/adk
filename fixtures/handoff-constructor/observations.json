@@ -1,0 +1,684 @@
+{
+  "cases": [
+    {
+      "approval": false,
+      "description": "Handoff to Code Reviewer",
+      "has_filter": false,
+      "name": "Code Reviewer",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_Code_Reviewer"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "Code Reviewer",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_Code_Reviewer"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "Code Reviewer",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_Code_Reviewer"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to a   b",
+      "has_filter": false,
+      "name": "a   b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_a_b"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "a   b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_a_b"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "a   b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_a_b"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to a..b",
+      "has_filter": false,
+      "name": "a..b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_a_b"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "a..b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_a_b"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "a..b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_a_b"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to a__b",
+      "has_filter": false,
+      "name": "a__b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_a__b"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "a__b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_a__b"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "a__b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_a__b"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to a--b",
+      "has_filter": false,
+      "name": "a--b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_a--b"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "a--b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_a--b"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "a--b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_a--b"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to __-A--_",
+      "has_filter": false,
+      "name": "__-A--_",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_A"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "__-A--_",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_A"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "__-A--_",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_A"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to  ",
+      "has_filter": false,
+      "name": " ",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": " ",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": " ",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to ",
+      "has_filter": false,
+      "name": "",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to \u4e2d\u6587",
+      "has_filter": false,
+      "name": "\u4e2d\u6587",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "\u4e2d\u6587",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "\u4e2d\u6587",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_agent"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to A\u4e2d\u6587B",
+      "has_filter": false,
+      "name": "A\u4e2d\u6587B",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_A_B"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "A\u4e2d\u6587B",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_A_B"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "A\u4e2d\u6587B",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_A_B"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to \u0130STANBUL",
+      "has_filter": false,
+      "name": "\u0130STANBUL",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_STANBUL"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "\u0130STANBUL",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_STANBUL"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "\u0130STANBUL",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_STANBUL"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to a_??_b",
+      "has_filter": false,
+      "name": "a_??_b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_a___b"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "a_??_b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_a___b"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "a_??_b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_a___b"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to a-\u00a0-b",
+      "has_filter": false,
+      "name": "a-\u00a0-b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_a-_-b"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "a-\u00a0-b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_a-_-b"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "a-\u00a0-b",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_a-_-b"
+    },
+    {
+      "approval": false,
+      "description": "Handoff to \ufeffx",
+      "has_filter": false,
+      "name": "\ufeffx",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "",
+      "tool_name": "transfer_to_x"
+    },
+    {
+      "approval": false,
+      "description": "custom description",
+      "has_filter": false,
+      "name": "\ufeffx",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "custom description",
+      "tool_name": "transfer_to_x"
+    },
+    {
+      "approval": false,
+      "description": " \n",
+      "has_filter": false,
+      "name": "\ufeffx",
+      "overrides": false,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": " \n",
+      "tool_name": "transfer_to_x"
+    },
+    {
+      "approval": false,
+      "description": "override",
+      "has_filter": false,
+      "name": "Target",
+      "overrides": true,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "original",
+      "tool_name": "custom_transfer"
+    },
+    {
+      "approval": false,
+      "description": "",
+      "has_filter": false,
+      "name": "Target",
+      "overrides": true,
+      "read_only": true,
+      "same_target": true,
+      "schema": {
+        "properties": {},
+        "type": "object"
+      },
+      "target_description": "original",
+      "tool_name": "custom_transfer"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/handoff-constructor-reference/reference_test.go": "766ddbff5c9a0c27734f54f17c161f2448759cc440db1daa0a55f7884def29c7",
+      "scripts/handoff-constructor-reference/run.py": "12b60d22966448bbe92854c0a2074ab6832b95e4f04767f2d947b5b860c1c022"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/agent.go": "4249ea49210c173858beda562079e6c198b482c2043b1fbc4df795b10dcb6d07",
+      "internal/agent/agent_tool.go": "de75139a43f0528386d076d70af3ee14da39fe625364f9cb34668cd424a5b1a2",
+      "internal/agent/handoff.go": "b27a3db25987e05001477d611f8227921532464cc569ec2d2cff801f4bc12a24",
+      "internal/agent/types_test.go": "9d71a1e6609d79cc77abd6713e043cb72d8ca9e22729b30cb71c268fecaeef10",
+      "pkg/agentsdk/runtime/builder.go": "b8ff1a0408743398214962c4d7589519eee1c8c2d709416428ed57e4c4a34c2a",
+      "pkg/agentsdk/specialists.go": "3f0bfe8d9e686ef00b16c709e9b3e71659389caf8fb3275c4958b05804b61e59"
+    }
+  }
+}

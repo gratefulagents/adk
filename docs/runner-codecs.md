@@ -4,6 +4,85 @@ Baseline: Go SDK `1dc92b73900fac74dc357a938e4b5eee6392b418`, especially
 `internal/agent/run_config.go`, `internal/agent/runner.go`, and
 `pkg/agentsdk/chatloop.go`. Native `adk-core` types remain unchanged.
 
+## Analysis snapshot records
+
+`dto::ResponseSnapshot` preserves Go response-record field formats independently
+of whether a record can be converted into an executable native response. Ordered
+slice fields decode JSON null elements as Go zero values (empty strings or empty
+records), not as omitted elements. Raw JSON retains missing-versus-null, numeric
+spelling and duplicate-key order; `snapshots::to_go_json` applies Go escaping.
+
+`dto::SnapshotType` is an open string label. Known labels keep named variants;
+empty/missing/null labels use `Unspecified`, and other strings use `Other(String)`.
+Unknown numeric native item tags still project to the literal `"unknown"` label.
+This permits faithful analysis-record transport, not execution of unfamiliar
+history. Native Go-checkpoint migration and platform transcript persistence reject
+unspecified, unknown and future labels before constructing executable state.
+`SnapshotType` is now cloneable rather than copyable, and its JSON Schema is an
+open string. This does not claim all snapshot-decoder edge cases or provider
+response conversion are equivalent.
+
+### Standalone schema and tool snapshots
+
+With `compat`, `adk::codec::{from_go_json, to_go_json_bytes}` supports
+`snapshots::{OutputSchema, ToolSnapshot}` (the Go LLMOutputSchema and
+LLMToolSnapshot analysis records). Use this explicit byte API for Go case-folded
+keys, duplicate/null updates, signed64-bit timeout values, invalid typed-string
+replacement and opaque schema bytes. Raw schemas preserve lexical spelling,
+duplicate keys, lone-surrogate escapes and invalid UTF-8. Encoding omits both nil
+and empty raw schemas, but retains explicit JSON null; required name/boolean
+fields remain present. The existing Go10,000-level decode/raw-marshal boundaries
+apply, including public raw-byte and RawValue construction.
+
+The independent payload oracle now has1,629 decode cases (the original1,267 are
+unchanged), plus14 constructed snapshot encoding cases. This is a standalone
+record boundary: it does not make whole RequestSnapshot/ResponseSnapshot nested
+decoders equivalent, validate executable schemas, or reproduce partial Go
+mutation/error text. Ordinary Serde is not a substitute for the byte API.
+
+## Explicit budget guidance
+
+With `compat`, `adk::codec::userinput::{build_run_budget_context,
+build_subagent_budget_context}` return the pinned SDK's complete guidance text.
+They accept signed 64-bit turn counts; positive counts pass through, and zero or
+negative values select the SDK defaults of 100 top-level or 50 child turns.
+The public Go aliases map to ordinary Rust functions, not mutable global callbacks.
+
+These are text helpers, not limit setters or enforcement mechanisms. Their text
+does not guarantee that a host delivers turn-budget warnings. The legacy
+top-level helper is never automatically injected, matching its deprecated source
+status. The native automatic child runner's prompt assembly and default ceiling
+are separate contracts; exposing this helper does not establish their parity.
+Seven pinned-Go inputs per helper include both signed endpoints and compare every
+byte of the returned text. Source attribution remains GPL-3.0-only as recorded in
+the fixture provenance and repository licensing notices.
+
+## Signed usage arithmetic
+
+`adk::codec::dto::Usage` (facade `compat` feature) retains all five signed SDK
+counters. `add(&other)` merges them in place without changing `other`;
+`total_tokens()` sums input and output only, not cache counters. Both use explicit
+wrapping arithmetic, including in debug builds, matching the pinned SDK on
+64-bit targets. `requests` models a 64-bit Go `int`; this is not a 32-bit Go
+compatibility claim. Native `adk::core::Usage` remains unsigned and unchanged.
+
+`fixtures/usage/generate.go` executes the pinned public SDK alias to produce 64
+operand pairs, including negative values, cache-only counters and signed extrema.
+The typed-record fixture check reproduces the output before ledger verification.
+
+## Settings composition
+
+With the facade's `compat` feature, `adk::codec::snapshots::ModelSettings::merge`
+returns owned settings using the pinned SDK's value-precedence rules. Present
+`temperature`, `top_p` and `parallel_tool_calls` override even with zero/false;
+`max_tokens` and `thinking_budget` override only when positive. Nonempty strings
+(including whitespace) and nonempty stop lists override. Null/absent optionals,
+empty strings/lists and nonpositive integer overrides preserve the base values.
+Neither input is mutated; returned strings and lists do not alias either input.
+This helper does not validate provider-specific ranges or change builder policy.
+The `settings_routing` offline example feeds merged settings into a real builder
+request and then verifies mode/role precedence.
+
 ## Configuration integration
 
 `adk_codec::config::RunConfigSentinels` is a **bounded scalar projection**, not
@@ -145,3 +224,42 @@ turn boundary gets the same one-turn extension as the Go runner.
 Model-specific threshold lookup and 104 local compaction cases are executed
 against the pinned SDK. Full approval histories/new items and streamed snapshot
 order are now compared in real-engine replay; see the replay README.
+
+The analysis `snapshots::ModelSettings` also supports `from_go_json` and
+`to_go_json_bytes`: scalar nulls retain earlier duplicate values, nullable
+numbers/booleans reset on null, and repeated stop arrays retain Go backing-slot
+values. Its `Vec` intentionally collapses nil and empty stops (both omit on
+encoding); use `dto::ModelSettings` when that distinction matters. This does not
+make the enclosing `RequestSnapshot` byte decoder Go-compatible.
+
+### Lossless display-cost projection
+
+`adk::codec::cost::estimate_result_cost` accepts an optional borrowed pair of
+signed usage and response DTOs, plus an optional synchronous pricing callback.
+The callback returns `(cost, known)`; adapt a legacy cost-only provider by returning
+`(cost, true)`. Absent results return unknown zero without invoking the callback.
+Empty response lists price all usage; nonempty lists sum response prices in order
+and price the componentwise-clamped residual once, preserving SDK signed wrapping
+arithmetic and uncertainty. Requests alone do not trigger residual pricing.
+
+This compatibility projection deliberately preserves negative, infinite and NaN
+prices. It is **not** a billing-validation API. Native runtime accounting and its
+price sanitization remain unchanged. No Go model-interface reflection or pointer
+identity is required; the host supplies the appropriate borrowed callback.
+
+### Governed built-in agent kinds
+
+`adk::codec::agents` exposes the pinned eleven-kind catalog with `Kind` constants,
+`Definition` metadata, `built_in_kinds`, `definitions`, `parse_kind`, `resolve_kind`
+and `is_allowed`. Resolution trims SDK whitespace and matches canonical names or
+legacy aliases (`Explore`, `Plan`, `general-purpose`) case-insensitively using Go
+simple lowercase. `Kind` is an open string: constructing it does not normalize or
+validate it. `is_allowed` compares a canonical kind against resolved candidates;
+an empty allow-list allows even an unknown kind. Use `parse_kind` separately when
+known-kind validation is required. These helpers do not grant execution authority.
+
+Kind and definition records support Go byte decoding/encoding, including alias
+nil/empty state, omission, duplicate/null updates and malformed-string replacement.
+Returned metadata owns its alias lists: modifying a returned list cannot mutate
+the catalog. This deliberately avoids the Go helper's shallow alias-slice sharing.
+The native scheduler and role catalogs remain independently host-configured.

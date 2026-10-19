@@ -2,7 +2,7 @@
 use crate::{
     Error, Limits, Transport,
     client::{Client, HostPolicy},
-    config::ConfigSnapshot,
+    config::{ConfigSnapshot, ConnectionConfig},
     transport::{HttpTransport, RemoteOptions, StdioTransport},
 };
 use std::{collections::BTreeMap, path::Path};
@@ -86,38 +86,55 @@ pub async fn connect_with_diagnostics(
     working_directory: &Path,
     limits: Limits,
 ) -> Result<Client, ConnectionFailure> {
-    snapshot.verify_unchanged()?;
-    let config = snapshot
-        .config()
-        .server(server)
-        .ok_or_else(|| Error::Policy("server not configured".into()))?
-        .clone();
-    let grant = policy
-        .servers
-        .get(server)
-        .ok_or_else(|| Error::Policy("server not granted by host".into()))?;
-    if !config.enabled() || !grant.enabled || policy.tenant_id.trim().is_empty() {
-        return Err(Error::Policy("server disabled or tenant missing".into()).into());
-    }
-    if limits.max_pages == 0
-        || limits.max_items == 0
-        || limits.max_message_bytes == 0
-        || limits.timeout.is_zero()
-    {
-        return Err(Error::Config("positive limits required".into()).into());
-    }
+    connect_config_with_diagnostics(
+        &ConnectionConfig::snapshot(snapshot.clone()),
+        server,
+        policy,
+        remote,
+        environment,
+        working_directory,
+        limits,
+    )
+    .await
+}
+
+/// Connect using an explicitly supplied, validated inline or snapshot source.
+pub async fn connect_config(
+    source: &ConnectionConfig,
+    server: &str,
+    policy: HostPolicy,
+    remote: Option<RemoteOptions>,
+    environment: &BTreeMap<String, String>,
+    working_directory: &Path,
+    limits: Limits,
+) -> Result<Client, Error> {
+    connect_config_with_diagnostics(
+        source,
+        server,
+        policy,
+        remote,
+        environment,
+        working_directory,
+        limits,
+    )
+    .await
+    .map_err(|failure| failure.error)
+}
+
+/// Like [`connect_config`], retaining bounded host-only startup diagnostics.
+pub async fn connect_config_with_diagnostics(
+    source: &ConnectionConfig,
+    server: &str,
+    policy: HostPolicy,
+    remote: Option<RemoteOptions>,
+    environment: &BTreeMap<String, String>,
+    working_directory: &Path,
+    limits: Limits,
+) -> Result<Client, ConnectionFailure> {
+    let config = preflight(source, server, &policy, remote.as_ref(), &limits)?.clone();
+    let grant = &policy.servers[server];
     let transport: Box<dyn Transport> = if config.is_remote() {
-        if !grant.allowed_origins.contains(&config.origin()?) {
-            return Err(Error::Policy("remote origin not granted by host".into()).into());
-        }
-        let remote =
-            remote.ok_or_else(|| Error::Policy("remote transport requires host options".into()))?;
-        if remote.tenant_id != policy.tenant_id {
-            return Err(Error::Policy(
-                "transport credential tenant differs from policy tenant".into(),
-            )
-            .into());
-        }
+        let remote = remote.expect("preflight remote options");
         Box::new(
             HttpTransport::connect(
                 server,
@@ -142,13 +159,59 @@ pub async fn connect_with_diagnostics(
             .await?,
         )
     };
-    let mut client = Client::with_limits(transport, server, config, policy, limits)?;
-    if let Err(error) = client.initialize().await {
-        let _ = client.close().await;
+    let client = Client::with_limits(transport, server, config, policy, limits)?;
+    let mut acquired = crate::session::AcquiredClients(vec![client]);
+    if let Err(error) = acquired.0[0].initialize().await {
+        let closed = acquired
+            .start_cleanup()
+            .await
+            .map_err(|_| Error::Transport)?;
         return Err(ConnectionFailure {
             error,
-            diagnostics: client.diagnostics(),
+            diagnostics: closed[0].diagnostics(),
         });
     }
-    Ok(client)
+    Ok(acquired.0.pop().expect("acquired client"))
+}
+
+pub(crate) fn preflight<'a>(
+    source: &'a ConnectionConfig,
+    server: &str,
+    policy: &HostPolicy,
+    remote: Option<&RemoteOptions>,
+    limits: &Limits,
+) -> Result<&'a crate::config::ServerConfig, Error> {
+    source.verify_unchanged()?;
+    let config = source
+        .config()
+        .server(server)
+        .ok_or_else(|| Error::Policy("server not configured".into()))?;
+    let grant = policy
+        .servers
+        .get(server)
+        .ok_or_else(|| Error::Policy("server not granted by host".into()))?;
+    if !config.enabled() || !grant.enabled || policy.tenant_id.trim().is_empty() {
+        return Err(Error::Policy("server disabled or tenant missing".into()));
+    }
+    if limits.max_pages == 0
+        || limits.max_items == 0
+        || limits.max_message_bytes == 0
+        || limits.timeout.is_zero()
+    {
+        return Err(Error::Config("positive limits required".into()));
+    }
+    if config.is_remote() {
+        if !grant.allowed_origins.contains(&config.origin()?) {
+            return Err(Error::Policy("remote origin not granted by host".into()));
+        }
+        let remote =
+            remote.ok_or_else(|| Error::Policy("remote transport requires host options".into()))?;
+        if remote.tenant_id != policy.tenant_id {
+            return Err(Error::Policy(
+                "transport credential tenant differs from policy tenant".into(),
+            ));
+        }
+        crate::transport::validate_remote_options(config.url(), remote, limits)?;
+    }
+    Ok(config)
 }

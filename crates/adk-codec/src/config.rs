@@ -19,6 +19,8 @@ pub struct ConfigError(pub &'static str);
 #[serde(default, rename_all = "PascalCase", deny_unknown_fields)]
 pub struct RunConfigSentinels {
     #[serde(deserialize_with = "null_default")]
+    pub require_completion_confirmation: bool,
+    #[serde(deserialize_with = "null_default")]
     pub max_turns: i64,
     #[serde(deserialize_with = "null_default")]
     pub sub_agent_max_turns: i64,
@@ -50,6 +52,7 @@ pub struct ToolPolicySentinels {
 /// Values for runtime adapters. No native authorization policy is implicitly changed.
 #[derive(Debug, Clone, PartialEq, Eq)]
 pub struct EffectiveRunConfig {
+    pub require_completion_confirmation: bool,
     pub max_turns: NonZeroU32,
     pub sub_agent_max_turns: NonZeroU32,
     pub max_concurrent_sub_agents: Option<usize>,
@@ -97,6 +100,7 @@ impl RunConfigSentinels {
                 .ok_or(ConfigError(field))
         };
         Ok(EffectiveRunConfig {
+            require_completion_confirmation: self.require_completion_confirmation,
             max_turns: turns(self.max_turns, 100, "MaxTurns")?,
             sub_agent_max_turns: turns(self.sub_agent_max_turns, 50, "SubAgentMaxTurns")?,
             max_concurrent_sub_agents: if self.max_concurrent_sub_agents <= 0 {
@@ -158,6 +162,7 @@ impl RunConfigSentinels {
             Some(n) => positive(n, field),
         };
         Ok(Self {
+            require_completion_confirmation: value.require_completion_confirmation,
             max_turns: value.max_turns.get().into(),
             sub_agent_max_turns: value.sub_agent_max_turns.get().into(),
             max_concurrent_sub_agents: optional(

@@ -38,6 +38,7 @@ async fn call(root: &Path, access: AccessMode, args: Value) -> ToolOutput {
         .execute(
             &context(root),
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: "Edit".into(),
                 arguments: args,
@@ -52,6 +53,101 @@ fn text(output: &ToolOutput) -> &str {
         _ => panic!("expected text"),
     }
 }
+#[tokio::test]
+async fn pinned_edit_tool_results_include_diffs_for_both_access_modes() {
+    let root = tempfile::tempdir().unwrap();
+    let path = root.path().join("main.go");
+    fs::write(
+        &path,
+        "package main\n\nfunc main() {\n\tprintln(\"old\")\n}\n",
+    )
+    .unwrap();
+    let output = call(
+        root.path(),
+        AccessMode::FullAccess,
+        json!({
+            "file_path": path, "old_string": "println(\"old\")", "new_string": "println(\"new\")"
+        }),
+    )
+    .await;
+    assert!(!output.is_error, "{output:?}");
+    let result = text(&output);
+    assert!(result.starts_with(&format!("Successfully edited {}", path.display())));
+    for expected in [
+        "@@ -1,5 +1,5 @@",
+        "-\tprintln(\"old\")",
+        "+\tprintln(\"new\")",
+        " func main() {",
+    ] {
+        assert!(result.contains(expected), "{result}");
+    }
+    fs::write(root.path().join("note.txt"), "alpha\nbeta\ngamma\n").unwrap();
+    let output = call(
+        root.path(),
+        AccessMode::WorkspaceWrite,
+        json!({
+            "file_path": "note.txt", "old_string": "beta", "new_string": "BETA"
+        }),
+    )
+    .await;
+    assert!(!output.is_error, "{output:?}");
+    let result = text(&output);
+    for expected in [
+        "Successfully edited",
+        "@@ -1,3 +1,3 @@",
+        "-beta",
+        "+BETA",
+        " alpha",
+        " gamma",
+    ] {
+        assert!(result.contains(expected), "{result}");
+    }
+    fs::write(root.path().join("note.txt"), "x\ny\nx\n").unwrap();
+    let output = call(
+        root.path(),
+        AccessMode::WorkspaceWrite,
+        json!({
+            "file_path": "note.txt", "old_string": "x", "new_string": "z", "replace_all": true
+        }),
+    )
+    .await;
+    assert!(!output.is_error, "{output:?}");
+    let result = text(&output);
+    assert!(result.contains("Successfully replaced 2 occurrences"));
+    assert_eq!(result.matches("-x").count(), 2);
+    assert_eq!(result.matches("+z").count(), 2);
+    assert_eq!(
+        fs::read_to_string(root.path().join("note.txt")).unwrap(),
+        "z\ny\nz\n"
+    );
+}
+
+#[tokio::test]
+async fn diff_match_cap_does_not_truncate_actual_replacements() {
+    let root = tempfile::tempdir().unwrap();
+    for count in [256, 257] {
+        fs::write(root.path().join("a"), "x\n".repeat(count)).unwrap();
+        let output = call(
+            root.path(),
+            AccessMode::WorkspaceWrite,
+            json!({
+                "file_path":"a", "old_string":"x", "new_string":"y", "replace_all":true
+            }),
+        )
+        .await;
+        assert!(!output.is_error, "{output:?}");
+        let result = text(&output);
+        assert!(result.contains(&format!("Successfully replaced {count} occurrences")));
+        assert_eq!(result.matches("-x").count(), 256);
+        assert_eq!(result.matches("+y").count(), 256);
+        assert_eq!(result.ends_with("... [diff truncated]"), count == 257);
+        assert_eq!(
+            fs::read_to_string(root.path().join("a")).unwrap(),
+            "y\n".repeat(count)
+        );
+    }
+}
+
 #[tokio::test]
 async fn exact_matching_preserves_binary_bytes_modes_and_line_endings() {
     for access in [AccessMode::WorkspaceWrite, AccessMode::FullAccess] {
@@ -151,6 +247,7 @@ async fn confinement_hardlinks_file_limits_and_cancellation_preserve_content() {
             .execute(
                 &ctx,
                 ToolCall {
+                    raw_arguments: None,
                     id: "call".into(),
                     name: "Edit".into(),
                     arguments: json!({"file_path":"hard","old_string":"secret","new_string":"bad"})

@@ -27,11 +27,13 @@ pub mod error;
 pub mod factory;
 pub mod material;
 pub mod metadata;
+pub mod modelsdev;
 pub mod oauth;
 mod openai;
 pub mod routing;
 #[cfg(feature = "runtime")]
 pub mod runtime;
+mod snapshot;
 pub mod sse;
 pub mod wire;
 

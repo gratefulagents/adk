@@ -1,5 +1,6 @@
 //! Baseline Messages shaping, separate from credential lookup and HTTP retries.
 use crate::auth::AuthMode;
+pub use crate::snapshot::assembler::StreamAssembler;
 use adk_core::ModelRequest;
 use serde_json::{Value, json};
 
@@ -169,11 +170,14 @@ mod tests {
     use crate::wire::{self, Protocol};
     fn request(model: &str, effort: &str) -> ModelRequest {
         ModelRequest {
+            input_provenance: Vec::new(),
             model: model.into(),
             instructions: "host instructions".into(),
             input: vec![],
             tools: vec![],
-            output_schema: Some(json!({"type":"object"}).try_into().unwrap()),
+            output_schema: Some(
+                adk_core::JsonDocument::new((json!({"type":"object"})).to_string()).unwrap(),
+            ),
             output_schema_name: "result".into(),
             output_schema_strict: true,
             settings: [("reasoning_effort".into(), json!(effort))]

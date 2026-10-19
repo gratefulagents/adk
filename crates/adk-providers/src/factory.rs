@@ -1,4 +1,5 @@
 //! Typed baseline provider selection. Credentials never inherit across routes.
+pub mod config;
 use crate::{
     auth::{AuthMode, CredentialStore, Refresh, Scope, Session},
     client::Provider,
@@ -9,6 +10,18 @@ use std::sync::Arc;
 
 pub const DEFAULT_CHAT_MODEL: &str = "gpt-5.6-sol";
 pub const DEFAULT_CHAT_MINI_MODEL: &str = "gpt-5.3-codex-spark";
+/// Default backend for explicitly supplied OpenAI OAuth sessions.
+pub const DEFAULT_CODEX_BACKEND_BASE_URL: &str = "https://chatgpt.com/backend-api/codex";
+
+// Canonical routing names do not install credentials or register providers.
+pub const DEFAULT_PROVIDER_OPENAI: &str = "openai";
+pub const DEFAULT_PROVIDER_ANTHROPIC: &str = "anthropic";
+pub const DEFAULT_PROVIDER_OPENROUTER: &str = "openrouter";
+pub const DEFAULT_PROVIDER_GEMINI: &str = "gemini";
+pub const DEFAULT_PROVIDER_GROQ: &str = "groq";
+pub const DEFAULT_PROVIDER_XAI: &str = "xai";
+pub const DEFAULT_PROVIDER_LOCAL: &str = "local";
+pub const DEFAULT_PROVIDER_COPILOT: &str = "copilot";
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Kind {
@@ -40,21 +53,19 @@ impl Kind {
     }
     pub fn name(self) -> &'static str {
         match self {
-            Self::OpenAi => "openai",
-            Self::Anthropic => "anthropic",
-            Self::OpenRouter => "openrouter",
-            Self::Gemini => "gemini",
-            Self::Groq => "groq",
-            Self::Xai => "xai",
-            Self::Local => "local",
-            Self::Copilot => "copilot",
+            Self::OpenAi => DEFAULT_PROVIDER_OPENAI,
+            Self::Anthropic => DEFAULT_PROVIDER_ANTHROPIC,
+            Self::OpenRouter => DEFAULT_PROVIDER_OPENROUTER,
+            Self::Gemini => DEFAULT_PROVIDER_GEMINI,
+            Self::Groq => DEFAULT_PROVIDER_GROQ,
+            Self::Xai => DEFAULT_PROVIDER_XAI,
+            Self::Local => DEFAULT_PROVIDER_LOCAL,
+            Self::Copilot => DEFAULT_PROVIDER_COPILOT,
         }
     }
     pub fn endpoint(self, mode: AuthMode) -> &'static str {
         match self {
-            Self::OpenAi if mode == AuthMode::OpenAiOAuth => {
-                "https://chatgpt.com/backend-api/codex"
-            }
+            Self::OpenAi if mode == AuthMode::OpenAiOAuth => DEFAULT_CODEX_BACKEND_BASE_URL,
             Self::OpenAi => "https://api.openai.com/v1",
             Self::Anthropic => "https://api.anthropic.com",
             Self::OpenRouter => "https://openrouter.ai/api/v1",
@@ -104,6 +115,17 @@ pub fn default_route(explicit: Option<&str>, model: &str, provider: Option<Kind>
 
 pub fn supports_chat_completions(model: &str) -> bool {
     !model.to_ascii_lowercase().contains("codex")
+}
+
+/// Validate model selection for hosts that require Chat Completions only.
+pub fn validate_chat_completions_model(model: &str) -> Result<(), Error> {
+    if supports_chat_completions(model) {
+        Ok(())
+    } else {
+        Err(crate::invalid(
+            "model is not compatible with the OpenAI chat completions API; use a chat-completions model such as gpt-4.1 or gpt-4.1-mini",
+        ))
+    }
 }
 
 /// Each named instance supplies its own host-owned store and refresh boundary.
@@ -162,6 +184,14 @@ impl RouteSpec {
         store: Arc<dyn CredentialStore>,
         refresh: Arc<dyn Refresh>,
     ) -> Result<Arc<dyn adk_core::StreamingModel>, Error> {
+        self.build_with_model_fallbacks(store, refresh, &[])
+    }
+    pub(crate) fn build_with_model_fallbacks(
+        &self,
+        store: Arc<dyn CredentialStore>,
+        refresh: Arc<dyn Refresh>,
+        fallbacks: &[String],
+    ) -> Result<Arc<dyn adk_core::StreamingModel>, Error> {
         let scope = self.scope()?;
         let protocol = self.protocol.unwrap_or(self.kind.protocol());
         if (self.kind == Kind::Anthropic && protocol != Protocol::Anthropic)
@@ -175,7 +205,9 @@ impl RouteSpec {
         if self.kind == Kind::Copilot && self.protocol.is_none() {
             Ok(Arc::new(crate::copilot::Copilot::new(name, session)?))
         } else {
-            Ok(Arc::new(Provider::new(name, protocol, session)?))
+            Ok(Arc::new(
+                Provider::new(name, protocol, session)?.with_model_fallbacks(fallbacks.to_vec()),
+            ))
         }
     }
 }

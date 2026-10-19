@@ -1,0 +1,1066 @@
+{
+  "cases": [
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "preserve",
+      "streamed": false,
+      "target_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ]
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "messages",
+      "streamed": false,
+      "target_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        }
+      ]
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "filtered summary"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "replace",
+      "streamed": false,
+      "target_input": [
+        {
+          "kind": "message",
+          "text": "filtered summary"
+        }
+      ]
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "empty",
+      "streamed": false,
+      "target_input": []
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "preserve",
+      "streamed": true,
+      "target_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ]
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "messages",
+      "streamed": true,
+      "target_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        }
+      ]
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "filtered summary"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "replace",
+      "streamed": true,
+      "target_input": [
+        {
+          "kind": "message",
+          "text": "filtered summary"
+        }
+      ]
+    },
+    {
+      "events": [
+        "callback",
+        "filter"
+      ],
+      "filter_all": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "filter_input": [
+        {
+          "kind": "message",
+          "text": "hello"
+        },
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        }
+      ],
+      "final_history": [
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "last_agent": "expert",
+      "result_items": [
+        {
+          "kind": "message",
+          "text": "transfer"
+        },
+        {
+          "id": "lookup",
+          "kind": "call",
+          "name": "lookup"
+        },
+        {
+          "id": "h1",
+          "kind": "call",
+          "name": "transfer_to_expert"
+        },
+        {
+          "error": true,
+          "id": "lookup",
+          "kind": "output",
+          "text": "not executed: the conversation was handed off to expert in this turn"
+        },
+        {
+          "error": false,
+          "id": "h1",
+          "kind": "output",
+          "text": "Handing off to expert"
+        },
+        {
+          "kind": "message",
+          "text": "done"
+        }
+      ],
+      "scenario": "empty",
+      "streamed": true,
+      "target_input": []
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/handoff-filter-reference/reference_test.go": "d6460c7c9cd59a119e2ab97b3942a81ddf36c76e9cd34c04d68bd9e41c4ca693",
+      "scripts/handoff-filter-reference/run.py": "c65cddea8c08f909ae065ce328e1bfa151891900b51f2a95bf7edbc33f751d65"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/audit_fixes_test.go": "5e1f1c487383cf9c6b9f134b9d1420a64b0bdac7efc69c0c019050cfef1b304e",
+      "internal/agent/handoff.go": "b27a3db25987e05001477d611f8227921532464cc569ec2d2cff801f4bc12a24",
+      "internal/agent/hooks.go": "54aa598d8c5452a05262ca1b1b28b9105a645891a586ef49344371b0183b6797",
+      "internal/agent/run_context.go": "79d96ddd0f84d206a8fd3a6f42b7a695aabe0b115aa1fd6078186823c9bc90fc",
+      "internal/agent/run_result.go": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/runner_test.go": "93f9b527d0c0b7bbbdfa0360c5a27697db2d42bf331753d2c05e120541d17ec3",
+      "internal/agent/stream_events.go": "bd15743e7a712c41fd2239f9fca07abe1831ab65c61bfb487763d920090f2484",
+      "pkg/agentsdk/aliases.go": "fb01b5c91385f8b3e15d91e69832a815899dfda2c7da11793000ae6d743281a1",
+      "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894"
+    }
+  }
+}

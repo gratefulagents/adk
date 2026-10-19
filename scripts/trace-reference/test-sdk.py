@@ -1,0 +1,105 @@
+#!/usr/bin/env python3
+"""Execute pinned public SDK and explicitly selected package tests; retain reference evidence, not Rust closure."""
+import argparse
+from collections import Counter
+import hashlib
+import json
+import os
+import re
+from pathlib import Path
+import subprocess
+import sys
+
+ROOT = Path(__file__).resolve().parents[2]
+SDK = ROOT / "repos/sdk"
+PIN = "1dc92b73900fac74dc357a938e4b5eee6392b418"
+
+def add_claimed_tests(claims, selected):
+    """Only explicitly supported packages and exact top-level Go test names."""
+    for claim in claims["claims"].values():
+        reference = claim["reference_test"]
+        for package in ("pkg/agentsdk/sandbox", "examples/features/guardrails", "examples/features/sandbox", "examples/features/streaming", "examples/features/tools", "examples/features/providers", "examples/features/mcp", "examples/features/errors_retries", "examples/features/context_compaction", "examples/features/settings_routing", "examples/features/tools_registry", "examples/features/memory", "examples/features/tracestore", "examples/features/policy", "internal/agent/policy", "internal/agent/agents", "internal/agent", "internal/openai", "internal/modelactivity", "internal/anthropic"):
+            prefix = "github.com/gratefulagents/sdk/" + package + "/"
+            if reference.startswith(prefix):
+                name = reference[len(prefix):]
+                if not re.fullmatch(r"Test[A-Za-z0-9_]+", name):
+                    sys.exit(f"unsupported reference identifier: {name}")
+                selected.setdefault(package, set()).add(name)
+                break
+
+def main():
+    parser = argparse.ArgumentParser(description=__doc__)
+    parser.add_argument("--output", type=Path, required=True)
+    args = parser.parse_args()
+    baseline = (ROOT / "docs/migration/ledger/sdk-v0.0.115").resolve()
+    if args.output.resolve() == baseline or baseline in args.output.resolve().parents:
+        sys.exit("refusing to overwrite immutable baseline")
+    revision = subprocess.check_output(["git", "-C", str(SDK), "rev-parse", "HEAD"], text=True).strip()
+    if revision != PIN or subprocess.check_output(["git", "-C", str(SDK), "status", "--porcelain"], text=True).strip():
+        sys.exit("reference must be clean at the authoritative pin")
+    go = os.environ.get("GO", "go")
+    # Keep the bounded historical regressions and every explicitly selected regression
+    # required by current Rust claims. Refreshing must not silently drop proof
+    # added by later slices of the migration.
+    internal_tests = {
+        "TestRunnerInputGuardrailTripwire", "TestRunnerToolInputGuardrailTripwireReturnsToolErrorAndContinues",
+        "TestRunnerToolOutputGuardrailTripwireReturnsToolErrorAndRedactsTrace",
+        "TestRunnerToolOutputGuardrailContentReplacedRewritesOutputWithoutError",
+        "TestRunnerRecoversFromPanickingInputGuardrail", "TestModeReasoningSettings",
+        "TestResolveRoleModeRouting", "TestBuildMCPPromptContextSanitizesServerNames",
+        "TestBuildMCPPromptContextEmpty", "TestSanitizeMCPServerName", "TestCompactionDefaultsForModel",
+        "TestRequireCompletionConfirmation", "TestRequireCompletionConfirmationOffByDefault",
+        "TestFinalAnswerVerifierSingleRefutationRound", "TestAgentGetInstructions_Static",
+        "TestAgentGetInstructions_Dynamic", "TestRunnerStopOnFirstTool",
+        "TestRunnerStopAtToolsRunsOutputGuardrails", "TestRunnerStopAtToolsUsesToolOutputAsFinal",
+        "TestHandoffToTool", "TestHandoffIsEnabledGatesTool", "TestHandoffInputFilterSeesCurrentTurnItems",
+        "TestThinkingDeltaEmitterCoalesces", "TestThinkingDeltaEmitterFlushesOnSize",
+        "TestRunnerStreamsThinkingDeltasToEventStream", "TestRunStreamedDoesNotEmitThinkingDeltaEvents",
+    }
+    claims = json.loads((ROOT / "docs/migration/ledger/issue-11-rust-claims.json").read_text())
+    selected = {"internal/agent": internal_tests}
+    add_claimed_tests(claims, selected)
+
+    commands = [[go, "test", "-count=1", "-json", "./pkg/agentsdk/..."]]
+    for package, names in sorted(selected.items()):
+        if names:
+            pattern = "^(" + "|".join(sorted(names)) + ")$"
+            commands.append([go, "test", "-count=1", "-json", "./" + package, "-run", pattern])
+    tests = {}
+    packages = {}
+    results = []
+    for command in commands:
+        result = subprocess.run(command, cwd=SDK, text=True, capture_output=True)
+        if result.returncode:
+            sys.stderr.write(result.stdout)
+            sys.stderr.write(result.stderr)
+        results.append(result)
+        for line in result.stdout.splitlines():
+            event = json.loads(line)
+            action = event["Action"]
+            if action in ("pass", "fail", "skip"):
+                package = event["Package"]
+                if "Test" in event:
+                    tests[package + "/" + event["Test"]] = action
+                else:
+                    packages[package] = action
+    exit_code = next((r.returncode for r in results if r.returncode), 0)
+    document = {
+        "sdk_revision": revision,
+        "go_version": subprocess.check_output([go, "version"], text=True).strip(),
+        "commands": [["go", *command[1:]] for command in commands],
+        "exit_code": exit_code,
+        "baseline_inventory_sha256": hashlib.sha256((baseline / "inventory.json").read_bytes()).hexdigest(),
+        "purpose": "Independent Go reference execution only; does not verify any Rust acceptance ID.",
+        "counts": dict(sorted(Counter(tests.values()).items())),
+        "packages": dict(sorted(packages.items())),
+        "tests": dict(sorted(tests.items())),
+        "stderr": "\n".join(r.stderr for r in results),
+    }
+    args.output.parent.mkdir(parents=True, exist_ok=True)
+    args.output.write_text(json.dumps(document, indent=2, sort_keys=True) + "\n")
+    print(json.dumps({"exit_code": exit_code, "counts": document["counts"], "packages": len(packages)}))
+    sys.exit(exit_code)
+
+if __name__ == "__main__":
+    main()

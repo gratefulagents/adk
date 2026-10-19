@@ -14,6 +14,9 @@ use adk_runtime::CancellationToken;
 use serde_json::json;
 use std::sync::{Arc, Mutex};
 
+#[cfg(feature = "runtime")]
+mod metadata_compaction;
+
 fn context() -> Context {
     Context {
         run_id: "routes-fixture".into(),
@@ -23,6 +26,7 @@ fn context() -> Context {
 }
 fn request(model: &str) -> ModelRequest {
     ModelRequest {
+        input_provenance: Vec::new(),
         model: model.into(),
         instructions: String::new(),
         input: vec![],
@@ -35,6 +39,7 @@ fn request(model: &str) -> ModelRequest {
 }
 fn usage() -> Usage {
     Usage {
+        requests: 1,
         input_tokens: 1000,
         output_tokens: 100,
         cache_read_tokens: 200,
@@ -44,6 +49,9 @@ fn usage() -> Usage {
 }
 fn answer() -> ModelResponse {
     ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
         items: vec![RunItem::Message {
             message: Message {
                 role: Role::Assistant,
@@ -383,7 +391,7 @@ fn metadata_catalog_picker_lookup_and_compaction_match_baseline() {
     assert!(!by_id.contains_key("openai/gpt-6-astra"));
     let astra = &by_id["gpt-6-astra"];
     assert_eq!(astra.priority, Some(1));
-    assert_eq!(astra.resolved_context_window(), Some(272000));
+    assert_eq!(astra.resolved_context_window(), 272000);
     assert_eq!(astra.compaction_defaults(), Some((244800, 136000)));
     assert_eq!(astra.supported_reasoning_levels, ["low", "ultra"]);
     assert_eq!(astra.default_reasoning_level, "high");
@@ -426,6 +434,149 @@ fn metadata_catalog_picker_lookup_and_compaction_match_baseline() {
         let error = parse_model_metadata(invalid).unwrap_err();
         assert!(!format!("{error:?}").contains("secret"));
     }
+}
+
+#[test]
+fn validate_chat_completions_original_cases() {
+    use adk_providers::factory::validate_chat_completions_model;
+    assert!(validate_chat_completions_model("gpt-4.1").is_ok());
+    assert!(validate_chat_completions_model("gpt-5.2-codex").is_err());
+}
+
+#[test]
+fn validate_chat_completions_diagnostics_and_predicate_agree() {
+    use adk_providers::factory::validate_chat_completions_model;
+    for model in [
+        "",
+        " \t\n",
+        "gpt-4.1",
+        " GPT-5.2-CODEX ",
+        "private/codex-secret",
+    ] {
+        let result = validate_chat_completions_model(model);
+        assert_eq!(result.is_ok(), supports_chat_completions(model));
+        if let Err(error) = result {
+            assert_eq!(error.info.category, ErrorCategory::InvalidInput);
+            let diagnostic = format!("{error:?}");
+            assert!(diagnostic.contains("gpt-4.1 or gpt-4.1-mini"));
+            assert!(!diagnostic.contains(model));
+        }
+    }
+}
+
+#[test]
+fn metadata_source_parse_codex_shape() {
+    let models = parse_model_metadata(
+        br#"{
+            "models": [{
+                "slug": "gpt-5.5",
+                "context_window": 272000,
+                "max_context_window": 272000,
+                "auto_compact_token_limit": null,
+                "effective_context_window_percent": 95
+            }]
+        }"#,
+    )
+    .unwrap();
+    assert_eq!(models.len(), 1);
+    let got = &models[0];
+    assert_eq!(got.id, "gpt-5.5");
+    assert_eq!(got.context_window, Some(272000));
+    assert_eq!(got.resolved_context_window(), 272000);
+    assert_eq!(got.auto_compact_token_limit, None);
+    assert_eq!(got.effective_context_window_percent, Some(95));
+}
+
+#[test]
+fn metadata_source_parse_copilot_capabilities_shape() {
+    let models = parse_model_metadata(
+        br#"{
+            "data": [{
+                "id": "gpt-5.3-codex-spark",
+                "capabilities": {
+                    "family": "gpt-5",
+                    "limits": {
+                        "max_context_window_tokens": 128000,
+                        "max_prompt_tokens": 96000,
+                        "max_output_tokens": 32000
+                    }
+                }
+            }]
+        }"#,
+    )
+    .unwrap();
+    assert_eq!(models.len(), 1);
+    let got = &models[0];
+    assert_eq!(got.id, "gpt-5.3-codex-spark");
+    assert_eq!(got.context_window, Some(128000));
+    assert_eq!(got.resolved_context_window(), 128000);
+    assert_eq!(got.max_output_tokens, Some(32000));
+}
+
+#[test]
+fn metadata_source_copilot_falls_back_to_max_prompt_tokens() {
+    let models = parse_model_metadata(
+        br#"{
+            "data": [{
+                "id": "some-model",
+                "capabilities": {"limits": {"max_prompt_tokens": 200000}}
+            }]
+        }"#,
+    )
+    .unwrap();
+    assert_eq!(models[0].context_window, Some(200000));
+}
+
+#[test]
+fn metadata_source_picker_mirrors_codex_picker() {
+    let models = parse_model_metadata(
+        br#"{
+            "models": [
+                {"slug": "gpt-5.6-sol", "visibility": "list", "priority": 6, "display_name": "GPT-5.6 Sol"},
+                {"slug": "gpt-reserve", "visibility": "hide", "priority": 3},
+                {"slug": "gpt-6-astra", "visibility": "list", "priority": 1, "display_name": "GPT-6-Astra",
+                 "description": "Our most capable model for complex, demanding work.",
+                 "default_reasoning_level": "low",
+                 "supported_reasoning_levels": [{"effort":"low","description":""},{"effort":"max","description":""},{"effort":"ultra","description":""}],
+                 "context_window": 272000, "max_context_window": 872000, "minimal_client_version": "0.153.0"},
+                {"slug": "gpt-5.4-mini", "visibility": "list", "priority": 23, "upgrade": {"model": "gpt-5.6-luna"}},
+                {"slug": "codex-auto-review", "visibility": "hide", "priority": 43}
+            ]
+        }"#,
+    )
+    .unwrap();
+    let picker = picker_model_metadata(&models);
+    assert_eq!(
+        picker.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(),
+        ["gpt-6-astra", "gpt-5.6-sol", "gpt-5.4-mini"]
+    );
+    let astra = &picker[0];
+    assert_eq!(astra.display_name, "GPT-6-Astra");
+    assert!(!astra.description.is_empty());
+    assert_eq!(astra.default_reasoning_level, "low");
+    assert_eq!(astra.supported_reasoning_levels.len(), 3);
+    assert_eq!(astra.supported_reasoning_levels[2], "ultra");
+    assert_eq!(astra.resolved_context_window(), 272000);
+    assert_eq!(picker[2].upgrade_model.as_deref(), Some("gpt-5.6-luna"));
+    assert!(
+        models
+            .iter()
+            .find(|m| m.id == "gpt-reserve")
+            .unwrap()
+            .hidden()
+    );
+}
+
+#[test]
+fn metadata_source_plain_openai_alphabetical() {
+    let models =
+        parse_model_metadata(br#"{"data":[{"id":"gpt-5.5"},{"id":"gpt-4.1"},{"id":"o3"}]}"#)
+            .unwrap();
+    let picker = picker_model_metadata(&models);
+    assert_eq!(
+        picker.iter().map(|m| m.id.as_str()).collect::<Vec<_>>(),
+        ["gpt-4.1", "gpt-5.5", "o3"]
+    );
 }
 
 struct Store(Mutex<Material>);
@@ -484,6 +635,68 @@ fn session(endpoint: &str, mode: AuthMode) -> Session {
 }
 
 #[tokio::test]
+async fn metadata_source_fetch_standard_openai_shape() {
+    use std::io::{Read, Write};
+    let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
+    let address = listener.local_addr().unwrap();
+    let server = std::thread::spawn(move || {
+        let (mut socket, _) = listener.accept().unwrap();
+        socket
+            .set_read_timeout(Some(std::time::Duration::from_secs(3)))
+            .unwrap();
+        let mut bytes = Vec::new();
+        loop {
+            let mut chunk = [0u8; 1024];
+            let n = socket.read(&mut chunk).unwrap();
+            assert!(n > 0);
+            bytes.extend_from_slice(&chunk[..n]);
+            if bytes.windows(4).any(|w| w == b"\r\n\r\n") {
+                break;
+            }
+        }
+        let body = r#"{"data":[{"id":"gpt-test"}]}"#;
+        write!(
+            socket,
+            "HTTP/1.1 200 OK\r\nContent-Length: {}\r\nConnection: close\r\n\r\n{body}",
+            body.len()
+        )
+        .unwrap();
+        String::from_utf8(bytes).unwrap()
+    });
+    let session = Session::new(
+        Scope::new(
+            "catalog",
+            &format!("http://{address}"),
+            None,
+            AuthMode::ApiKey,
+        )
+        .unwrap(),
+        Arc::new(Store(Mutex::new(Material {
+            access_token: Secret::new("test-key"),
+            refresh_token: None,
+            id_token: None,
+            email: None,
+            account: None,
+            expires_at: None,
+            last_refresh: None,
+            revision: 0,
+        }))),
+        Arc::new(Rotate),
+    )
+    .unwrap();
+    let models = fetch_model_metadata(&context(), &session).await.unwrap();
+    let request = server.join().unwrap();
+    assert_eq!(models.len(), 1);
+    assert_eq!(models[0].id, "gpt-test");
+    assert!(request.lines().any(|line| {
+        line.split_once(':').is_some_and(|(name, value)| {
+            name.eq_ignore_ascii_case("authorization") && value.trim() == "Bearer test-key"
+        })
+    }));
+    assert_eq!(request.lines().next(), Some("GET /v1/models HTTP/1.1"));
+}
+
+#[tokio::test]
 async fn explicit_metadata_get_refreshes_once_and_normalizes_endpoint() {
     use std::io::{Read, Write};
     let listener = std::net::TcpListener::bind("127.0.0.1:0").unwrap();
@@ -523,7 +736,7 @@ async fn explicit_metadata_get_refreshes_once_and_normalizes_endpoint() {
         }
     });
     let session = session(
-        &format!("http://{address}/v1/responses"),
+        &format!("http://{address}/%76%31%2Fresponses"),
         AuthMode::OpenAiOAuth,
     );
     let models = fetch_model_metadata(&context(), &session).await.unwrap();
@@ -549,6 +762,219 @@ async fn explicit_metadata_get_refreshes_once_and_normalizes_endpoint() {
     );
 }
 
+#[test]
+fn metadata_endpoint_normalization_matrix() {
+    for (endpoint, expected) in [
+        ("https://api.openai.com", "https://api.openai.com/v1/models"),
+        (
+            "https://api.openai.com/",
+            "https://api.openai.com/v1/models",
+        ),
+        ("http://127.0.0.1:1234", "http://127.0.0.1:1234/v1/models"),
+        (
+            "https://example.test/proxy",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/proxy///",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/proxy/responses/",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/proxy/chat/completions/",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/responses",
+            "https://example.test/v1/models",
+        ),
+        (
+            "https://example.test/chat/completions",
+            "https://example.test/v1/models",
+        ),
+        (
+            "https://example.test/proxy/v1",
+            "https://example.test/proxy/v1/models",
+        ),
+        (
+            "https://example.test/v1/proxy/responses",
+            "https://example.test/v1/proxy/models",
+        ),
+        (
+            "https://example.test/v10",
+            "https://example.test/v10/models",
+        ),
+        (
+            "https://example.test/V1",
+            "https://example.test/V1/v1/models",
+        ),
+        (
+            "https://example.test/responses/chat/completions",
+            "https://example.test/v1/models",
+        ),
+        ("https://chatgpt.com", "https://chatgpt.com/v1/models"),
+        (
+            "https://chatgpt.com/backend-api/codex/responses",
+            "https://chatgpt.com/backend-api/codex/models",
+        ),
+        (
+            "https://API.CHATGPT.COM:8443/custom/chat/completions",
+            "https://api.chatgpt.com:8443/custom/v1/models",
+        ),
+        (
+            "https://notchatgpt.com/custom",
+            "https://notchatgpt.com/custom/v1/models",
+        ),
+        (
+            "https://chatgpt.com.evil.test/custom",
+            "https://chatgpt.com.evil.test/custom/v1/models",
+        ),
+        (
+            "https://api.githubcopilot.com",
+            "https://api.githubcopilot.com/models",
+        ),
+        (
+            "https://api.individual.githubcopilot.com/",
+            "https://api.individual.githubcopilot.com/models",
+        ),
+        (
+            "https://api.githubcopilot.com/chat/completions",
+            "https://api.githubcopilot.com/models",
+        ),
+        (
+            "https://API.GITHUBCOPILOT.COM:8443/custom/responses",
+            "https://api.githubcopilot.com:8443/custom/v1/models",
+        ),
+        (
+            "https://api.individual.githubcopilot.com/custom",
+            "https://api.individual.githubcopilot.com/custom/models",
+        ),
+        (
+            "https://other.githubcopilot.com",
+            "https://other.githubcopilot.com/v1/models",
+        ),
+        (
+            "https://api.githubcopilot.com.evil.test",
+            "https://api.githubcopilot.com.evil.test/v1/models",
+        ),
+    ] {
+        let session = session(endpoint, AuthMode::ApiKey);
+        assert_eq!(
+            model_metadata_endpoint(&session).unwrap().as_str(),
+            expected,
+            "{endpoint}"
+        );
+    }
+    for endpoint in [
+        "https://example.test/proxy?key=value",
+        "https://example.test/proxy?",
+        "https://example.test/proxy#fragment",
+        "https://example.test/proxy#",
+    ] {
+        assert!(Scope::new("catalog", endpoint, None, AuthMode::ApiKey).is_err());
+    }
+}
+
+#[test]
+fn metadata_codex_client_version_is_session_owned_and_guarded() {
+    for (configured, expected) in [
+        (None, "0.153.4"),
+        (Some("0.999.0"), "0.999.0"),
+        (Some(" \t0.999.0\n"), "0.999.0"),
+        (Some(""), "0.153.4"),
+        (Some(" \t\r\n"), "0.153.4"),
+    ] {
+        for mode in [
+            AuthMode::OpenAiOAuth,
+            AuthMode::ApiKey,
+            AuthMode::Anonymous,
+            AuthMode::AnthropicOAuth,
+            AuthMode::CopilotOAuth,
+        ] {
+            for (host, accepted) in [
+                ("chatgpt.com", true),
+                ("chatgpt.com:443", false),
+                ("chatgpt.com:", false),
+                ("api.chatgpt.com:00443", false),
+                ("CHATGPT.COM", true),
+                ("api.chatgpt.com", true),
+                ("a.b.chatgpt.com:8443", false),
+                ("api.openai.com", false),
+                ("example.test", false),
+                ("notchatgpt.com", false),
+                ("chatgpt.com.evil.test", false),
+                ("chatgpt.com.", false),
+                ("127.0.0.1", false),
+                ("[::1]", false),
+            ] {
+                for suffix in ["", "/", "/responses", "/chat/completions"] {
+                    let mut session =
+                        session(&format!("https://{host}/backend-api/codex{suffix}"), mode);
+                    let scope = session.scope().clone();
+                    if let Some(version) = configured {
+                        session = session.with_codex_client_version(version);
+                    }
+                    assert_eq!(session.scope(), &scope);
+                    assert_eq!(session.codex_client_version(), expected);
+                    let version_path = if accepted { "" } else { "/v1" };
+                    let base = reqwest::Url::parse(&format!(
+                        "https://{host}/backend-api/codex{version_path}/models"
+                    ))
+                    .unwrap();
+                    let expected_url = if accepted && mode == AuthMode::OpenAiOAuth {
+                        format!("{base}?client_version={expected}")
+                    } else {
+                        base.to_string()
+                    };
+                    assert_eq!(
+                        model_metadata_endpoint(&session).unwrap().as_str(),
+                        expected_url
+                    );
+                }
+            }
+        }
+    }
+    let reset = session("https://chatgpt.com", AuthMode::OpenAiOAuth)
+        .with_codex_client_version("0.999.0")
+        .with_codex_client_version(" \n ");
+    assert_eq!(reset.codex_client_version(), "0.153.4");
+    for endpoint in [
+        "https://chatgpt.com?client_version=0.999.0",
+        "https://chatgpt.com#fragment",
+        "https://user@chatgpt.com",
+        "https://user:password@chatgpt.com",
+        "http://chatgpt.com",
+    ] {
+        assert!(Scope::new("codex", endpoint, None, AuthMode::OpenAiOAuth).is_err());
+    }
+}
+
+#[cfg(feature = "runtime")]
+#[test]
+fn metadata_resolver_and_provider_share_configured_session() {
+    let session = Arc::new(
+        session(
+            "https://chatgpt.com/backend-api/codex",
+            AuthMode::OpenAiOAuth,
+        )
+        .with_codex_client_version("0.999.0"),
+    );
+    let resolver = adk_providers::runtime::MetadataCompactionResolver::new(session.clone());
+    let provider =
+        adk_providers::client::Provider::new("codex", Protocol::Responses, session.clone())
+            .unwrap();
+    assert_eq!(Arc::strong_count(&session), 3);
+    assert_eq!(
+        model_metadata_endpoint(&session).unwrap().as_str(),
+        "https://chatgpt.com/backend-api/codex/models?client_version=0.999.0"
+    );
+    drop((resolver, provider));
+    assert_eq!(Arc::strong_count(&session), 1);
+}
+
 #[cfg(feature = "runtime")]
 #[tokio::test]
 async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_modes() {
@@ -567,7 +993,13 @@ async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_mod
         }
     }
     #[derive(Default)]
-    struct Costs(Mutex<Vec<f64>>);
+    struct Costs(Mutex<Vec<f64>>, Mutex<Vec<Option<f64>>>);
+    impl adk_runtime::tracing::GenerationObserver for Costs {
+        fn start(&self, _: &Context, _: &adk_runtime::tracing::GenerationRecord) {}
+        fn end(&self, _: &Context, record: &adk_runtime::tracing::GenerationRecord) {
+            self.1.lock().unwrap().push(record.cost_usd);
+        }
+    }
     impl RunHooks for Costs {
         fn observe<'a>(
             &'a self,
@@ -582,57 +1014,68 @@ async fn runner_fallback_charges_actual_named_binding_in_complete_and_stream_mod
             })
         }
     }
-    for streaming in [false, true] {
-        let primary = Arc::new(Probe {
-            fail: true,
-            ..Default::default()
-        });
-        let backup = Arc::new(Probe::default());
-        let mut routes = Routes::new("primary");
-        routes
-            .register_kind("primary", Kind::OpenAi, primary.clone())
+    for (backup_model, backup_kind, expected_cost) in [
+        ("claude-sonnet-5", Kind::Anthropic, Some(0.003165)),
+        ("unknown", Kind::OpenAi, None),
+    ] {
+        for streaming in [false, true] {
+            let primary = Arc::new(Probe {
+                fail: true,
+                ..Default::default()
+            });
+            let backup = Arc::new(Probe::default());
+            let mut routes = Routes::new("primary");
+            routes
+                .register_kind("primary", Kind::OpenAi, primary.clone())
+                .unwrap();
+            routes
+                .register_kind("backup", backup_kind, backup.clone())
+                .unwrap();
+            let routes = Arc::new(routes);
+            let mut agent = AgentConfig::new(
+                "fixture",
+                ModelBinding::streaming("primary/gpt-5.6", routes.clone()),
+            );
+            agent.fallbacks.push(ModelBinding::streaming(
+                format!("backup/{backup_model}"),
+                routes.clone(),
+            ));
+            let observed = Arc::new(Costs::default());
+            let config = RunnerConfig {
+                cost_estimator: Some(Arc::new(adk_providers::runtime::BaselineCosts(routes))),
+                generation_observer: Some(observed.clone()),
+                hooks: Some(observed.clone()),
+                ..Default::default()
+            };
+            let runner = Runner::new(agent, config).unwrap();
+            let request = RunRequest {
+                input_provenance: Vec::new(),
+                input: vec![],
+                policy: RunPolicy {
+                    max_turns: 2.try_into().unwrap(),
+                    tools: ToolPolicy::default(),
+                    tool_use: ToolUseBehavior::Continue,
+                },
+            };
+            let outcome = if streaming {
+                runner
+                    .stream(context(), request, Arc::new(HostFixture))
+                    .finish()
+                    .await
+            } else {
+                runner.run(context(), request, Arc::new(HostFixture)).await
+            }
             .unwrap();
-        routes
-            .register_kind("backup", Kind::Anthropic, backup.clone())
-            .unwrap();
-        let routes = Arc::new(routes);
-        let mut agent = AgentConfig::new(
-            "fixture",
-            ModelBinding::streaming("primary/gpt-5.6", routes.clone()),
-        );
-        agent.fallbacks.push(ModelBinding::streaming(
-            "backup/claude-sonnet-5",
-            routes.clone(),
-        ));
-        let observed = Arc::new(Costs::default());
-        let config = RunnerConfig {
-            cost_estimator: Some(Arc::new(adk_providers::runtime::BaselineCosts(routes))),
-            hooks: Some(observed.clone()),
-            ..Default::default()
-        };
-        let runner = Runner::new(agent, config).unwrap();
-        let request = RunRequest {
-            input: vec![],
-            policy: RunPolicy {
-                max_turns: 2.try_into().unwrap(),
-                tools: ToolPolicy::default(),
-                tool_use: ToolUseBehavior::Continue,
-            },
-        };
-        let outcome = if streaming {
-            runner
-                .stream(context(), request, Arc::new(HostFixture))
-                .finish()
-                .await
-        } else {
-            runner.run(context(), request, Arc::new(HostFixture)).await
+            assert_eq!(outcome.result.responses.len(), 1);
+            assert_eq!(outcome.result.usage.input_tokens, 1000);
+            assert_eq!(*primary.requests.lock().unwrap(), ["gpt-5.6"]);
+            assert_eq!(*backup.requests.lock().unwrap(), [backup_model]);
+            near(
+                *observed.0.lock().unwrap().last().unwrap(),
+                expected_cost.unwrap_or(0.0),
+            );
+            assert_eq!(*observed.1.lock().unwrap().last().unwrap(), expected_cost);
         }
-        .unwrap();
-        assert_eq!(outcome.result.responses.len(), 1);
-        assert_eq!(outcome.result.usage.input_tokens, 1000);
-        assert_eq!(*primary.requests.lock().unwrap(), ["gpt-5.6"]);
-        assert_eq!(*backup.requests.lock().unwrap(), ["claude-sonnet-5"]);
-        near(*observed.0.lock().unwrap().last().unwrap(), 0.003165);
     }
 }
 
@@ -708,5 +1151,7 @@ fn numeric_runner_adapter_does_not_claim_unknown_prices_are_known() {
     let costs = adk_providers::runtime::BaselineCosts(Arc::new(routes));
     assert_eq!(costs.0.estimate_cost("unknown", &usage()), None);
     assert_eq!(costs.cost("unknown", &usage()), 0.0);
+    assert_eq!(costs.estimate_cost("unknown", &usage()), None);
     near(costs.cost("gpt-5.6", &usage()), 0.00533);
+    near(costs.estimate_cost("gpt-5.6", &usage()).unwrap(), 0.00533);
 }

@@ -102,3 +102,64 @@ Pattern detection handles the tested ANSI/Unicode obfuscations, not arbitrary
 encoding or deliberate data exfiltration; it is not a comprehensive DLP system.
 See the [security crate](../crates/adk-security/README.md) and
 [sandbox crate](../crates/adk-sandbox/README.md) for API-specific restrictions.
+
+## Legacy SDK policy projections
+
+`adk::codec::policy` (facade `compat` feature) exposes the SDK's pure permission,
+Git-remote-write and runtime-surface helpers. These values are **not execution
+authorization** and are not automatically installed into builders or tool contexts.
+`normalize_permission_mode("")` returns `workspace-write`, and
+`normalize_git_remote_writes("")` returns `enabled`, matching legacy defaults.
+Unknown labels fail closed; normalization trims Go-compatible Unicode whitespace
+but does not lowercase or accept underscore aliases. This differs deliberately
+from host/chat-loop normalization and native `security::normalize_access`.
+
+`RuntimePolicy::normalize` preserves optional-feature flags and allowed-kind/skill
+lists, including absent versus allocated-empty lists. It enables no optional feature
+in a default policy. `ToolPolicy::new` derives its normalized mutability label.
+PermissionMode/GitRemoteWrites are owned string aliases; source label methods map
+to free functions `allows_write_tools` and `allows_mcp_tool`. Owned clones replace
+Go slice sharing. The module provides no Go JSON decoder or mutable package-level
+function variables.
+
+The separate public mapping helpers return `full`/`read-only` access labels and
+`Option<config::ToolPolicySentinels>`: danger-full-access maps to None; other modes
+require mutating-tool approval and leave timeout unset (zero sentinel). None is a
+legacy projection, not permission to bypass a host restriction. Do not interpret
+the approval flag as requiring approval for every native tool: source policy only
+requires it for mutating, non-control-flow tools.
+
+Native `core::ToolPolicy` still defaults to ReadOnly; `security::normalize_access`
+still fails closed on empty/unknown input. Hosts must explicitly resolve legacy
+configuration against their native permission ceiling. These helpers do not grant
+network, remote-write, MCP or sandbox authority.
+
+## Native per-action authorization
+
+Hosts can set `runtime::RunnerConfig::action_authorizer` to an
+`Arc<dyn core::ActionAuthorizer>`. The default is absent. Each accessible ordinary
+tool call supplies its name, original argument text, workspace, read-only flag and
+`model-tool-call` provenance. Handoff routing is not an ordinary tool authorization
+request. Static permission ceilings remain authoritative: an allow result cannot
+make a hidden or denied tool executable, nor waive an existing approval requirement.
+Automatic builder-created child runners inherit the parent authorizer.
+
+The open decision strings `allow`, `deny`, and `ask` are recognized exactly. Empty,
+unknown, case-mismatched and `classify` decisions fail closed. Callback failures
+retain risk metadata but replace the decision, reason and rule with a canonical
+denial. Panics are sanitized; cancellation, deadlines and dropping the run owner
+cancel pending authorization rather than detach it. Ask enters the normal approval
+flow. Authorization is repeated when an approval is resumed, so an old approval
+cannot override a newer denial. Batch audit order follows tool-call order.
+
+`RunResult::action_audit_records` contains raw requests, normalized decisions and
+host errors. These records can include private tool arguments and must be treated
+as sensitive data, not automatically forwarded to public logs. The typed native
+records are not Go JSON wire DTOs. Unlike the source in-memory approval path, the
+native approval journal rejects malformed raw JSON instead of persisting it.
+
+Durable execution requires a nonempty `ActionAuthorizer::durable_key()` identifying
+all policy inputs and asserting replay-safe repeated authorization. Missing or
+changed bindings cannot resume a checkpoint. Existing audit records survive native
+checkpoint recovery; uncertain external effects still require operator resolution
+before any reauthorization or re-execution.

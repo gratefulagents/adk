@@ -1,4 +1,4 @@
-# Deterministic LOCAL compaction
+# Local compaction and model-written summaries
 
 ## Scope and provenance
 
@@ -13,11 +13,13 @@ URLs, exporter hashes, and fixture hashes are in
 **Important baseline distinction:** Go `DefaultCompactionConfig()` sets
 `UseLLMSummary=true`. The Go runner first tries provider compaction, then selects
 a deterministic local plan, then optionally asks the model to replace that
-plan's summary. This module implements the deterministic local algorithm, not
-that additional model call. Its usage counters and cost are zero. Provider-native
-compaction, opaque provider item transport, and LLM summary generation remain
-outside this LOCAL deliverable (#5). The fixtures execute the actual Go planner
-and default post-compaction finalizer, not a second handwritten algorithm.
+plan's summary. The pure planning functions and `LocalCompactor` adapter remain
+provider-free: their usage counters and cost are zero. The runner integration
+also supports the additional model-summary call; it is not performed by a direct
+call to the pure planner. Provider-native compaction and opaque provider item
+transport are separate capabilities. The original local fixtures execute the
+actual Go planner and default post-compaction finalizer, not a second handwritten
+algorithm. Model-summary fixtures are recorded separately.
 
 ## Exact policy and source evidence
 
@@ -70,12 +72,57 @@ instructions, namespace, wire key and settings stable across compaction.
 Only working history is replaced. The Go runner's accumulated emitted items
 (`allItems`) and usage are not reset by local compaction. The Rust integration
 must leave `RunResult.new_items` append-only, and preserve cumulative usage/cost.
-Do not append synthetic summary messages to `new_items` or account them as model
-usage. Transient request-only context must not become persisted summary content.
+Do not append synthetic summary messages to `new_items`. Deterministic summaries
+have no model usage; actual model-summary calls do contribute their returned
+usage, even when their text is rejected and the deterministic summary is kept.
+Transient request-only context must not become persisted summary content.
 
 ## Integration API
 
 The public `compaction` module is wired into the runner.
+
+### Runner model-summary calls
+
+`LocalCompactionPolicy.use_llm_summary` defaults to `true`, matching the SDK.
+After a local plan actually removes history, the runner asks the active model
+for a continuation brief before replacing working history. This can add a billed
+model call. Set `use_llm_summary: false` to retain deterministic summaries without
+disabling compaction or model-dependent threshold selection.
+
+The call uses `complete`, including when ordinary generation streams. It carries
+only the removed-history transcript, the pinned continuation instructions,
+`max_tokens: 2048` and `reasoning_effort: "low"`; no tools, output schema, or
+ordinary prompt-cache key are exposed. Transcript limits count UTF-8 bytes, not
+characters. An explicitly attributed `context-summary` message retains up to
+16,000 bytes; marker text alone does not confer that identity. Transient
+request-only context is excluded.
+
+The summary timeout is the positive configured model-call timeout, otherwise
+120 seconds, bounded by caller cancellation/deadline. Empty, failed, timed-out,
+or non-shrinking summaries retain the deterministic plan. The host receives a
+redacted `CompactionFailed` diagnostic for this fallback, followed by the normal
+successful compaction observation; provider error bodies and transcript text are
+not included in the diagnostic. Caller cancellation/deadline still terminates
+the run. Returned usage is charged even if the summary is rejected; summary calls
+do not consume ordinary generation turns, enter ordinary generation spans, or
+append summary text to `new_items`, matching SDK out-of-band call semantics.
+
+Summary selection is included unconditionally in the durable configuration
+fingerprint. Existing native checkpoints with the old deterministic-default
+fingerprint are rejected rather than silently resumed with different model-call
+behavior. This does not change the pure planner or `LocalCompactor` into a
+provider-calling API.
+
+The independent oracle in `scripts/llm-summary-reference/run.py` records 52 byte
+truncation, 44 transcript, 18 summary-call and nine plan observations, plus 12
+unchanged upstream tests. Native comparisons cover all 52 truncation cases, 39
+representable transcript cases, 13 pure request/body cases and all nine plans;
+runtime tests separately exercise errors, usage, timeout and cancellation. Five
+source transcript cases use arbitrary non-JSON tool-input bytes that native
+`ToolCall.arguments: Value` cannot represent. They remain source-only evidence,
+not native passes or whole-helper closure.
+
+### Pure planner APIs
 
 - `LocalCompactionPolicy::default()` — enabled local defaults. `normalized()`
   implements zero normalization. Rust fields are unsigned, so negative Go
@@ -221,3 +268,11 @@ forced overflow recovery in both execution modes, one-turn retry limits, no-op
 and disabled recovery, transient/cache preservation, and active-model defaults
 before any reported usage. Custom compaction with repeated ordinary messages
 retains approval-local anchors without treating prose duplication as corruption.
+
+Handoffs can now use `HandoffHistoryPolicy` and `compact_handoff_history` independently
+of ordinary turn compaction. The runner integrates this after history filtering,
+with marker/provenance-aware planning and existing carry-forward handling. Raw
+argument text contributes to tool/approval estimates; native handoff outputs are
+paired with their calls during planning and finalization. See
+[builder semantics](runtime-builder.md#handoff-history-compaction) for distinct
+builder defaults, feature/host precedence and the exact parity boundary.

@@ -1,0 +1,590 @@
+// SPDX-License-Identifier: GPL-3.0-only
+package agent
+
+import (
+	"encoding/hex"
+	"encoding/json"
+	"fmt"
+	"math"
+	"os"
+	"reflect"
+	"strconv"
+	"strings"
+	"testing"
+)
+
+var payloadRawType = reflect.TypeOf(json.RawMessage(nil))
+
+func payloadFields(v reflect.Value) any {
+	switch v.Kind() {
+	case reflect.Ptr:
+		if v.IsNil() {
+			return nil
+		}
+		if v.Type().Elem().Kind() == reflect.Float64 {
+			return fmt.Sprintf("%016x", math.Float64bits(v.Elem().Float()))
+		}
+		return v.Interface()
+	case reflect.Struct:
+		fields := map[string]any{}
+		for i := 0; i < v.NumField(); i++ {
+			field := v.Type().Field(i)
+			if field.Type != payloadRawType {
+				fields[strings.Split(field.Tag.Get("json"), ",")[0]] = payloadFields(v.Field(i))
+			}
+		}
+		return fields
+	case reflect.Slice:
+		if v.IsNil() {
+			return nil
+		}
+		fields := make([]any, v.Len())
+		for i := range fields {
+			fields[i] = payloadFields(v.Index(i))
+		}
+		return fields
+	default:
+		return v.Interface()
+	}
+}
+
+func payloadStructSample(typ reflect.Type, populated bool) string {
+	var fields []string
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		key := strings.Split(field.Tag.Get("json"), ",")[0]
+		fields = append(fields, strconv.Quote(key)+":"+payloadSample(field, populated))
+	}
+	return "{" + strings.Join(fields, ",") + "}"
+}
+
+func payloadSample(field reflect.StructField, populated bool) string {
+	if field.Type == payloadRawType {
+		if populated {
+			return `{ "n": 1e+09, "n": -0, "s": "\ud800", "a": [true, null] }`
+		}
+		return `null`
+	}
+	switch field.Type.Kind() {
+	case reflect.String:
+		if populated {
+			return `"value <&>\u2028\u2029\n\"\\"`
+		}
+		return `""`
+	case reflect.Ptr:
+		if !populated {
+			return "null"
+		}
+		if field.Type.Elem().Kind() == reflect.Bool {
+			return "true"
+		}
+		if field.Type.Elem().Kind() == reflect.Struct {
+			return payloadStructSample(field.Type.Elem(), true)
+		}
+		return "0.125"
+	case reflect.Struct:
+		return payloadStructSample(field.Type, populated)
+	case reflect.Int, reflect.Int64:
+		if populated {
+			return "-7"
+		}
+		return "0"
+	case reflect.Bool:
+		if populated {
+			return `true`
+		}
+		return `false`
+	case reflect.Slice:
+		if field.Type.Elem().Kind() == reflect.String {
+			if populated {
+				return `["first","tail"]`
+			}
+			return `[]`
+		}
+		if populated {
+			if field.Type.Elem().Name() != "ImageAttachment" {
+				item := payloadStructSample(field.Type.Elem(), true)
+				return "[" + item + "," + item + "]"
+			}
+			return `[{"media_type":"image/png","data":"AQI=","detail":"high"},{"media_type":"image/jpeg","data":"/w==","detail":"low"}]`
+		}
+		return `[]`
+	default:
+		panic(field.Type.String())
+	}
+}
+
+func snapshotFieldInputs(typ reflect.Type) []string {
+	var inputs []string
+	for i := 0; i < typ.NumField(); i++ {
+		field := typ.Field(i)
+		key := strings.Split(field.Tag.Get("json"), ",")[0]
+		quoted := strconv.Quote(key)
+		good := payloadSample(field, true)
+		for _, candidate := range []string{good, payloadSample(field, false), `null`, `42`, `1.5`, `true`, `"string"`, `{}`, `[]`} {
+			inputs = append(inputs, "{"+quoted+":"+candidate+"}", "{"+quoted+":"+candidate+","+quoted+":"+good+"}")
+		}
+		inputs = append(inputs,
+			"{"+strconv.Quote(strings.ToUpper(key))+":"+good+"}",
+			"{"+strconv.Quote(field.Name)+":"+good+"}",
+			"{"+quoted+":"+good+","+quoted+":null}",
+			"{"+quoted+":"+good+","+quoted+":"+payloadSample(field, false)+"}",
+		)
+		folded := strings.NewReplacer("k", "K", "s", "ſ").Replace(key)
+		inputs = append(inputs, "{"+strconv.Quote(folded)+":"+good+"}")
+		if field.Type.Kind() == reflect.Ptr && field.Type.Elem().Kind() == reflect.Struct {
+			first := strings.Split(field.Type.Elem().Field(0).Tag.Get("json"), ",")[0]
+			inputs = append(inputs,
+				"{"+quoted+":"+good+","+quoted+":{}}",
+				"{"+quoted+":"+good+","+quoted+":null,"+quoted+":{}}",
+				"{"+quoted+":"+good+","+quoted+":{"+strconv.Quote(first)+":null}}",
+			)
+		}
+		if field.Type.Kind() == reflect.String {
+			for _, candidate := range []string{`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, "\"\xff\"", "\"\xe2\x82\"", "\"\xed\xa0\x80\""} {
+				inputs = append(inputs, "{"+quoted+":"+candidate+"}")
+			}
+		}
+	}
+	return inputs
+}
+
+func runItemByteCases() []map[string]any {
+	inputs := []string{
+		`{}`, `null`, `[]`, `false`,
+		`{"TYPE":"message","MESSAGE_TEXT":"retained","message_text":null}`,
+		`{"tool_call":{"input":{"a":1}},"TOOL_CALL":{"name":"tool"}}`,
+		`{"tool_call":{"input":true},"tool_call":null,"tool_call":{"name":"new"}}`,
+		`{"tool_call":{"input":true},"tool_call":{"input":null}}`,
+		`{"tool_call":{"input":01},"tool_call":null}`,
+		`{"tool_approval":{"input":{"a":1},"approved":true},"TOOL_APPROVAL":{"input":false,"approved":null}}`,
+		`{"tool_approval":{"input":true},"tool_approval":null}`,
+		`{"tool_call":{"input":{"input":"not another field"}},"unknown":{"tool_call":{"input":42}}}`,
+		`{"message_images":[{"media_type":"one","data":"a"},{"media_type":"two","data":"b"}],"message_images":[{}],"message_images":[null,null]}`,
+		"{\"message_text\":\"\xff\",\"tool_call\":{\"name\":\"\xff\",\"input\":\"\xff\"}}",
+	}
+	for _, field := range []string{"tool_call", "tool_approval"} {
+		for _, raw := range []string{`null`, `false`, `-0`, `1e99999`, `{ "x":1e+02,"x":2,"s":"\ud800" }`, `"\ud800"`, "\"\xff\"", "{\"\xff\":\"\xff\"}", `[1,]`} {
+			inputs = append(inputs, fmt.Sprintf(`{"%s":{"input":%s}}`, field, raw))
+		}
+		for _, depth := range []int{9997, 9998, 9999, 10000} {
+			inputs = append(inputs, fmt.Sprintf(`{"%s":{"input":%s0%s}}`, field, strings.Repeat("[", depth), strings.Repeat("]", depth)))
+		}
+	}
+	inputs = append(inputs, snapshotFieldInputs(reflect.TypeOf(LLMRunItemSnapshot{}))...)
+	inputs = append(inputs,
+		`{"tool_approval":{"input":{"n":1e9999}},"tool_call":{"input":{"n":-0}},"TOOL_APPROVAL":{"approved":true},"TOOL_CALL":{"name":"tool"}}`,
+		"{\"tool_call\":{\"input\":\"\xff\"},\"tool_approval\":{\"input\":\"\xed\xa0\x80\"}}",
+	)
+	cases := []map[string]any{}
+	for _, input := range inputs {
+		var item LLMRunItemSnapshot
+		err := json.Unmarshal([]byte(input), &item)
+		row := map[string]any{"input_hex": hex.EncodeToString([]byte(input)), "decode_ok": err == nil}
+		if err == nil {
+			encoded, marshalErr := json.Marshal(item)
+			row["marshal_ok"] = marshalErr == nil
+			row["marshal_hex"] = hex.EncodeToString(encoded)
+			raw := map[string]any{}
+			if item.ToolCall != nil {
+				raw["tool_call"] = map[string]any{"present": item.ToolCall.Input != nil, "hex": hex.EncodeToString(item.ToolCall.Input)}
+			}
+			if item.ToolApproval != nil {
+				raw["tool_approval"] = map[string]any{"present": item.ToolApproval.Input != nil, "hex": hex.EncodeToString(item.ToolApproval.Input)}
+			}
+			row["raw"] = raw
+			row["message_images_nil"] = item.MessageImages == nil
+			row["output_images_nil"] = nil
+			if item.ToolOutput != nil {
+				row["output_images_nil"] = item.ToolOutput.Images == nil
+			}
+		}
+		cases = append(cases, row)
+	}
+	return cases
+}
+
+func payloadSliceStates(v reflect.Value, path string, states map[string]bool) {
+	if v.Type() == payloadRawType {
+		return
+	}
+	switch v.Kind() {
+	case reflect.Ptr:
+		if !v.IsNil() {
+			payloadSliceStates(v.Elem(), path, states)
+		}
+	case reflect.Struct:
+		for i := 0; i < v.NumField(); i++ {
+			key := strings.Split(v.Type().Field(i).Tag.Get("json"), ",")[0]
+			if path != "" {
+				key = path + "/" + key
+			}
+			payloadSliceStates(v.Field(i), key, states)
+		}
+	case reflect.Slice:
+		states[path] = v.IsNil()
+		for i := 0; i < v.Len(); i++ {
+			payloadSliceStates(v.Index(i), fmt.Sprintf("%s/%d", path, i), states)
+		}
+	}
+}
+
+func envelopeFieldCases() []map[string]any {
+	var cases []map[string]any
+	for _, typ := range []reflect.Type{reflect.TypeOf(LLMRequestSnapshot{}), reflect.TypeOf(LLMResponseSnapshot{})} {
+		inputs := append([]string{`{}`, `null`, `[]`, `false`, payloadStructSample(typ, true), payloadStructSample(typ, false)}, snapshotFieldInputs(typ)...)
+		for _, input := range inputs {
+			value := reflect.New(typ)
+			err := json.Unmarshal([]byte(input), value.Interface())
+			row := map[string]any{"type": typ.Name(), "input_hex": hex.EncodeToString([]byte(input)), "decode_ok": err == nil}
+			if err == nil {
+				encoded, marshalErr := json.Marshal(value.Interface())
+				row["marshal_ok"] = marshalErr == nil
+				row["marshal_hex"] = hex.EncodeToString(encoded)
+				states := map[string]bool{}
+				payloadSliceStates(value.Elem(), "", states)
+				row["nil_slices"] = states
+			}
+			cases = append(cases, row)
+		}
+	}
+	return cases
+}
+
+func runItemEncodeCases() []map[string]any {
+	cases := []map[string]any{}
+	values := []json.RawMessage{nil, {}, json.RawMessage(`null`), json.RawMessage(` { "b":1e+09,"b":2 } `), json.RawMessage("\"\xff\""), json.RawMessage(` `), json.RawMessage(`[1,]`)}
+	for _, depth := range []int{9999, 10000, 10001} {
+		values = append(values, json.RawMessage(strings.Repeat("[", depth)+"0"+strings.Repeat("]", depth)))
+	}
+	for _, raw := range values {
+		for _, field := range []string{"tool_call", "tool_approval"} {
+			item := LLMRunItemSnapshot{}
+			if field == "tool_call" {
+				item.ToolCall = &LLMToolCall{Input: raw}
+			} else {
+				item.ToolApproval = &LLMToolApproval{Input: raw}
+			}
+			encoded, err := json.Marshal(item)
+			cases = append(cases, map[string]any{"field": field, "raw_nil": raw == nil, "raw_hex": hex.EncodeToString(raw), "marshal_ok": err == nil, "marshal_hex": hex.EncodeToString(encoded)})
+		}
+	}
+	return cases
+}
+
+func snapshotItemProjectionCases() []map[string]any {
+	typ := reflect.TypeOf(RunItem{})
+	var populated []string
+	populated = append(populated, `"Agent":{"Name":"agent <&>"}`)
+	for _, name := range []string{"Message", "ToolCall", "ToolOutput", "HandoffCall", "HandoffOutput", "Reasoning", "Compaction", "ToolApproval"} {
+		field, ok := typ.FieldByName(name)
+		if !ok {
+			panic(name)
+		}
+		populated = append(populated, strconv.Quote(name)+":"+payloadSample(field, true))
+	}
+	inputs := []string{`null`, `[]`}
+	var mixed []string
+	for _, kind := range []int{-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 99} {
+		item := fmt.Sprintf(`{"Type":%d,%s}`, kind, strings.Join(populated, ","))
+		inputs = append(inputs, fmt.Sprintf(`[{"Type":%d}]`, kind), "["+item+"]")
+		mixed = append(mixed, item)
+	}
+	inputs = append(inputs, "["+strings.Join(mixed, ",")+"]")
+	var cases []map[string]any
+	for _, input := range inputs {
+		var items []RunItem
+		if err := json.Unmarshal([]byte(input), &items); err != nil {
+			panic(err)
+		}
+		output := SnapshotRunItems(items)
+		encoded, err := json.Marshal(output)
+		if err != nil {
+			panic(err)
+		}
+		states := map[string]bool{}
+		payloadSliceStates(reflect.ValueOf(output), "", states)
+		cases = append(cases, map[string]any{"input": input, "output_nil": output == nil, "encoded_hex": hex.EncodeToString(encoded), "nil_slices": states})
+	}
+	return cases
+}
+
+func snapshotRawHelperCases() []map[string]any {
+	values := []json.RawMessage{
+		nil, {}, json.RawMessage(`null`), json.RawMessage(`"text"`),
+		json.RawMessage(`"\ud800"`), json.RawMessage("\"\xff\""),
+		json.RawMessage("\xff"), json.RawMessage("\xe2\x82"), json.RawMessage("\xed\xa0\x80"),
+		json.RawMessage("�"), json.RawMessage("�\xff"),
+		json.RawMessage(" { \"n\": 1e+02, \"n\": -0 } \n"),
+		json.RawMessage(`1e9999`), json.RawMessage(` `), json.RawMessage(`[1,]`), json.RawMessage(`01`),
+	}
+	for _, depth := range []int{9999, 10000, 10001} {
+		values = append(values, json.RawMessage(strings.Repeat("[", depth)+"0"+strings.Repeat("]", depth)))
+	}
+	var cases []map[string]any
+	for _, raw := range values {
+		for _, kind := range []RunItemType{RunItemToolCall, RunItemToolApproval} {
+			item := RunItem{Type: kind}
+			if kind == RunItemToolCall {
+				item.ToolCall = &ToolCallData{ID: "call", Name: "tool", Input: raw}
+			} else {
+				item.ToolApproval = &ToolApprovalData{CallID: "call", ToolName: "tool", Input: raw, Approved: true}
+			}
+			snapshot := SnapshotRunItems([]RunItem{item})[0]
+			var output json.RawMessage
+			if kind == RunItemToolCall {
+				output = snapshot.ToolCall.Input
+			} else {
+				output = snapshot.ToolApproval.Input
+			}
+			encoded, err := json.Marshal(snapshot)
+			if err != nil {
+				panic(err)
+			}
+			cases = append(cases, map[string]any{
+				"kind": kind, "raw_nil": raw == nil, "input_hex": hex.EncodeToString(raw),
+				"output_nil": output == nil, "output_hex": hex.EncodeToString(output), "encoded_hex": hex.EncodeToString(encoded),
+			})
+		}
+	}
+	return cases
+}
+
+func TestNativePayloadReference(t *testing.T) {
+	if strconv.IntSize != 64 {
+		t.Fatalf("oracle requires IntSize 64, got %d", strconv.IntSize)
+	}
+	// Public RawMessage marshaling has a depth boundary independent of decoding
+	// the containing payload (which adds an outer object level).
+	for _, depth := range []int{10000, 10001} {
+		raw := json.RawMessage(strings.Repeat("[", depth) + "0" + strings.Repeat("]", depth))
+		for _, value := range []any{ToolCallData{Input: raw}, ToolApprovalData{Input: raw}, LLMOutputSchema{Schema: raw}, LLMToolSnapshot{InputSchema: raw}} {
+			_, err := json.Marshal(value)
+			if (err == nil) != (depth == 10000) {
+				t.Fatalf("%T raw marshal depth %d: %v", value, depth, err)
+			}
+		}
+	}
+	var cases []map[string]any
+	seen := map[string]bool{}
+	add := func(typ reflect.Type, name, input string) {
+		id := typ.Name() + "/" + name
+		if seen[id] {
+			t.Fatalf("duplicate case %s", id)
+		}
+		seen[id] = true
+		value := reflect.New(typ)
+		err := json.Unmarshal([]byte(input), value.Interface())
+		decodeError := ""
+		if err != nil {
+			decodeError = err.Error()
+		}
+		var raw any
+		var fields any
+		if typ.Kind() == reflect.Struct {
+			fields = payloadFields(value.Elem())
+			for i := 0; i < typ.NumField(); i++ {
+				if typ.Field(i).Type == payloadRawType {
+					bytes := value.Elem().Field(i).Bytes()
+					raw = map[string]any{"present": bytes != nil, "hex": hex.EncodeToString(bytes)}
+				}
+			}
+		} else {
+			fields = map[string]any{"value": value.Elem().Int()}
+		}
+		marshaled, marshalErr := json.Marshal(value.Interface())
+		marshalError := ""
+		if marshalErr != nil {
+			marshalError = marshalErr.Error()
+		}
+		cases = append(cases, map[string]any{
+			"id": id, "type": typ.Name(), "input_hex": hex.EncodeToString([]byte(input)),
+			"decode_ok": err == nil, "decode_error": decodeError,
+			"decoded_fields": fields, "raw_input": raw,
+			"marshal_ok": marshalErr == nil, "marshal_error": marshalError,
+			"marshal_hex": hex.EncodeToString(marshaled),
+		})
+	}
+	types := []reflect.Type{
+		reflect.TypeOf(ModelSettings{}), reflect.TypeOf(MessageOutput{}), reflect.TypeOf(ImageAttachment{}),
+		reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolOutputData{}),
+		reflect.TypeOf(HandoffCallData{}), reflect.TypeOf(HandoffOutputData{}),
+		reflect.TypeOf(ReasoningData{}), reflect.TypeOf(CompactionData{}),
+		reflect.TypeOf(LLMReasoning{}), reflect.TypeOf(LLMCompaction{}),
+		reflect.TypeOf(LLMToolCall{}), reflect.TypeOf(LLMToolApproval{}),
+		reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{}),
+	}
+	for _, typ := range types {
+		var populated, zero []string
+		for i := 0; i < typ.NumField(); i++ {
+			field := typ.Field(i)
+			key := strings.Split(field.Tag.Get("json"), ",")[0]
+			populated = append(populated, strconv.Quote(key)+":"+payloadSample(field, true))
+			zero = append(zero, strconv.Quote(key)+":"+payloadSample(field, false))
+		}
+		add(typ, "zero", `{}`)
+		add(typ, "explicit_zero", "{"+strings.Join(zero, ",")+"}")
+		add(typ, "populated", "{"+strings.Join(populated, ",")+"}")
+		for i, input := range []string{`null`, `[]`, `[{}]`, `true`, `false`, `0`, `1.25`, `"text"`, ``, `{`, `{} {}`, `{"unknown":42}`, `{"unknown":{"arbitrary":[true,null,1e9999]}}`} {
+			add(typ, fmt.Sprintf("root_%02d", i), input)
+		}
+		for i := 0; i < typ.NumField(); i++ {
+			field := typ.Field(i)
+			key := strings.Split(field.Tag.Get("json"), ",")[0]
+			quoted := strconv.Quote(key)
+			good := payloadSample(field, true)
+			missing := append([]string{}, populated[:i]...)
+			missing = append(missing, populated[i+1:]...)
+			add(typ, key+"/missing", "{"+strings.Join(missing, ",")+"}")
+			add(typ, key+"/populated", "{"+quoted+":"+good+"}")
+			add(typ, key+"/null", "{"+quoted+":null}")
+			add(typ, key+"/zero", "{"+quoted+":"+payloadSample(field, false)+"}")
+			add(typ, key+"/upper", "{"+strconv.Quote(strings.ToUpper(key))+":"+good+"}")
+			add(typ, key+"/go_name", "{"+strconv.Quote(field.Name)+":"+good+"}")
+			add(typ, key+"/duplicate_null", "{"+quoted+":"+good+","+quoted+":null}")
+			add(typ, key+"/duplicate_zero", "{"+quoted+":"+good+","+quoted+":"+payloadSample(field, false)+"}")
+			add(typ, key+"/duplicate_folded", "{"+quoted+":"+payloadSample(field, false)+","+strconv.Quote(strings.ToUpper(key))+":"+good+"}")
+			if strings.ContainsAny(key, "ks") {
+				folded := strings.NewReplacer("k", "K", "s", "ſ").Replace(key)
+				add(typ, key+"/unicode_fold", "{"+strconv.Quote(folded)+":"+good+"}")
+			}
+			for j, candidate := range []string{`42`, `1.5`, `true`, `"string"`, `{}`, `[]`} {
+				add(typ, fmt.Sprintf("%s/type_%d", key, j), "{"+quoted+":"+candidate+"}")
+				add(typ, fmt.Sprintf("%s/earlier_type_%d", key, j), "{"+quoted+":"+candidate+","+quoted+":"+good+"}")
+			}
+			if field.Type.Kind() == reflect.Int {
+				for j, value := range []string{"-0", "9223372036854775807", "-9223372036854775808", "9223372036854775808", "-9223372036854775809", "1.0", "1e0"} {
+					add(typ, fmt.Sprintf("%s/integer_%d", key, j), "{"+quoted+":"+value+"}")
+				}
+			}
+			if field.Type.Kind() == reflect.String {
+				for j, text := range []string{`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, `"\ud800\ud800\udc00"`, `"\\ud800"`, `"\uDFFF\uD800"`, `"\u0000\b\f\r\t/é😀<&>"`, `"\ud800\uZZZZ"`} {
+					add(typ, fmt.Sprintf("%s/unicode_%d", key, j), "{"+quoted+":"+text+"}")
+				}
+				for j, invalid := range []string{string([]byte{0xff}), string([]byte{0xe2, 0x82}), string([]byte{0xed, 0xa0, 0x80}), string([]byte{0xf0, 0x80, 0x80, 0x80})} {
+					add(typ, fmt.Sprintf("%s/invalid_utf8_%d", key, j), "{"+quoted+":\""+invalid+"\"}")
+				}
+			}
+		}
+		for _, depth := range []int{9999, 10000, 10001} {
+			add(typ, fmt.Sprintf("unknown_depth_%d", depth), `{"unknown":`+strings.Repeat("[", depth-1)+`0`+strings.Repeat("]", depth-1)+`}`)
+		}
+		add(typ, "unknown_invalid_utf8", "{\"unknown\":\""+string([]byte{0xff})+"\"}")
+		add(typ, "invalid_utf8_key", "{\""+string([]byte{0xff})+"\":true}")
+	}
+	for i, input := range []string{
+		`{"stop_sequences":["a","b"],"stop_sequences":[null],"stop_sequences":[null,null]}`,
+		`{"stop_sequences":["a","b"],"stop_sequences":[],"stop_sequences":[null,null]}`,
+		`{"stop_sequences":["a","b"],"stop_sequences":null,"stop_sequences":[null,null]}`,
+		`{"stop_sequences":["\ud800",null,"<&>"]}`,
+		`{"temperature":-0,"top_p":1e-7}`, `{"temperature":1e309}`, `{"top_p":-1e309}`,
+		`{"temperature":5e-324,"top_p":1.7976931348623157e308}`,
+		`{"temperature":1e-400,"top_p":-1e-400}`,
+		`{"temperature":0.1,"TEMPERATURE":null,"parallel_tool_calls":true,"PARALLEL_TOOL_CALLS":null}`,
+	} {
+		add(reflect.TypeOf(ModelSettings{}), fmt.Sprintf("settings_special_%02d", i), input)
+	}
+	for _, typ := range []reflect.Type{reflect.TypeOf(MessageOutput{}), reflect.TypeOf(ToolOutputData{})} {
+		for i, input := range []string{
+			`{"images":[null,{}]}`,
+			`{"images":[false]}`, `{"images":[42]}`, `{"images":["x"]}`, `{"images":[[]]}`,
+			`{"images":[{"media_type":42,"data":"ok"}]}`,
+			`{"images":[{"MEDIA_TYPE":"image/png","DATA":"x","DETAIL":"high"}]}`,
+			`{"imageſ":[{"media_type":"image/png"}]}`,
+			`{"images":[{"media_type":"first","data":"a","detail":"high"}],"images":[{"data":"b"}]}`,
+			`{"images":[{"media_type":"first","data":"a"},{"media_type":"tail","data":"z"}],"images":[null],"images":[{"detail":"low"},null]}`,
+			`{"images":[{"media_type":"first"},{"media_type":"tail"}],"images":[{}],"images":[{},{}]}`,
+			`{"images":[{"media_type":"first"},{"media_type":"tail"}],"images":[{}],"images":[{},{},{}]}`,
+			`{"images":[{"media_type":"first"}],"images":[],"images":[{"data":"b"}]}`,
+			`{"images":[{"media_type":"first"}],"images":null,"images":[{"data":"b"}]}`,
+			`{"images":[{"media_type":"first"}],"IMAGES":[null]}`,
+			`{"images":[false],"images":[{"data":"b"}]}`,
+			`{"images":false,"images":[{"data":"b"}]}`,
+			`{"images":[{"media_type":"a","MEDIA_TYPE":null,"data":"a","DATA":"b"}]}`,
+		} {
+			add(typ, fmt.Sprintf("image_reuse_%02d", i), input)
+		}
+	}
+	for _, typ := range []reflect.Type{reflect.TypeOf(ToolCallData{}), reflect.TypeOf(ToolApprovalData{}), reflect.TypeOf(LLMOutputSchema{}), reflect.TypeOf(LLMToolSnapshot{}), reflect.TypeOf(LLMToolCall{}), reflect.TypeOf(LLMToolApproval{})} {
+		field := "input"
+		if typ == reflect.TypeOf(LLMOutputSchema{}) {
+			field = "schema"
+		}
+		if typ == reflect.TypeOf(LLMToolSnapshot{}) {
+			field = "input_schema"
+		}
+		rawAdd := func(name, input string) {
+			input = strings.ReplaceAll(input, `"input"`, strconv.Quote(field))
+			input = strings.ReplaceAll(input, `"INPUT"`, strconv.Quote(strings.ToUpper(field)))
+			add(typ, name, input)
+		}
+		for i, raw := range []string{
+			`null`, `true`, `false`, `0`, `-0`, `-0.00`, `1e+09`, `1E-9`, `1.2300`,
+			`9007199254740993`, `9223372036854775808`, `1e999999`, strings.Repeat("9", 400),
+			`"\ud800"`, `"\udfff"`, `"\ud800\udc00"`, `"\\ud800"`, `"\u0061\/\u003c<&>\u2028"`,
+			`[ 1, 2 , { "x" : 1, "x": 2 } ]`, `{ "b": 1e+09, "a": -0, "b": 1.2300 }`,
+			`{ "\ud800": "\udfff", "n":1e999999 }`,
+		} {
+			rawAdd(fmt.Sprintf("raw_lexical_%02d", i), "{\"input\": \n\t"+raw+" \n}")
+		}
+		for i, input := range []string{
+			`{"input":{"a":1},"INPUT": { "b": -0 }}`,
+			`{"input":{"a":1},"input":null}`,
+			`{"input":null,"input": { "a" : 1e+09 }}`,
+			`{"input":true,"input":false,"input":[ 1, 2 ]}`,
+			`{"input":01,"input":{}}`, `{"input":"\uZZZZ","input":{}}`,
+			`{"input":NaN}`, `{"input":Infinity}`, `{"input":-Infinity}`,
+		} {
+			rawAdd(fmt.Sprintf("raw_duplicate_or_invalid_%02d", i), input)
+		}
+		for j, invalid := range []string{string([]byte{0xff}), string([]byte{0xe2, 0x82}), string([]byte{0xed, 0xa0, 0x80}), string([]byte{0xf0, 0x80, 0x80, 0x80})} {
+			rawAdd(fmt.Sprintf("raw_invalid_utf8_%d", j), "{\"input\":\""+invalid+"\"}")
+			rawAdd(fmt.Sprintf("raw_invalid_utf8_key_%d", j), "{\"input\":{\""+invalid+"\":\""+invalid+"\"}}")
+		}
+		for _, depth := range []int{9999, 10000, 10001} {
+			rawAdd(fmt.Sprintf("raw_depth_%d", depth), `{"input":`+strings.Repeat("[", depth-1)+`0`+strings.Repeat("]", depth-1)+`}`)
+		}
+	}
+	enumType := reflect.TypeOf(RunItemType(0))
+	for i, input := range []string{
+		`0`, `1`, `2`, `3`, `4`, `5`, `6`, `7`, `8`, `99`, `-1`, `-99`, `-0`,
+		`9223372036854775807`, `-9223372036854775808`, `9223372036854775808`, `-9223372036854775809`,
+		`18446744073709551615`, `1.0`, `0.0`, `-0.0`, `1e0`, `1E+0`, `1e999999`, `0e0`,
+		`null`, `"1"`, `"message"`, `true`, `false`, `[]`, `{}`, ``, `01`, `+1`, `NaN`, `1 2`,
+	} {
+		add(enumType, fmt.Sprintf("value_%02d", i), input)
+	}
+	encoding := []map[string]any{}
+	for _, raw := range []json.RawMessage{nil, {}, json.RawMessage(`null`), json.RawMessage(` { "b":1e+09, "a":-0, "b":1.00 } `), json.RawMessage("\"\xff\""), json.RawMessage(` `), json.RawMessage(`[1,]`)} {
+		for _, value := range []any{LLMOutputSchema{Schema: raw}, LLMToolSnapshot{InputSchema: raw}, LLMToolCall{Input: raw}, LLMToolApproval{Input: raw}} {
+			encoded, err := json.Marshal(value)
+			encoding = append(encoding, map[string]any{"type": reflect.TypeOf(value).Name(), "raw_nil": raw == nil, "raw_hex": hex.EncodeToString(raw), "marshal_ok": err == nil, "marshal_hex": hex.EncodeToString(encoded)})
+		}
+	}
+	result := map[string]any{
+		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
+		"run_item_byte_cases": runItemByteCases(), "run_item_encode_cases": runItemEncodeCases(),
+		"envelope_field_cases":           envelopeFieldCases(),
+		"snapshot_raw_helper_cases":      snapshotRawHelperCases(),
+		"snapshot_item_projection_cases": snapshotItemProjectionCases(),
+		"snapshot_empty_results": map[string]bool{
+			"nil_input_nil":   SnapshotRunItems(nil) == nil,
+			"empty_input_nil": SnapshotRunItems([]RunItem{}) == nil,
+		},
+		"envelope_byte_cases": snapshotEnvelopeCases(), "envelope_encode_cases": snapshotEnvelopeEncodeCases(),
+		"enum_values": map[string]RunItemType{
+			"RunItemMessage": RunItemMessage, "RunItemToolCall": RunItemToolCall,
+			"RunItemToolOutput": RunItemToolOutput, "RunItemHandoffCall": RunItemHandoffCall,
+			"RunItemHandoffOutput": RunItemHandoffOutput, "RunItemReasoning": RunItemReasoning,
+			"RunItemToolApproval": RunItemToolApproval, "RunItemCompaction": RunItemCompaction,
+		},
+	}
+	data, err := json.MarshalIndent(result, "", "  ")
+	if err != nil {
+		t.Fatal(err)
+	}
+	if err := os.WriteFile(os.Getenv("PAYLOAD_OUTPUT"), data, 0600); err != nil {
+		t.Fatal(err)
+	}
+	t.Logf("recorded %d payload cases at IntSize=%d", len(cases), strconv.IntSize)
+}

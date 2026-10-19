@@ -42,6 +42,7 @@ async fn main() {
             .execute(
                 &context,
                 ToolCall {
+                    raw_arguments: None,
                     id: "fixture".into(),
                     name: "ApplyPatch".into(),
                     arguments: request.arguments,

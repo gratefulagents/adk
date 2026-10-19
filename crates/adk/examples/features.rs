@@ -1,0 +1,2420 @@
+//! Deterministic offline assertions: cargo run -p adk --all-features --example features -- all
+use adk::{core::*, runtime::*};
+use serde_json::{Value, json};
+use std::{
+    collections::VecDeque,
+    sync::{
+        Arc, Mutex,
+        atomic::{AtomicUsize, Ordering},
+    },
+    time::Duration,
+};
+
+const SCENARIOS: &[&str] = &[
+    "agent_runtime",
+    "model_abstraction",
+    "providers",
+    "tools",
+    "tools_registry",
+    "mcp",
+    "sandbox",
+    "chatloop",
+    "handoffs_subagents",
+    "guardrails",
+    "structured_output",
+    "streaming",
+    "context_compaction",
+    "settings_routing",
+    "observability",
+    "errors_retries",
+    "costs",
+    "policy",
+    "memory",
+    "tracestore",
+];
+
+fn message(role: Role, text: &str) -> RunItem {
+    RunItem::Message {
+        message: Message {
+            role,
+            content: vec![Content::Text { text: text.into() }],
+        },
+    }
+}
+fn response(items: Vec<RunItem>) -> ModelResponse {
+    ModelResponse {
+        snapshot_raw: None,
+        snapshot_projection: None,
+        raw: None,
+        items,
+        usage: Usage {
+            input_tokens: 10,
+            output_tokens: 2,
+            ..Usage::default()
+        },
+        end_turn: None,
+        response_id: None,
+        metadata: Default::default(),
+    }
+}
+fn answer(text: &str) -> ModelResponse {
+    response(vec![message(Role::Assistant, text)])
+}
+fn call(name: &str, arguments: Value) -> ToolCall {
+    ToolCall {
+        raw_arguments: None,
+        id: format!("call-{name}"),
+        name: name.into(),
+        arguments,
+    }
+}
+fn tool_response(name: &str, arguments: Value) -> ModelResponse {
+    response(vec![RunItem::ToolCall {
+        call: call(name, arguments),
+    }])
+}
+fn context() -> Context {
+    Context {
+        run_id: "offline-feature".into(),
+        cancellation: Arc::new(CancellationToken::new()),
+        deadline: None,
+    }
+}
+fn request() -> RunRequest {
+    RunRequest {
+        input_provenance: Vec::new(),
+        input: vec![message(Role::User, "Exercise this feature")],
+        policy: RunPolicy {
+            max_turns: 5.try_into().unwrap(),
+            ..RunPolicy::default()
+        },
+    }
+}
+fn tool_context() -> ToolContext {
+    ToolContext {
+        operation: context(),
+        work_dir: ".".into(),
+        policy: ToolPolicy::default(),
+        idempotency_key: None,
+    }
+}
+fn definition(name: &str, approval: bool) -> ToolDefinition {
+    ToolDefinition { name: name.into(), description: "Offline lookup".into(),
+        input_schema: json!({"type":"object","properties":{"key":{"type":"string"}},"required":["key"],"additionalProperties":false}).try_into().unwrap(),
+        read_only: true, requires_approval: approval }
+}
+
+struct Scripted {
+    retry_advice: Option<ModelRetryAdvice>,
+    replies: Mutex<VecDeque<Result<ModelResponse, Error>>>,
+    requests: Mutex<Vec<ModelRequest>>,
+}
+impl Scripted {
+    fn new(replies: Vec<ModelResponse>) -> Arc<Self> {
+        Self::results(replies.into_iter().map(Ok).collect())
+    }
+    fn results(replies: Vec<Result<ModelResponse, Error>>) -> Arc<Self> {
+        Arc::new(Self {
+            retry_advice: None,
+            replies: Mutex::new(replies.into()),
+            requests: Mutex::new(vec![]),
+        })
+    }
+}
+impl Model for Scripted {
+    fn retry_advice(&self, _: &Error) -> Option<ModelRetryAdvice> {
+        self.retry_advice.clone()
+    }
+    fn provider(&self) -> &str {
+        "offline"
+    }
+    fn complete<'a>(
+        &'a self,
+        _: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        Box::pin(async move {
+            self.requests.lock().unwrap().push(request);
+            self.replies
+                .lock()
+                .unwrap()
+                .pop_front()
+                .expect("unexpected model invocation")
+        })
+    }
+}
+struct Events(VecDeque<ModelEvent>);
+impl ModelStream for Events {
+    fn next(&mut self) -> BoxFuture<'_, Result<Option<ModelEvent>, Error>> {
+        Box::pin(async { Ok(self.0.pop_front()) })
+    }
+}
+impl StreamingModel for Scripted {
+    fn stream<'a>(
+        &'a self,
+        ctx: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        Box::pin(async move {
+            let response = self.complete(ctx, request).await?;
+            Ok(Box::new(Events(VecDeque::from([
+                ModelEvent::TextDelta {
+                    delta: "hel".into(),
+                },
+                ModelEvent::TextDelta { delta: "lo".into() },
+                ModelEvent::Complete { response },
+            ]))) as Box<dyn ModelStream>)
+        })
+    }
+}
+#[derive(Default)]
+struct RecordingHost(Mutex<Vec<RunEvent>>);
+impl Host for RecordingHost {
+    fn emit<'a>(&'a self, _: &'a Context, event: RunEvent) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            self.0.lock().unwrap().push(event);
+            Ok(())
+        })
+    }
+    fn approve<'a>(
+        &'a self,
+        _: &'a Context,
+        _: ApprovalRequest,
+    ) -> BoxFuture<'a, Result<ApprovalDecision, Error>> {
+        Box::pin(async { Ok(ApprovalDecision::Defer) })
+    }
+}
+struct Lookup {
+    definition: ToolDefinition,
+    calls: AtomicUsize,
+}
+impl Lookup {
+    fn new(approval: bool) -> Arc<Self> {
+        Arc::new(Self {
+            definition: definition("lookup", approval),
+            calls: AtomicUsize::new(0),
+        })
+    }
+}
+impl Tool for Lookup {
+    fn definition(&self) -> &ToolDefinition {
+        &self.definition
+    }
+    fn execute<'a>(
+        &'a self,
+        _: &'a ToolContext,
+        call: ToolCall,
+    ) -> BoxFuture<'a, Result<ToolOutput, Error>> {
+        Box::pin(async move {
+            assert_eq!(call.arguments["key"], "answer");
+            self.calls.fetch_add(1, Ordering::SeqCst);
+            Ok(ToolOutput {
+                content: vec![Content::Text { text: "42".into() }],
+                is_error: false,
+                should_pause: false,
+            })
+        })
+    }
+}
+fn agent(model: Arc<dyn Model>) -> AgentConfig {
+    AgentConfig::new("assistant", ModelBinding::complete("offline-model", model))
+}
+fn runner(agent: AgentConfig) -> Runner {
+    Runner::new(agent, RunnerConfig::default()).unwrap()
+}
+async fn run(agent: AgentConfig) -> RunOutcome {
+    runner(agent)
+        .run(context(), request(), Arc::new(RecordingHost::default()))
+        .await
+        .unwrap()
+}
+
+async fn agent_runtime() {
+    let model = Scripted::new(vec![
+        tool_response("lookup", json!({"key":"answer"})),
+        answer("42"),
+    ]);
+    let tool = Lookup::new(false);
+    let mut a = agent(model.clone());
+    a.instructions = "Use lookup before answering".into();
+    a.tools.push(tool.clone());
+    let result = run(a).await.result;
+    assert_eq!(result.status, RunStatus::Completed);
+    assert_eq!(result.final_output, Some(json!("42")));
+    assert_eq!(result.responses.len(), 2);
+    assert_eq!(result.usage.input_tokens, 20);
+    assert_eq!(result.usage.output_tokens, 4);
+    assert_eq!(result.last_agent.as_deref(), Some("assistant"));
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+    let mut progress = adk::runtime::autoloop::AutoTracker::default();
+    progress.update(&result.new_items);
+    assert_eq!(progress.tool_call_count(), 1);
+    assert_eq!(progress.consecutive_no_tool_turns(), 0);
+    assert!(!progress.check_circuit_breakers().tripped);
+    assert!(
+        adk::runtime::autoloop::build_smart_nudge(Some(&progress), "plan")
+            .contains("1 tool calls so far")
+    );
+    {
+        let requests = model.requests.lock().unwrap();
+        assert_eq!(requests[0].instructions, "Use lookup before answering");
+        assert!(requests[1].input.iter().any(
+            |item| matches!(item, RunItem::ToolResult { call_id, .. } if call_id == "call-lookup")
+        ));
+    }
+
+    let mut req = request();
+    req.policy.max_turns = 1.try_into().unwrap();
+    let mut a = agent(Scripted::new(vec![tool_response(
+        "lookup",
+        json!({"key":"answer"}),
+    )]));
+    a.tools.push(Lookup::new(false));
+    let error = runner(a)
+        .run(context(), req, Arc::new(RecordingHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::MaxTurns);
+    assert_eq!(error.partial.unwrap().responses.len(), 1);
+}
+
+async fn model_abstraction() {
+    let selected = Scripted::new(vec![answer("routed")]);
+    let unused = Scripted::new(vec![]);
+    let mut routes = adk::providers::routing::Routes::new("mock");
+    routes.register("mock", selected.clone()).unwrap();
+    routes.register("other", unused.clone()).unwrap();
+    assert_eq!(routes.resolve("fast").unwrap().1, "fast");
+    assert!(routes.resolve("missing/model").is_err());
+    let result = run(AgentConfig::new(
+        "router",
+        ModelBinding::complete("mock/vendor/model", Arc::new(routes)),
+    ))
+    .await;
+    assert_eq!(result.result.final_output, Some(json!("routed")));
+    assert_eq!(selected.requests.lock().unwrap()[0].model, "vendor/model");
+    assert!(unused.requests.lock().unwrap().is_empty());
+}
+
+async fn providers() {
+    use adk::providers::auth::{CredentialStore, Material, Refresh, Scope};
+    use adk::providers::{
+        auth::AuthMode,
+        factory::{Kind, RouteSpec},
+        wire::{self, Protocol},
+    };
+    struct ConfigurationOnly;
+    impl CredentialStore for ConfigurationOnly {
+        fn load<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            panic!("configuration must not load credentials")
+        }
+        fn replace<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: u64,
+            _: Material,
+        ) -> BoxFuture<'a, Result<bool, Error>> {
+            panic!("configuration must not replace credentials")
+        }
+    }
+    impl Refresh for ConfigurationOnly {
+        fn refresh<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: Material,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            panic!("configuration must not refresh credentials")
+        }
+    }
+    for (kind, name, endpoint, protocol) in [
+        (
+            Kind::OpenAi,
+            "gpt-4.1-mini",
+            "http://127.0.0.1:1/v1",
+            Protocol::Chat,
+        ),
+        (
+            Kind::Anthropic,
+            "claude-haiku-4-5",
+            "http://127.0.0.1:1",
+            Protocol::Anthropic,
+        ),
+        (
+            Kind::OpenRouter,
+            "gpt-4.1-mini",
+            "https://openrouter.ai/api/v1",
+            Protocol::Chat,
+        ),
+    ] {
+        let mut spec = RouteSpec::new(kind, AuthMode::ApiKey);
+        spec.endpoint = Some(endpoint.into());
+        spec.protocol = Some(protocol);
+        let model = spec
+            .build(Arc::new(ConfigurationOnly), Arc::new(ConfigurationOnly))
+            .unwrap();
+        assert_eq!(model.provider(), kind.name());
+        Runner::new(
+            AgentConfig::new("configured", ModelBinding::streaming(name, model)),
+            RunnerConfig::default(),
+        )
+        .unwrap();
+    }
+    assert!(adk::providers::factory::supports_chat_completions(
+        "gpt-4.1-mini"
+    ));
+    assert!(
+        adk::providers::factory::validate_chat_completions_model(
+            adk::providers::factory::DEFAULT_CHAT_MINI_MODEL
+        )
+        .is_err()
+    );
+    assert_eq!(Kind::OpenRouter.protocol(), Protocol::Chat);
+    assert_eq!(Kind::Anthropic.protocol(), Protocol::Anthropic);
+    assert!(
+        RouteSpec::new(Kind::Anthropic, AuthMode::AnthropicOAuth)
+            .scope()
+            .is_ok()
+    );
+    assert!(
+        RouteSpec::new(Kind::Anthropic, AuthMode::OpenAiOAuth)
+            .scope()
+            .is_err()
+    );
+    let request = ModelRequest {
+        input_provenance: Vec::new(),
+        model: "vendor/model".into(),
+        instructions: "Be concise".into(),
+        input: vec![message(Role::User, "hello")],
+        tools: vec![],
+        output_schema: None,
+        output_schema_name: "answer".into(),
+        output_schema_strict: true,
+        settings: Default::default(),
+    };
+    for protocol in [Protocol::Chat, Protocol::Responses, Protocol::Anthropic] {
+        let wire = wire::request(&request, protocol, false).unwrap();
+        assert_eq!(wire["model"], "vendor/model");
+        assert!(wire.to_string().contains("hello"));
+        assert!(wire.to_string().contains("Be concise"));
+    }
+    let chat = wire::response(&json!({"id":"chat-1","choices":[{"message":{"role":"assistant","content":"hello"},"finish_reason":"stop"}],"usage":{"prompt_tokens":7,"completion_tokens":2}}), Protocol::Chat).unwrap();
+    let anthropic = wire::response(&json!({"id":"ant-1","content":[{"type":"text","text":"hello"}],"stop_reason":"end_turn","usage":{"input_tokens":7,"output_tokens":2}}), Protocol::Anthropic).unwrap();
+    assert_eq!(chat.items, anthropic.items);
+    assert_eq!(chat.usage.input_tokens, 7);
+    assert_eq!(anthropic.usage.output_tokens, 2);
+}
+
+async fn tools() {
+    use adk::tools::{Config, Features, Registry};
+    let features = Features::Strict(
+        ["ReadFile", "Glob", "Grep", "Write", "Edit"]
+            .into_iter()
+            .map(str::to_owned)
+            .collect(),
+    );
+    let readonly = Registry::build(
+        &Config {
+            features: features.clone(),
+            access: AccessMode::ReadOnly,
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    let writable = Registry::build(
+        &Config {
+            features,
+            access: AccessMode::WorkspaceWrite,
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    for name in ["read_file", "glob", "grep"] {
+        assert!(readonly.get(name).is_some());
+    }
+    for name in ["Write", "Edit"] {
+        assert!(readonly.get(name).is_none());
+        assert!(writable.get(name).is_some());
+    }
+    let tool = Lookup::new(true);
+    let model = Scripted::new(vec![
+        tool_response("lookup", json!({"key":"answer"})),
+        answer("approved"),
+    ]);
+    let mut a = agent(model);
+    a.tools.push(tool.clone());
+    let paused = run(a).await;
+    assert_eq!(paused.result.status, RunStatus::Paused);
+    assert_eq!(paused.result.pending_approvals.len(), 1);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+    let resumed = paused
+        .continuation
+        .unwrap()
+        .resume(Some(ApprovalDecision::Approve))
+        .await
+        .unwrap();
+    assert_eq!(resumed.result.final_output, Some(json!("approved")));
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+}
+
+async fn tools_registry() {
+    use adk::tools::{Config, Features, bundle::BundleBuilder};
+    let temp = tempfile::tempdir().unwrap();
+    std::fs::write(temp.path().join("example.txt"), "registry evidence").unwrap();
+    let config = Config {
+        features: Features::Strict(["ReadFile".into()].into()),
+        ..Default::default()
+    };
+    let mut bundle = BundleBuilder::new(config)
+        .build(ToolPolicy::default())
+        .unwrap();
+    let prepared = bundle.prepared();
+    let tool = prepared
+        .tools
+        .iter()
+        .find(|t| t.definition().name == "read_file")
+        .unwrap();
+    let mut ctx = tool_context();
+    ctx.work_dir = temp.path().into();
+    ctx.policy = prepared.policy;
+    let output = tool
+        .execute(&ctx, call("read_file", json!({"path":"example.txt"})))
+        .await
+        .unwrap();
+    assert!(!output.is_error);
+    assert!(
+        serde_json::to_string(&output)
+            .unwrap()
+            .contains("registry evidence")
+    );
+    let registry = adk::tools::Registry::build(
+        &Config {
+            features: Features::Strict(["Write".into()].into()),
+            access: AccessMode::WorkspaceWrite,
+            ..Default::default()
+        },
+        [],
+    )
+    .unwrap();
+    let write = registry.get("Write").expect("Write tool missing");
+    ctx.policy.access = AccessMode::WorkspaceWrite;
+    let output = write
+        .execute(
+            &ctx,
+            call("Write", json!({"file_path":"notes.txt","content":"hello"})),
+        )
+        .await
+        .unwrap();
+    assert!(!output.is_error);
+    assert_eq!(
+        std::fs::read(temp.path().join("notes.txt")).unwrap(),
+        b"hello"
+    );
+    bundle.close().await.unwrap();
+    let error = tool
+        .execute(&ctx, call("read_file", json!({"path":"example.txt"})))
+        .await
+        .unwrap_err();
+    assert_eq!(error.info.category, ErrorCategory::Cancelled);
+}
+
+struct McpManager(AtomicUsize);
+impl adk::mcp::tools::ToolManager for McpManager {
+    fn definitions(&self) -> Vec<ToolDefinition> {
+        vec![ToolDefinition {
+            name: "mcp__notes__lookup".into(),
+            description: "Lookup notes".into(),
+            input_schema: json!({"type":"object"}).try_into().unwrap(),
+            read_only: true,
+            requires_approval: false,
+        }]
+    }
+    fn call<'a>(
+        &'a self,
+        name: &'a str,
+        args: Value,
+    ) -> BoxFuture<'a, Result<Value, adk::mcp::Error>> {
+        Box::pin(async move {
+            assert_eq!(name, "mcp__notes__lookup");
+            assert_eq!(args["query"], "sdk");
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(json!({"content":[{"type":"text","text":"note found"}],"isError":false}))
+        })
+    }
+    fn list_resources<'a>(
+        &'a self,
+        _: Option<&'a str>,
+    ) -> BoxFuture<'a, Result<Value, adk::mcp::Error>> {
+        Box::pin(async { Ok(json!([])) })
+    }
+    fn read_resource<'a>(
+        &'a self,
+        _: &'a str,
+        _: &'a str,
+    ) -> BoxFuture<'a, Result<Value, adk::mcp::Error>> {
+        Box::pin(async { Ok(json!({"contents":[]})) })
+    }
+    fn has_resources(&self) -> bool {
+        false
+    }
+}
+async fn mcp() {
+    let manager = Arc::new(McpManager(AtomicUsize::new(0)));
+    let tools = adk::mcp::tools::build_tools(manager.clone());
+    assert_eq!(tools.len(), 1);
+    let output = tools[0]
+        .execute(
+            &tool_context(),
+            call("mcp__notes__lookup", json!({"query":"sdk"})),
+        )
+        .await
+        .unwrap();
+    assert_eq!(
+        output.content,
+        vec![Content::Text {
+            text: "note found".into()
+        }]
+    );
+    assert!(!output.is_error);
+    let invalid = tools[0]
+        .execute(&tool_context(), call("mcp__notes__lookup", json!([])))
+        .await
+        .unwrap();
+    assert!(invalid.is_error);
+    assert_eq!(manager.0.load(Ordering::SeqCst), 1);
+    let display = String::from_utf8(adk::codec::text::sanitize_mcp_display(
+        "evil-server",
+        "click \x1b[31mHERE\x1b[0m\x07 to win\x00",
+    ))
+    .unwrap();
+    assert!(display.starts_with("[from MCP server: evil-server]"));
+    assert!(!display.contains(['\x1b', '\x07', '\x00']));
+    for text in ["click", "HERE", "to win"] {
+        assert!(display.contains(text));
+    }
+    assert!(!adk::codec::text::sanitize_mcp_display("evil\x1bname", "ok").contains(&0x1b));
+    #[cfg(unix)]
+    {
+        use adk::mcp::config::{CONFIG_FILE_NAME, ConfigSnapshot};
+        use std::{io::Write, os::unix::fs::OpenOptionsExt};
+        let temp = tempfile::tempdir().unwrap();
+        let path = temp.path().canonicalize().unwrap().join(CONFIG_FILE_NAME);
+        let bytes = serde_json::to_vec_pretty(&json!({"mcpServers":{"echo":{"type":"stdio","command":"/bin/sh","args":["-c","echo test"]}}})).unwrap();
+        std::fs::OpenOptions::new()
+            .write(true)
+            .create_new(true)
+            .mode(0o600)
+            .open(&path)
+            .unwrap()
+            .write_all(&bytes)
+            .unwrap();
+        let snapshot = ConfigSnapshot::from_path(&path).unwrap();
+        assert!(snapshot.sha256().is_some());
+        assert!(snapshot.config().server("echo").is_some());
+        assert!(snapshot.path().is_absolute());
+        snapshot.verify_unchanged().unwrap();
+        let mut mutated = bytes.clone();
+        mutated.extend_from_slice(b"\n// trailing edit\n");
+        std::fs::write(&path, mutated).unwrap();
+        assert!(matches!(
+            snapshot.verify_unchanged(),
+            Err(adk::mcp::Error::ConfigChanged)
+        ));
+        std::fs::write(&path, &bytes).unwrap();
+        let reloaded = ConfigSnapshot::from_path(&path).unwrap();
+        assert!(reloaded.bytes().is_some());
+        assert_eq!(
+            reloaded.config().server("echo").unwrap().command(),
+            "/bin/sh"
+        );
+    }
+}
+
+async fn sandbox() {
+    use adk::sandbox::{Backend, Completion, Config, Executor, Network, Request};
+    let temp = tempfile::tempdir().unwrap();
+    let mut config = Config::new(temp.path());
+    config.backend = Backend::Local;
+    config.output_limit = 64;
+    config
+        .application_env
+        .insert("CUSTOM".into(), "value".into());
+    let executor = Executor::new(config).unwrap();
+    let mut req = Request::new("/bin/sh");
+    req.args = vec![
+        "-c".into(),
+        "printf '%s' \"${PATH}\"; i=0; while [ $i -lt 100 ]; do printf x; i=$((i+1)); done".into(),
+    ];
+    req.access = AccessMode::FullAccess;
+    req.network = Network::Allow;
+    req.timeout = Some(Duration::from_secs(5));
+    let mut hello = req.clone();
+    hello.args = vec!["-c".into(), "printf hello".into()];
+    let output = executor.run(&context(), hello).await.unwrap();
+    assert!(output.status.success());
+    assert_eq!(output.stdout, b"hello");
+    let mut env = req.clone();
+    env.args = vec!["-c".into(), "printf '%s|%s|%s|%s' \"$CUSTOM\" \"${OPENAI_API_KEY-unset}\" \"${AWS_SECRET_ACCESS_KEY-unset}\" \"${DATABASE_URL-unset}\"".into()];
+    let output = executor.run(&context(), env).await.unwrap();
+    assert!(output.status.success());
+    assert_eq!(output.stdout, b"value|unset|unset|unset");
+    let output = executor.run(&context(), req.clone()).await.unwrap();
+    assert_eq!(output.completion, Completion::Exited);
+    assert!(output.status.success());
+    assert_eq!(output.stdout.len() + output.stderr.len(), 64);
+    assert!(output.truncated);
+    req.args = vec!["-c".into(), "printf '%s|%s|%s' \"$PATH\" \"${OPENAI_API_KEY-unset}\" \"${AWS_SECRET_ACCESS_KEY-unset}\"".into()];
+    let output = executor.run(&context(), req).await.unwrap();
+    assert_eq!(
+        String::from_utf8(output.stdout).unwrap(),
+        "/usr/bin:/bin|unset|unset"
+    );
+}
+
+struct Gate(AtomicUsize);
+impl compat::GoApprovalGate for Gate {
+    fn approve<'a>(
+        &'a self,
+        _: &'a Context,
+        request: &'a ApprovalRequest,
+    ) -> BoxFuture<'a, Result<compat::GoApprovalDecision, Error>> {
+        Box::pin(async move {
+            assert_eq!(request.call.name, "lookup");
+            self.0.fetch_add(1, Ordering::SeqCst);
+            Ok(compat::GoApprovalDecision {
+                approved: true,
+                reason: "offline approval".into(),
+            })
+        })
+    }
+}
+async fn chatloop() {
+    let model = Scripted::new(vec![
+        tool_response("lookup", json!({"key":"answer"})),
+        answer("first"),
+        answer("second"),
+    ]);
+    let tool = Lookup::new(true);
+    let mut a = agent(model.clone());
+    a.tools.push(tool.clone());
+    let runner = runner(a);
+    let gate = Gate(AtomicUsize::new(0));
+    let first = compat::run_go_chat(
+        &runner,
+        context(),
+        request(),
+        Arc::new(RecordingHost::default()),
+        &gate,
+        None,
+    )
+    .await
+    .unwrap();
+    assert_eq!(first.result.final_output, Some(json!("first")));
+    assert_eq!(gate.0.load(Ordering::SeqCst), 1);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+    let mut next = request();
+    next.input = first.result.history;
+    next.input.push(message(Role::User, "continue"));
+    let second = runner
+        .run(context(), next.clone(), Arc::new(RecordingHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(second.result.final_output, Some(json!("second")));
+    assert_eq!(model.requests.lock().unwrap()[2].input, next.input);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 1);
+}
+
+struct HandoffState {
+    enabled: AtomicUsize,
+    callbacks: AtomicUsize,
+}
+impl HandoffPredicate for HandoffState {
+    fn enabled(&self, _: HandoffContext<'_>) -> bool {
+        self.enabled.load(Ordering::SeqCst) != 0
+    }
+}
+impl HandoffCallback for HandoffState {
+    fn on_handoff<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        input: &'a ToolCall,
+    ) -> BoxFuture<'a, ()> {
+        Box::pin(async move {
+            assert_eq!(context.target.name, "specialist");
+            assert_eq!(&input.arguments, &json!({"key":"answer"}));
+            self.callbacks.fetch_add(1, Ordering::SeqCst);
+        })
+    }
+}
+impl HandoffHistoryFilter for HandoffState {
+    fn filter<'a>(
+        &'a self,
+        _: HandoffContext<'a>,
+        mut history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>> {
+        Box::pin(async move {
+            assert_eq!(self.callbacks.load(Ordering::SeqCst), 1);
+            assert!(
+                history
+                    .items
+                    .iter()
+                    .any(|item| matches!(item, RunItem::Handoff { .. }))
+            );
+            (history.items, history.provenance) = history
+                .items
+                .into_iter()
+                .zip(history.provenance)
+                .filter(|(item, _)| matches!(item, RunItem::Message { .. }))
+                .unzip();
+            history.approvals.clear();
+            Ok(history)
+        })
+    }
+}
+
+async fn handoffs_subagents() {
+    let specialist = Scripted::new(vec![answer("specialist evidence")]);
+    let mut a = agent(Scripted::new(vec![tool_response(
+        "transfer_to_specialist",
+        json!({"key":"answer"}),
+    )]));
+    let state = Arc::new(HandoffState {
+        enabled: AtomicUsize::new(1),
+        callbacks: AtomicUsize::new(0),
+    });
+    let mut handoff = Handoff::new(Arc::new(AgentConfig::new(
+        "specialist",
+        ModelBinding::complete("offline", specialist.clone()),
+    )));
+    handoff.input_type = Some(HandoffInputType {
+        schema: schemars::json_schema!({"type":"object","properties":{"key":{"type":"string"}}}),
+        parser: None,
+    });
+    handoff.is_enabled = Some(state.clone());
+    handoff.on_handoff = Some(state.clone());
+    handoff.history_filter = Some(state.clone());
+    a.handoffs.push(handoff);
+    let handoffs = a.handoffs.clone();
+    let result = run(a).await.result;
+    assert_eq!(result.final_output, Some(json!("specialist evidence")));
+    assert_eq!(result.last_agent.as_deref(), Some("specialist"));
+    assert_eq!(state.callbacks.load(Ordering::SeqCst), 1);
+    {
+        let requests = specialist.requests.lock().unwrap();
+        assert_eq!(requests.len(), 1);
+        assert!(
+            requests[0]
+                .input
+                .iter()
+                .all(|item| matches!(item, RunItem::Message { .. }))
+        );
+        assert_eq!(requests[0].input.len(), requests[0].input_provenance.len());
+    }
+    assert!(
+        result
+            .new_items
+            .iter()
+            .any(|item| matches!(item, RunItem::Handoff { .. }))
+    );
+    state.enabled.store(0, Ordering::SeqCst);
+    let model = Scripted::new(vec![answer("handoff disabled")]);
+    let mut disabled = agent(model.clone());
+    disabled.handoffs = handoffs;
+    assert_eq!(run(disabled).await.result.final_text(), "handoff disabled");
+    assert!(model.requests.lock().unwrap()[0].tools.is_empty());
+    assert_eq!(state.callbacks.load(Ordering::SeqCst), 1);
+
+    // The facade can compose a catalog transfer without an async scheduler.
+    {
+        use adk::builder::{Builder, Config, Features, RoleSpec};
+        let model = Scripted::new(vec![
+            tool_response("transfer_to_reviewer", json!({})),
+            answer("catalog review"),
+        ]);
+        let mut bundle = Builder::new(Config {
+            model: "mock/base".into(),
+            roles: vec![RoleSpec {
+                name: "reviewer".into(),
+                instructions: "Review carefully.".into(),
+                tool_access: "read-only".into(),
+                ..Default::default()
+            }],
+            features: Some(Features {
+                handoffs: true,
+                handoff_history: true,
+                ..Default::default()
+            }),
+            ..Default::default()
+        })
+        .model("mock", adk::providers::factory::Kind::Local, model.clone())
+        .unwrap()
+        .build(&context())
+        .await
+        .unwrap();
+        assert!(bundle.specialists().contains_key("reviewer"));
+        let mut input = request().input;
+        input.extend((0..12).map(|_| message(Role::Assistant, &"older context. ".repeat(100))));
+        let result = bundle
+            .run(context(), input, Arc::new(RecordingHost::default()))
+            .await
+            .unwrap();
+        assert_eq!(result.result.last_agent.as_deref(), Some("reviewer"));
+        assert_eq!(result.result.final_output, Some(json!("catalog review")));
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(requests.len(), 2);
+            assert!(!compaction::extract_summary(&requests[1].input).is_empty());
+            assert_eq!(requests[1].instructions, "Review carefully.");
+            assert!(
+                requests[1]
+                    .input
+                    .iter()
+                    .all(|item| matches!(item, RunItem::Message { .. }))
+            );
+        }
+        bundle.close().await.unwrap();
+    }
+
+    {
+        use adk::builder::{Builder, Config, Features, SubagentFeatures};
+        let model = Scripted::new(vec![
+            tool_response("subagent", json!({"message":"investigate", "mode":"sync"})),
+            answer("automatic child evidence"),
+            answer("automatic synthesis"),
+        ]);
+        let host = Arc::new(RecordingHost::default());
+        let mut bundle = Builder::new(Config {
+            model: "mock/base".into(),
+            features: Some(Features {
+                subagents: SubagentFeatures {
+                    task: true,
+                    generic_fallback: true,
+                    ..Default::default()
+                },
+                ..Default::default()
+            }),
+            ..Default::default()
+        })
+        .model("mock", adk::providers::factory::Kind::Local, model)
+        .unwrap()
+        .subagent_host(host.clone())
+        .build(&context())
+        .await
+        .unwrap();
+        let result = bundle.run(context(), request().input, host).await.unwrap();
+        assert_eq!(
+            result.result.final_output,
+            Some(json!("automatic synthesis"))
+        );
+        let session = bundle.session();
+        let tasks = session.subagents().unwrap().scheduler.list();
+        assert_eq!(tasks.len(), 1);
+        assert_eq!(tasks[0].agent_name, "agent");
+        assert_eq!(tasks[0].result, "automatic child evidence");
+        bundle.close().await.unwrap();
+        assert!(session.is_closed());
+    }
+
+    {
+        use adk::builder::{Builder, Config, Features, SubagentFeatures};
+        let model = Scripted::new(vec![
+            tool_response("subagent", json!({"message":"first", "mode":"sync"})),
+            answer("first child"),
+            answer("first synthesis"),
+            tool_response("subagent", json!({"message":"second", "mode":"sync"})),
+            answer("second child"),
+            answer("second synthesis"),
+        ]);
+        let host = Arc::new(RecordingHost::default());
+        let config = Config {
+            model: "mock/base".into(),
+            features: Some(Features {
+                subagents: SubagentFeatures {
+                    task: true,
+                    generic_fallback: true,
+                    ..Default::default()
+                },
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        // This context and its owner belong to the whole session, not one turn.
+        let session_context = context();
+        let mut owner = Builder::new(config.clone())
+            .model("mock", adk::providers::factory::Kind::Local, model.clone())
+            .unwrap()
+            .subagent_host(host.clone())
+            .build_session(&session_context)
+            .await
+            .unwrap();
+        let handle = owner.handle();
+        let scheduler = handle.subagents().unwrap().clone();
+        for expected in ["first synthesis", "second synthesis"] {
+            let mut turn = Builder::new(config.clone())
+                .model("mock", adk::providers::factory::Kind::Local, model.clone())
+                .unwrap()
+                .session(handle.clone())
+                .build(&context())
+                .await
+                .unwrap();
+            assert!(Arc::ptr_eq(turn.session().subagents().unwrap(), &scheduler));
+            let result = turn
+                .run(context(), request().input, host.clone())
+                .await
+                .unwrap();
+            assert_eq!(result.result.final_output, Some(json!(expected)));
+            turn.close().await.unwrap();
+            assert!(!handle.is_closed());
+        }
+        assert_eq!(scheduler.scheduler.list().len(), 2);
+        let refreshed = Scripted::new(vec![answer("refreshed child")]);
+        owner = Builder::new(config)
+            .model(
+                "mock",
+                adk::providers::factory::Kind::Local,
+                refreshed.clone(),
+            )
+            .unwrap()
+            .subagent_host(host)
+            .owned_session(owner)
+            .build_session(&session_context)
+            .await
+            .unwrap();
+        assert!(Arc::ptr_eq(owner.handle().subagents().unwrap(), &scheduler));
+        let task = scheduler
+            .scheduler
+            .run(subagent::Submission::new("agent", "third"))
+            .await
+            .unwrap();
+        assert_eq!(task.result, "refreshed child");
+        assert_eq!(refreshed.requests.lock().unwrap().len(), 1);
+        assert_eq!(scheduler.scheduler.list().len(), 3);
+        owner.close().await.unwrap();
+        assert!(handle.is_closed());
+    }
+
+    use subagent::{Scheduler, SchedulerConfig, SecurityBaseline};
+    let child = Scripted::new(vec![answer("child evidence")]);
+    let host = Arc::new(RecordingHost::default());
+    let executor = RunnerChildExecutor::new(
+        [("child".into(), runner(agent(child.clone())))]
+            .into_iter()
+            .collect(),
+        host,
+    )
+    .with_output_extractor(
+        "child",
+        Arc::new(|result| format!("summary: {}", result.final_text())),
+    );
+    let baseline = SecurityBaseline::default();
+    let owner = Scheduler::new(
+        context(),
+        SchedulerConfig {
+            agents: [("child".into(), baseline)].into_iter().collect(),
+            ..Default::default()
+        },
+        Arc::new(executor),
+        None,
+    )
+    .unwrap();
+    let session = Arc::new(SubagentSession::new(owner.handle()));
+    let parent = Scripted::new(vec![
+        tool_response("specialist", json!({"message":"investigate"})),
+        answer("synthesis"),
+    ]);
+    let mut a = agent(parent.clone());
+    a.tools.push(Arc::new(AgentAsTool::new(
+        "specialist",
+        "Consult child",
+        "child",
+        session.clone(),
+    )));
+    let r = Runner::new(
+        a,
+        RunnerConfig {
+            subagents: Some(session),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let result = r
+        .run(context(), request(), Arc::new(RecordingHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("synthesis")));
+    assert!(
+        serde_json::to_string(&parent.requests.lock().unwrap()[1].input)
+            .unwrap()
+            .contains("summary: child evidence")
+    );
+    assert_eq!(child.requests.lock().unwrap().len(), 1);
+    owner.shutdown().await.unwrap();
+}
+
+struct DemoTripwire(&'static str);
+impl Guardrail for DemoTripwire {
+    fn name(&self) -> &str {
+        self.0
+    }
+    fn check<'a>(
+        &'a self,
+        _: &'a Context,
+        _: &'a str,
+        input: GuardrailInput<'a>,
+    ) -> BoxFuture<'a, Result<Option<GuardrailResult>, Error>> {
+        Box::pin(async move {
+            let (text, trigger, output) = match input {
+                GuardrailInput::Input(items) => {
+                    let text = items
+                        .iter()
+                        .filter_map(|item| match item {
+                            RunItem::Message { message } => Some(
+                                message
+                                    .content
+                                    .iter()
+                                    .filter_map(|content| match content {
+                                        Content::Text { text } => Some(text.as_str()),
+                                        _ => None,
+                                    })
+                                    .collect::<String>(),
+                            ),
+                            _ => None,
+                        })
+                        .collect::<String>();
+                    (text, "tripwire-input", "checked input")
+                }
+                GuardrailInput::Output(value) => (
+                    value.as_str().unwrap_or_default().into(),
+                    "tripwire-output",
+                    "checked output",
+                ),
+                GuardrailInput::ToolInput(call) => (
+                    call.arguments.to_string(),
+                    "tripwire-tool",
+                    call.name.as_str(),
+                ),
+                GuardrailInput::ToolOutput { call, output } => (
+                    output
+                        .content
+                        .iter()
+                        .filter_map(|content| match content {
+                            Content::Text { text } => Some(text.as_str()),
+                            _ => None,
+                        })
+                        .collect::<String>(),
+                    "tripwire-tool-output",
+                    call.name.as_str(),
+                ),
+            };
+            Ok(Some(GuardrailResult {
+                output: json!(output),
+                tripwire_triggered: text.to_lowercase().contains(trigger),
+                ..Default::default()
+            }))
+        })
+    }
+}
+
+async fn original_tripwire_guardrails() {
+    for triggered in [false, true] {
+        let input = vec![message(
+            Role::User,
+            if triggered {
+                "contains TRIPWIRE-input"
+            } else {
+                "benign"
+            },
+        )];
+        let output = json!(if triggered {
+            "contains TRIPWIRE-output"
+        } else {
+            "benign"
+        });
+        let call = call(
+            "demo",
+            json!({"value": if triggered { "TRIPWIRE-tool" } else { "benign" }}),
+        );
+        let result = ToolOutput {
+            content: vec![Content::Text {
+                text: if triggered {
+                    "TRIPWIRE-tool-output"
+                } else {
+                    "benign"
+                }
+                .into(),
+            }],
+            is_error: false,
+            should_pause: false,
+        };
+        for (name, input, expected) in [
+            (
+                "no-tripwire-input",
+                GuardrailInput::Input(&input),
+                "checked input",
+            ),
+            (
+                "no-tripwire-output",
+                GuardrailInput::Output(&output),
+                "checked output",
+            ),
+            ("tool-input-valid", GuardrailInput::ToolInput(&call), "demo"),
+            (
+                "tool-output-valid",
+                GuardrailInput::ToolOutput {
+                    call: &call,
+                    output: &result,
+                },
+                "demo",
+            ),
+        ] {
+            let guard = DemoTripwire(name);
+            assert_eq!(guard.name(), name);
+            let checked = guard
+                .check(&context(), "example", input)
+                .await
+                .unwrap()
+                .unwrap();
+            assert_eq!(checked.tripwire_triggered, triggered);
+            assert_eq!(checked.output, json!(expected));
+            assert!(checked.replacement_content.is_none());
+        }
+    }
+}
+
+async fn guardrails() {
+    original_tripwire_guardrails().await;
+    adk::security::check_secrets("public documentation").unwrap();
+    let secret = ["ghp_", &"a".repeat(36)].concat();
+    let error = adk::security::check_secrets(&secret).unwrap_err();
+    assert_eq!(error.info.category, ErrorCategory::Guardrail);
+    assert!(!error.info.message.contains(&secret));
+    // Runtime builtins protect custom tools too, independently of shell execution.
+    let read = call("custom_read", json!({}));
+    let output = ToolOutput {
+        content: vec![Content::Text {
+            text: format!("public prefix\n{secret}\npublic suffix"),
+        }],
+        is_error: false,
+        should_pause: false,
+    };
+    let guards = adk::guardrails::builtin_tool_output_guardrails();
+    let checked = guards[0]
+        .check(
+            &context(),
+            "example",
+            GuardrailInput::ToolOutput {
+                call: &read,
+                output: &output,
+            },
+        )
+        .await
+        .unwrap()
+        .unwrap();
+    assert!(!checked.tripwire_triggered);
+    let replacement = checked.replacement_content.unwrap();
+    assert!(replacement.contains("public prefix"));
+    assert!(replacement.contains("public suffix"));
+    assert!(!replacement.contains(&secret));
+    let temp = tempfile::tempdir().unwrap();
+    std::fs::write(temp.path().join("fixture"), &secret).unwrap();
+    let mut config = adk::sandbox::Config::new(temp.path());
+    config.backend = adk::sandbox::Backend::Local;
+    let executor = adk::sandbox::Executor::new(config).unwrap();
+    let policy = adk::security::SecurityPolicy {
+        tools: ToolPolicy {
+            access: AccessMode::FullAccess,
+            ..Default::default()
+        },
+        allow_network: true,
+        ..Default::default()
+    };
+    let command =
+        adk::security::CommandRequest::from_call(call("shell", json!({"command":"cat fixture"})))
+            .unwrap();
+    let ctx = context();
+    let adk::security::Authorization::Approved(command) = policy
+        .authorize(
+            &ctx,
+            &RecordingHost::default(),
+            &definition("shell", false),
+            command,
+        )
+        .await
+        .unwrap()
+    else {
+        panic!("unapproved read-only command");
+    };
+    let error = adk::execution::run_authorized(&executor, &ctx, command)
+        .await
+        .unwrap_err();
+    assert_eq!(error.info.category, ErrorCategory::Guardrail);
+    assert!(!error.info.message.contains(&secret));
+}
+async fn structured_output() {
+    for (raw, valid) in [
+        (r#"{"answer":42}"#, true),
+        (r#"{"answer":"wrong"}"#, true),
+        ("not json", false),
+    ] {
+        let hooks = Arc::new(Hooks::default());
+        let mut bundle = adk::builder::Builder::new(adk::builder::Config {
+            model: "mock/base".into(),
+            output_schema: Some(adk_core::JsonDocument::new((json!({"type":"object","properties":{"answer":{"type":"integer"}},"required":["answer"],"additionalProperties":false})).to_string()).unwrap()),
+            output_schema_name: "answer".into(),
+            ..Default::default()
+        })
+        .model("mock", adk::providers::factory::Kind::Local, Scripted::new(vec![answer(raw)]))
+        .unwrap()
+        .runner_config(RunnerConfig { hooks: Some(hooks.clone()), ..Default::default() })
+        .build(&context())
+        .await
+        .unwrap();
+        let result = bundle
+            .run(
+                context(),
+                request().input,
+                Arc::new(RecordingHost::default()),
+            )
+            .await
+            .unwrap();
+        assert_eq!(
+            result.result.final_output,
+            Some(serde_json::from_str(raw).unwrap_or_else(|_| json!(raw)))
+        );
+        let violations = hooks
+            .0
+            .lock()
+            .unwrap()
+            .iter()
+            .filter(|o| matches!(o, Observation::OutputValidationFailed { .. }))
+            .count();
+        assert_eq!(violations, usize::from(!valid));
+        bundle.close().await.unwrap();
+    }
+}
+async fn streaming() {
+    let a = AgentConfig::new(
+        "stream",
+        ModelBinding::streaming("offline", Scripted::new(vec![answer("hello")])),
+    );
+    let mut stream = runner(a).stream(context(), request(), Arc::new(RecordingHost::default()));
+    let mut deltas = vec![];
+    let mut finished = 0;
+    while let Some(event) = stream.next().await {
+        match event {
+            RunEvent::Model {
+                event: ModelEvent::TextDelta { delta },
+            } => deltas.push(delta),
+            RunEvent::Finished { .. } => finished += 1,
+            _ => {}
+        }
+    }
+    assert_eq!(deltas, ["hel", "lo"]);
+    assert_eq!(finished, 1);
+    assert_eq!(
+        stream.finish().await.unwrap().result.final_output,
+        Some(json!("hello"))
+    );
+
+    use adk::providers::{
+        auth::*,
+        factory::{Kind, RouteSpec},
+        wire::Protocol,
+    };
+    use tokio::io::{AsyncReadExt, AsyncWriteExt};
+    struct FixtureCredentials;
+    impl CredentialStore for FixtureCredentials {
+        fn load<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            Box::pin(async {
+                Ok(Material {
+                    access_token: Secret::new("offline-fixture-token"),
+                    refresh_token: None,
+                    id_token: None,
+                    email: None,
+                    account: None,
+                    expires_at: None,
+                    last_refresh: None,
+                    revision: 0,
+                })
+            })
+        }
+        fn replace<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: u64,
+            _: Material,
+        ) -> BoxFuture<'a, Result<bool, Error>> {
+            panic!("fixture credentials must not refresh")
+        }
+    }
+    impl Refresh for FixtureCredentials {
+        fn refresh<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            _: Material,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            panic!("fixture credentials must not refresh")
+        }
+    }
+    let listener = tokio::net::TcpListener::bind("127.0.0.1:0").await.unwrap();
+    let mut spec = RouteSpec::new(Kind::OpenAi, AuthMode::ApiKey);
+    spec.endpoint = Some(format!("http://{}", listener.local_addr().unwrap()));
+    spec.protocol = Some(Protocol::Chat);
+    let model = spec
+        .build(Arc::new(FixtureCredentials), Arc::new(FixtureCredentials))
+        .unwrap();
+    let server = async move {
+        let (mut socket, _) = listener.accept().await.unwrap();
+        let mut bytes = Vec::new();
+        let (headers, body) = loop {
+            let mut chunk = [0; 1024];
+            let count = socket.read(&mut chunk).await.unwrap();
+            assert!(count > 0, "incomplete streaming request");
+            bytes.extend_from_slice(&chunk[..count]);
+            if let Some(end) = bytes.windows(4).position(|part| part == b"\r\n\r\n") {
+                let headers = std::str::from_utf8(&bytes[..end]).unwrap();
+                let length: usize = headers
+                    .lines()
+                    .find_map(|line| {
+                        line.split_once(':')
+                            .filter(|(name, _)| name.eq_ignore_ascii_case("content-length"))
+                            .map(|(_, value)| value.trim().parse().unwrap())
+                    })
+                    .unwrap();
+                if bytes.len() >= end + 4 + length {
+                    break (
+                        headers.to_owned(),
+                        bytes[end + 4..end + 4 + length].to_vec(),
+                    );
+                }
+            }
+        };
+        let sse = [
+            r#"data: {"id":"chatcmpl-test","model":"gpt-4.1-mini","choices":[{"index":0,"delta":{"content":"hello from "}}]}"#,
+            r#"data: {"choices":[{"index":0,"delta":{"content":"test server"},"finish_reason":"stop"}]}"#,
+            r#"data: {"choices":[],"usage":{"prompt_tokens":5,"completion_tokens":4,"total_tokens":9}}"#,
+            "data: [DONE]", "",
+        ].join("\n\n");
+        socket.write_all(format!("HTTP/1.1 200 OK\r\nContent-Type: text/event-stream\r\nContent-Length: {}\r\nConnection: close\r\n\r\n", sse.len()).as_bytes()).await.unwrap();
+        socket.write_all(sse.as_bytes()).await.unwrap();
+        socket.shutdown().await.unwrap();
+        (headers, body)
+    };
+    let client = async {
+        let context = context();
+        let request = ModelRequest {
+            input_provenance: vec![],
+            model: "gpt-4.1-mini".into(),
+            instructions: "Say hi.".into(),
+            input: vec![message(Role::User, "hi")],
+            tools: vec![],
+            output_schema: None,
+            output_schema_name: "answer".into(),
+            output_schema_strict: true,
+            settings: [("max_tokens".into(), json!(32))].into_iter().collect(),
+        };
+        let mut stream = model.stream(&context, request).await.unwrap();
+        let mut delta = String::new();
+        let mut complete = None;
+        while let Some(event) = stream.next().await.unwrap() {
+            match event {
+                ModelEvent::TextDelta { delta: part } => delta.push_str(&part),
+                ModelEvent::Complete { response } => {
+                    assert!(complete.replace(response).is_none());
+                }
+                _ => {}
+            }
+        }
+        assert_eq!(delta, "hello from test server");
+        let complete = complete.unwrap();
+        assert!(!complete.items.is_empty());
+        assert_eq!(complete.usage.output_tokens, 4);
+    };
+    let ((headers, body), ()) = tokio::time::timeout(Duration::from_secs(5), async {
+        tokio::join!(server, client)
+    })
+    .await
+    .unwrap();
+    assert!(
+        headers
+            .lines()
+            .next()
+            .unwrap()
+            .split_whitespace()
+            .nth(1)
+            .unwrap()
+            .ends_with("/chat/completions")
+    );
+    let body: Value = serde_json::from_slice(&body).unwrap();
+    assert_eq!(body["model"], "gpt-4.1-mini");
+    assert_eq!(body["stream"], true);
+}
+
+async fn context_compaction() {
+    use compaction::{LocalCompactionPolicy, compact_for_request, extract_summary};
+    let mut history = vec![message(Role::User, "Preserve the original goal")];
+    for i in 0..30 {
+        history.push(message(
+            Role::Assistant,
+            &format!("step {i}: {}", "historical detail ".repeat(100)),
+        ));
+    }
+    history.push(message(Role::User, "Keep this latest question"));
+    let policy = LocalCompactionPolicy {
+        trigger_tokens: 1000,
+        target_tokens: 500,
+        preserve_recent_items: 1,
+        preserve_initial_user_messages: 1,
+        ..Default::default()
+    };
+    let compacted = compact_for_request(&history, policy, 0);
+    assert!(compacted.changed);
+    assert!(compacted.after_tokens < compacted.before_tokens);
+    assert!(!extract_summary(&compacted.history).is_empty());
+    assert!(compacted.history.contains(&history[0]));
+    assert_eq!(compacted.history.last(), history.last());
+    let disabled = compact_for_request(
+        &history,
+        LocalCompactionPolicy {
+            enabled: false,
+            ..policy
+        },
+        0,
+    );
+    assert!(!disabled.changed);
+    assert_eq!(disabled.history, history);
+
+    let original = vec![message(Role::Assistant, &"important project context ".repeat(20)); 24];
+    let original_policy = LocalCompactionPolicy {
+        enabled: true,
+        use_llm_summary: false,
+        trigger_tokens: 100,
+        target_tokens: 60,
+        preserve_recent_items: 4,
+        preserve_initial_user_messages: 1,
+        summary_bullet_limit: 3,
+    };
+    let compacted = compact_for_request(&original, original_policy, 0);
+    assert!(compacted.changed);
+    assert!(compacted.history.len() < original.len());
+    assert!(compacted.after_tokens < compacted.before_tokens);
+    assert!(extract_summary(&compacted.history).contains(compaction::SUMMARY_MARKER));
+    let defaults = LocalCompactionPolicy::for_model("gpt-5.6-sol");
+    assert!(defaults.trigger_tokens > defaults.target_tokens);
+}
+async fn settings_routing() {
+    use adk::codec::{dto, mode};
+    let routing = dto::ModeRouting {
+        default_model: "medium".into(),
+        reasoning_level: "high".into(),
+        text_verbosity: "low".into(),
+        role_overrides: Some(
+            [(
+                "writer".into(),
+                dto::ModeRoleRouting {
+                    model: "small".into(),
+                    reasoning_level: "low".into(),
+                    text_verbosity: "high".into(),
+                    ..Default::default()
+                },
+            )]
+            .into(),
+        ),
+        ..Default::default()
+    };
+    let top = mode::resolve_mode_routing("", "anthropic", Some(&routing));
+    assert_eq!(top.model, "claude-sonnet-4-6");
+    assert_eq!(top.model_settings.reasoning_effort, "high");
+    assert_eq!(top.model_settings.text_verbosity, "low");
+    let writer = mode::resolve_role_mode_routing("", "anthropic", "writer", Some(&routing));
+    assert_eq!(writer.model, "claude-haiku-4-5");
+    assert_eq!(writer.model_settings.reasoning_effort, "low");
+    assert_eq!(writer.model_settings.text_verbosity, "high");
+    use adk::builder::{Builder, Config, Features, ModeSpec, ModelRouting, RoleRouting, RoleSpec};
+    use adk::codec::snapshots::ModelSettings;
+    let settings = ModelSettings {
+        max_tokens: 100,
+        parallel_tool_calls: Some(true),
+        ..Default::default()
+    }
+    .merge(&ModelSettings {
+        temperature: Some(0.0),
+        max_tokens: 0,
+        parallel_tool_calls: Some(false),
+        ..Default::default()
+    });
+    assert_eq!(settings.temperature, Some(0.0));
+    assert_eq!(settings.max_tokens, 100);
+    assert_eq!(settings.parallel_tool_calls, Some(false));
+    for role in [None, Some("writer")] {
+        let model = Scripted::new(vec![answer("configured")]);
+        let config = Config {
+            model: "mock/base".into(),
+            settings: serde_json::to_value(&settings)
+                .unwrap()
+                .as_object()
+                .unwrap()
+                .clone(),
+            active_role: role.map(str::to_owned),
+            roles: vec![RoleSpec {
+                name: "writer".into(),
+                instructions: "Write clearly".into(),
+                ..Default::default()
+            }],
+            features: Some(Features {
+                mode_model_routing: true,
+                mode_instructions: true,
+                ..Default::default()
+            }),
+            mode_snapshot: Some(ModeSpec {
+                name: "plan".into(),
+                tool_access: "read-only".into(),
+                instructions: "Inspect first".into(),
+                model_routing: Some(ModelRouting {
+                    default_model: "mock/planner".into(),
+                    reasoning_level: "high".into(),
+                    role_overrides: [(
+                        "writer".into(),
+                        RoleRouting {
+                            model: "mock/writer".into(),
+                            text_verbosity: "low".into(),
+                            ..Default::default()
+                        },
+                    )]
+                    .into(),
+                    settings: [("temperature".into(), json!(0.2))].into_iter().collect(),
+                    ..Default::default()
+                }),
+                ..Default::default()
+            }),
+            ..Default::default()
+        };
+        let mut bundle = Builder::new(config)
+            .model("mock", adk::providers::factory::Kind::Local, model.clone())
+            .unwrap()
+            .build(&context())
+            .await
+            .unwrap();
+        assert_eq!(bundle.policy().tools.access, AccessMode::ReadOnly);
+        let result = bundle
+            .run(
+                context(),
+                request().input,
+                Arc::new(RecordingHost::default()),
+            )
+            .await
+            .unwrap();
+        assert_eq!(result.result.final_output, Some(json!("configured")));
+        {
+            let requests = model.requests.lock().unwrap();
+            assert_eq!(
+                requests[0].model,
+                if role.is_some() { "writer" } else { "planner" }
+            );
+            assert_eq!(requests[0].settings["temperature"], json!(0.2));
+            assert_eq!(requests[0].settings["max_tokens"], 100);
+            assert_eq!(requests[0].settings["reasoning_effort"], "high");
+            assert_eq!(requests[0].settings["thinking_budget"], 8192);
+            assert_eq!(
+                requests[0].settings["text_verbosity"],
+                if role.is_some() { "low" } else { "medium" }
+            );
+            assert!(requests[0].instructions.contains("Inspect first"));
+            if role.is_some() {
+                assert!(requests[0].instructions.contains("Write clearly"));
+            }
+        }
+        bundle.close().await.unwrap();
+        assert!(bundle.session().is_closed());
+    }
+}
+#[derive(Default)]
+struct Hooks(Mutex<Vec<Observation>>);
+impl RunHooks for Hooks {
+    fn observe<'a>(
+        &'a self,
+        _: &'a Context,
+        observation: Observation,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            self.0.lock().unwrap().push(observation);
+            Ok(())
+        })
+    }
+}
+async fn observability() {
+    use adk::observability::{CapturePolicy, Observability, ObservedHost};
+    let sink = Arc::new(EventLines::default());
+    let hooks = Arc::new(
+        Observability::new(
+            "offline-feature",
+            CapturePolicy::default(),
+            vec![sink.clone()],
+        )
+        .unwrap(),
+    );
+    let host = Arc::new(RecordingHost::default());
+    let mut a = agent(Scripted::new(vec![
+        tool_response("lookup", json!({"key":"answer"})),
+        answer("observed"),
+    ]));
+    a.tools.push(Lookup::new(false));
+    let r = Runner::new(
+        a,
+        RunnerConfig {
+            hooks: Some(hooks.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    r.run(
+        context(),
+        request(),
+        Arc::new(ObservedHost {
+            host: host.clone(),
+            observations: hooks.clone(),
+        }),
+    )
+    .await
+    .unwrap();
+    let snapshot = hooks.snapshot().await;
+    assert_eq!(snapshot.model_attempts, 2);
+    assert_eq!(snapshot.tool_calls, 1);
+    assert_eq!(snapshot.tool_results, 1);
+    assert_eq!(snapshot.usage.input_tokens, 20);
+    hooks.shutdown().await.unwrap();
+    let bytes = sink.0.lock().unwrap().clone();
+    let mut decoder = adk::observability::LineDecoder::new(1024 * 1024).unwrap();
+    let mut records = vec![];
+    for chunk in bytes.chunks(7) {
+        records.extend(decoder.push(chunk).into_iter().map(Result::unwrap));
+    }
+    assert!(decoder.finish().is_none());
+    assert_eq!(records.len() as u64, snapshot.sequence);
+    assert!(
+        records
+            .iter()
+            .enumerate()
+            .all(|(i, r)| r.sequence == i as u64 + 1)
+    );
+    assert!(records.iter().any(|r| r.kind == "tool_start"));
+    assert_eq!(records.last().unwrap().kind, "done");
+    assert!(!String::from_utf8(bytes).unwrap().contains("observed"));
+    let events = host.0.lock().unwrap();
+    assert!(matches!(events.first(), Some(RunEvent::Started { .. })));
+    assert!(matches!(events.last(), Some(RunEvent::Finished { .. })));
+}
+#[derive(Default)]
+struct EventLines(Mutex<Vec<u8>>);
+impl adk::observability::EventSink for EventLines {
+    fn emit<'a>(
+        &'a self,
+        record: &'a adk::observability::EventRecord,
+    ) -> BoxFuture<'a, Result<(), Error>> {
+        Box::pin(async move {
+            self.0.lock().unwrap().extend(record.to_json_line()?);
+            Ok(())
+        })
+    }
+}
+async fn tracestore() {
+    use adk::observability::{
+        CapturePolicy, EventRecord, FilesystemTraceStore, Observability, TraceLimits,
+    };
+    use std::os::unix::fs::PermissionsExt;
+    let temp = tempfile::tempdir().unwrap();
+    let root = temp.path().canonicalize().unwrap().join("private");
+    let store = Arc::new(
+        FilesystemTraceStore::create(&root, "offline-feature", TraceLimits::default()).unwrap(),
+    );
+    let pipeline =
+        Observability::new("offline-feature", CapturePolicy::default(), vec![store]).unwrap();
+    pipeline
+        .publish(&context(), "first", json!({"output":"private content"}))
+        .await
+        .unwrap();
+    pipeline
+        .publish(&context(), "second", json!({"input_tokens":12}))
+        .await
+        .unwrap();
+    pipeline.shutdown().await.unwrap();
+    assert_eq!(pipeline.health().await.events_written, 2);
+    let path = root.join("traces/offline-feature/events.jsonl");
+    assert_eq!(
+        std::fs::metadata(&path).unwrap().permissions().mode() & 0o777,
+        0o600
+    );
+    let bytes = std::fs::read_to_string(path).unwrap();
+    assert!(!bytes.contains("private content"));
+    let records: Vec<_> = bytes
+        .lines()
+        .map(|line| EventRecord::from_json_line(line.as_bytes()).unwrap())
+        .collect();
+    assert_eq!(records.len(), 2);
+    assert_eq!(records[0].sequence, 1);
+    assert_eq!(records[1].sequence, 2);
+    assert_eq!(records[1].data["input_tokens"], 12);
+    assert!(FilesystemTraceStore::create(&root, "../escape", TraceLimits::default()).is_err());
+    assert!(
+        FilesystemTraceStore::create(&root, "offline-feature", TraceLimits::default()).is_err()
+    );
+
+    // The compatible schema-2 path has distinct storage and explicit ownership.
+    #[cfg(target_os = "linux")]
+    {
+        use adk::{
+            tracestore::{
+                FilesystemTraceStore as SdkStore, RunFilter, RunMetadata, Score, ScoreMetrics,
+            },
+            tracewriter::{Options, TraceWriter},
+            tracing::TraceSession,
+            tracing_runtime::RunTrace,
+        };
+        let store = Arc::new(SdkStore::new(root.join("sdk")).unwrap());
+        let writer = Arc::new(TraceWriter::new(
+            store.clone(),
+            "sdk-run",
+            Options::default(),
+        ));
+        let metadata = RunMetadata {
+            run_id: "sdk-run".into(),
+            candidate_id: "candidate".into(),
+            model: "scripted".into(),
+            mode: "exploration".into(),
+            permission_mode: "workspace_write".into(),
+            max_turns: 8,
+            tools: vec!["echo".into()],
+            started_at: "2025-01-02T03:04:05Z".parse().unwrap(),
+            ..Default::default()
+        };
+        let path = writer.init_run(&metadata).unwrap();
+        assert!(path.starts_with(root.join("sdk")));
+        let persisted: RunMetadata =
+            serde_json::from_slice(&std::fs::read(path.join("metadata.json")).unwrap()).unwrap();
+        assert_eq!(persisted, metadata);
+        for tokens in [42, 58] {
+            store
+                .append_trace(
+                    "sdk-run",
+                    "llm_calls",
+                    serde_json::to_string(&json!({"event":"llm_call","tokens":tokens}))
+                        .unwrap()
+                        .as_bytes(),
+                )
+                .unwrap();
+        }
+        let calls: Vec<serde_json::Value> = std::fs::read_to_string(path.join("llm_calls.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(
+            calls,
+            vec![
+                json!({"event":"llm_call","tokens":42}),
+                json!({"event":"llm_call","tokens":58})
+            ]
+        );
+        let score = Score {
+            task_id: "task".into(),
+            candidate_id: "candidate".into(),
+            success: true,
+            metrics: ScoreMetrics {
+                accuracy: 1.0,
+                tokens_used: 100,
+                cost_usd: 0.0042,
+                duration_sec: 1.23,
+                tool_calls: 1,
+                turns_used: 2,
+                ..Default::default()
+            },
+        };
+        store.write_score("sdk-run", &score).unwrap();
+        let persisted: Score =
+            serde_json::from_slice(&std::fs::read(path.join("score.json")).unwrap()).unwrap();
+        assert_eq!(persisted, score);
+        let trace = RunTrace::new(TraceSession::new("standalone", writer.clone()));
+        let observer = trace.observer();
+        let runner = Runner::new(
+            agent(Scripted::results(vec![Ok(answer("traced"))])),
+            RunnerConfig {
+                hooks: Some(observer.clone()),
+                generation_observer: Some(observer),
+                ..Default::default()
+            },
+        )
+        .unwrap();
+        trace
+            .run_session(runner.run(context(), request(), Arc::new(RecordingHost::default())))
+            .await
+            .unwrap(); // The owned wrapper ends spans/root even on cancellation.
+        drop(runner); // Retained observer Arcs no longer keep the root open.
+        writer.finalize_run("completed").unwrap();
+        let records: Vec<serde_json::Value> = std::fs::read_to_string(path.join("spans.jsonl"))
+            .unwrap()
+            .lines()
+            .map(|line| serde_json::from_str(line).unwrap())
+            .collect();
+        assert_eq!(records.first().unwrap()["type"], "trace_start");
+        assert_eq!(records.last().unwrap()["type"], "trace_end");
+        let session = records
+            .iter()
+            .find(|record| record["type"] == "span_end" && record["name"] == "session")
+            .unwrap();
+        assert_eq!(session["num_turns"], 1);
+        assert_eq!(session["stop_reason"], "completed");
+        assert_eq!(writer.health().write_errors, 0);
+        let finished_at = "2025-01-02T03:04:07Z".parse().unwrap();
+        store
+            .update_metadata_finished_at("sdk-run", finished_at)
+            .unwrap();
+        let mut expected = metadata;
+        expected.finished_at = finished_at;
+        assert_eq!(
+            store.list_runs(&RunFilter::default()).unwrap(),
+            vec![expected.clone()]
+        );
+        assert_eq!(
+            store
+                .list_runs(&RunFilter {
+                    candidate_id: "candidate".into(),
+                    since: Some(expected.started_at),
+                })
+                .unwrap(),
+            vec![expected]
+        );
+        assert!(
+            store
+                .list_runs(&RunFilter {
+                    candidate_id: "does-not-exist".into(),
+                    ..Default::default()
+                })
+                .unwrap()
+                .is_empty()
+        );
+        assert!(
+            store
+                .list_runs(&RunFilter {
+                    since: Some(finished_at),
+                    ..Default::default()
+                })
+                .unwrap()
+                .is_empty()
+        );
+        for name in [
+            "metadata.json",
+            "score.json",
+            "llm_calls.jsonl",
+            "spans.jsonl",
+        ] {
+            assert_eq!(
+                std::fs::metadata(path.join(name))
+                    .unwrap()
+                    .permissions()
+                    .mode()
+                    & 0o777,
+                0o600
+            );
+        }
+        store.close();
+    }
+}
+async fn errors_retries() {
+    let legacy = adk::codec::retry::default_retry_policy();
+    assert_eq!(legacy.max_retries, 3);
+    assert_eq!(legacy.delay_for_attempt(2), 4_000_000_000);
+    assert_eq!(RunnerConfig::default().retry.max_retries, 0);
+    let mut advised = Scripted::results(vec![
+        Err(Error::new(
+            ErrorCategory::Provider,
+            "temporary provider outage",
+        )),
+        Ok(answer("recovered")),
+    ]);
+    Arc::get_mut(&mut advised).unwrap().retry_advice = Some(ModelRetryAdvice {
+        should_retry: true,
+        retry_after: Duration::ZERO,
+        reason: "temporary".into(),
+    });
+    let mut retry_request = request();
+    retry_request.input = vec![message(Role::User, "Try once, then recover.")];
+    retry_request.policy.max_turns = 2.try_into().unwrap();
+    let result = runner(agent(advised.clone()))
+        .run(
+            context(),
+            retry_request.clone(),
+            Arc::new(RecordingHost::default()),
+        )
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("recovered")));
+    assert_eq!(advised.requests.lock().unwrap().len(), 2);
+    retry_request.input.clear();
+    let model = Scripted::results(vec![
+        Err(Error::new(ErrorCategory::Provider, "temporary")),
+        Ok(answer("policy recovered")),
+    ]);
+    let mut config = RunnerConfig::default();
+    config.retry.max_retries = 1;
+    config.retry.initial_delay = Duration::ZERO;
+    config.retry.max_delay = Duration::ZERO;
+    let result = Runner::new(agent(model.clone()), config)
+        .unwrap()
+        .run(context(), retry_request, Arc::new(RecordingHost::default()))
+        .await
+        .unwrap();
+    assert_eq!(result.result.final_output, Some(json!("policy recovered")));
+    assert_eq!(model.requests.lock().unwrap().len(), 2);
+    assert_eq!(result.result.responses.len(), 1);
+    let token = CancellationToken::new();
+    token.cancel();
+    let mut ctx = context();
+    ctx.cancellation = Arc::new(token);
+    let never = Scripted::new(vec![]);
+    let error = runner(agent(never.clone()))
+        .run(ctx, request(), Arc::new(RecordingHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Cancelled);
+    assert!(never.requests.lock().unwrap().is_empty());
+}
+struct Prices;
+impl CostEstimator for Prices {
+    fn cost(&self, _: &str, usage: &Usage) -> f64 {
+        usage.input_tokens as f64 * 0.001 + usage.output_tokens as f64 * 0.002
+    }
+}
+async fn costs() {
+    let hooks = Arc::new(Hooks::default());
+    let r = Runner::new(
+        agent(Scripted::new(vec![answer("costed")])),
+        RunnerConfig {
+            cost_estimator: Some(Arc::new(Prices)),
+            hooks: Some(hooks.clone()),
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    r.run(context(), request(), Arc::new(RecordingHost::default()))
+        .await
+        .unwrap();
+    let costs: Vec<_> = hooks
+        .0
+        .lock()
+        .unwrap()
+        .iter()
+        .filter_map(|o| {
+            if let Observation::Usage { cost, .. } = o {
+                Some(*cost)
+            } else {
+                None
+            }
+        })
+        .collect();
+    assert_eq!(costs.len(), 1);
+    assert!((costs[0] - 0.014).abs() < 1e-12);
+    let mut a = agent(Scripted::new(vec![tool_response(
+        "lookup",
+        json!({"key":"answer"}),
+    )]));
+    let tool = Lookup::new(false);
+    a.tools.push(tool.clone());
+    let r = Runner::new(
+        a,
+        RunnerConfig {
+            cost_estimator: Some(Arc::new(Prices)),
+            limits: Limits {
+                max_cost: Some(0.001),
+                ..Default::default()
+            },
+            ..Default::default()
+        },
+    )
+    .unwrap();
+    let error = r
+        .run(context(), request(), Arc::new(RecordingHost::default()))
+        .await
+        .err()
+        .unwrap();
+    assert_eq!(error.error.info.category, ErrorCategory::Guardrail);
+    assert_eq!(tool.calls.load(Ordering::SeqCst), 0);
+}
+async fn policy() {
+    use adk::codec::policy as legacy;
+    let default_policy = legacy::RuntimePolicy::default().normalize();
+    assert_eq!(
+        default_policy.permission_mode,
+        legacy::PERMISSION_MODE_WORKSPACE_WRITE
+    );
+    assert!(!default_policy.enable_mcp);
+    let read_only = legacy::RuntimePolicy {
+        permission_mode: legacy::PERMISSION_MODE_READ_ONLY.into(),
+        ..Default::default()
+    };
+    assert!(!legacy::ToolPolicy::new(&read_only).allows_write_tools());
+    assert!(!legacy::allows_mcp_tool(
+        legacy::PERMISSION_MODE_READ_ONLY,
+        false
+    ));
+    assert!(legacy::allows_mcp_tool(
+        legacy::PERMISSION_MODE_DANGER_FULL_ACCESS,
+        false
+    ));
+    let mut tool = definition("write", true);
+    tool.read_only = false;
+    let mut policy = ToolPolicy::default();
+    assert_eq!(policy.decision(&tool), ToolDecision::Deny);
+    policy.access = AccessMode::WorkspaceWrite;
+    assert_eq!(policy.decision(&tool), ToolDecision::RequireApproval);
+    policy.denied_tools.insert("write".into());
+    assert_eq!(policy.decision(&tool), ToolDecision::Deny);
+    policy.denied_tools.clear();
+    policy.allowed_tools = Some(["write_other".into()].into());
+    assert_eq!(policy.decision(&tool), ToolDecision::Deny);
+    assert_eq!(
+        adk::security::clamp_access(AccessMode::FullAccess, AccessMode::ReadOnly),
+        AccessMode::ReadOnly
+    );
+}
+/// An application-owned backend adapter: the tool depends only on Store.
+#[derive(Default)]
+struct AuditedMemory {
+    inner: adk::project_state::memory::InMemoryStore,
+    operations: Mutex<Vec<&'static str>>,
+}
+impl adk::project_state::memory::Store for AuditedMemory {
+    fn store(
+        &self,
+        namespace: &str,
+        content: &str,
+        tags: &[String],
+        source_run: &str,
+        metadata: Value,
+    ) -> adk::project_state::Result<adk::project_state::memory::Memory> {
+        self.operations.lock().unwrap().push("store");
+        self.inner
+            .store(namespace, content, tags, source_run, metadata)
+    }
+    fn search(
+        &self,
+        namespace: &str,
+        query: &str,
+        tags: &[String],
+        limit: i32,
+    ) -> adk::project_state::Result<Vec<adk::project_state::memory::Memory>> {
+        self.operations.lock().unwrap().push("search");
+        self.inner.search(namespace, query, tags, limit)
+    }
+    fn list(
+        &self,
+        namespace: &str,
+        tags: &[String],
+        limit: i32,
+    ) -> adk::project_state::Result<Vec<adk::project_state::memory::Memory>> {
+        self.operations.lock().unwrap().push("list");
+        self.inner.list(namespace, tags, limit)
+    }
+    fn delete(&self, namespace: &str, id: uuid::Uuid) -> adk::project_state::Result<()> {
+        self.operations.lock().unwrap().push("delete");
+        self.inner.delete(namespace, id)
+    }
+}
+
+async fn memory() {
+    use adk::project_state::memory::{Embedder, InMemoryStore, NoopEmbedder, Store};
+    let original = InMemoryStore::new();
+    let first = original
+        .store(
+            "team-a",
+            "remember to renew SSL certs in November",
+            &["ops".into(), "tls".into()],
+            "run-001",
+            json!({"kind":"reminder"}),
+        )
+        .unwrap();
+    assert!(!first.id.is_nil());
+    original
+        .store(
+            "team-a",
+            "deploy guide is in /runbooks/deploy.md",
+            &["ops".into()],
+            "run-002",
+            Value::Null,
+        )
+        .unwrap();
+    original
+        .store(
+            "team-b",
+            "do not include this in team-a results",
+            &["ops".into()],
+            "run-003",
+            Value::Null,
+        )
+        .unwrap();
+    assert_eq!(original.list("team-a", &[], 10).unwrap().len(), 2);
+    let tagged = original.list("team-a", &["tls".into()], 10).unwrap();
+    assert_eq!(tagged.len(), 1);
+    assert_eq!(tagged[0].id, first.id);
+    original.delete("team-a", first.id).unwrap();
+    assert_eq!(original.list("team-a", &[], 10).unwrap().len(), 1);
+    let embedder = NoopEmbedder::default();
+    let embedded = embedder.embed("hello world").unwrap();
+    assert!(!embedded.is_empty());
+    assert_eq!(embedded, embedder.embed("hello world").unwrap());
+    let custom = Arc::new(AuditedMemory::default());
+    let registry = adk::tools::Registry::build(
+        &adk::tools::Config {
+            features: adk::tools::Features::Strict(["ExtraTools".into()].into()),
+            access: AccessMode::WorkspaceWrite,
+            allowed_names: Some(["Memory".into()].into()),
+            ..Default::default()
+        },
+        [adk::tools::memory::tool(
+            custom.clone(),
+            "team-a",
+            "run-001",
+            "https://example.test/repo",
+        )],
+    )
+    .unwrap();
+    let tool = registry.get("Memory").expect("Memory tool missing");
+    let mut ctx = tool_context();
+    ctx.policy.access = AccessMode::WorkspaceWrite;
+    let stored = tool
+        .execute(
+            &ctx,
+            call("Memory", json!({"action":"store","content":"deploys require a green smoke test","tags":["deploy"]})),
+        )
+        .await
+        .unwrap();
+    assert!(!stored.is_error);
+    let Content::Text { text } = &stored.content[0] else {
+        panic!("expected memory JSON text");
+    };
+    let payload: adk::project_state::memory::Memory = serde_json::from_str(text).unwrap();
+    assert_eq!(payload.namespace, "team-a");
+    assert_eq!(payload.source_run, "run-001");
+    assert_eq!(payload.metadata["repo"], "https://example.test/repo");
+    let found = tool
+        .execute(
+            &ctx,
+            call(
+                "Memory",
+                json!({"action":"search","content":"smoke test","tags":["deploy"],"limit":1}),
+            ),
+        )
+        .await
+        .unwrap();
+    assert!(!found.is_error);
+    assert!(
+        serde_json::to_string(&found)
+            .unwrap()
+            .contains(&payload.id.to_string())
+    );
+    assert_eq!(*custom.operations.lock().unwrap(), ["store", "search"]);
+    let store = Arc::new(AuditedMemory::default());
+    let memory = store
+        .store(
+            "team-a",
+            "Prefer Rust examples",
+            &["preference".into()],
+            "run-1",
+            json!({"source":"example"}),
+        )
+        .unwrap();
+    store
+        .store("team-b", "Prefer Rust examples", &[], "run-2", json!({}))
+        .unwrap();
+    let found = store
+        .search("team-a", "Rust examples", &["preference".into()], 5)
+        .unwrap();
+    assert_eq!(found.len(), 1);
+    assert_eq!(found[0].id, memory.id);
+    assert_eq!(found[0].similarity, 1.0);
+    assert!(store.delete("team-b", memory.id).is_err());
+    store.delete("team-a", memory.id).unwrap();
+    assert!(store.list("team-a", &[], 5).unwrap().is_empty());
+    assert_eq!(store.list("team-b", &[], 5).unwrap().len(), 1);
+    let tool = adk::tools::memory::tool(
+        store.clone(),
+        "team-a",
+        "tool-run",
+        "https://example.invalid/repo",
+    );
+    let mut ctx = tool_context();
+    ctx.policy.access = AccessMode::WorkspaceWrite;
+    let output = tool.execute(&ctx, call("Memory", json!({"action":"store","content":"Use namespace tools","tags":["guide"],"namespace":"team-b"}))).await.unwrap();
+    assert!(!output.is_error);
+    let memories = store.list("team-a", &[], 5).unwrap();
+    assert_eq!(memories.len(), 1);
+    assert_eq!(memories[0].source_run, "tool-run");
+    assert_eq!(memories[0].metadata["repo"], "https://example.invalid/repo");
+    assert_eq!(store.list("team-b", &[], 5).unwrap().len(), 1);
+    let output = tool
+        .execute(
+            &ctx,
+            call(
+                "Memory",
+                json!({"action":"search","content":"namespace tools"}),
+            ),
+        )
+        .await
+        .unwrap();
+    assert!(!output.is_error);
+    assert!(
+        serde_json::to_string(&output)
+            .unwrap()
+            .contains("Use namespace tools")
+    );
+    let output = tool
+        .execute(
+            &ctx,
+            call("Memory", json!({"action":"delete","id":memories[0].id})),
+        )
+        .await
+        .unwrap();
+    assert!(!output.is_error);
+    assert!(store.list("team-a", &[], 5).unwrap().is_empty());
+    let operations = store.operations.lock().unwrap();
+    assert_eq!(operations.iter().filter(|op| **op == "store").count(), 3);
+    assert_eq!(operations.iter().filter(|op| **op == "search").count(), 2);
+    assert_eq!(operations.iter().filter(|op| **op == "delete").count(), 3);
+}
+
+#[tokio::main(flavor = "current_thread")]
+async fn main() {
+    let args: Vec<_> = std::env::args().skip(1).collect();
+    if args == ["--list"] {
+        for name in SCENARIOS {
+            println!("{name}");
+        }
+        return;
+    }
+    let selected: Vec<&str> = if args.is_empty() || args == ["all"] {
+        SCENARIOS.to_vec()
+    } else {
+        args.iter().map(String::as_str).collect()
+    };
+    for name in &selected {
+        if !SCENARIOS.contains(name) {
+            eprintln!("Unknown scenario {name:?}; use --list");
+            std::process::exit(2);
+        }
+    }
+    for name in selected {
+        match name {
+            "agent_runtime" => agent_runtime().await,
+            "model_abstraction" => model_abstraction().await,
+            "providers" => providers().await,
+            "tools" => tools().await,
+            "tools_registry" => tools_registry().await,
+            "mcp" => mcp().await,
+            "sandbox" => sandbox().await,
+            "chatloop" => chatloop().await,
+            "handoffs_subagents" => handoffs_subagents().await,
+            "guardrails" => guardrails().await,
+            "structured_output" => structured_output().await,
+            "streaming" => streaming().await,
+            "context_compaction" => context_compaction().await,
+            "settings_routing" => settings_routing().await,
+            "observability" => observability().await,
+            "errors_retries" => errors_retries().await,
+            "costs" => costs().await,
+            "policy" => policy().await,
+            "memory" => memory().await,
+            "tracestore" => tracestore().await,
+            _ => unreachable!(),
+        }
+        println!("PASS {name}");
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    #[tokio::test]
+    async fn original_four_phase_tripwire_guardrails() {
+        super::original_tripwire_guardrails().await;
+    }
+
+    #[tokio::test]
+    async fn original_sandbox_local_executor_and_explicit_environment() {
+        super::sandbox().await;
+    }
+
+    #[tokio::test]
+    async fn original_local_http_streaming_example() {
+        super::streaming().await;
+    }
+
+    #[tokio::test]
+    async fn original_readonly_registry_example() {
+        super::tools().await;
+    }
+
+    #[tokio::test]
+    async fn original_provider_configuration_example() {
+        super::providers().await;
+    }
+
+    #[tokio::test]
+    async fn original_mcp_tool_builder_example() {
+        super::mcp().await;
+    }
+
+    #[cfg(unix)]
+    #[tokio::test]
+    async fn original_mcp_snapshot_and_display_example() {
+        super::mcp().await;
+    }
+
+    #[tokio::test]
+    async fn original_errors_retries_examples() {
+        super::errors_retries().await;
+    }
+
+    #[tokio::test]
+    async fn original_context_compaction_example() {
+        super::context_compaction().await;
+    }
+
+    #[tokio::test]
+    async fn original_settings_routing_example() {
+        super::settings_routing().await;
+    }
+
+    #[tokio::test]
+    async fn original_tools_registry_example() {
+        super::tools_registry().await;
+    }
+
+    #[tokio::test]
+    async fn original_memory_examples() {
+        super::memory().await;
+    }
+
+    #[tokio::test]
+    async fn original_policy_primitives_example() {
+        super::policy().await;
+    }
+
+    #[cfg(target_os = "linux")]
+    #[tokio::test]
+    async fn original_tracestore_example() {
+        super::tracestore().await;
+    }
+}

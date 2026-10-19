@@ -1,0 +1,185 @@
+# Standalone host sessions
+
+Enable `adk`'s `host` feature for caller-driven orchestration. It includes
+`builder` and `observability`, but no platform client, service discovery,
+background polling, worker command, or evaluation adapter. Application code
+owns the stores, credentials, input source, and schedule.
+
+Run the offline embedding example:
+
+```sh
+cargo run --locked -p adk --features host --example host_session
+```
+
+The example consumes a host message, calls an injected model, verifies the
+persisted batch and cursor, and explicitly closes the owned session. It uses no
+network, credentials, subprocess, or platform service.
+
+## Composition and ownership
+
+Construct `host::ChatLoopOptions::new(agent)` with a native `AgentConfig`.
+Supply optional `SessionStore`, `ConfigSource`, `PlatformToolFactory`,
+`ApprovalGate`, `TraceStore`, `RunStatusSink`, and core `Host` implementations.
+`RunnerConfig` and `RunPolicy` remain explicit native values; custom runtime
+hooks are composed rather than replaced. Tool-factory results replace the
+agent's tool list, so return any base tools you want to retain.
+
+`RunStatusSink::publish_progress` accepts the SDK-compatible
+`progress::ProgressSnapshot` (step, session, USD/token totals, per-model usage and
+events), not the distinct native `observability::ProgressSnapshot` counters.
+Hosts can pass `ProgressTracker::snapshot()` directly. Progress and trace-ID
+publication remain host-driven; ChatLoop does not invoke those two methods
+automatically. It publishes the final result at successful finalization.
+
+`ChatLoop::run` performs one invocation, not an infinite conversation loop.
+The default session is owned. `Session::Borrowed(handle)` binds an existing
+owner without closing it. Call `close().await` to drain an owned session;
+closing a borrowed loop does not close its owner. Caller cancellation and the
+session cancellation signal are both respected, and caller deadlines remain
+in force during collaborator calls.
+
+Each invocation defaults the logical prompt-cache key to `run` and generates a
+fresh namespace when none is supplied. Approval resumes share that invocation's
+64-character hashed wire key. To deliberately share a cache across invocations,
+set `RunnerConfig::prompt_cache_namespace`; this is also how a host supplies a
+shared trace identity for caching. Logical keys and namespaces are trimmed, with
+blank values treated as absent. This default is specific to ChatLoop, not the
+lower-level native Runner's opt-in cache configuration.
+
+The loop does not create a store session, implement a transaction, or persist
+its cursor automatically. `cursor()` exposes the signed message ID **and**
+opaque token. Save both if the application needs restartable ingestion.
+The cursor advances as each page is loaded, before model execution. A later
+page/model/store failure therefore does not roll back already consumed pages.
+The default page size is 50; a short page or unchanged cursor ends pagination.
+
+`host::Cursor` is the shared `codec::dto::Cursor` record and supports Serde
+persistence (`message_id` and `token`, omitted when zero/empty). Use
+`codec::from_go_json::<host::Cursor>` and `codec::to_go_json_bytes` when reading
+or writing the pinned SDK format: these include Go key folding, duplicate/null
+field behavior, signed integer parsing, malformed string replacement, nesting
+limits and HTML escaping. Ordinary Serde remains available for native JSON;
+Go decoder partial mutation and exact error messages are not reproduced. The
+same record/codec is available with only the `compat` feature.
+
+Each call reloads handoff history from `ConfigSource`; previous call results
+are not silently retained as the next call's prompt. A store must supply its
+own replay history through that collaborator. `RunBatch` keeps native items,
+authorship provenance and approval-boundary sidecars together. Missing
+provenance means unknown authorship, never the active agent.
+
+## Conversation helpers
+
+`host` supplies pure helpers for
+applications that maintain durable history or queues:
+
+- `build_conversation_tail`: filters the history floor/current message and keeps
+  the last requested number of nonblank or image-bearing messages (default 8).
+  Assistant/system summary labels are explicit provenance, not guessed authorship.
+- `build_working_state_context` / `WorkingState::context`: deterministic compact
+  working-state text, using the latest four progress summaries.
+- `derive_working_state_goal`: preserves the effective objective for shorthand
+  approval replies; `truncate_context_text` applies Unicode-safe snippet limits.
+- `build_assistant_turn_summary`: summarizes explicitly attributed assistant
+  text, tool-call counts, successful outputs and errors; unknown authorship is
+  not silently promoted to assistant text.
+- `summarize_turn_tool_calls`: deterministic count/name ordering.
+- `select_next_user_message` and `collect_immediate_run_items`: prioritize
+  unconsumed immediate messages while returning a cursor that never skips an
+  earlier pending queued message. The application owns the `BTreeSet<i64>` of
+  consumed immediate IDs. These helpers do not change ChatLoop's paged-ingestion
+  semantics or install a scheduler.
+
+Default message/summary snippet limits are 1200/320 Unicode scalar values;
+positive truncation appends `...`. A nonpositive snippet limit is unlimited.
+The conversation-tail limit separately defaults to 8 when nonpositive.
+
+The always-available `core::RunResult` offers borrowed `final_text`,
+`to_input_list`, `all_interruptions`, and `is_interrupted` views. Structured
+final output is not stringified by `final_text`. An approval-free tool pause
+is not an approval interruption. `to_input_list` means **new items only**, not
+complete history; replay `history` after resolving approvals. These views do
+not manufacture an executable continuation or durable checkpoint.
+
+## Ordering and failure boundaries
+
+Preparation loads permissions, instructions, guardrail rules and mode snapshot,
+then working state, then invokes the tool factory. Handoff history and paged
+messages are loaded afterward. `role_catalog` is available to application/tool
+assembly but is not called by the loop.
+
+`PermissionMode::parse` follows the SDK host's Unicode whitespace trimming and
+simple lowercase normalization (including `K` → `k` and `İ` → `i`). Empty input
+selects workspace-write; unrecognized nonempty input remains read-only. This is
+the ChatLoop host contract, not the SDK's separate case-sensitive internal policy
+normalizer.
+
+Successful runner batches are persisted, including an empty batch. Approval
+resolution is sequential; resolved items and markers are persisted **before**
+another model call. If a later gate fails, already resolved records are still
+persisted. Persistence failure takes precedence over the earlier resolution
+failure. The default maximum is 12 approval resumes, checked after persisting
+the interrupted runner batch. An approved tool's pause resolves the entire
+pending approval batch without making another model call.
+
+Approval gates receive both the parsed `ToolApprovalRequest::input` and owned
+`input_json` text. The latter preserves the original UTF-8 tool arguments,
+including whitespace, duplicate keys, escapes and numeric spelling; native
+value-only calls use their JSON encoding. Modifying the gate's copy cannot alter
+retained call history. Arbitrary non-UTF-8 Go byte slices are not a native tool
+argument representation.
+
+Without a gate, the loop synthesizes denied approval/error-output pairs,
+persists them and finalizes without executing tools. The result retains the
+source SDK's interrupted state and prior final history; no executable
+continuation is returned for those denied calls.
+
+The awaited approval-persistence boundary is not a durable recovery protocol.
+Native durable continuations are rejected before approval resolution when this
+boundary is supplied: a checkpoint alone cannot prove that a separate host
+store append committed. Durable reconciliation of that external append remains
+an explicit integration limit, not an exactly-once guarantee.
+
+Model failures discard the returned partial result, matching the pinned host
+contract; this does not undo effects or records already persisted. Append,
+approval and finalization failures retain their combined partial result. Trace
+finalization precedes final status publication. Optional progress, trace-ID,
+category and file methods are application hooks, not promises that the loop
+calls them automatically. Use the separate tracing integration for runtime
+spans and provider snapshots.
+
+## Limits and compaction
+
+A mode can supply missing main/child turn limits and narrow tool access.
+Child limits are attached to each invocation's tool policy, composed by minimum
+with existing restrictions, and bounded again by the scheduler owner. Reusing
+a scheduler does not mutate a session-global turn limit.
+
+Working state is carried forward after compaction, not added automatically to
+the initial prompt. Nonblank dynamic `CompactionCarryForward` context supersedes
+static `working_state_context`; blank dynamic context falls back to static.
+Existing carry-forward messages are replaced, preserving provenance and
+approval boundaries. Input guardrails run before the new context is inserted.
+Durable runs require a nonempty stable callback key; changed host settings
+participate in the durable configuration fingerprint.
+
+## Compatibility and validation limits
+
+Reference: SDK v0.0.115, commit
+`1dc92b73900fac74dc357a938e4b5eee6392b418`,
+[`pkg/agentsdk/chatloop.go`](https://github.com/gratefulagents/sdk/blob/1dc92b73900fac74dc357a938e4b5eee6392b418/pkg/agentsdk/chatloop.go).
+`fixtures/host-loop/sdk-chatloop.json` contains 61 independently executed Go
+scenarios. Regenerate and check them with `python3 scripts/host-reference/check.py`
+after obtaining the clean pinned SDK and a Go toolchain. Source fixture coverage
+is not a claim that every scenario or SDK capability is verified in Rust.
+
+Dynamic guardrail regular expressions use Rust's regex engine; unsupported
+syntax is rejected explicitly. Go quoted literals (`\Q...\E`, including quoting
+to the end of the pattern) are translated outside character classes; literal
+flag-like text inside quotes does not enable Rust flags. Input rules match original UTF-8 argument text
+when present, retaining whitespace, duplicate keys and escapes; value-only native
+calls use their serialized JSON. Arbitrary non-UTF-8 Go input bytes are not
+represented by this native boundary. Store durability,
+transactionality, provider credentials, and live services remain application
+responsibilities. The full SDK capability ledger remains authoritative for
+unresolved parity; this feature is not blanket ledger closure.

@@ -35,6 +35,40 @@ boundaries, research, cancellation ownership, license decisions and limitations.
 The [migration baseline](docs/migration/README.md) contains source pins, upstream
 contracts, original Go fixture provenance and unverified migration obligations.
 
+## Bounded Go payload codecs
+
+With `compat`, `adk::codec::{from_go_json, to_go_json_bytes}` supports
+`MessageOutput`, `ImageAttachment`, `ToolCallData`, `ToolOutputData`,
+`HandoffCallData`, `HandoffOutputData`, `ReasoningData`, `CompactionData`,
+`ToolApprovalData`, and `RunItemType`. These sealed entrypoints do not accept
+`RunItem` or `Agent`. Typed strings use Go's replacement rules; raw `input`
+preserves original bytes, duplicate keys, number spellings, and escapes,
+including invalid UTF-8. The byte encoder compacts raw JSON and applies Go's
+HTML and U+2028/U+2029 escaping without normalizing invalid raw bytes.
+
+`RawJson::bytes()` is lossless; `try_text()` rejects invalid UTF-8 and
+`try_value()` is a strict, fallible projection, not the raw syntax authority.
+Valid UTF-8 raw inputs retain `Encoded`; invalid UTF-8 uses `EncodedBytes`.
+Ordinary Serde serialization and native tool/approval bridges reject invalid
+UTF-8 rather than silently replacing it. Public `EncodedBytes` values are
+syntax-checked by the byte encoder. Decode errors return no partial state;
+Go error text and partial mutations are not reproduced. Existing `Vec` image
+fields collapse nil and empty slices (both omitted on marshal).
+
+`adk::codec::items::{extract_text, extract_last_text, extract_tool_calls}`
+operates on constructed `dto::RunItem` values. Text extraction honors the item
+kind and missing payloads, including the SDK's empty-message separator behavior.
+Tool-call extraction returns `None` when no calls match and otherwise owns cloned
+call values, preserving raw input bytes without validating them. Mutable Go
+backing-array aliases are not reproduced. These helpers do not add `RunItem`
+support to the sealed Go JSON decoder.
+
+`adk::codec::value::decode` parses untyped JSON with Go string replacement and
+finite float64 number semantics, preserving ordinary object keys and validating
+duplicate entries before replacement. Parsed numbers use Go JSON spelling rather
+than original lexical bytes. This decoder retains the native 127-container depth
+bound, not Go's 10,000; it is used for default output/handoff advisory validation.
+
 ## Reproducible development
 
 Install [rustup](https://rustup.rs/); `rust-toolchain.toml` pins Rust **1.88.0**,
@@ -62,6 +96,10 @@ cargo deny --locked check
 | Minimal | `cargo test --locked -p adk --no-default-features --all-targets` | Native contracts only |
 | Default | `cargo test --locked --all-targets` | Default workspace members: facade, core, SDK codecs |
 | Runtime | `cargo test --locked -p adk --no-default-features --features runtime --all-targets` | Add standalone runner and Tokio ownership |
+| Builder | `cargo test --locked -p adk --no-default-features --features builder --all-targets` | Add host configuration and provider/tool/session composition |
+| Host sessions | `cargo test --locked -p adk --no-default-features --features host --all-targets` | Caller-driven message ingestion, approval persistence, and explicit session lifecycle ([guide](docs/host-sessions.md)) |
+| Observability | `cargo test --locked -p adk --no-default-features --features observability --all-targets` | Ordered hooks/events and private local traces |
+| OpenTelemetry | `cargo test --locked -p adk --no-default-features --features otel --all-targets` | Host-owned tracer bridge, no implicit exporter |
 | Execution | `cargo test --locked -p adk --no-default-features --features execution --all-targets` | Add opt-in sandbox, process ownership and security |
 | All | `cargo test --locked --workspace --all-features --all-targets` | Include codecs, runtime, execution, platform boundary and binaries |
 
@@ -77,6 +115,38 @@ See [managed subagents](docs/subagents.md) for session ownership, DAG tools,
 security narrowing, steering and conservative scheduler recovery. Purity checks walk
 the resolved transitive all-feature Cargo graph, with negative tests for indirect
 platform/Kubernetes dependencies.
+
+## Embedding and composition
+
+The public [runtime builder](docs/runtime-builder.md) composes host-supplied
+models, tools, configuration and explicit bundle/session ownership via the
+`builder` feature (which enables `providers-runtime` and `tools`). It does not
+discover credentials or start platform services. [Observability](docs/observability.md)
+adds ordered event/progress delivery, private trace persistence and an optional
+OpenTelemetry bridge. The `observability` feature enables the local adapters;
+`otel` additionally accepts a host-owned OpenTelemetry tracer. Exporter configuration,
+flush and shutdown remain the embedding application's responsibility.
+
+See the [20 offline feature examples](docs/feature-examples.md),
+[Rust API research](docs/research/facade.md), and
+[issue #11 verification and remaining blockers](docs/verification/issue-11.md).
+Example coverage is not a declaration of full SDK behavioral parity.
+The [CLI scope](docs/sdk-cli.md) explicitly excludes porting `grateful-agent-run`
+and evaluation/Terminal-Bench adapters.
+
+An independent workspace consumer builds every reusable facade feature without
+depending on either development binary or `adk-platform`:
+
+```sh
+cargo run --locked --manifest-path fixtures/standalone-consumer/Cargo.toml
+sh scripts/check-feature-examples.sh
+```
+
+CI checks each named facade feature independently, the runtime/tools/providers
+composition, and the all-feature workspace. For a prepared dependency cache, use
+`--offline`; the example script makes no live provider calls. Live provider,
+OAuth and remote-service verification must be reported separately from offline
+tests, and absent credentials mean **unverified**, not passed.
 
 ```sh
 cargo run --locked -p adk --example standalone --no-default-features

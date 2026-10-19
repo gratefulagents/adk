@@ -4,27 +4,61 @@ use crate::{
     error::RequestFailure,
 };
 use adk_core::{Context, Error, ErrorCategory};
+mod input;
 use std::collections::BTreeMap;
 
 pub const DEFAULT_CODEX_CLIENT_VERSION: &str = "0.153.4";
 
 pub fn model_metadata_endpoint(session: &Session) -> Result<reqwest::Url, Error> {
-    let scope = session.scope();
-    let base = scope
-        .endpoint
-        .trim_end_matches('/')
-        .trim_end_matches("/responses")
-        .trim_end_matches("/chat/completions");
-    let mut url = reqwest::Url::parse(&format!("{base}/models"))
+    let mut url = reqwest::Url::parse(&session.scope().endpoint)
         .map_err(|_| crate::invalid("invalid model metadata endpoint"))?;
-    if scope.mode == AuthMode::OpenAiOAuth
-        && url
-            .host_str()
-            .is_some_and(|host| host == "chatgpt.com" || host.ends_with(".chatgpt.com"))
+    let host = url.host_str().unwrap_or_default();
+    let has_port = crate::auth::explicit_endpoint_port(&session.scope().endpoint).is_some();
+    let chatgpt = !has_port && (host == "chatgpt.com" || host.ends_with(".chatgpt.com"));
+    let copilot = !has_port
+        && matches!(
+            host,
+            "api.githubcopilot.com" | "api.individual.githubcopilot.com"
+        );
+    let decoded: Vec<u8> = percent_encoding::percent_decode_str(url.path()).collect();
+    // Replacement characters only locate Unicode whitespace boundaries; path bytes
+    // themselves must survive even when Go's decoded path is not valid UTF-8.
+    let text = String::from_utf8_lossy(&decoded);
+    let start = text.len() - text.trim_start().len();
+    let end = decoded.len() - (text.len() - text.trim_end().len());
+    let path = &decoded[start..end];
+    let path = path.strip_suffix(b"/").unwrap_or(path);
+    let path = path.strip_suffix(b"/chat/completions").unwrap_or(path);
+    let path = path.strip_suffix(b"/responses").unwrap_or(path);
+    let mut base = path.to_vec();
+    if (base.is_empty() && !copilot)
+        || (!chatgpt && !copilot && !base.windows(3).any(|part| part == b"/v1"))
     {
-        url.query_pairs_mut()
-            .append_pair("client_version", DEFAULT_CODEX_CLIENT_VERSION);
+        if base.last() == Some(&b'/') {
+            base.pop();
+        }
+        base.extend_from_slice(b"/v1");
     }
+    if base.last() == Some(&b'/') {
+        base.pop();
+    }
+    base.extend_from_slice(b"/models");
+    const PATH_ENCODING: &percent_encoding::AsciiSet = &percent_encoding::NON_ALPHANUMERIC
+        .remove(b'-')
+        .remove(b'_')
+        .remove(b'.')
+        .remove(b'~')
+        .remove(b'$')
+        .remove(b'&')
+        .remove(b'+')
+        .remove(b',')
+        .remove(b'/')
+        .remove(b':')
+        .remove(b';')
+        .remove(b'=')
+        .remove(b'@');
+    url.set_path(&percent_encoding::percent_encode(&base, PATH_ENCODING).to_string());
+    crate::auth::decorate_codex_url(&mut url, session);
     Ok(url)
 }
 
@@ -99,11 +133,11 @@ pub async fn fetch_model_metadata(
 pub struct ModelMetadata {
     #[serde(alias = "slug")]
     pub id: String,
-    pub context_window: Option<u64>,
-    pub max_context_window: Option<u64>,
-    pub max_output_tokens: Option<u64>,
-    pub auto_compact_token_limit: Option<u64>,
-    pub effective_context_window_percent: Option<u64>,
+    pub context_window: Option<i64>,
+    pub max_context_window: Option<i64>,
+    pub max_output_tokens: Option<i64>,
+    pub auto_compact_token_limit: Option<i64>,
+    pub effective_context_window_percent: Option<i64>,
     pub display_name: String,
     pub description: String,
     pub visibility: String,
@@ -118,112 +152,100 @@ impl ModelMetadata {
     pub fn hidden(&self) -> bool {
         self.visibility.trim().eq_ignore_ascii_case("hide")
     }
-    pub fn resolved_context_window(&self) -> Option<u64> {
+    pub fn resolved_context_window(&self) -> i64 {
         self.context_window
             .filter(|v| *v > 0)
-            .or(self.max_context_window.filter(|v| *v > 0))
+            .unwrap_or(self.max_context_window.unwrap_or(0))
     }
     /// Baseline compaction trigger and target, in tokens.
     pub fn compaction_defaults(&self) -> Option<(u64, u64)> {
         let mut trigger = self.auto_compact_token_limit.unwrap_or(0);
         let mut target = trigger / 2;
-        if let Some(context) = self.resolved_context_window() {
-            let limit = (u128::from(context) * 9 / 10) as u64;
-            if trigger == 0 || trigger > limit {
+        let context = self.resolved_context_window();
+        if context > 0 {
+            // Preserve the pinned 64-bit SDK arithmetic for reported metadata limits.
+            let limit = context.wrapping_mul(9) / 10;
+            if trigger <= 0 || trigger > limit {
                 trigger = limit;
             }
             target = context / 2;
         }
-        if trigger == 0 {
+        if trigger <= 0 {
             return None;
         }
-        if target == 0 || target >= trigger {
+        if target <= 0 || target >= trigger {
             target = trigger / 2;
         }
-        Some((trigger, target))
+        Some((trigger as u64, target as u64))
     }
 }
 
-/// Decode the pinned OpenAI, Codex, or Copilot catalog shape. First duplicate
+/// Decode the pinned OpenAI, Codex, or Copilot catalog shape. First duplicate model ID
 /// wins case-insensitively; a nonempty Codex catalog takes precedence over data.
 /// The host owns fetching, authentication, refresh, and any catalog lifetime.
 pub fn parse_model_metadata(body: &[u8]) -> Result<Vec<ModelMetadata>, Error> {
-    #[derive(Default, serde::Deserialize)]
-    #[serde(default)]
-    struct Limits {
-        max_context_window_tokens: Option<u64>,
-        max_prompt_tokens: Option<u64>,
-        max_output_tokens: Option<u64>,
-    }
-    #[derive(Default, serde::Deserialize)]
-    #[serde(default)]
-    struct Capabilities {
-        limits: Limits,
-    }
-    #[derive(serde::Deserialize)]
-    struct Effort {
-        effort: String,
-    }
-    #[derive(serde::Deserialize)]
-    struct Upgrade {
-        model: String,
-    }
-    #[derive(serde::Deserialize)]
-    struct Entry {
-        #[serde(flatten)]
-        metadata: ModelMetadata,
-        #[serde(default)]
-        capabilities: Capabilities,
-        supported_reasoning_levels: Option<Vec<Effort>>,
-        upgrade: Option<Upgrade>,
-    }
-    #[derive(serde::Deserialize)]
-    struct Catalog {
-        models: Option<Vec<Entry>>,
-        data: Option<Vec<Entry>>,
-    }
     if body.len() > 8 * 1024 * 1024 {
         return Err(crate::invalid("model metadata exceeds response limit"));
     }
-    let catalog: Catalog = serde_json::from_slice(body)
-        .map_err(|_| crate::invalid("invalid model metadata response"))?;
-    let models = catalog.models.unwrap_or_default();
-    let codex = !models.is_empty();
-    let entries = if codex {
+    let catalog =
+        input::decode(body).map_err(|_| crate::invalid("invalid model metadata response"))?;
+    let models = catalog.models;
+    let entries: Vec<ModelMetadata> = if !models.is_empty() {
         models
+            .into_iter()
+            .map(|entry| ModelMetadata {
+                id: entry.slug.unwrap_or_default(),
+                context_window: entry.context_window,
+                max_context_window: entry.max_context_window,
+                auto_compact_token_limit: entry.auto_compact_token_limit,
+                effective_context_window_percent: entry.effective_context_window_percent,
+                display_name: entry.display_name.unwrap_or_default().trim().to_owned(),
+                description: entry.description.unwrap_or_default().trim().to_owned(),
+                visibility: metadata_key(&entry.visibility.unwrap_or_default()),
+                priority: entry.priority,
+                default_reasoning_level: metadata_key(
+                    &entry.default_reasoning_level.unwrap_or_default(),
+                ),
+                supported_reasoning_levels: entry
+                    .supported_reasoning_levels
+                    .into_iter()
+                    .filter_map(|level| {
+                        let effort = metadata_key(&level.effort.unwrap_or_default());
+                        (!effort.is_empty()).then_some(effort)
+                    })
+                    .collect(),
+                upgrade_model: entry
+                    .upgrade
+                    .map(|upgrade| upgrade.model.unwrap_or_default().trim().to_owned()),
+                ..Default::default()
+            })
+            .collect()
     } else {
-        catalog.data.unwrap_or_default()
+        catalog
+            .data
+            .into_iter()
+            .map(|entry| {
+                let limits = entry.capabilities.limits;
+                ModelMetadata {
+                    id: entry.id.unwrap_or_default(),
+                    context_window: limits
+                        .max_context_window_tokens
+                        .filter(|v| *v != 0)
+                        .or(limits.max_prompt_tokens),
+                    max_context_window: limits.max_context_window_tokens,
+                    max_output_tokens: limits.max_output_tokens,
+                    ..Default::default()
+                }
+            })
+            .collect()
     };
     let mut unique = BTreeMap::new();
-    for entry in entries {
-        let mut meta = entry.metadata;
+    for mut meta in entries {
         meta.id = meta.id.trim().to_owned();
         if meta.id.is_empty() {
             continue;
         }
-        if codex {
-            meta.display_name = meta.display_name.trim().to_owned();
-            meta.description = meta.description.trim().to_owned();
-            meta.visibility = meta.visibility.trim().to_ascii_lowercase();
-            meta.default_reasoning_level = meta.default_reasoning_level.trim().to_ascii_lowercase();
-            meta.supported_reasoning_levels = entry
-                .supported_reasoning_levels
-                .unwrap_or_default()
-                .into_iter()
-                .map(|level| level.effort.trim().to_ascii_lowercase())
-                .filter(|level| !level.is_empty())
-                .collect();
-            meta.upgrade_model = entry.upgrade.map(|upgrade| upgrade.model.trim().to_owned());
-        } else {
-            let limits = entry.capabilities.limits;
-            meta.context_window = limits
-                .max_context_window_tokens
-                .filter(|v| *v > 0)
-                .or(limits.max_prompt_tokens);
-            meta.max_context_window = limits.max_context_window_tokens;
-            meta.max_output_tokens = limits.max_output_tokens;
-        }
-        unique.entry(meta.id.to_ascii_lowercase()).or_insert(meta);
+        unique.entry(metadata_key(&meta.id)).or_insert(meta);
     }
     if unique.is_empty() {
         return Err(crate::invalid("provider returned no models"));
@@ -245,7 +267,27 @@ pub fn model_metadata_by_id(models: &[ModelMetadata]) -> BTreeMap<String, ModelM
     models
         .iter()
         .filter(|meta| !meta.id.trim().is_empty())
-        .map(|meta| (meta.id.trim().to_ascii_lowercase(), meta.clone()))
+        .map(|meta| (metadata_key(&meta.id), meta.clone()))
+        .collect()
+}
+
+pub(crate) fn metadata_key(id: &str) -> String {
+    metadata_lower(id.trim())
+}
+
+fn metadata_lower(value: &str) -> String {
+    // The pinned Go uses Unicode 15 simple mappings, not Rust's expanding lowercase.
+    value
+        .chars()
+        .map(|c| {
+            if unicode_general_category::get_general_category(c)
+                == unicode_general_category::GeneralCategory::Unassigned
+            {
+                c
+            } else {
+                c.to_lowercase().next().unwrap()
+            }
+        })
         .collect()
 }
 
@@ -255,12 +297,44 @@ pub fn picker_model_metadata(models: &[ModelMetadata]) -> Vec<ModelMetadata> {
         .filter(|meta| !meta.hidden())
         .cloned()
         .collect();
+    sort_model_metadata_for_picker(&mut models);
+    models
+}
+
+pub fn sort_model_metadata_for_picker(models: &mut [ModelMetadata]) {
     models.sort_by_key(|meta| {
         (
             meta.priority.filter(|priority| *priority > 0).is_none(),
             meta.priority.filter(|priority| *priority > 0).unwrap_or(0),
-            meta.id.to_ascii_lowercase(),
+            metadata_lower(&meta.id),
         )
     });
-    models
+}
+
+#[cfg(test)]
+mod tests {
+    use super::metadata_key;
+    use sha2::{Digest, Sha256};
+
+    #[test]
+    fn lookup_keys_match_every_pinned_go_scalar() {
+        let fixture: serde_json::Value = serde_json::from_str(include_str!(
+            "../../../fixtures/metadata-compaction/observations.json"
+        ))
+        .unwrap();
+        assert_eq!(fixture["unicode_version"], "15.0.0");
+        let mut hash = Sha256::new();
+        let mut count = 0u64;
+        for ch in (0..=0x10ffff).filter_map(char::from_u32) {
+            let key = metadata_key(&ch.to_string());
+            hash.update((key.len() as u32).to_le_bytes());
+            hash.update(key.as_bytes());
+            count += 1;
+        }
+        assert_eq!(count, fixture["scalar_count"].as_u64().unwrap());
+        assert_eq!(
+            format!("{:x}", hash.finalize()),
+            fixture["scalar_sha256"].as_str().unwrap()
+        );
+    }
 }

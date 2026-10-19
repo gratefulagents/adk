@@ -126,6 +126,52 @@ async fn wait(handle: &SchedulerHandle, ids: &[&str]) -> Vec<TaskSnapshot> {
 }
 
 #[tokio::test]
+async fn child_turn_default_and_explicit_caps_are_applied_before_execution() {
+    for (configured, requested, expected) in [
+        (None, 100, 50),
+        (Some(40), 100, 40),
+        (None, 12, 12),
+        (None, 400, 50),
+        (Some(120), 150, 120),
+        (Some(200), 400, 200),
+    ] {
+        let mut cfg = config();
+        if let Some(limit) = configured {
+            cfg.max_turns = std::num::NonZeroU32::new(limit).unwrap();
+        }
+        let (owner, handle, mut starts, _) = rig(cfg, None);
+        let mut submission = request("limited");
+        submission.policy.max_turns = std::num::NonZeroU32::new(requested).unwrap();
+        handle.submit(submission).await.unwrap();
+        let child = next(&mut starts).await;
+        assert_eq!(child.invocation.request.policy.max_turns.get(), expected);
+        child.done.send(ChildOutcome::completed("done")).unwrap();
+        assert_eq!(
+            wait(&handle, &["limited"]).await[0].status,
+            TaskStatus::Completed
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[test]
+fn parent_and_child_turn_defaults_are_independent() {
+    let mut parent = adk_core::RunPolicy::default();
+    assert_eq!(parent.max_turns.get(), 100);
+    assert_eq!(SchedulerConfig::default().max_turns.get(), 50);
+    parent.max_turns = std::num::NonZeroU32::new(50).unwrap();
+    assert_eq!(parent.max_turns.get(), 50);
+    parent.max_turns = std::num::NonZeroU32::new(400).unwrap();
+    assert_eq!(parent.max_turns.get(), 400);
+    assert_eq!(SchedulerConfig::default().max_turns.get(), 50);
+    let child = SchedulerConfig {
+        max_turns: std::num::NonZeroU32::new(200).unwrap(),
+        ..Default::default()
+    };
+    assert_eq!(child.max_turns.get(), 200);
+}
+
+#[tokio::test]
 async fn fresh_context_explicit_history_and_common_sync_background_engine() {
     let (owner, handle, mut starts, _) = rig(config(), None);
     let sync = handle.run(request("sync"));
@@ -575,6 +621,107 @@ async fn queued_checkpoint() -> SchedulerCheckpoint {
 }
 
 #[tokio::test]
+async fn invalid_executor_prices_fail_without_discarding_reported_usage() {
+    for price in [-1.0, f64::NAN, f64::INFINITY, f64::NEG_INFINITY] {
+        let store = Arc::new(Store::default());
+        let (owner, handle, mut starts, _) = rig(config(), Some(store.clone()));
+        handle.submit(request("a")).await.unwrap();
+        next(&mut starts)
+            .await
+            .done
+            .send(ChildOutcome {
+                cost_usd: price,
+                cost_known: true,
+                usage: BudgetUsage {
+                    cost_micros: 7,
+                    ..Default::default()
+                },
+                ..ChildOutcome::completed("must not publish")
+            })
+            .unwrap();
+        let tasks = wait(&handle, &["a"]).await;
+        assert_eq!(tasks[0].status, TaskStatus::Failed);
+        assert_eq!(
+            tasks[0].error.as_deref(),
+            Some("invalid child cost estimate")
+        );
+        assert!(tasks[0].result.is_empty());
+        assert_eq!(tasks[0].cost_usd, 0.0);
+        assert!(!tasks[0].cost_known);
+        assert_eq!(tasks[0].usage.cost_micros, 7);
+        assert_eq!(handle.snapshot().usage.cost_micros, 7);
+        assert!(serde_json::to_vec(store.snapshots.lock().unwrap().last().unwrap()).is_ok());
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn reconciled_prices_persist_and_legacy_snapshots_remain_unknown() {
+    let queued = queued_checkpoint().await;
+    for known in [false, true] {
+        let store = Arc::new(Store::default());
+        let (owner, handle, _, _) = rig(config(), Some(store.clone()));
+        handle
+            .restore(&context(), serde_json::to_value(&queued).unwrap())
+            .await
+            .unwrap();
+        for price in [-1.0, f64::NAN, f64::INFINITY] {
+            let outcome = ChildOutcome {
+                cost_usd: price,
+                cost_known: true,
+                ..ChildOutcome::completed("invalid")
+            };
+            assert!(handle.reconcile("a", outcome).await.is_err());
+            assert_eq!(handle.snapshot().revision, queued.revision);
+            assert_eq!(
+                handle.status("a", Detail::Full).unwrap().status,
+                TaskStatus::Reconciling
+            );
+        }
+        handle
+            .reconcile(
+                "a",
+                ChildOutcome {
+                    cost_usd: 0.25,
+                    cost_known: known,
+                    usage: BudgetUsage {
+                        cost_micros: 250_000,
+                        ..Default::default()
+                    },
+                    ..ChildOutcome::completed("confirmed")
+                },
+            )
+            .await
+            .unwrap();
+        let saved = store.snapshots.lock().unwrap().last().unwrap().clone();
+        assert_eq!(saved.records[0].task.cost_usd, 0.25);
+        assert_eq!(saved.records[0].task.cost_known, known);
+        owner.shutdown().await.unwrap();
+        for legacy in [false, true] {
+            let mut value = serde_json::to_value(&saved).unwrap();
+            if legacy {
+                let task = value["records"][0]["task"].as_object_mut().unwrap();
+                task.remove("cost_usd");
+                task.remove("cost_known");
+            }
+            let (owner, handle, _, _) = rig(config(), None);
+            handle.restore(&context(), value).await.unwrap();
+            let task = handle.status("a", Detail::Full).unwrap();
+            assert_eq!(task.cost_usd, if legacy { 0.0 } else { 0.25 });
+            assert_eq!(task.cost_known, known && !legacy);
+            assert_eq!(task.usage.cost_micros, 250_000);
+            owner.shutdown().await.unwrap();
+        }
+        let mut invalid = serde_json::to_value(&saved).unwrap();
+        invalid["records"][0]["task"]["cost_usd"] = serde_json::json!(-0.25);
+        let (owner, handle, _, _) = rig(config(), None);
+        assert!(handle.restore(&context(), invalid).await.is_err());
+        assert!(handle.snapshot().records.is_empty());
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
 async fn restore_never_dispatches_queued_work_without_explicit_resume() {
     let checkpoint = queued_checkpoint().await;
     let (owner, handle, mut starts, _) = rig(config(), None);
@@ -629,35 +776,267 @@ async fn restored_running_effect_and_steering_journal_require_reconciliation() {
     owner.shutdown().await.unwrap();
 }
 
-#[tokio::test]
-async fn cancel_wins_while_resume_persistence_is_blocked() {
-    let checkpoint = queued_checkpoint().await;
+async fn started_checkpoint() -> SchedulerCheckpoint {
     let store = Arc::new(Store::default());
-    store
-        .blocked_revision
-        .store(checkpoint.revision + 1, Ordering::SeqCst);
+    let owner = Scheduler::new(
+        context(),
+        config(),
+        native_executor(Arc::new(AtomicUsize::new(0))),
+        Some(store.clone()),
+    )
+    .unwrap();
+    owner.handle().submit(request("a")).await.unwrap();
+    wait(&owner.handle(), &["a"]).await;
+    owner.shutdown().await.unwrap();
+    let checkpoint = store
+        .snapshots
+        .lock()
+        .unwrap()
+        .iter()
+        .find(|snapshot| {
+            snapshot.records[0]
+                .durable_checkpoint
+                .as_ref()
+                .is_some_and(|c| c.execution_boundary() == "model_prepared")
+        })
+        .unwrap()
+        .clone();
+    assert_eq!(checkpoint.records[0].dispatch, DispatchState::Started);
+    checkpoint
+}
+
+#[tokio::test]
+async fn restored_steering_redelivers_in_flight_before_queued_with_clone_isolation() {
+    let mut checkpoint = started_checkpoint().await;
+    let record = &mut checkpoint.records[0];
+    record.in_flight_messages = vec![SteeringMessage {
+        id: "one".into(),
+        text: "first".into(),
+    }];
+    record.queued_messages = vec![SteeringMessage {
+        id: "two".into(),
+        text: "second".into(),
+    }];
+    record.task.messages_received = 2;
+    let mut caller_checkpoint = serde_json::to_value(checkpoint).unwrap();
+    let (owner, handle, mut starts, _) = rig(config(), None);
+    handle
+        .restore(&context(), caller_checkpoint.clone())
+        .await
+        .unwrap();
+    caller_checkpoint["records"][0]["in_flight_messages"][0]["text"] = "caller mutation".into();
+    assert!(handle.resume_queued("a").await.is_err());
+    handle.resume_checkpoint("a").await.unwrap();
+    let a = next(&mut starts).await;
+    let mut id = "three".to_owned();
+    let mut text = "third".to_owned();
+    handle.steer("a", &id, &text).await.unwrap();
+    id.clear();
+    text.clear();
+    let mut snapshot = handle.snapshot();
+    snapshot.records[0].in_flight_messages[0].text = "snapshot mutation".into();
+    snapshot.records[0].queued_messages.clear();
+    let expected = vec![
+        SteeringMessage {
+            id: "one".into(),
+            text: "first".into(),
+        },
+        SteeringMessage {
+            id: "two".into(),
+            text: "second".into(),
+        },
+        SteeringMessage {
+            id: "three".into(),
+            text: "third".into(),
+        },
+    ];
+    let mut delivery = a.control.take_messages().await.unwrap();
+    assert_eq!(delivery, expected);
+    delivery[0].text = "delivery mutation".into();
+    delivery.pop();
+    assert_eq!(a.control.take_messages().await.unwrap(), expected);
+    assert_eq!(handle.snapshot().records[0].in_flight_messages, expected);
+    a.control
+        .acknowledge_messages(&["one".into(), "two".into(), "three".into()])
+        .await
+        .unwrap();
+    a.done.send(ChildOutcome::completed("done")).unwrap();
+    wait(&handle, &["a"]).await;
+    owner.shutdown().await.unwrap();
+}
+
+async fn cancellation_during_resume(native: bool, failed_write: Option<u64>) {
+    let checkpoint = if native {
+        started_checkpoint().await
+    } else {
+        queued_checkpoint().await
+    };
+    let revision = checkpoint.revision;
+    let store = Arc::new(Store::default());
+    store.blocked_revision.store(revision + 1, Ordering::SeqCst);
+    if let Some(offset) = failed_write {
+        store
+            .failed_revision
+            .store(revision + offset, Ordering::SeqCst);
+    }
     let (owner, handle, mut starts, _) = rig(config(), Some(store.clone()));
     handle
         .restore(&context(), serde_json::to_value(checkpoint).unwrap())
         .await
         .unwrap();
-    let resume = handle.resume_queued("a");
+    let committed = handle.checkpoint(&context()).await.unwrap();
+    let resume = async {
+        if native {
+            handle.resume_checkpoint("a").await
+        } else {
+            handle.resume_queued("a").await
+        }
+    };
     let concurrent = async {
         store.entered.notified().await;
         let cancel = handle.cancel("a");
         tokio::pin!(cancel);
-        tokio::select! { result = &mut cancel => panic!("cancel unexpectedly completed: {result:?}"), _ = tokio::task::yield_now() => {} }
+        assert!(futures_util::poll!(&mut cancel).is_pending());
+        let repeated = handle.cancel("a");
+        tokio::pin!(repeated);
+        assert!(futures_util::poll!(&mut repeated).is_pending());
+        for task in [
+            handle.status("a", Detail::Full).unwrap(),
+            handle.list().remove(0),
+        ] {
+            assert_eq!(task.status, TaskStatus::Cancelled);
+            assert_eq!(task.error.as_deref(), Some("cancellation requested"));
+            assert!(task.waiting_on.is_empty());
+        }
+        assert_eq!(handle.checkpoint(&context()).await.unwrap(), committed);
+        assert_eq!(serde_json::to_value(handle.snapshot()).unwrap(), committed);
+        assert!(starts.try_recv().is_err());
+        assert!(store.snapshots.lock().unwrap().is_empty());
+        let ids = ["a".into()];
+        let wait_all = handle.wait(&ids, WaitMode::All, None);
+        let wait_any = handle.wait(&ids, WaitMode::Any, None);
+        tokio::pin!(wait_all, wait_any);
+        assert!(futures_util::poll!(&mut wait_all).is_pending());
+        assert!(futures_util::poll!(&mut wait_any).is_pending());
         store.release.add_permits(1);
-        cancel.await.unwrap();
+        if failed_write.is_some() {
+            assert_eq!(cancel.await.unwrap_err().info.category, ErrorCategory::Host);
+            assert_eq!(
+                repeated.await.unwrap_err().info.category,
+                ErrorCategory::Host
+            );
+            assert_eq!(
+                wait_all.await.unwrap_err().info.category,
+                ErrorCategory::Host
+            );
+            assert_eq!(
+                wait_any.await.unwrap_err().info.category,
+                ErrorCategory::Host
+            );
+            assert!(handle.cancel("a").await.is_err());
+            assert!(handle.collect().await.is_err());
+            assert!(handle.submit(request("b")).await.is_err());
+            assert!(!handle.snapshot().records[0].task.status.is_terminal());
+            assert!(!handle.snapshot().records[0].result_delivered);
+        } else {
+            cancel.await.unwrap();
+            repeated.await.unwrap();
+            assert_eq!(wait_all.await.unwrap()[0].status, TaskStatus::Cancelled);
+            assert_eq!(wait_any.await.unwrap()[0].status, TaskStatus::Cancelled);
+            assert_eq!(
+                handle.snapshot().records[0].task.status,
+                TaskStatus::Cancelled
+            );
+            assert!(
+                store
+                    .snapshots
+                    .lock()
+                    .unwrap()
+                    .iter()
+                    .any(|s| s.records[0].task.status == TaskStatus::Cancelled)
+            );
+            assert_eq!(
+                handle.collect().await.unwrap()[0].status,
+                TaskStatus::Cancelled
+            );
+        }
     };
     let (result, ()) = tokio::join!(resume, concurrent);
-    result.unwrap();
+    if failed_write == Some(1) {
+        assert!(result.is_err());
+        assert_eq!(serde_json::to_value(handle.snapshot()).unwrap(), committed);
+    } else {
+        result.unwrap();
+    }
     tokio::task::yield_now().await;
     assert_eq!(
         handle.status("a", Detail::Full).unwrap().status,
         TaskStatus::Cancelled
     );
     assert!(starts.try_recv().is_err());
+    if failed_write.is_some() {
+        assert!(owner.shutdown().await.is_err());
+    } else {
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn cancel_wins_while_resume_persistence_is_blocked() {
+    cancellation_during_resume(false, None).await;
+}
+
+#[tokio::test]
+async fn cancel_wins_while_resume_checkpoint_persistence_is_blocked() {
+    cancellation_during_resume(true, None).await;
+}
+
+#[tokio::test]
+async fn cancellation_intent_does_not_acknowledge_failed_resume_or_cancel_writes() {
+    for native in [false, true] {
+        for failed_write in [1, 2] {
+            cancellation_during_resume(native, Some(failed_write)).await;
+        }
+    }
+}
+
+#[tokio::test]
+async fn cancellation_observation_clears_waiting_without_changing_checkpoint() {
+    let store = Arc::new(Store::default());
+    let (owner, handle, mut starts, _) = rig(config(), Some(store.clone()));
+    let mut dependent = request("b");
+    dependent.depends_on = vec!["a".into()];
+    handle
+        .submit_dag(vec![request("a"), dependent])
+        .await
+        .unwrap();
+    let a = next(&mut starts).await;
+    assert_eq!(
+        handle.status("b", Detail::Full).unwrap().waiting_on,
+        vec!["a"]
+    );
+    let committed = serde_json::to_value(handle.snapshot()).unwrap();
+    store
+        .blocked_revision
+        .store(handle.snapshot().revision + 1, Ordering::SeqCst);
+    let cancel = handle.cancel("b");
+    tokio::pin!(cancel);
+    assert!(futures_util::poll!(&mut cancel).is_pending());
+    for task in [
+        handle.status("b", Detail::Full).unwrap(),
+        handle.list().remove(1),
+    ] {
+        assert_eq!(task.status, TaskStatus::Cancelled);
+        assert_eq!(task.error.as_deref(), Some("cancellation requested"));
+        assert!(task.waiting_on.is_empty());
+    }
+    assert_eq!(serde_json::to_value(handle.snapshot()).unwrap(), committed);
+    assert!(starts.try_recv().is_err());
+    store.release.add_permits(1);
+    cancel.await.unwrap();
+    assert!(handle.snapshot().records[1].task.waiting_on.is_empty());
+    a.done.send(ChildOutcome::completed("done")).unwrap();
+    wait(&handle, &["a", "b"]).await;
     owner.shutdown().await.unwrap();
 }
 
@@ -922,6 +1301,9 @@ impl adk_core::Model for Model {
         Box::pin(async move {
             self.0.fetch_add(1, Ordering::SeqCst);
             Ok(adk_core::ModelResponse {
+                snapshot_raw: None,
+                snapshot_projection: None,
+                raw: None,
                 items: vec![RunItem::Message {
                     message: Message {
                         role: Role::Assistant,
@@ -1205,6 +1587,7 @@ impl adk_core::Model for ToolModel {
             } else {
                 vec![RunItem::ToolCall {
                     call: adk_core::ToolCall {
+                        raw_arguments: None,
                         id: "read-1".into(),
                         name: "read".into(),
                         arguments: serde_json::json!({}),
@@ -1212,6 +1595,9 @@ impl adk_core::Model for ToolModel {
                 }]
             };
             Ok(adk_core::ModelResponse {
+                snapshot_raw: None,
+                snapshot_projection: None,
+                raw: None,
                 items,
                 usage: Default::default(),
                 end_turn: None,
@@ -1517,4 +1903,631 @@ async fn structured_activity_records_observed_tool_lifecycle() {
     child.done.send(ChildOutcome::completed("done")).unwrap();
     wait(&handle, &["activity"]).await;
     owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn owner_reconfiguration_preserves_accepted_wiring_and_refreshes_future_submissions() {
+    for capacity in [1, 2] {
+        let mut original = config();
+        original.max_concurrency = 1;
+        original.max_turns = std::num::NonZeroU32::new(9).unwrap();
+        original.security.tools.access = adk_core::AccessMode::FullAccess;
+        original.agents.get_mut("worker").unwrap().tools.access = adk_core::AccessMode::FullAccess;
+        let (mut owner, handle, mut old_events, _) = rig(original.clone(), None);
+        let mut first = request("old-running");
+        first.policy.tools.access = adk_core::AccessMode::FullAccess;
+        handle.submit(first.clone()).await.unwrap();
+        let running = next(&mut old_events).await;
+        first.id = "old-queued".into();
+        handle.submit(first).await.unwrap();
+        let (sender, mut new_events) = mpsc::unbounded_channel();
+        let executor = Arc::new(Executor {
+            started: sender,
+            stats: Arc::new(Stats::default()),
+        });
+        let mut updated = original.clone();
+        updated.max_concurrency = capacity;
+        updated.max_turns = std::num::NonZeroU32::new(2).unwrap();
+        updated.security.tools.access = adk_core::AccessMode::ReadOnly;
+        updated.agents = BTreeMap::from([("reviewer".into(), SecurityBaseline::default())]);
+        owner.reconfigure(updated, executor).await.unwrap();
+        assert_eq!(handle.max_concurrency(), capacity);
+        assert_eq!(handle.agent_names().collect::<Vec<_>>(), ["reviewer"]);
+        assert!(handle.submit(request("removed-agent")).await.is_err());
+        let mut future = Submission::new("reviewer", "new work");
+        future.id = "future".into();
+        future.policy.tools.access = adk_core::AccessMode::FullAccess;
+        handle.submit(future).await.unwrap();
+        assert_eq!(running.invocation.request.policy.max_turns.get(), 9);
+        assert_eq!(
+            running.invocation.security.tools.access,
+            adk_core::AccessMode::FullAccess
+        );
+        let future = if capacity == 2 {
+            Some(next(&mut new_events).await)
+        } else {
+            assert!(
+                tokio::time::timeout(Duration::from_millis(20), new_events.recv())
+                    .await
+                    .is_err()
+            );
+            None
+        };
+        assert!(old_events.try_recv().is_err());
+        running
+            .done
+            .send(ChildOutcome::completed("old running"))
+            .unwrap();
+        let queued = next(&mut old_events).await;
+        assert_eq!(queued.invocation.task_id, "old-queued");
+        assert_eq!(queued.invocation.request.policy.max_turns.get(), 9);
+        assert_eq!(
+            queued.invocation.security.tools.access,
+            adk_core::AccessMode::FullAccess
+        );
+        if capacity == 1 {
+            assert!(
+                tokio::time::timeout(Duration::from_millis(20), new_events.recv())
+                    .await
+                    .is_err()
+            );
+        }
+        queued
+            .done
+            .send(ChildOutcome::completed("old queued"))
+            .unwrap();
+        let future = match future {
+            Some(child) => child,
+            None => next(&mut new_events).await,
+        };
+        assert_eq!(future.invocation.request.policy.max_turns.get(), 2);
+        assert_eq!(
+            future.invocation.security.tools.access,
+            adk_core::AccessMode::ReadOnly
+        );
+        future.done.send(ChildOutcome::completed("new")).unwrap();
+        let results = wait(&handle, &["old-running", "old-queued", "future"]).await;
+        assert!(
+            results
+                .iter()
+                .all(|task| task.status == TaskStatus::Completed)
+        );
+        assert_eq!(handle.list().len(), 3);
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn invalid_owner_reconfiguration_leaves_live_configuration_unchanged() {
+    let original = config();
+    let (mut owner, handle, mut events, _) = rig(original.clone(), None);
+    for changed in [0, 1, 2] {
+        let mut invalid = original.clone();
+        match changed {
+            0 => invalid.max_concurrency = 0,
+            1 => invalid.max_tasks += 1,
+            _ => invalid.budget.tokens = Some(1),
+        }
+        let (sender, _) = mpsc::unbounded_channel();
+        let executor = Arc::new(Executor {
+            started: sender,
+            stats: Arc::new(Stats::default()),
+        });
+        assert_eq!(
+            owner
+                .reconfigure(invalid, executor)
+                .await
+                .unwrap_err()
+                .info
+                .category,
+            ErrorCategory::InvalidInput
+        );
+        assert_eq!(handle.max_concurrency(), original.max_concurrency);
+        assert_eq!(handle.agent_names().collect::<Vec<_>>(), ["worker"]);
+    }
+    handle.submit(request("unchanged")).await.unwrap();
+    next(&mut events)
+        .await
+        .done
+        .send(ChildOutcome::completed("original"))
+        .unwrap();
+    assert_eq!(wait(&handle, &["unchanged"]).await[0].result, "original");
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn durable_owner_rejects_unreconstructible_executor_generations() {
+    let original = config();
+    let (mut owner, handle, mut events, _) =
+        rig(original.clone(), Some(Arc::new(Store::default())));
+    handle.submit(request("durable")).await.unwrap();
+    let running = next(&mut events).await;
+    let before = handle.snapshot();
+    let (sender, mut changed_events) = mpsc::unbounded_channel();
+    let executor = Arc::new(Executor {
+        started: sender,
+        stats: Arc::new(Stats::default()),
+    });
+    assert_eq!(
+        owner
+            .reconfigure(original.clone(), executor)
+            .await
+            .unwrap_err()
+            .info
+            .category,
+        ErrorCategory::Unsupported
+    );
+    assert_eq!(handle.snapshot().revision, before.revision);
+    assert!(changed_events.try_recv().is_err());
+    running
+        .done
+        .send(ChildOutcome::completed("preserved"))
+        .unwrap();
+    assert_eq!(wait(&handle, &["durable"]).await[0].result, "preserved");
+    handle.submit(request("still-original")).await.unwrap();
+    next(&mut events)
+        .await
+        .done
+        .send(ChildOutcome::completed("original executor"))
+        .unwrap();
+    assert_eq!(
+        wait(&handle, &["still-original"]).await[0].result,
+        "original executor"
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn replaced_executor_drops_outside_scheduler_locks() {
+    struct ReentrantDrop {
+        handle: Arc<Mutex<Option<SchedulerHandle>>>,
+        dropped: Arc<AtomicUsize>,
+    }
+    impl ChildExecutor for ReentrantDrop {
+        fn execute<'a>(
+            &'a self,
+            _: ChildInvocation,
+            _: ChildControl,
+        ) -> BoxFuture<'a, Result<ChildOutcome, Error>> {
+            Box::pin(async { Ok(ChildOutcome::completed("unused")) })
+        }
+    }
+    impl Drop for ReentrantDrop {
+        fn drop(&mut self) {
+            assert_eq!(
+                self.handle
+                    .lock()
+                    .unwrap()
+                    .as_ref()
+                    .unwrap()
+                    .max_concurrency(),
+                2
+            );
+            self.dropped.fetch_add(1, Ordering::SeqCst);
+        }
+    }
+    let observer = Arc::new(Mutex::new(None));
+    let dropped = Arc::new(AtomicUsize::new(0));
+    let mut owner = Scheduler::new(
+        context(),
+        config(),
+        Arc::new(ReentrantDrop {
+            handle: observer.clone(),
+            dropped: dropped.clone(),
+        }),
+        None,
+    )
+    .unwrap();
+    *observer.lock().unwrap() = Some(owner.handle());
+    let (sender, _) = mpsc::unbounded_channel();
+    let executor = Arc::new(Executor {
+        started: sender,
+        stats: Arc::new(Stats::default()),
+    });
+    let mut next = config();
+    next.max_concurrency = 2;
+    owner.reconfigure(next, executor).await.unwrap();
+    assert_eq!(dropped.load(Ordering::SeqCst), 1);
+    owner.shutdown().await.unwrap();
+}
+
+fn generation(
+    id: &str,
+    config: SchedulerConfig,
+) -> (SchedulerGeneration, mpsc::UnboundedReceiver<Started>) {
+    let (started, receiver) = mpsc::unbounded_channel();
+    (
+        SchedulerGeneration {
+            id: id.into(),
+            config,
+            executor: Arc::new(Executor {
+                started,
+                stats: Arc::new(Stats::default()),
+            }),
+        },
+        receiver,
+    )
+}
+
+#[tokio::test]
+async fn named_generations_restore_security_execution_and_pool_identity() {
+    for capacity in [1, 2] {
+        let mut original = config();
+        original.max_concurrency = 1;
+        original.max_turns = std::num::NonZeroU32::new(9).unwrap();
+        original
+            .security
+            .input_guardrails
+            .insert("old-input".into());
+        original
+            .security
+            .output_guardrails
+            .insert("old-output".into());
+        original.security.untrusted_tool_outputs = true;
+        original.security.max_output_bytes = Some(42);
+        let (old, mut old_events) = generation("old", original.clone());
+        let mut owner = Scheduler::new_with_generations(
+            context(),
+            old,
+            vec![],
+            Some(Arc::new(Store::default())),
+        )
+        .unwrap();
+        let handle = owner.handle();
+        handle.submit(request("blocker")).await.unwrap();
+        let _running = next(&mut old_events).await;
+        handle.submit(request("old-queued")).await.unwrap();
+        let mut updated = config();
+        updated.max_concurrency = capacity;
+        updated.max_turns = std::num::NonZeroU32::new(2).unwrap();
+        updated.agents = BTreeMap::from([("reviewer".into(), SecurityBaseline::default())]);
+        let (new, _new_events) = generation("new", updated.clone());
+        owner.reconfigure_generation(new).await.unwrap();
+        let mut future = Submission::new("reviewer", "new work");
+        future.id = "future".into();
+        handle.submit(future).await.unwrap();
+        let saved = handle.snapshot();
+        assert_eq!(saved.version, 2);
+        assert_eq!(
+            saved.generations[1].pool_id,
+            if capacity == 1 { "old" } else { "new" }
+        );
+        drop(owner);
+        tokio::task::yield_now().await;
+        let (old, mut old_events) = generation("old", original);
+        let (new, mut new_events) = generation("new", updated);
+        let owner = Scheduler::new_with_generations(context(), new, vec![old], None).unwrap();
+        let handle = owner.handle();
+        handle
+            .restore(&context(), serde_json::to_value(saved).unwrap())
+            .await
+            .unwrap();
+        assert!(old_events.try_recv().is_err());
+        assert!(new_events.try_recv().is_err());
+        assert!(handle.resume_queued("blocker").await.is_err());
+        handle
+            .reconcile("blocker", ChildOutcome::completed("reconciled"))
+            .await
+            .unwrap();
+        handle.resume_queued("old-queued").await.unwrap();
+        let old = next(&mut old_events).await;
+        assert_eq!(old.invocation.request.policy.max_turns.get(), 9);
+        assert_eq!(
+            old.invocation.security.input_guardrails,
+            ["old-input".into()].into()
+        );
+        assert_eq!(
+            old.invocation.security.output_guardrails,
+            ["old-output".into()].into()
+        );
+        assert!(old.invocation.security.untrusted_tool_outputs);
+        assert_eq!(old.invocation.security.max_output_bytes, Some(42));
+        handle.resume_queued("future").await.unwrap();
+        let new = if capacity == 1 {
+            assert!(
+                tokio::time::timeout(Duration::from_millis(20), new_events.recv())
+                    .await
+                    .is_err()
+            );
+            None
+        } else {
+            Some(next(&mut new_events).await)
+        };
+        old.done
+            .send(ChildOutcome::completed("old result"))
+            .unwrap();
+        let new = match new {
+            Some(new) => new,
+            None => next(&mut new_events).await,
+        };
+        assert_eq!(new.invocation.request.policy.max_turns.get(), 2);
+        assert!(new.invocation.security.input_guardrails.is_empty());
+        new.done
+            .send(ChildOutcome::completed("new result"))
+            .unwrap();
+        wait(&handle, &["old-queued", "future"]).await;
+        assert!(
+            handle
+                .snapshot()
+                .records
+                .iter()
+                .all(|r| r.generation_id.is_some())
+        );
+        owner.shutdown().await.unwrap();
+    }
+}
+
+#[tokio::test]
+async fn named_restore_rejects_incomplete_or_mutated_descriptors_atomically() {
+    let (old, _events) = generation("old", config());
+    let mut owner = Scheduler::new_with_generations(context(), old, vec![], None).unwrap();
+    owner.handle().submit(request("queued")).await.unwrap();
+    let (new, _events) = generation("new", config());
+    owner.reconfigure_generation(new).await.unwrap();
+    let saved = serde_json::to_value(owner.handle().snapshot()).unwrap();
+    drop(owner);
+    for variant in 0..12 {
+        let mut value = saved.clone();
+        match variant {
+            0 => {
+                value
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("active_generation_id");
+            }
+            1 => {
+                value["records"][0]
+                    .as_object_mut()
+                    .unwrap()
+                    .remove("generation_id");
+            }
+            2 => value["records"][0]["generation_id"] = "unknown".into(),
+            3 => value["generations"][0]["config"]["max_turns"] = 7.into(),
+            4 => value["generations"][1]["pool_id"] = "new".into(),
+            5 => value["generations"][1] = value["generations"][0].clone(),
+            6 => value["generations"][0]["pool_id"] = "missing".into(),
+            7 => value["active_generation_id"] = "old".into(),
+            8 => value["version"] = 1.into(),
+            9 => value["generations"] = serde_json::json!([]),
+            10 | 11 => {}
+            _ => unreachable!(),
+        }
+        let (mut old, _events) = generation("old", config());
+        if variant == 11 {
+            old.config.security.max_output_bytes = Some(1);
+        }
+        let (new, _events) = generation("new", config());
+        let owner = Scheduler::new_with_generations(
+            context(),
+            new,
+            if variant == 10 { vec![] } else { vec![old] },
+            None,
+        )
+        .unwrap();
+        let handle = owner.handle();
+        assert!(
+            handle.restore(&context(), value).await.is_err(),
+            "variant {variant}"
+        );
+        assert!(handle.list().is_empty());
+        assert_eq!(handle.snapshot().revision, 0);
+        owner.shutdown().await.unwrap();
+    }
+    let (named, _events) = generation("named", config());
+    let mut named_owner =
+        Scheduler::new_with_generations(context(), named.clone(), vec![], None).unwrap();
+    assert!(
+        named_owner
+            .reconfigure_generation(named.clone())
+            .await
+            .is_err()
+    );
+    assert!(
+        Scheduler::new_with_generations(context(), named.clone(), vec![named.clone()], None)
+            .is_err()
+    );
+    assert!(
+        named_owner
+            .handle()
+            .restore(
+                &context(),
+                serde_json::to_value(queued_checkpoint().await).unwrap()
+            )
+            .await
+            .is_err()
+    );
+    let (mut legacy, _, _, _) = rig(config(), None);
+    assert!(legacy.reconfigure_generation(named).await.is_err());
+    legacy.shutdown().await.unwrap();
+    named_owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn named_activation_persists_before_publish_and_poison_is_latched() {
+    for mode in 0..3 {
+        let store = Arc::new(Store::default());
+        store.blocked_revision.store(1, Ordering::SeqCst);
+        if mode == 1 {
+            store.failed_revision.store(1, Ordering::SeqCst);
+        }
+        let (old, mut events) = generation("old", config());
+        let mut owner =
+            Scheduler::new_with_generations(context(), old, vec![], Some(store.clone())).unwrap();
+        let handle = owner.handle();
+        *store.reader.lock().unwrap() = Some(handle.clone());
+        let mut updated = config();
+        updated.agents.clear();
+        let (new, _) = generation("new", updated);
+        {
+            let activate = owner.reconfigure_generation(new);
+            tokio::pin!(activate);
+            tokio::select! {
+                result = &mut activate => panic!("unexpected activation: {result:?}"),
+                _ = store.entered.notified() => {}
+            }
+            assert_eq!(handle.agent_names().collect::<Vec<_>>(), ["worker"]);
+            assert_eq!(
+                handle.snapshot().active_generation_id.as_deref(),
+                Some("old")
+            );
+            assert_eq!(handle.checkpoint(&context()).await.unwrap()["revision"], 0);
+            assert!(
+                tokio::time::timeout(Duration::from_millis(10), handle.submit(request("blocked")))
+                    .await
+                    .is_err()
+            );
+            if mode != 2 {
+                store.release.add_permits(1);
+                assert_eq!(activate.await.is_ok(), mode == 0);
+            }
+        }
+        assert!(events.try_recv().is_err());
+        if mode == 0 {
+            assert_eq!(
+                handle.snapshot().active_generation_id.as_deref(),
+                Some("new")
+            );
+            assert!(handle.agent_names().next().is_none());
+            assert_eq!(store.observed.lock().unwrap().as_slice(), [0]);
+            owner.shutdown().await.unwrap();
+        } else {
+            assert_eq!(
+                handle.snapshot().active_generation_id.as_deref(),
+                Some("old")
+            );
+            assert!(handle.checkpoint(&context()).await.is_err());
+            assert!(handle.submit(request("poisoned")).await.is_err());
+            assert!(owner.shutdown().await.is_err());
+        }
+    }
+}
+
+#[tokio::test]
+async fn named_activation_fences_stale_owners_and_preserves_terminal_ids() {
+    let store = Arc::new(CasStore(AtomicU64::new(0)));
+    let (old, mut events) = generation("old", config());
+    let mut owner =
+        Scheduler::new_with_generations(context(), old.clone(), vec![], Some(store.clone()))
+            .unwrap();
+    let handle = owner.handle();
+    handle.submit(request("done")).await.unwrap();
+    next(&mut events)
+        .await
+        .done
+        .send(ChildOutcome::completed("done"))
+        .unwrap();
+    wait(&handle, &["done"]).await;
+    let stale = handle.snapshot();
+    let (new, _) = generation("new", config());
+    owner.reconfigure_generation(new.clone()).await.unwrap();
+    let saved = handle.snapshot();
+    assert_eq!(saved.records[0].generation_id.as_deref(), Some("old"));
+    let mut stale_owner =
+        Scheduler::new_with_generations(context(), old.clone(), vec![], Some(store.clone()))
+            .unwrap();
+    stale_owner
+        .handle()
+        .restore(&context(), serde_json::to_value(stale).unwrap())
+        .await
+        .unwrap();
+    assert!(
+        stale_owner
+            .reconfigure_generation(new.clone())
+            .await
+            .is_err()
+    );
+    assert!(stale_owner.handle().checkpoint(&context()).await.is_err());
+    assert!(stale_owner.shutdown().await.is_err());
+    drop(owner);
+    let (rebound_old, _) = generation("old", config());
+    let owner =
+        Scheduler::new_with_generations(context(), new, vec![rebound_old], Some(store)).unwrap();
+    owner
+        .handle()
+        .restore(&context(), serde_json::to_value(saved).unwrap())
+        .await
+        .unwrap();
+    assert_eq!(
+        owner.handle().status("done", Detail::Full).unwrap().result,
+        "done"
+    );
+    owner.shutdown().await.unwrap();
+}
+
+#[tokio::test]
+async fn named_activation_committed_before_cancel_recovers_authoritative_generation() {
+    #[derive(Default)]
+    struct CommitThenBlock {
+        latest: Mutex<Option<SchedulerCheckpoint>>,
+        committed: Notify,
+    }
+    impl SchedulerStore for CommitThenBlock {
+        fn persist<'a>(
+            &'a self,
+            _: &'a Context,
+            checkpoint: &'a SchedulerCheckpoint,
+        ) -> BoxFuture<'a, Result<(), Error>> {
+            Box::pin(async move {
+                {
+                    let mut latest = self.latest.lock().unwrap();
+                    let revision = latest.as_ref().map_or(0, |saved| saved.revision);
+                    assert_eq!(checkpoint.revision, revision + 1);
+                    *latest = Some(checkpoint.clone());
+                }
+                if checkpoint.revision == 1 {
+                    self.committed.notify_one();
+                    std::future::pending::<()>().await;
+                }
+                Ok(())
+            })
+        }
+    }
+    let store = Arc::new(CommitThenBlock::default());
+    let (old, mut old_events) = generation("old", config());
+    let (new, mut new_events) = generation("new", config());
+    let mut owner =
+        Scheduler::new_with_generations(context(), old.clone(), vec![], Some(store.clone()))
+            .unwrap();
+    let handle = owner.handle();
+    {
+        let activation = owner.reconfigure_generation(new.clone());
+        tokio::pin!(activation);
+        tokio::select! {
+            result = &mut activation => panic!("unexpected acknowledgement: {result:?}"),
+            _ = store.committed.notified() => {}
+        }
+        assert_eq!(
+            handle.snapshot().active_generation_id.as_deref(),
+            Some("old")
+        );
+    }
+    assert!(handle.checkpoint(&context()).await.is_err());
+    assert!(handle.submit(request("poisoned")).await.is_err());
+    let authoritative = store.latest.lock().unwrap().clone().unwrap();
+    assert_eq!(authoritative.active_generation_id.as_deref(), Some("new"));
+    drop(owner);
+
+    let recovered =
+        Scheduler::new_with_generations(context(), new, vec![old], Some(store)).unwrap();
+    let handle = recovered.handle();
+    handle
+        .restore(&context(), serde_json::to_value(authoritative).unwrap())
+        .await
+        .unwrap();
+    handle.submit(request("after-recovery")).await.unwrap();
+    next(&mut new_events)
+        .await
+        .done
+        .send(ChildOutcome::completed("new generation"))
+        .unwrap();
+    wait(&handle, &["after-recovery"]).await;
+    assert!(old_events.try_recv().is_err());
+    assert_eq!(
+        handle
+            .status("after-recovery", Detail::Full)
+            .unwrap()
+            .result,
+        "new generation"
+    );
+    recovered.shutdown().await.unwrap();
 }

@@ -87,11 +87,40 @@ fn policy() -> security::SecurityPolicy {
 fn call(command: &str) -> security::CommandRequest {
     // All test commands are literal ASCII without JSON metacharacters.
     security::CommandRequest::from_call(ToolCall {
+        raw_arguments: None,
         id: "call-1".into(),
         name: "shell".into(),
         arguments: format!(r#"{{"command":"{command}"}}"#).parse().unwrap(),
     })
     .unwrap()
+}
+
+// Public-facade counterparts of the pinned LocalExecutor restricted-mode tests.
+// Match the native policy error rather than Go's diagnostic substrings, and
+// prove that rejection happens before the command can create a file.
+#[cfg(any(target_os = "linux", target_os = "macos"))]
+#[tokio::test]
+async fn local_executor_rejects_restricted_modes_before_spawn() {
+    let workspace = Workspace::new();
+    let executor = workspace.executor();
+    for (access, marker) in [
+        (AccessMode::ReadOnly, "rejected-read-only"),
+        (AccessMode::WorkspaceWrite, "rejected-workspace-write"),
+    ] {
+        let mut request = sandbox::Request::new("/bin/sh");
+        request.args = vec!["-c".into(), format!("printf forbidden > {marker}")];
+        request.access = access;
+        request.network = sandbox::Network::Allow;
+        match executor.run(&context("local-refusal"), request).await {
+            Err(sandbox::Error::Invalid(message)) => assert_eq!(
+                message,
+                "local requires explicit FullAccess and network Allow"
+            ),
+            Err(other) => panic!("unexpected rejection: {other}"),
+            Ok(_) => panic!("restricted command executed"),
+        }
+        assert!(!workspace.0.join(marker).exists());
+    }
 }
 
 #[tokio::test]

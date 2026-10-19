@@ -9,6 +9,8 @@
 #[cfg(feature = "compat")]
 pub use adk_codec as codec;
 pub use adk_core as core;
+/// Standalone specialist tool-list selection; execution authorization remains host-owned.
+pub mod specialists;
 /// Compatible durable documents, stores and effect recovery.
 #[cfg(feature = "durable")]
 pub use adk_durable as durable;
@@ -35,3 +37,52 @@ pub use adk_security as security;
 /// Lifecycle-owned prepared tool integration with the standalone runner.
 #[cfg(all(feature = "tools", feature = "runtime"))]
 pub mod tool_runtime;
+
+/// Host-owned SDK turn/tool logging with native formatting.
+#[cfg(feature = "observability")]
+pub mod agent_logger;
+/// Host-owned SDK content-event log bodies.
+#[cfg(feature = "observability")]
+pub mod content_logger;
+/// SDK content-event metadata and bounded owned subscriptions.
+#[cfg(feature = "observability")]
+pub mod content_stream;
+/// Ordered native events, explicit capture policy and host-owned telemetry.
+#[cfg(feature = "observability")]
+pub mod observability;
+
+/// SDK-shaped progress accounting, independent of native observability snapshots.
+#[cfg(feature = "observability")]
+pub mod progress;
+
+/// Compatible SDK trace documents and Linux confined category storage.
+#[cfg(feature = "observability")]
+pub mod tracestore;
+
+/// SDK schema-2 trace writer and host-published span records.
+#[cfg(feature = "observability")]
+pub mod tracewriter;
+
+/// Explicitly owned stdout/OTLP exporters and SDK endpoint defaults.
+#[cfg(feature = "otel")]
+pub mod telemetry;
+
+/// Host configuration, provider/tool composition and explicit bundle/session ownership.
+#[cfg(feature = "builder")]
+pub mod builder;
+
+/// Opt-in builtin runtime tool guardrails backed by the shared security policy.
+#[cfg(feature = "builder")]
+pub mod guardrails;
+
+/// Host-owned message ingestion, approvals and session persistence.
+#[cfg(feature = "host")]
+pub mod host;
+
+/// Shared trace ownership, scoped spans and ordered processor composition.
+#[cfg(feature = "observability")]
+pub mod tracing;
+
+/// Explicit runtime hook and generation integration for owned trace scopes.
+#[cfg(feature = "observability")]
+pub mod tracing_runtime;

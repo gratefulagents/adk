@@ -61,6 +61,10 @@ impl SecurityPolicy {
                 } else {
                     ApprovalPolicy::RequiredByTool
                 },
+                max_child_turns: match (a.max_child_turns, b.max_child_turns) {
+                    (Some(a), Some(b)) => Some(a.min(b)),
+                    (a, b) => a.or(b),
+                },
                 timeout: match (a.timeout, b.timeout) {
                     (Some(a), Some(b)) => Some(a.min(b)),
                     (a, b) => a.or(b),

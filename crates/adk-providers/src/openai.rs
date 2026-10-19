@@ -3,6 +3,20 @@ use crate::wire::Protocol;
 use adk_core::{Error, ModelRequest};
 use serde_json::{Value, json};
 
+pub(crate) fn model_fallbacks(primary: &str, fallbacks: &[String]) -> Option<Vec<String>> {
+    if fallbacks.is_empty() {
+        return None;
+    }
+    let mut models = Vec::new();
+    for model in std::iter::once(primary).chain(fallbacks.iter().map(String::as_str)) {
+        let model = model.trim();
+        if !model.is_empty() && !models.iter().any(|previous| previous == model) {
+            models.push(model.to_owned());
+        }
+    }
+    (models.len() > 1).then_some(models)
+}
+
 fn supports_none(model: &str) -> bool {
     let model = model.trim().to_lowercase();
     if model.contains("codex") {
@@ -50,6 +64,7 @@ pub(crate) fn shape(
             request
                 .settings
                 .get("thinking")
+                .filter(|value| protocol == Protocol::Responses || value["type"] == "enabled")
                 .and_then(|value| value["budget_tokens"].as_u64())
         })
         .unwrap_or(0);
@@ -57,18 +72,18 @@ pub(crate) fn shape(
         let fallbacks = fallbacks
             .as_array()
             .ok_or_else(|| crate::invalid("model fallbacks must be an array"))?;
-        let mut models = vec![request.model.trim().to_owned()];
+        let mut configured = Vec::new();
         for model in fallbacks {
             let model = model
                 .as_str()
                 .ok_or_else(|| crate::invalid("fallback model must be a string"))?
                 .trim();
-            if !model.is_empty() && !models.iter().any(|previous| previous == model) {
-                models.push(model.to_owned());
-            }
+            configured.push(model.to_owned());
         }
-        if protocol == Protocol::Chat && models.len() > 1 {
-            object.insert("models".into(), json!(models));
+        if protocol == Protocol::Chat {
+            if let Some(models) = model_fallbacks(&request.model, &configured) {
+                object.insert("models".into(), json!(models));
+            }
         }
     }
     if let Some(verbosity) = object.remove("text_verbosity") {
@@ -181,6 +196,32 @@ pub(crate) fn codex(body: &mut Value) {
 #[cfg(test)]
 mod tests {
     use super::*;
+    #[test]
+    fn original_model_fallback_order_deduplication_and_omission() {
+        for (primary, fallbacks, expected) in [
+            ("a", vec![], None),
+            (
+                "openrouter/qwen/qwen3-coder:free",
+                vec![
+                    "openrouter/deepseek/deepseek-chat",
+                    "openrouter/openrouter/auto",
+                ],
+                Some(vec![
+                    "openrouter/qwen/qwen3-coder:free",
+                    "openrouter/deepseek/deepseek-chat",
+                    "openrouter/openrouter/auto",
+                ]),
+            ),
+            ("a", vec![" ", "a", "b", "b"], Some(vec!["a", "b"])),
+            ("a", vec!["a", "  "], None),
+            (" ", vec!["a", "b"], Some(vec!["a", "b"])),
+            (" ", vec!["a"], None),
+        ] {
+            let fallbacks: Vec<String> = fallbacks.into_iter().map(str::to_owned).collect();
+            let expected = expected.map(|models| models.into_iter().map(str::to_owned).collect());
+            assert_eq!(model_fallbacks(primary, &fallbacks), expected);
+        }
+    }
     #[test]
     fn codex_omits_unsupported_budget_fields_without_losing_continuation() {
         let mut body = json!({"model":"gpt-5.6","stream":false,"store":true,"max_output_tokens":42,"truncation":"auto","prompt_cache_retention":"24h","include":["reasoning.encrypted_content"],"reasoning":{"effort":"max","summary":"auto"}});

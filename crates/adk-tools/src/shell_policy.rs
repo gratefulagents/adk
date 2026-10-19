@@ -1,4 +1,8 @@
 use adk_core::AccessMode;
+use adk_security::{
+    destructive_shell_words as destructive, is_shell_assignment as assignment,
+    unwrap_shell_words as unwrap,
+};
 
 /// Tool-layer defense in depth; filesystem enforcement must come from the executor.
 /// `filesystem_enforced` is trusted host metadata, never a model argument.
@@ -384,99 +388,6 @@ fn base(s: &str) -> &str {
 fn shell(s: &str) -> bool {
     matches!(s, "sh" | "bash" | "zsh" | "ksh" | "dash" | "ash")
 }
-fn assignment(s: &str) -> bool {
-    s.split_once('=').is_some_and(|(name, _)| {
-        !name.is_empty()
-            && name
-                .bytes()
-                .enumerate()
-                .all(|(i, c)| c == b'_' || c.is_ascii_alphabetic() || i > 0 && c.is_ascii_digit())
-    })
-}
-fn unwrap(words: &[String]) -> Vec<String> {
-    let mut words = words.to_vec();
-    loop {
-        while words.first().is_some_and(|s| assignment(s)) {
-            words.remove(0);
-        }
-        let Some(head) = words.first().map(|s| base(s).to_owned()) else {
-            return words;
-        };
-        let operands: &[&str] = match head.as_str() {
-            "sudo" => &[
-                "-u",
-                "--user",
-                "-g",
-                "--group",
-                "-h",
-                "--host",
-                "-p",
-                "--prompt",
-                "-C",
-                "--close-from",
-                "-D",
-                "--chdir",
-                "-R",
-                "--chroot",
-                "-r",
-                "--role",
-                "-t",
-                "--type",
-                "-T",
-                "--command-timeout",
-                "-U",
-                "--other-user",
-            ],
-            "doas" => &["-C", "-u"],
-            "env" => &["-u", "--unset", "-C", "--chdir"],
-            "nice" => &["-n", "--adjustment"],
-            "ionice" => &["-c", "--class", "-n", "--classdata", "-p", "--pid"],
-            "stdbuf" => &["-i", "--input", "-o", "--output", "-e", "--error"],
-            "exec" => &["-a"],
-            "timeout" => &["-k", "--kill-after", "-s", "--signal"],
-            "command" | "nohup" | "setsid" | "builtin" => &[],
-            _ => return words,
-        };
-        let mut i = 1;
-        let mut splice = None;
-        while i < words.len() {
-            let a = &words[i];
-            if a.starts_with('-') {
-                let (name, value) = a
-                    .split_once('=')
-                    .map_or((a.as_str(), None), |(n, v)| (n, Some(v)));
-                if head == "env" && matches!(name, "-S" | "--split-string") {
-                    let value = value
-                        .or_else(|| words.get(i + 1).map(String::as_str))
-                        .unwrap_or("");
-                    let mut split: Vec<_> = value.split_whitespace().map(str::to_owned).collect();
-                    split.extend_from_slice(
-                        &words[(i + if a.contains('=') { 1 } else { 2 }).min(words.len())..],
-                    );
-                    splice = Some(split);
-                    break;
-                }
-                i += if value.is_none() && operands.contains(&name) {
-                    2
-                } else {
-                    1
-                };
-            } else if matches!(head.as_str(), "env" | "sudo" | "doas") && assignment(a) {
-                i += 1;
-            } else {
-                break;
-            }
-        }
-        if let Some(split) = splice {
-            words = split;
-            continue;
-        }
-        if head == "timeout" && i < words.len() {
-            i += 1;
-        }
-        words.drain(..i.min(words.len()));
-    }
-}
 fn git_sub(argv: &[String]) -> Option<usize> {
     let mut i = 1;
     while i < argv.len() {
@@ -520,99 +431,6 @@ fn protected_ref(s: &str) -> bool {
             .iter()
             .any(|end| s.ends_with(end))
 }
-fn forbidden(path: &str) -> bool {
-    if matches!(
-        path,
-        "/dev/null"
-            | "/dev/zero"
-            | "/dev/full"
-            | "/dev/tty"
-            | "/dev/stdin"
-            | "/dev/stdout"
-            | "/dev/stderr"
-            | "/dev/random"
-            | "/dev/urandom"
-    ) || path.starts_with("/dev/fd/")
-    {
-        return false;
-    }
-    ["/etc", "/dev", "/sys", "/proc", "/boot"]
-        .iter()
-        .any(|p| path == *p || path.starts_with(&format!("{p}/")))
-}
-fn destructive(argv: &[String], redirects: &[(String, String)]) -> Option<String> {
-    for (op, target) in redirects {
-        if op.starts_with('>') && forbidden(target) {
-            return Some(format!(
-                "redirect to protected path {target:?} is not allowed"
-            ));
-        }
-    }
-    let head = base(argv.first()?);
-    let args = &argv[1..];
-    if head == "rm"
-        && args.iter().any(|a| {
-            a == "--recursive"
-                || a.starts_with('-') && !a.starts_with("--") && a.contains(['r', 'R'])
-        })
-        && args.iter().any(|a| {
-            a.starts_with("/*")
-                || matches!(
-                    a.trim_end_matches('/'),
-                    "" | "/etc"
-                        | "/usr"
-                        | "/bin"
-                        | "/sbin"
-                        | "/lib"
-                        | "/lib64"
-                        | "/var"
-                        | "/boot"
-                        | "/root"
-                        | "/home"
-                        | "/opt"
-                        | "/dev"
-                        | "/proc"
-                        | "/sys"
-                )
-        })
-    {
-        return Some("recursive removal of root paths is not allowed".into());
-    }
-    if matches!(head, "chmod" | "chown")
-        && args
-            .iter()
-            .any(|a| a == "--recursive" || a.starts_with('-') && a.contains('R'))
-        && args.iter().any(|a| a == "/" || a.starts_with("/*"))
-    {
-        return Some(format!("{head} recursive at root is not allowed"));
-    }
-    if head == "dd" && args.iter().any(|a| a.starts_with("of=/dev/")) {
-        return Some("dd to block device is not allowed".into());
-    }
-    if head.starts_with("mkfs") {
-        return Some(format!("{head} is not allowed"));
-    }
-    if head == "tee"
-        && let Some(path) = args.iter().find(|a| forbidden(a))
-    {
-        return Some(format!("tee to protected path {path:?} is not allowed"));
-    }
-    if head.starts_with(":()") {
-        return Some("fork bomb pattern is not allowed".into());
-    }
-    if matches!(head, "python" | "python3" | "perl" | "ruby" | "node")
-        && args.windows(2).any(|p| {
-            p[0] == "-c"
-                && ["/etc/passwd", "/etc/shadow", "/etc/hosts", "/etc/sudoers"]
-                    .iter()
-                    .any(|s| p[1].contains(s))
-        })
-    {
-        return Some(format!("{head} -c writing to system files is not allowed"));
-    }
-    None
-}
-
 #[derive(Default)]
 struct Command {
     piped: bool,

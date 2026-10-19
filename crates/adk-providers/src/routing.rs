@@ -4,7 +4,8 @@ use crate::{
     factory::{Kind, RouteSpec},
 };
 use adk_core::{
-    BoxFuture, Context, Error, Model, ModelRequest, ModelResponse, ModelStream, StreamingModel,
+    BoxFuture, Context, Error, Model, ModelActivitySink, ModelReasoningSink, ModelRequest,
+    ModelResponse, ModelStream, StreamingModel,
 };
 use std::{collections::BTreeMap, sync::Arc};
 
@@ -47,9 +48,18 @@ impl Routes {
         store: Arc<dyn CredentialStore>,
         refresh: Arc<dyn Refresh>,
     ) -> Result<(), Error> {
+        self.register_spec_with_model_fallbacks(spec, store, refresh, &[])
+    }
+    pub(crate) fn register_spec_with_model_fallbacks(
+        &mut self,
+        spec: &RouteSpec,
+        store: Arc<dyn CredentialStore>,
+        refresh: Arc<dyn Refresh>,
+        fallbacks: &[String],
+    ) -> Result<(), Error> {
         self.insert(
             &spec.prefix(),
-            spec.build(store, refresh)?,
+            spec.build_with_model_fallbacks(store, refresh, fallbacks)?,
             Some(spec.kind),
             spec.protocol,
         )
@@ -125,6 +135,16 @@ impl Routes {
     }
 }
 impl Model for Routes {
+    fn info(&self, name: &str) -> adk_core::ModelInfo {
+        match self.select(name) {
+            Ok((route, model)) => route.model.info(&model),
+            Err(_) => adk_core::ModelInfo {
+                provider: self.provider().into(),
+                model: name.into(),
+                input_tokens_include_cache: None,
+            },
+        }
+    }
     fn provider(&self) -> &str {
         "multi"
     }
@@ -134,13 +154,32 @@ impl Model for Routes {
     fn complete<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, None)
+    }
+    fn complete_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_observers(context, request, activity, None)
+    }
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+        reasoning: Option<ModelReasoningSink<'a>>,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
             context.check_active()?;
             let (route, name) = self.resolve(&request.model)?;
             request.model = name;
-            route.complete(context, request).await
+            route
+                .complete_with_observers(context, request, activity, reasoning)
+                .await
         })
     }
 }
@@ -150,13 +189,24 @@ impl StreamingModel for Routes {
     fn stream<'a>(
         &'a self,
         context: &'a Context,
+        request: ModelRequest,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        self.stream_with_activity(context, request, None)
+    }
+    fn stream_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
         mut request: ModelRequest,
+        activity: Option<ModelActivitySink>,
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
         Box::pin(async move {
             context.check_active()?;
             let (route, model) = self.select(&request.model)?;
             request.model = model;
-            route.model.stream(context, request).await
+            route
+                .model
+                .stream_with_activity(context, request, activity)
+                .await
         })
     }
 }

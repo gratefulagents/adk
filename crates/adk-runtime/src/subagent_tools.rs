@@ -1,5 +1,6 @@
 //! Model-facing adapters over an explicitly owned child session.
 
+use crate::progress::{ProgressChild, ProgressChildEnd, RuntimeProgress};
 use crate::runner::Runner;
 use crate::subagent::*;
 use adk_core::*;
@@ -16,7 +17,7 @@ use std::{
 /// the host explicitly closes the session with `Scheduler::shutdown`.
 pub struct SubagentSession {
     pub scheduler: SchedulerHandle,
-    parent: Mutex<Vec<RunItem>>,
+    parent: Mutex<(Vec<RunItem>, Vec<ItemProvenance>)>,
     staged_delivery: Mutex<HashSet<String>>,
     parent_task: Option<String>,
 }
@@ -25,7 +26,7 @@ impl SubagentSession {
     pub fn new(scheduler: SchedulerHandle) -> Self {
         Self {
             scheduler,
-            parent: Mutex::new(Vec::new()),
+            parent: Mutex::new((Vec::new(), Vec::new())),
             staged_delivery: Mutex::new(HashSet::new()),
             parent_task: None,
         }
@@ -37,7 +38,7 @@ impl SubagentSession {
         session
     }
 
-    pub(crate) fn update_parent(&self, history: &[RunItem]) {
+    pub(crate) fn update_parent(&self, history: &[RunItem], provenance: &[ItemProvenance]) {
         let completed: HashSet<_> = history
             .iter()
             .filter_map(|item| match item {
@@ -49,12 +50,13 @@ impl SubagentSession {
             .collect();
         *self.parent.lock().unwrap() = history
             .iter()
-            .filter(|item| match item {
+            .zip(provenance)
+            .filter(|(item, _)| match item {
                 RunItem::ToolCall { call } => completed.contains(call.id.as_str()),
                 _ => true,
             })
-            .cloned()
-            .collect();
+            .map(|(item, source)| (item.clone(), source.clone()))
+            .unzip();
     }
 }
 
@@ -352,7 +354,7 @@ impl Tool for SubagentTool {
                 ToolKind::Spawn => match parse::<SpawnInput>(call.arguments) {
                     Ok(input) => {
                         self.session
-                            .spawn(context, input, &self.default_agent)
+                            .spawn(context, input, &self.default_agent, false)
                             .await
                     }
                     Err(error) => Err(error),
@@ -484,6 +486,7 @@ impl Tool for AgentAsTool {
                         ..Default::default()
                     },
                     &self.agent,
+                    true,
                 )
                 .await
         })
@@ -517,7 +520,7 @@ impl SubagentSession {
         let snapshot = self.scheduler.snapshot();
         let visible: HashSet<_> = self
             .scheduler
-            .list()
+            .committed_list()
             .into_iter()
             .map(|task| task.id)
             .collect();
@@ -538,7 +541,7 @@ impl SubagentSession {
     fn pending_ids(&self) -> Vec<String> {
         let visible: HashSet<_> = self
             .scheduler
-            .list()
+            .committed_list()
             .into_iter()
             .map(|task| task.id)
             .collect();
@@ -573,12 +576,20 @@ impl SubagentSession {
             })
             .collect())
     }
+    pub(crate) fn has_pending_final_join(&self) -> bool {
+        !self.pending_ids().is_empty()
+            || self
+                .scheduler
+                .committed_list()
+                .iter()
+                .any(|task| !task.status.is_terminal())
+    }
     pub(crate) async fn join(&self, context: &Context) -> Result<Vec<RunItem>, Error> {
         let mut ids = self.pending_ids();
         // A direct child may intentionally end a no-output turn while its own
         // background descendants still run. Final answers must join those too,
         // without stealing their results from their immediate parent.
-        for task in self.scheduler.list() {
+        for task in self.scheduler.committed_list() {
             if !task.status.is_terminal() && !ids.contains(&task.id) {
                 ids.push(task.id);
             }
@@ -588,7 +599,7 @@ impl SubagentSession {
         }
         if self
             .scheduler
-            .list()
+            .committed_list()
             .iter()
             .any(|t| ids.contains(&t.id) && t.status == TaskStatus::Reconciling)
         {
@@ -610,6 +621,7 @@ impl SubagentSession {
         context: &ToolContext,
         input: SpawnInput,
         default_agent: &str,
+        final_text: bool,
     ) -> Result<ToolOutput, Error> {
         let background = match input.mode.trim().to_ascii_lowercase().as_str() {
             "" | "sync" => false,
@@ -685,11 +697,18 @@ impl SubagentSession {
                 }
             };
             submission.include_dependency_results = task.include_dependency_results.unwrap_or(true);
-            submission.parent_history = task
+            if task
                 .share_parent_context
                 .unwrap_or(input.share_parent_context)
-                .then(|| self.parent.lock().unwrap().clone());
+            {
+                let (history, provenance) = self.parent.lock().unwrap().clone();
+                submission.parent_history = Some(history);
+                submission.parent_history_provenance = provenance;
+            }
             submission.policy.tools = narrowed(policy.clone(), &task.tool_access)?;
+            if let Some(limit) = policy.max_child_turns {
+                submission.policy.max_turns = limit;
+            }
             if !single {
                 let mut summary =
                     json!({"key":task.key,"task_id":submission.id,"agent":submission.agent_name});
@@ -723,6 +742,18 @@ impl SubagentSession {
         let failed = tasks
             .iter()
             .any(|task| matches!(task.status, TaskStatus::Failed | TaskStatus::Cancelled));
+        if final_text && !timed_out && tasks[0].status == TaskStatus::Completed {
+            let text = if tasks[0].result.is_empty() {
+                "(no output)".into()
+            } else {
+                tasks[0].result.clone()
+            };
+            return Ok(ToolOutput {
+                content: vec![Content::Text { text }],
+                is_error: false,
+                should_pause: false,
+            });
+        }
         let mut response = if single {
             joined_task(&tasks[0])
         } else {
@@ -758,7 +789,13 @@ impl SubagentSession {
         }
         let tasks = ids
             .iter()
-            .map(|id| self.scheduler.status(id, Detail::Full))
+            .map(|id| {
+                if detail == "results" {
+                    self.scheduler.committed_status(id, Detail::Full)
+                } else {
+                    self.scheduler.status(id, Detail::Full)
+                }
+            })
             .collect::<Result<Vec<_>, _>>()?;
         let response = match detail.as_str() {
             "graph" => {
@@ -864,7 +901,7 @@ impl SubagentSession {
         };
         let tasks = ids
             .iter()
-            .map(|id| self.scheduler.status(id, Detail::Full))
+            .map(|id| self.scheduler.committed_status(id, Detail::Full))
             .collect::<Result<Vec<_>, _>>()?;
         let timed_out = timed_out && tasks.iter().any(|task| !task.status.is_terminal());
         Ok((tasks, timed_out))
@@ -963,14 +1000,40 @@ impl SubagentSession {
     }
 }
 
+/// Post-processes a successful child result; an empty string preserves the final output.
+pub type ChildOutputExtractor = dyn Fn(&RunResult) -> String + Send + Sync;
+
 /// Registered runners share one child execution implementation across both tool surfaces.
 pub struct RunnerChildExecutor {
     runners: HashMap<String, Runner>,
     host: Arc<dyn Host>,
+    output_extractors: HashMap<String, Arc<ChildOutputExtractor>>,
+    progress: Option<Arc<ChildProgressRegistry>>,
 }
 impl RunnerChildExecutor {
     pub fn new(runners: HashMap<String, Runner>, host: Arc<dyn Host>) -> Self {
-        Self { runners, host }
+        Self {
+            runners,
+            host,
+            output_extractors: HashMap::new(),
+            progress: None,
+        }
+    }
+
+    /// Bind this executor's root while sharing parent bindings with other generations.
+    pub fn with_progress(mut self, registry: Arc<ChildProgressRegistry>) -> Self {
+        self.progress = Some(registry);
+        self
+    }
+
+    /// Applies to this registration on both named and managed delegation surfaces.
+    pub fn with_output_extractor(
+        mut self,
+        agent_name: impl Into<String>,
+        extractor: Arc<ChildOutputExtractor>,
+    ) -> Self {
+        self.output_extractors.insert(agent_name.into(), extractor);
+        self
     }
 }
 impl ChildExecutor for RunnerChildExecutor {
@@ -984,9 +1047,138 @@ impl ChildExecutor for RunnerChildExecutor {
                 .runners
                 .get(&invocation.agent_name)
                 .ok_or_else(|| invalid("unknown child runner"))?;
-            runner
-                .run_child(invocation, control, self.host.clone())
-                .await
+            let extractor = self
+                .output_extractors
+                .get(&invocation.agent_name)
+                .map(Arc::as_ref);
+            let mut scope = self
+                .progress
+                .as_ref()
+                .and_then(|registry| registry.fork(&invocation, runner.progress_model()));
+            let progress = scope.as_ref().and_then(|scope| scope.observer.clone());
+            let result = runner
+                .run_child(invocation, control, self.host.clone(), extractor, progress)
+                .await;
+            if let Some(scope) = &mut scope {
+                scope.finish(match &result {
+                    Ok(outcome) => ProgressChildEnd::Finished(outcome),
+                    Err(error) => ProgressChildEnd::Failed(&error.info),
+                });
+            }
+            result
         })
+    }
+}
+
+// A present None preserves an unobserved parent across later root rebindings.
+type ChildProgressBindings = HashMap<String, Option<Arc<dyn RuntimeProgress>>>;
+
+/// Session-scoped progress bindings. Nested invocations fork from their immediate parent.
+/// Missing ancestors are restored without replaying their execution, using the
+/// scheduler's validated ancestry regardless of executor startup order.
+#[derive(Default)]
+pub struct ChildProgressRegistry {
+    root: Option<Arc<dyn RuntimeProgress>>,
+    active: Arc<Mutex<ChildProgressBindings>>,
+}
+impl ChildProgressRegistry {
+    pub fn new(root: Arc<dyn RuntimeProgress>) -> Self {
+        Self {
+            root: Some(root),
+            ..Default::default()
+        }
+    }
+    /// Create a generation-local root, retaining immediate-parent bindings and their gate.
+    pub fn rebind(&self, root: Option<Arc<dyn RuntimeProgress>>) -> Self {
+        Self {
+            root,
+            active: self.active.clone(),
+        }
+    }
+    fn fork(
+        self: &Arc<Self>,
+        invocation: &ChildInvocation,
+        model: &str,
+    ) -> Option<ChildProgressScope> {
+        let mut active = self.active.lock().unwrap();
+        let missing_from = invocation
+            .ancestors
+            .iter()
+            .rposition(|ancestor| active.contains_key(&ancestor.task_id))
+            .map_or(0, |index| index + 1);
+        for ancestor in &invocation.ancestors[missing_from..] {
+            let parent = match &ancestor.parent_task_id {
+                Some(id) => active.get(id)?.clone(),
+                None => self.root.clone(),
+            };
+            let observer = parent.and_then(|parent| {
+                parent.restore_child(ProgressChild {
+                    task_id: &ancestor.task_id,
+                    parent_task_id: ancestor.parent_task_id.as_deref(),
+                    agent_name: &ancestor.agent_name,
+                    agent_model: "",
+                })
+            });
+            active.insert(ancestor.task_id.clone(), observer);
+        }
+        let parent = match &invocation.parent_task_id {
+            Some(id) => active.get(id).cloned()?,
+            None => self.root.clone(),
+        };
+        let child = ProgressChild {
+            task_id: &invocation.task_id,
+            parent_task_id: invocation.parent_task_id.as_deref(),
+            agent_name: &invocation.agent_name,
+            agent_model: model,
+        };
+        let observer = parent.as_ref().and_then(|parent| parent.fork_child(child));
+        active.insert(invocation.task_id.clone(), observer.clone());
+        Some(ChildProgressScope {
+            registry: self.clone(),
+            parent,
+            observer,
+            task_id: invocation.task_id.clone(),
+            parent_task_id: invocation.parent_task_id.clone(),
+            agent_name: invocation.agent_name.clone(),
+            model: model.into(),
+            finished: false,
+        })
+    }
+}
+struct ChildProgressScope {
+    registry: Arc<ChildProgressRegistry>,
+    parent: Option<Arc<dyn RuntimeProgress>>,
+    observer: Option<Arc<dyn RuntimeProgress>>,
+    task_id: String,
+    parent_task_id: Option<String>,
+    agent_name: String,
+    model: String,
+    finished: bool,
+}
+impl ChildProgressScope {
+    fn finish(&mut self, end: ProgressChildEnd<'_>) {
+        if self.finished {
+            return;
+        }
+        self.finished = true;
+        let mut active = self.registry.active.lock().unwrap();
+        active.remove(&self.task_id);
+        if let (Some(parent), Some(_)) = (&self.parent, &self.observer) {
+            parent.child_finished(
+                ProgressChild {
+                    task_id: &self.task_id,
+                    parent_task_id: self.parent_task_id.as_deref(),
+                    agent_name: &self.agent_name,
+                    agent_model: &self.model,
+                },
+                end,
+            );
+        }
+        drop(active);
+    }
+}
+impl Drop for ChildProgressScope {
+    fn drop(&mut self) {
+        self.finish(ProgressChildEnd::Dropped);
     }
 }

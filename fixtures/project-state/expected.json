@@ -14,6 +14,9 @@
         "rust",
         "design"
       ],
+      "task_ids": [
+        "task_000000000001"
+      ],
       "updated_at": "2025-01-01T00:00:11.123456789Z"
     },
     {
@@ -61,6 +64,9 @@
         "rust",
         "design"
       ],
+      "task_ids": [
+        "task_000000000001"
+      ],
       "updated_at": "2025-01-01T00:00:11.123456789Z"
     }
   ],
@@ -70,6 +76,10 @@
       "id": "session_000000000001",
       "run_id": "fixture-run",
       "summary": "Foundation delivered",
+      "task_ids": [
+        "task_000000000001",
+        "task_000000000002"
+      ],
       "updated_at": "2025-01-01T00:00:15.123456789Z"
     }
   ],

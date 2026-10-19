@@ -6,9 +6,10 @@ use crate::{
     wire::{self, Protocol},
 };
 use adk_core::{
-    BoxFuture, Context, Error, ErrorCategory, Model, ModelEvent, ModelRequest, ModelResponse,
-    ModelStream, StreamingModel,
+    BoxFuture, Context, Error, ErrorCategory, Model, ModelActivitySink, ModelEvent,
+    ModelReasoningSink, ModelRequest, ModelResponse, ModelStream, StreamingModel,
 };
+use base64::{Engine, engine::general_purpose::STANDARD};
 use reqwest::Client;
 use serde_json::{Value, json};
 use std::{
@@ -22,9 +23,151 @@ pub struct Provider {
     protocol: Protocol,
     session: Arc<Session>,
     client: Client,
+    model_fallbacks: Vec<String>,
     thinking_overrides: Mutex<BTreeMap<String, (String, bool)>>,
 }
+/// An explicit image-analysis call, separate from the attachment-loading tool.
+pub struct ImageAnalysisRequest<'a> {
+    pub model: &'a str,
+    pub data: &'a [u8],
+    pub media_type: &'a str,
+    pub prompt: &'a str,
+    pub detail: &'a str,
+}
+
+impl<'a> ImageAnalysisRequest<'a> {
+    pub fn new(model: &'a str, data: &'a [u8], media_type: &'a str, prompt: &'a str) -> Self {
+        Self {
+            model,
+            data,
+            media_type,
+            prompt,
+            detail: "high",
+        }
+    }
+}
+
 impl Provider {
+    /// Uses Responses even when ordinary calls select Chat, sharing this provider's
+    /// transport and credential session. The host retains retry ownership.
+    pub async fn analyze_image(
+        &self,
+        context: &Context,
+        request: ImageAnalysisRequest<'_>,
+    ) -> Result<String, Error> {
+        context.check_active()?;
+        if self.protocol == Protocol::Anthropic {
+            return Err(Error::new(
+                ErrorCategory::Unsupported,
+                "image analysis requires an OpenAI-compatible provider",
+            ));
+        }
+        if request.data.is_empty() {
+            return Err(crate::invalid("image data is empty"));
+        }
+        let prompt = request.prompt.trim();
+        if prompt.is_empty() {
+            return Err(crate::invalid("prompt is required"));
+        }
+        let model = request.model.trim();
+        let model = if model.is_empty() {
+            crate::factory::DEFAULT_CHAT_MODEL
+        } else {
+            model
+        };
+        let detail = match request.detail.trim().to_ascii_lowercase().as_str() {
+            "low" => "low",
+            "original" => "original",
+            "auto" => "auto",
+            _ => "high",
+        };
+        let media_type = request
+            .media_type
+            .split(';')
+            .next()
+            .unwrap_or_default()
+            .trim();
+        let media_type =
+            if media_type.is_empty() || media_type.contains([' ', '\t', '\r', '\n', ',']) {
+                "application/octet-stream"
+            } else {
+                media_type
+            };
+        let mut body = json!({
+            "model": model,
+            "max_output_tokens": 4096,
+            "input": [{"role":"user", "content":[
+                {"type":"input_text", "text":prompt},
+                {"type":"input_image", "detail":detail, "image_url":format!("data:{media_type};base64,{}", STANDARD.encode(request.data))}
+            ]}],
+            "instructions":"Analyze the image and answer the user's prompt. Be concise and specific.",
+            "truncation":"auto",
+            "store":false,
+            "prompt_cache_retention":"in_memory",
+            "stream":true,
+        });
+        let codex = self.session.scope().mode == AuthMode::OpenAiOAuth;
+        if codex {
+            crate::openai::codex(&mut body);
+        }
+        let transport = Self {
+            name: self.name.clone(),
+            protocol: Protocol::Responses,
+            session: self.session.clone(),
+            client: self.client.clone(),
+            model_fallbacks: Vec::new(),
+            thinking_overrides: Mutex::default(),
+        };
+        let response = transport
+            .send_body(context, "/responses", body, None, None)
+            .await?;
+        let mut state = StreamState::new(Protocol::Responses);
+        state.snapshot_profile = if codex {
+            crate::snapshot::Profile::Collected
+        } else {
+            crate::snapshot::Profile::Complete
+        };
+        let mut stream = HttpStream {
+            context: context.clone(),
+            activity: None,
+            response: Some(response),
+            decoder: Decoder::default(),
+            state,
+            queue: VecDeque::new(),
+            closed: false,
+        };
+        while let Some(event) = stream.read().await? {
+            if let ModelEvent::Complete { response } = event {
+                let parts: Vec<_> = response
+                    .items
+                    .iter()
+                    .filter_map(|item| match item {
+                        adk_core::RunItem::Message { message }
+                        | adk_core::RunItem::PhasedMessage { message, .. } => {
+                            Some(&message.content)
+                        }
+                        _ => None,
+                    })
+                    .flatten()
+                    .filter_map(|content| match content {
+                        adk_core::Content::Text { text } if !text.trim().is_empty() => {
+                            Some(text.as_str())
+                        }
+                        _ => None,
+                    })
+                    .collect();
+                let text = parts.join("\n").trim().to_owned();
+                if text.is_empty() {
+                    return Err(protocol_error("image analysis response contained no text"));
+                }
+                return Ok(text);
+            }
+        }
+        Err(protocol_error(
+            "image analysis stream ended without completion",
+        ))
+    }
+
     pub fn new(
         name: impl Into<String>,
         protocol: Protocol,
@@ -48,8 +191,16 @@ impl Provider {
             protocol,
             session,
             client,
+            model_fallbacks: Vec::new(),
             thinking_overrides: Mutex::new(BTreeMap::new()),
         })
+    }
+    /// Configure ordered Chat Completions fallback models. Responses and
+    /// Anthropic requests never receive the `models` extension. An explicit
+    /// request-level `model_fallbacks` setting takes precedence.
+    pub fn with_model_fallbacks(mut self, models: Vec<String>) -> Self {
+        self.model_fallbacks = models;
+        self
     }
     /// Explicit native Responses compaction. No local summary is substituted when
     /// the selected protocol or endpoint does not support this operation.
@@ -84,7 +235,9 @@ impl Provider {
                 body["text"] = json!({"verbosity":verbosity});
             }
         }
-        let response = self.send_body(context, "/responses/compact", body).await?;
+        let response = self
+            .send_body(context, "/responses/compact", body, None, None)
+            .await?;
         let result = wire::response(&read_json(context, response).await?, self.protocol)?;
         if !result.items.iter().any(|item| matches!(item, adk_core::RunItem::Compaction { compaction } if !compaction.encrypted_content.trim().is_empty())) {
             return Err(protocol_error("native compaction response has no encrypted continuation"));
@@ -96,8 +249,28 @@ impl Provider {
         context: &Context,
         request: &ModelRequest,
         stream: bool,
+        activity: Option<&ModelActivitySink>,
     ) -> Result<reqwest::Response, Error> {
-        let mut body = wire::request(request, self.protocol, stream)?;
+        let schema = request
+            .output_schema
+            .as_ref()
+            .filter(|_| self.protocol == Protocol::Anthropic);
+        let mut projected;
+        let wire_request = if schema.is_some() {
+            projected = request.clone();
+            projected.output_schema = None;
+            &projected
+        } else {
+            request
+        };
+        let mut body = wire::request(wire_request, self.protocol, stream)?;
+        if self.protocol == Protocol::Chat && !request.settings.contains_key("model_fallbacks") {
+            if let Some(models) =
+                crate::openai::model_fallbacks(&request.model, &self.model_fallbacks)
+            {
+                body["models"] = json!(models);
+            }
+        }
         let scope = self.session.scope();
         if scope.mode == AuthMode::OpenAiOAuth {
             crate::openai::codex(&mut body);
@@ -108,13 +281,16 @@ impl Provider {
         if self.protocol == Protocol::Anthropic {
             crate::anthropic::shape(&mut body, request, scope.mode);
         }
-        self.send_body(context, self.protocol.path(), body).await
+        self.send_body(context, self.protocol.path(), body, activity, schema)
+            .await
     }
     async fn send_body(
         &self,
         context: &Context,
         path: &str,
         body: Value,
+        activity: Option<&ModelActivitySink>,
+        schema: Option<&adk_core::JsonDocument>,
     ) -> Result<reqwest::Response, Error> {
         let scope = self.session.scope();
         let mut body = body;
@@ -151,35 +327,9 @@ impl Provider {
                         .to_owned();
                 }
             }
-            let endpoint = format!("{}{path}", resolved.endpoint);
-            let mut outgoing = body.clone();
-            if let Some(key) = outgoing.get("prompt_cache_key").and_then(Value::as_str) {
-                let key = crate::auth::cache_scope(&resolved, &material, key);
-                if key.is_empty() {
-                    outgoing.as_object_mut().unwrap().remove("prompt_cache_key");
-                } else {
-                    outgoing["prompt_cache_key"] = key.into();
-                }
-            }
-            let mut headers =
-                crate::auth::headers(&resolved, &material, self.protocol == Protocol::Anthropic)?;
-            if self.protocol == Protocol::Anthropic && scope.mode != AuthMode::CopilotOAuth {
-                let betas = crate::anthropic::beta(
-                    body["model"].as_str().unwrap_or_default(),
-                    scope.mode == AuthMode::AnthropicOAuth,
-                );
-                headers.insert(
-                    "anthropic-beta",
-                    reqwest::header::HeaderValue::from_str(&betas)
-                        .map_err(|_| crate::invalid("invalid beta header"))?,
-                );
-            }
             let response = crate::active(
                 context,
-                self.client
-                    .post(&endpoint)
-                    .headers(headers)
-                    .json(&outgoing)
+                self.prepare_request(&resolved, &material, path, &body, schema)?
                     .send(),
             )
             .await?
@@ -200,7 +350,7 @@ impl Provider {
                 let status = response.status().as_u16();
                 let failure = RequestFailure::http(status, response.headers(), SystemTime::now());
                 if status == 400 {
-                    let bytes = read_bytes(context, response).await?;
+                    let bytes = read_bytes(context, response, activity).await?;
                     if !repaired_anthropic
                         && repair(
                             &mut body,
@@ -236,8 +386,89 @@ impl Provider {
             "provider authentication retry exhausted",
         ))
     }
+    fn prepare_request(
+        &self,
+        scope: &crate::auth::Scope,
+        material: &crate::auth::Material,
+        path: &str,
+        body: &Value,
+        schema: Option<&adk_core::JsonDocument>,
+    ) -> Result<reqwest::RequestBuilder, Error> {
+        let mut endpoint = reqwest::Url::parse(&format!("{}{path}", scope.endpoint))
+            .map_err(|_| crate::invalid("invalid provider request endpoint"))?;
+        crate::auth::decorate_codex_url(&mut endpoint, &self.session);
+        let mut outgoing = body.clone();
+        if let Some(key) = outgoing.get("prompt_cache_key").and_then(Value::as_str) {
+            let key = crate::auth::cache_scope(scope, material, key);
+            if key.is_empty() {
+                outgoing.as_object_mut().unwrap().remove("prompt_cache_key");
+            } else {
+                outgoing["prompt_cache_key"] = key.into();
+            }
+        }
+        let mut headers =
+            crate::auth::headers(scope, material, self.protocol == Protocol::Anthropic)?;
+        if self.protocol == Protocol::Anthropic && scope.mode != AuthMode::CopilotOAuth {
+            let betas = crate::anthropic::beta(
+                body["model"].as_str().unwrap_or_default(),
+                scope.mode == AuthMode::AnthropicOAuth,
+            );
+            headers.insert(
+                "anthropic-beta",
+                reqwest::header::HeaderValue::from_str(&betas)
+                    .map_err(|_| crate::invalid("invalid beta header"))?,
+            );
+        }
+        let builder = self.client.post(endpoint).headers(headers);
+        if let Some(schema) = schema {
+            #[derive(serde::Serialize)]
+            struct Format<'a> {
+                #[serde(rename = "type")]
+                kind: &'static str,
+                schema: &'a serde_json::value::RawValue,
+            }
+            #[derive(serde::Serialize)]
+            struct Body<'a> {
+                #[serde(flatten)]
+                fields: &'a Value,
+                output_format: &'a serde_json::value::RawValue,
+            }
+            let raw: &serde_json::value::RawValue = serde_json::from_str(schema.as_str())
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let compact = adk_codec::snapshots::to_go_json(&raw)
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let compact = serde_json::from_slice(&compact)
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let format = serde_json::to_vec(&Format {
+                kind: "json_schema",
+                schema: compact,
+            })
+            .map_err(|_| crate::invalid("invalid output schema"))?;
+            // The SDK validates this marshaler envelope independently of the root request.
+            adk_codec::value::validate(&format)
+                .map_err(|_| crate::invalid("invalid output schema"))?;
+            let encoded = serde_json::to_vec(&Body {
+                fields: &outgoing,
+                output_format: serde_json::from_slice(&format)
+                    .map_err(|_| crate::invalid("invalid output schema"))?,
+            })
+            .map_err(|_| crate::invalid("invalid output schema"))?;
+            Ok(builder
+                .header(reqwest::header::CONTENT_TYPE, "application/json")
+                .body(encoded))
+        } else {
+            Ok(builder.json(&outgoing))
+        }
+    }
 }
 impl Model for Provider {
+    fn info(&self, model: &str) -> adk_core::ModelInfo {
+        adk_core::ModelInfo {
+            provider: self.name.clone(),
+            model: model.into(),
+            input_tokens_include_cache: Some(self.protocol != Protocol::Anthropic),
+        }
+    }
     fn provider(&self) -> &str {
         &self.name
     }
@@ -249,22 +480,97 @@ impl Model for Provider {
         context: &'a Context,
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_activity(context, request, None)
+    }
+    fn complete_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
+        self.complete_with_observers(context, request, activity, None)
+    }
+    fn complete_with_observers<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+        reasoning: Option<ModelReasoningSink<'a>>,
+    ) -> BoxFuture<'a, Result<ModelResponse, Error>> {
         Box::pin(async move {
-            if self.session.scope().mode == AuthMode::OpenAiOAuth
-                || (self.session.scope().mode == AuthMode::CopilotOAuth
-                    && self.protocol == Protocol::Chat)
-            {
-                let mut stream = self.stream(context, request).await?;
-                let mut complete = None;
-                while let Some(event) = stream.next().await? {
+            let mode = self.session.scope().mode;
+            let streaming = match mode {
+                AuthMode::CopilotOAuth => self.protocol == Protocol::Chat,
+                AuthMode::OpenAiOAuth => true,
+                _ => self.protocol != Protocol::Chat,
+            };
+            let response = self
+                .send(context, &request, streaming, activity.as_ref())
+                .await?;
+            let event_stream = response
+                .headers()
+                .get(reqwest::header::CONTENT_TYPE)
+                .and_then(|value| value.to_str().ok())
+                .is_some_and(|value| value.starts_with("text/event-stream"));
+            let profile = if mode == AuthMode::OpenAiOAuth {
+                crate::snapshot::Profile::Collected
+            } else {
+                crate::snapshot::Profile::Complete
+            };
+            if event_stream {
+                let mut state = StreamState::new(self.protocol);
+                state.snapshot_profile = profile;
+                let mut stream = HttpStream {
+                    context: context.clone(),
+                    activity,
+                    response: Some(response),
+                    decoder: Decoder::default(),
+                    state,
+                    queue: VecDeque::new(),
+                    closed: false,
+                };
+                while let Some(event) = stream.read().await? {
+                    if let ModelEvent::ReasoningDelta { delta } = &event
+                        && !delta.is_empty()
+                        && let Some(sink) = &reasoning
+                    {
+                        sink(delta);
+                    }
+                    if let ModelEvent::Complete { response } = event {
+                        return Ok(response);
+                    }
+                }
+                return Err(protocol_error("stream ended without completion"));
+            }
+            let bytes = read_bytes(context, response, activity.as_ref()).await?;
+            // Some compatible gateways return a JSON document even when streaming
+            // was requested. Keep that existing native transport extension.
+            let json_document = bytes
+                .iter()
+                .find(|byte| !byte.is_ascii_whitespace())
+                .is_some_and(|byte| matches!(byte, b'{' | b'['));
+            if !event_stream && (!streaming || json_document) {
+                return wire::response_json(&bytes, self.protocol);
+            }
+            let mut decoder = Decoder::default();
+            let mut state = StreamState::new(self.protocol);
+            state.snapshot_profile = profile;
+            let mut complete = None;
+            for event in decoder.feed(&bytes)? {
+                for event in state.event(&event.data)? {
+                    if let ModelEvent::ReasoningDelta { delta } = &event
+                        && !delta.is_empty()
+                        && let Some(sink) = &reasoning
+                    {
+                        sink(delta);
+                    }
                     if let ModelEvent::Complete { response } = event {
                         complete = Some(response);
                     }
                 }
-                return complete.ok_or_else(|| protocol_error("stream ended without completion"));
             }
-            let response = self.send(context, &request, false).await?;
-            wire::response(&read_json(context, response).await?, self.protocol)
+            decoder.finish()?;
+            complete.ok_or_else(|| protocol_error("stream ended without completion"))
         })
     }
 }
@@ -274,10 +580,21 @@ impl StreamingModel for Provider {
         context: &'a Context,
         request: ModelRequest,
     ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
+        self.stream_with_activity(context, request, None)
+    }
+    fn stream_with_activity<'a>(
+        &'a self,
+        context: &'a Context,
+        request: ModelRequest,
+        activity: Option<ModelActivitySink>,
+    ) -> BoxFuture<'a, Result<Box<dyn ModelStream + 'a>, Error>> {
         Box::pin(async move {
-            let response = self.send(context, &request, true).await?;
+            let response = self
+                .send(context, &request, true, activity.as_ref())
+                .await?;
             Ok(Box::new(HttpStream {
                 context: context.clone(),
+                activity,
                 response: Some(response),
                 decoder: Decoder::default(),
                 state: StreamState::new(self.protocol),
@@ -288,15 +605,24 @@ impl StreamingModel for Provider {
     }
 }
 async fn read_json(context: &Context, response: reqwest::Response) -> Result<Value, Error> {
-    serde_json::from_slice(&read_bytes(context, response).await?)
+    serde_json::from_slice(&read_bytes(context, response, None).await?)
         .map_err(|_| protocol_error("invalid provider response JSON"))
 }
-async fn read_bytes(context: &Context, mut response: reqwest::Response) -> Result<Vec<u8>, Error> {
+async fn read_bytes(
+    context: &Context,
+    mut response: reqwest::Response,
+    activity: Option<&ModelActivitySink>,
+) -> Result<Vec<u8>, Error> {
     let mut bytes = Vec::new();
     while let Some(chunk) = crate::active(context, response.chunk())
         .await?
         .map_err(|e| RequestFailure::transport(&e).into_error())?
     {
+        if !chunk.is_empty()
+            && let Some(activity) = activity
+        {
+            activity();
+        }
         if bytes.len().saturating_add(chunk.len()) > 16 * 1024 * 1024 {
             return Err(protocol_error("provider response exceeds limit"));
         }
@@ -388,6 +714,7 @@ fn protocol_error(message: &'static str) -> Error {
 
 struct HttpStream {
     context: Context,
+    activity: Option<ModelActivitySink>,
     response: Option<reqwest::Response>,
     decoder: Decoder,
     state: StreamState,
@@ -415,6 +742,11 @@ impl HttpStream {
                     "provider stream ended without terminal event",
                 ));
             };
+            if !chunk.is_empty()
+                && let Some(activity) = &self.activity
+            {
+                activity();
+            }
             for event in self.decoder.feed(&chunk)? {
                 self.queue.extend(self.state.event(&event.data)?);
             }
@@ -442,11 +774,19 @@ impl ModelStream for HttpStream {
 /// here, rather than inferred from transport EOF.
 pub struct StreamState {
     protocol: Protocol,
+    snapshot_profile: crate::snapshot::Profile,
+    snapshot_completion_usage: Option<Value>,
+    snapshot_compaction_content: BTreeMap<u64, String>,
     body: Value,
     tools: BTreeMap<u64, Value>,
     argument_buffers: BTreeMap<u64, String>,
+    snapshot_inputs: BTreeMap<u64, String>,
+    snapshot_starts: BTreeMap<u64, Value>,
+    snapshot_stop_reason: Option<&'static str>,
+    message_started: bool,
     text: String,
     reasoning: String,
+    chat_reasoning_details: Vec<String>,
     complete: bool,
     finish_reason: Option<String>,
     bytes: usize,
@@ -461,11 +801,19 @@ impl StreamState {
     pub fn new(protocol: Protocol) -> Self {
         Self {
             protocol,
+            snapshot_profile: crate::snapshot::Profile::Stream,
+            snapshot_completion_usage: None,
+            snapshot_compaction_content: BTreeMap::new(),
             body: json!({}),
             tools: BTreeMap::new(),
             argument_buffers: BTreeMap::new(),
+            snapshot_inputs: BTreeMap::new(),
+            snapshot_starts: BTreeMap::new(),
+            snapshot_stop_reason: None,
+            message_started: false,
             text: String::new(),
             reasoning: String::new(),
+            chat_reasoning_details: Vec::new(),
             complete: false,
             finish_reason: None,
             bytes: 0,
@@ -515,7 +863,16 @@ impl StreamState {
         }
         match self.protocol {
             Protocol::Responses => self.responses(event),
-            Protocol::Chat => self.chat(event),
+            Protocol::Chat => {
+                if let Some(raw) = wire::original_chat_reasoning_details(data, "delta")
+                    && let Ok(details) =
+                        serde_json::from_str::<Vec<&serde_json::value::RawValue>>(raw)
+                {
+                    self.chat_reasoning_details
+                        .extend(details.into_iter().map(|detail| detail.get().to_owned()));
+                }
+                self.chat(event)
+            }
             Protocol::Anthropic => self.anthropic(event),
         }
     }
@@ -575,7 +932,17 @@ impl StreamState {
                 if kind.ends_with(".done") && self.response_deltas.contains(&delta_key) {
                     return Ok(Vec::new());
                 }
-                let id = required(&event, "item_id")?;
+                let id = event["item_id"]
+                    .as_str()
+                    .map(str::to_owned)
+                    .or_else(|| {
+                        event["output_index"]
+                            .as_u64()
+                            .and_then(|index| self.response_items.get(&index))
+                            .and_then(|item| item["id"].as_str())
+                            .map(str::to_owned)
+                    })
+                    .ok_or_else(|| protocol_error("tool arguments missing item identifier"))?;
                 let call_id = self
                     .response_call_ids
                     .get(&id)
@@ -625,6 +992,24 @@ impl StreamState {
                 }])
             }
             "response.completed" | "response.incomplete" => {
+                let raw = &event["response"];
+                self.snapshot_stop_reason = Some(
+                    if raw["incomplete_details"]["reason"]
+                        .as_str()
+                        .is_some_and(|s| s.eq_ignore_ascii_case("max_output_tokens"))
+                    {
+                        "max_tokens"
+                    } else if raw["output"]
+                        .as_array()
+                        .into_iter()
+                        .flatten()
+                        .any(|item| item["type"] == "function_call")
+                    {
+                        "tool_use"
+                    } else {
+                        "end_turn"
+                    },
+                );
                 let terminal = event["response"]
                     .as_object()
                     .ok_or_else(|| protocol_error("invalid response terminal event"))?;
@@ -689,7 +1074,111 @@ impl StreamState {
         }
     }
     fn finish(&mut self) -> Result<Vec<ModelEvent>, Error> {
-        let response = wire::response(&self.body, self.protocol)?;
+        let mut response =
+            if self.protocol == Protocol::Chat && !self.chat_reasoning_details.is_empty() {
+                let details = crate::snapshot::compact_go_json(&format!(
+                    "[{}]",
+                    self.chat_reasoning_details.join(",")
+                ));
+                // Carry the byte-preserving signature without re-encoding parsed details.
+                let mut body = self.body.clone();
+                body["choices"][0]["message"]["reasoning_details"] = Value::Null;
+                body["choices"][0]["message"]["reasoning_opaque"] =
+                    wire::encode_reasoning_details_raw(&details).into();
+                let mut response = wire::response(&body, self.protocol)?;
+                response.raw = Some(self.body.clone());
+                response
+            } else {
+                wire::response(&self.body, self.protocol)?
+            };
+        if self.protocol == Protocol::Anthropic {
+            let source_calls = self
+                .tools
+                .iter()
+                .filter(|(_, block)| block["type"] == "tool_use");
+            for (call, (index, _)) in response
+                .items
+                .iter_mut()
+                .filter_map(|item| match item {
+                    adk_core::RunItem::ToolCall { call } => Some(call),
+                    _ => None,
+                })
+                .zip(source_calls)
+            {
+                if let Some(input) = self.snapshot_inputs.get(index) {
+                    call.raw_arguments = Some(input.clone());
+                }
+            }
+        }
+        if self.snapshot_profile == crate::snapshot::Profile::Stream
+            && self.protocol != Protocol::Anthropic
+        {
+            let arguments: Vec<_> = match self.protocol {
+                Protocol::Chat => self.body["choices"][0]["message"]["tool_calls"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .map(|tool| tool["function"]["arguments"].as_str())
+                    .collect(),
+                Protocol::Responses => self.body["output"]
+                    .as_array()
+                    .into_iter()
+                    .flatten()
+                    .filter(|item| item["type"] == "function_call")
+                    .map(|item| item["arguments"].as_str())
+                    .collect(),
+                Protocol::Anthropic => unreachable!(),
+            };
+            for (call, raw) in response
+                .items
+                .iter_mut()
+                .filter_map(|item| match item {
+                    adk_core::RunItem::ToolCall { call } => Some(call),
+                    _ => None,
+                })
+                .zip(arguments)
+            {
+                let Some(raw) = raw else { continue };
+                if serde_json::from_str::<Value>(raw).is_ok_and(|value| value == call.arguments) {
+                    call.raw_arguments = Some(raw.into());
+                }
+            }
+        }
+        if let Some(document) = &response.snapshot_raw {
+            response.snapshot_raw = Some(match self.snapshot_profile {
+                crate::snapshot::Profile::Collected => document.clone(),
+                crate::snapshot::Profile::Complete => crate::snapshot::complete_document(
+                    document,
+                    self.protocol,
+                    self.snapshot_stop_reason,
+                    self.snapshot_completion_usage.as_ref(),
+                    self.tools.keys().enumerate().filter_map(|(index, key)| {
+                        self.snapshot_compaction_content
+                            .get(key)
+                            .map(|text| (index, text.as_str()))
+                    }),
+                    self.tools.keys().enumerate().filter_map(|(index, key)| {
+                        self.snapshot_inputs
+                            .get(key)
+                            .map(|text| (index, text.as_str()))
+                    }),
+                )?,
+                crate::snapshot::Profile::Stream => crate::snapshot::stream_document(
+                    document,
+                    self.protocol,
+                    self.snapshot_stop_reason,
+                    self.tools.keys().enumerate().filter_map(|(index, key)| {
+                        self.snapshot_starts.get(key).map(|start| {
+                            (
+                                index,
+                                start,
+                                self.snapshot_inputs.get(key).map(String::as_str),
+                            )
+                        })
+                    }),
+                )?,
+            });
+        }
         self.complete = true;
         let mut events: Vec<_> = response
             .items
@@ -810,16 +1299,25 @@ impl StreamState {
             Some("message_start") => {
                 let message = &event["message"];
                 if !message.is_object()
-                    || !message["id"].is_string()
-                    || message.get("usage").is_some_and(|usage| !usage.is_object())
-                    || self.body.get("id").is_some()
+                    || message
+                        .get("usage")
+                        .is_some_and(|usage| !usage.is_null() && !usage.is_object())
+                    || self.message_started
                 {
                     return Err(protocol_error("invalid or repeated message start"));
                 }
+                self.message_started = true;
+                self.snapshot_completion_usage = Some(
+                    message
+                        .get("usage")
+                        .filter(|value| value.is_object())
+                        .cloned()
+                        .unwrap_or_else(|| json!({})),
+                );
                 self.body = message.clone();
             }
             Some("content_block_start") => {
-                if !event["content_block"].is_object() || self.body.get("id").is_none() {
+                if !event["content_block"].is_object() || !self.message_started {
                     return Err(protocol_error("invalid content block start"));
                 }
                 let index = event["index"]
@@ -832,6 +1330,8 @@ impl StreamState {
                 {
                     return Err(protocol_error("duplicate content block"));
                 }
+                self.snapshot_starts
+                    .insert(index, event["content_block"].clone());
             }
             Some("content_block_delta") => {
                 let index = event["index"]
@@ -869,6 +1369,8 @@ impl StreamState {
                         .into()
                     }
                     Some("compaction_delta") => {
+                        self.snapshot_compaction_content
+                            .insert(index, delta["content"].as_str().unwrap_or_default().into());
                         if block["type"] != "compaction" {
                             return Err(protocol_error("compaction delta has wrong block type"));
                         }
@@ -915,12 +1417,28 @@ impl StreamState {
                         .ok_or_else(|| protocol_error("content stop before start"))?["input"] =
                         serde_json::from_str(&args)
                             .map_err(|_| protocol_error("invalid streamed tool arguments"))?;
+                    self.snapshot_inputs.insert(index, args);
                 }
             }
             Some("message_delta") => {
-                if let Some(usage) = event["usage"].as_object() {
+                if let Some(usage) = &mut self.snapshot_completion_usage {
+                    usage["output_tokens"] = event["usage"]["output_tokens"].clone();
+                }
+                // SDK completion and streaming use different usage accumulators.
+                if self.snapshot_profile == crate::snapshot::Profile::Complete {
+                    self.body["usage"]["output_tokens"] = event["usage"]["output_tokens"].clone();
+                } else if let Some(usage) = event["usage"].as_object() {
                     for (key, value) in usage {
-                        self.body["usage"][key] = value.clone();
+                        if !matches!(
+                            key.as_str(),
+                            "input_tokens"
+                                | "output_tokens"
+                                | "cache_read_input_tokens"
+                                | "cache_creation_input_tokens"
+                        ) || value.as_u64().is_some_and(|count| count != 0)
+                        {
+                            self.body["usage"][key] = value.clone();
+                        }
                     }
                 }
                 self.body["stop_reason"] = event["delta"]["stop_reason"].clone();
@@ -929,8 +1447,15 @@ impl StreamState {
                 }
             }
             Some("message_stop") => {
-                if !self.body["id"].is_string() || !self.body["stop_reason"].is_string() {
+                if !self.message_started {
                     return Err(protocol_error("premature Anthropic terminal event"));
+                }
+                if self
+                    .tools
+                    .keys()
+                    .any(|index| !self.stopped_blocks.contains(index))
+                {
+                    return Err(protocol_error("unfinished content block"));
                 }
                 if !self.argument_buffers.is_empty() {
                     return Err(protocol_error("unfinished tool arguments"));
@@ -949,4 +1474,344 @@ fn required(value: &Value, key: &str) -> Result<String, Error> {
         .as_str()
         .map(str::to_owned)
         .ok_or_else(|| protocol_error("stream event missing required field"))
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::auth::{CredentialStore, Material, Refresh, Scope, Secret, cache_scope};
+
+    #[test]
+    fn anthropic_partial_usage_matches_original_regression() {
+        let mut state = StreamState::new(Protocol::Anthropic);
+        state.event(r#"{"type":"message_start","message":{"id":"msg_1","usage":{"input_tokens":1200,"cache_read_input_tokens":800,"cache_creation_input_tokens":50}}}"#).unwrap();
+        state.event(r#"{"type":"message_delta","delta":{"type":"message_delta","stop_reason":"end_turn"},"usage":{"output_tokens":42}}"#).unwrap();
+        let usage = wire::usage(&state.body["usage"], Protocol::Anthropic);
+        assert_eq!(usage.input_tokens, 1200);
+        assert_eq!(usage.cache_read_tokens, 800);
+        assert_eq!(usage.cache_creation_tokens, 50);
+        assert_eq!(usage.output_tokens, 42);
+    }
+
+    #[test]
+    fn anthropic_partial_end_turn_matches_original_regression() {
+        let mut state = StreamState::new(Protocol::Anthropic);
+        state.event(r#"{"type":"message_delta","delta":{"type":"message_delta","stop_reason":"end_turn","end_turn":false}}"#).unwrap();
+        assert_eq!(
+            state.body.get("end_turn").and_then(Value::as_bool),
+            Some(false)
+        );
+    }
+
+    #[test]
+    fn anthropic_partial_compaction_matches_original_regression() {
+        let mut state = StreamState::new(Protocol::Anthropic);
+        for event in [
+            json!({"type":"message_start","message":{"id":"msg_1"}}),
+            json!({"type":"content_block_start","index":0,"content_block":{"type":"compaction"}}),
+            json!({"type":"content_block_delta","index":0,"delta":{"type":"compaction_delta","content":"summary part 1 "}}),
+            json!({"type":"content_block_delta","index":0,"delta":{"type":"compaction_delta","content":"and part 2","encrypted_content":"opaque-blob"}}),
+            json!({"type":"content_block_stop","index":0}),
+        ] {
+            state.event(&event.to_string()).unwrap();
+        }
+        assert_eq!(state.tools.len(), 1);
+        let block = &state.tools[&0];
+        assert_eq!(block["type"], "compaction");
+        assert_eq!(block["content"], "summary part 1 and part 2");
+        assert_eq!(block["encrypted_content"], "opaque-blob");
+    }
+
+    #[tokio::test]
+    async fn body_read_activity_matches_original_sdk_test() {
+        use std::sync::atomic::{AtomicUsize, Ordering};
+        let chunks = [
+            "event: message_start\ndata: {}\n\n",
+            "",
+            "event: ping\ndata: {}\n\n",
+            "event: input_json_delta\ndata: {}\n\n",
+        ];
+        let frames = futures_util::stream::iter(chunks.map(Ok::<_, std::io::Error>));
+        let response =
+            reqwest::Response::from(http::Response::new(reqwest::Body::wrap_stream(frames)));
+        let count = Arc::new(AtomicUsize::new(0));
+        let observed = count.clone();
+        let activity: ModelActivitySink = Arc::new(move || {
+            observed.fetch_add(1, Ordering::SeqCst);
+        });
+        let context = Context {
+            run_id: "activity".into(),
+            cancellation: Arc::new(adk_runtime::CancellationToken::new()),
+            deadline: None,
+        };
+        assert_eq!(
+            read_bytes(&context, response, Some(&activity))
+                .await
+                .unwrap(),
+            chunks.concat().as_bytes()
+        );
+        assert_eq!(count.load(Ordering::SeqCst), 3);
+    }
+
+    struct Credentials(Mutex<Material>);
+    impl CredentialStore for Credentials {
+        fn load<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            Box::pin(async { Ok(self.0.lock().unwrap().clone()) })
+        }
+        fn replace<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            revision: u64,
+            material: Material,
+        ) -> BoxFuture<'a, Result<bool, Error>> {
+            Box::pin(async move {
+                let mut current = self.0.lock().unwrap();
+                assert_eq!(current.revision, revision);
+                *current = material;
+                Ok(true)
+            })
+        }
+    }
+    struct Rotate;
+    impl Refresh for Rotate {
+        fn refresh<'a>(
+            &'a self,
+            _: &'a Context,
+            _: &'a Scope,
+            mut material: Material,
+        ) -> BoxFuture<'a, Result<Material, Error>> {
+            Box::pin(async move {
+                material.access_token = Secret::new("refreshed");
+                material.revision += 1;
+                Ok(material)
+            })
+        }
+    }
+    fn credentials() -> Arc<Credentials> {
+        Arc::new(Credentials(Mutex::new(Material {
+            access_token: Secret::new("initial"),
+            refresh_token: Some(Secret::new("refresh")),
+            id_token: None,
+            email: None,
+            account: Some("account".into()),
+            expires_at: None,
+            last_refresh: None,
+            revision: 0,
+        })))
+    }
+    fn session(endpoint: &str, mode: AuthMode, store: Arc<Credentials>) -> Session {
+        Session::new(
+            Scope::new("codex", endpoint, Some("account".into()), mode).unwrap(),
+            store,
+            Arc::new(Rotate),
+        )
+        .unwrap()
+    }
+
+    #[test]
+    fn codex_url_query_get_set_encoding_and_idempotence() {
+        let session = session("https://chatgpt.com", AuthMode::OpenAiOAuth, credentials())
+            .with_codex_client_version(" 0.999.0 +&/?=#%β ");
+        let encoded = "client_version=0.999.0+%2B%26%2F%3F%3D%23%25%CE%B2";
+        for (query, expected) in [
+            ("".to_owned(), encoded.to_owned()),
+            ("client_version".into(), encoded.into()),
+            ("client_version=".into(), encoded.into()),
+            (
+                "client_version=&client_version=existing".into(),
+                encoded.into(),
+            ),
+            ("client_version=&client_version=".into(), encoded.into()),
+            (
+                "client_version=existing&client_version=".into(),
+                "client_version=existing&client_version=".into(),
+            ),
+            (
+                "client_version=%20&keep=%2f".into(),
+                "client_version=%20&keep=%2f".into(),
+            ),
+            (
+                "client%5Fversion=existing".into(),
+                "client%5Fversion=existing".into(),
+            ),
+            (
+                "x=a%26b&client_version=&x=c%2Bd&empty=".into(),
+                format!("x=a%26b&x=c%2Bd&empty=&{encoded}"),
+            ),
+            (
+                "Client_Version=other".into(),
+                format!("Client_Version=other&{encoded}"),
+            ),
+        ] {
+            let mut url =
+                reqwest::Url::parse(&format!("https://chatgpt.com/responses?{query}#keep"))
+                    .unwrap();
+            crate::auth::decorate_codex_url(&mut url, &session);
+            assert_eq!(
+                url.as_str(),
+                format!("https://chatgpt.com/responses?{expected}#keep")
+            );
+            let once = url.clone();
+            crate::auth::decorate_codex_url(&mut url, &session);
+            assert_eq!(url, once);
+        }
+    }
+
+    #[test]
+    fn prepared_inference_urls_obey_host_and_mode_guards() {
+        for mode in [
+            AuthMode::OpenAiOAuth,
+            AuthMode::ApiKey,
+            AuthMode::Anonymous,
+            AuthMode::AnthropicOAuth,
+            AuthMode::CopilotOAuth,
+        ] {
+            for (host, accepted) in [
+                ("chatgpt.com", true),
+                ("chatgpt.com:443", false),
+                ("chatgpt.com:", false),
+                ("api.chatgpt.com:00443", false),
+                ("a.b.chatgpt.com:8443", false),
+                ("api.openai.com", false),
+                ("chatgpt.com.evil.test", false),
+                ("notchatgpt.com", false),
+                ("127.0.0.1", false),
+            ] {
+                let store = credentials();
+                let session = Arc::new(
+                    session(
+                        &format!("https://{host}/backend-api/codex"),
+                        mode,
+                        store.clone(),
+                    )
+                    .with_codex_client_version("0.999.0"),
+                );
+                let provider =
+                    Provider::new("codex", Protocol::Responses, session.clone()).unwrap();
+                for path in ["/responses", "/responses/compact"] {
+                    let request = provider
+                        .prepare_request(
+                            session.scope(),
+                            &store.0.lock().unwrap(),
+                            path,
+                            &json!({}),
+                            None,
+                        )
+                        .unwrap()
+                        .build()
+                        .unwrap();
+                    let suffix = if accepted && mode == AuthMode::OpenAiOAuth {
+                        "?client_version=0.999.0"
+                    } else {
+                        ""
+                    };
+                    assert_eq!(
+                        request.url(),
+                        &reqwest::Url::parse(&format!(
+                            "https://{host}/backend-api/codex{path}{suffix}"
+                        ))
+                        .unwrap()
+                    );
+                }
+            }
+        }
+    }
+
+    #[tokio::test]
+    async fn prepared_requests_share_metadata_version_across_refresh_and_external_rotation() {
+        let context = Context {
+            run_id: "codex-version".into(),
+            cancellation: Arc::new(adk_runtime::CancellationToken::new()),
+            deadline: None,
+        };
+        let store = credentials();
+        let baseline = session(
+            "https://chatgpt.com/backend-api/codex",
+            AuthMode::OpenAiOAuth,
+            store.clone(),
+        );
+        let scope = baseline.scope().clone();
+        let initial = baseline.material_for_request(&context).await.unwrap();
+        let cache = cache_scope(&scope, &initial, "prompt");
+        let baseline_headers = crate::auth::headers(&scope, &initial, false).unwrap();
+        for (configured, expected) in [
+            (None, "0.153.4"),
+            (Some(" \t0.999.0\n"), "0.999.0"),
+            (Some(" \t"), "0.153.4"),
+        ] {
+            let mut configured_session = session(&scope.endpoint, scope.mode, store.clone());
+            if let Some(version) = configured {
+                configured_session = configured_session.with_codex_client_version(version);
+            }
+            let session = Arc::new(configured_session);
+            let provider = Provider::new("codex", Protocol::Responses, session.clone()).unwrap();
+            assert!(Arc::ptr_eq(&provider.session, &session));
+            for rotation in 0..3 {
+                let material = session.material_for_request(&context).await.unwrap();
+                assert_eq!(session.scope(), &scope);
+                assert_eq!(cache_scope(session.scope(), &material, "prompt"), cache);
+                assert_eq!(session.codex_client_version(), expected);
+                assert_eq!(
+                    crate::metadata::model_metadata_endpoint(&session)
+                        .unwrap()
+                        .as_str(),
+                    format!(
+                        "https://chatgpt.com/backend-api/codex/models?client_version={expected}"
+                    )
+                );
+                for path in [Protocol::Responses.path(), "/responses/compact"] {
+                    let body = json!({"model":"gpt-5.6", "prompt_cache_key":"prompt"});
+                    let request = provider
+                        .prepare_request(session.scope(), &material, path, &body, None)
+                        .unwrap()
+                        .build()
+                        .unwrap();
+                    assert_eq!(request.method(), reqwest::Method::POST);
+                    assert_eq!(
+                        request.url().as_str(),
+                        format!(
+                            "https://chatgpt.com/backend-api/codex{path}?client_version={expected}"
+                        )
+                    );
+                    let outgoing: Value =
+                        serde_json::from_slice(request.body().unwrap().as_bytes().unwrap())
+                            .unwrap();
+                    assert_eq!(outgoing["prompt_cache_key"], cache);
+                    assert_eq!(body["prompt_cache_key"], "prompt");
+                    let headers = crate::auth::headers(&scope, &material, false).unwrap();
+                    assert_eq!(request.headers().len(), headers.len() + 1);
+                    for (key, value) in &headers {
+                        assert_eq!(request.headers().get(key), Some(value));
+                    }
+                }
+                match rotation {
+                    0 => {
+                        session
+                            .reject(&context, &material.access_token)
+                            .await
+                            .unwrap();
+                        let refreshed = session.material_for_request(&context).await.unwrap();
+                        assert_eq!(refreshed.access_token.expose(), "refreshed");
+                        assert_eq!(refreshed.revision, material.revision + 1);
+                    }
+                    1 => {
+                        let mut current = store.0.lock().unwrap();
+                        current.access_token = Secret::new("external");
+                        current.revision += 1;
+                    }
+                    _ => assert_eq!(material.access_token.expose(), "external"),
+                }
+            }
+            assert_eq!(baseline.codex_client_version(), "0.153.4");
+            assert_eq!(
+                crate::auth::headers(&scope, &initial, false).unwrap(),
+                baseline_headers
+            );
+        }
+    }
 }

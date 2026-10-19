@@ -1,0 +1,784 @@
+{
+  "cases": [
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_00",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_01",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "checked",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_02",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_03",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": " verdict: approved. \n",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_04",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED because done",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_05",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "quoted VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_06",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "\"VERDICT: APPROVED\"",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "VERDICT: REJECTED\n1. gap",
+      "instructions": "",
+      "name": "verdict_07",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: REJECTED\n1. gap",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "VERDICT: REJECTEDness",
+      "instructions": "",
+      "name": "verdict_08",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: REJECTEDness",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "VERDICT: APPROVED\nVERDICT: REJECTED gap",
+      "instructions": "",
+      "name": "verdict_09",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED\nVERDICT: REJECTED gap",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "VERDICT: REJECTED gap\nVERDICT: APPROVED",
+      "instructions": "",
+      "name": "verdict_10",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: REJECTED gap\nVERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_11",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED\nVERDICT: inconclusive",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_12",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: INCONCLUSIVE",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_13",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED..",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "verdict_14",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT : APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_15",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "\u00a0verdict:\u00a0approved.\u00a0",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_16",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "verd\u0131ct: approved",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_17",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "```\nVERDICT: APPROVED\n```",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "VERDICT: Rejected\n1. gap \n",
+      "instructions": "",
+      "name": "verdict_18",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: Rejected\n1. gap \n",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_19",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED\nVERDICT: APPROVED.",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "verdict_20",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "  VERDICT:\tAPPROVED  ",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": " custom instructions \n",
+      "name": "custom",
+      "nested_turns": [],
+      "original_instructions": " custom instructions \n",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        " custom instructions \n"
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": " \n\t",
+      "name": "blank",
+      "nested_turns": [],
+      "original_instructions": " \n\t",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "read",
+      "nested_turns": [
+        12
+      ],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 1,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ],
+        [
+          "read"
+        ]
+      ],
+      "requests": 2,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "write",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ],
+        [
+          "read"
+        ]
+      ],
+      "requests": 2,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "turn_cap",
+      "nested_turns": [
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12,
+        12
+      ],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 11,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.\n\n<final_turn>\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n</final_turn>"
+      ],
+      "request_tools": [
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        [
+          "read"
+        ],
+        []
+      ],
+      "requests": 12,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": true,
+      "feedback": "",
+      "instructions": "",
+      "name": "error",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "VERDICT: APPROVED",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify."
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": false,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "The independent verifier did not return a usable verdict. Re-check your answer against the original task requirements, verify your claims, and provide your final answer again.",
+      "instructions": "",
+      "name": "structured",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "{\"verdict\":\"VERDICT: APPROVED\"}",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.\n\n---\n\n<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nJSON schema:\ntrue\n</structured_output>"
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": true,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    },
+    {
+      "candidate": "candidate <&>\nnext",
+      "error": false,
+      "feedback": "",
+      "instructions": "",
+      "name": "structured_string",
+      "nested_turns": [],
+      "original_instructions": "",
+      "prompt": "<original_task>\noriginal <task>\n\u7b2c\u4e8c\u884c\n</original_task>\n\n<candidate_final_answer>\ncandidate <&>\nnext\n</candidate_final_answer>\n\nReview the candidate final answer against the original task. Verify its claims with your tools, then give your verdict.",
+      "read_calls": 0,
+      "reply": "\"VERDICT: APPROVED\"",
+      "request_instructions": [
+        "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.\n\n---\n\n<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: final_output\nJSON schema:\ntrue\n</structured_output>"
+      ],
+      "request_tools": [
+        [
+          "read"
+        ]
+      ],
+      "requests": 1,
+      "structured": true,
+      "task": "original <task>\n\u7b2c\u4e8c\u884c",
+      "write_calls": 0
+    }
+  ],
+  "default_instructions": "You are an independent reviewer. Another agent claims to have completed a task; your job is to try to REFUTE that claim using read-only inspection.\n\nActively look for: requirements that were not satisfied, files or artifacts that should exist but do not (or have wrong content), claims in the answer contradicted by the actual state of the workspace, tests/checks that were never run, and unhandled edge cases the task implies.\n\nVerify evidence with your tools instead of trusting the answer's claims. Be precise and cite file paths or command output for every problem you report.\n\nEnd your reply with exactly one verdict line:\nVERDICT: APPROVED \u2014 only if you could not find any substantive problem.\nVERDICT: REJECTED \u2014 followed by a numbered list of concrete, actionable problems.\nDo not reject for style, phrasing, or hypothetical concerns you did not verify.",
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/critic-reference/reference_test.go": "1ca5c90a7f2e345f05e67f711dd8e83b7e42f3a897514933ea152b0934609c2f",
+      "scripts/critic-reference/run.py": "1ad52e6320d89feb8aa39d2aa1b29d645d25dbe382bbb4082cc13798221d71a1"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/run_config.go": "8bf6e20a356b493908bb9789b4b82b1430646558d1936cf8fa41439922d4163e",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "pkg/agentsdk/subagent_tools_test.go": "8210cb245acae6d52197f2ebafada6840c2ab431529dfc938f104a5783229894",
+      "pkg/agentsdk/verifier.go": "0c6e843e7a7b8e1acfec158abcbd17ce72782578267e848eeb3fefaa274dd4f3",
+      "pkg/agentsdk/verifier_test.go": "4b8e6609c7e0d16402a426f529e6d39de2151d778313b95b088cb3441a0e6a95"
+    }
+  }
+}

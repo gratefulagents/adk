@@ -36,16 +36,23 @@ use std::{
 
 use adk_codec::approval::ApprovalMarkerBoundary;
 use adk_core::*;
+use futures_util::FutureExt;
 use serde_json::{Map, Value};
 use sha2::{Digest, Sha256};
 use tokio::sync::mpsc;
 
 use crate::compaction::{
-    EstimateCalibration, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER, compact_with_approvals,
+    EstimateCalibration, HandoffHistoryPolicy, LocalCompactionPolicy, REQUEST_SAFETY_BUFFER,
     estimate_history_tokens, estimate_history_tokens_with_approvals,
-    estimate_request_overhead_tokens, finalize_local_history_with_approvals, output_reserve_tokens,
+    estimate_request_overhead_tokens, finalize_with_provenance, output_reserve_tokens,
+    plan_with_provenance,
 };
+use crate::guardrails::{Guardrail, GuardrailInput, run_guardrails, run_tool_output_guardrails};
 use crate::output::{OutputPolicy, SpillFile};
+use crate::progress::{
+    ProgressFrame, ProgressObservation, ProgressUsage, RuntimeProgress, UsageOrigin,
+};
+use crate::tracing::{GenerationGuard, GenerationObserver, GenerationRecord, GenerationStatus};
 
 #[derive(Clone)]
 pub enum ModelBinding {
@@ -79,28 +86,189 @@ impl ModelBinding {
     }
 }
 
+/// Model-facing history selection after a transfer; never erases the audit record.
+#[derive(Debug, Clone, Copy, Default, PartialEq, Eq, serde::Serialize, serde::Deserialize)]
+#[serde(rename_all = "snake_case")]
+pub enum HandoffInputFilter {
+    /// Retain prior behavior, including tool and reasoning history.
+    #[default]
+    Preserve,
+    /// Retain messages and compaction with exact provenance; remove tool,
+    /// handoff and reasoning items and clear forwarded approval markers.
+    RemoveTools,
+}
+
+pub struct HandoffContext<'a> {
+    pub operation: &'a Context,
+    pub agent: &'a AgentConfig,
+    pub target: &'a AgentConfig,
+    pub snapshot: &'a RunResult,
+    pub config: &'a RunnerConfig,
+    pub policy: &'a RunPolicy,
+}
+
+pub trait HandoffCallback: Send + Sync {
+    /// Opt in only for deterministic, effect-free behavior with a stable configuration identity.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn on_handoff<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        call: &'a ToolCall,
+    ) -> BoxFuture<'a, ()>;
+}
+
+#[derive(Clone)]
+pub struct HandoffHistory {
+    pub items: Vec<RunItem>,
+    pub provenance: Vec<ItemProvenance>,
+    pub approvals: Vec<ApprovalMarkerBoundary>,
+}
+
+pub trait HandoffHistoryFilter: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn filter<'a>(
+        &'a self,
+        context: HandoffContext<'a>,
+        history: HandoffHistory,
+    ) -> BoxFuture<'a, Result<HandoffHistory, Error>>;
+}
+
+pub trait HandoffPredicate: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn enabled(&self, context: HandoffContext<'_>) -> bool;
+}
+
+#[derive(Clone)]
+pub struct HandoffInputType {
+    pub schema: schemars::Schema,
+    pub parser: Option<Arc<dyn OutputParser>>,
+}
+
 #[derive(Clone)]
 pub struct Handoff {
     pub definition: ToolDefinition,
     pub target: Arc<AgentConfig>,
+    pub input_filter: HandoffInputFilter,
+    pub input_type: Option<HandoffInputType>,
+    pub history_filter: Option<Arc<dyn HandoffHistoryFilter>>,
+    pub on_handoff: Option<Arc<dyn HandoffCallback>>,
+    pub is_enabled: Option<Arc<dyn HandoffPredicate>>,
+}
+
+impl Handoff {
+    pub fn tool_definition(&self) -> ToolDefinition {
+        let mut definition = self.definition.clone();
+        if let Some(input_type) = &self.input_type {
+            definition.input_schema = input_type.schema.clone();
+        }
+        definition
+    }
+
+    pub fn new(target: Arc<AgentConfig>) -> Self {
+        let mut name = String::new();
+        let mut invalid_run = false;
+        for character in target.name.trim().chars() {
+            if character.is_ascii_alphanumeric() || matches!(character, '_' | '-') {
+                name.push(character);
+                invalid_run = false;
+            } else if !invalid_run {
+                name.push('_');
+                invalid_run = true;
+            }
+        }
+        let name = name.trim_matches(['_', '-']);
+        let name = if name.is_empty() { "agent" } else { name };
+        Self {
+            definition: ToolDefinition {
+                name: format!("transfer_to_{name}"),
+                description: if target.handoff_description.is_empty() {
+                    format!("Handoff to {}", target.name)
+                } else {
+                    target.handoff_description.clone()
+                },
+                input_schema: schemars::json_schema!({"type":"object", "properties":{}}),
+                read_only: true,
+                requires_approval: false,
+            },
+            target,
+            input_filter: HandoffInputFilter::Preserve,
+            input_type: None,
+            history_filter: None,
+            on_handoff: None,
+            is_enabled: None,
+        }
+    }
 }
 
 pub trait OutputParser: Send + Sync {
     fn parse(&self, raw: &str) -> Result<Value, Error>;
 }
 
+pub struct InstructionContext<'a> {
+    pub operation: &'a Context,
+    pub agent: &'a AgentConfig,
+    pub snapshot: &'a RunResult,
+    pub config: &'a RunnerConfig,
+    pub policy: &'a RunPolicy,
+}
+
+impl InstructionContext<'_> {
+    /// Resolve raw instructions before run-wide/schema/MCP composition.
+    /// Blank dynamic results deliberately do not fall back to static text.
+    pub async fn resolve(self) -> Result<String, Error> {
+        if let Some(provider) = &self.agent.instruction_provider {
+            bounded(self.operation, None, provider.instructions(self)).await
+        } else {
+            Ok(self.agent.instructions.clone())
+        }
+    }
+}
+
+pub trait InstructionProvider: Send + Sync {
+    /// Stable identity of a deterministic, effect-free provider and its configuration.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn instructions<'a>(
+        &'a self,
+        context: InstructionContext<'a>,
+    ) -> BoxFuture<'a, Result<String, Error>>;
+}
+
+#[derive(Debug, Clone, PartialEq, serde::Serialize, serde::Deserialize)]
+pub enum ToolFinalOutput {
+    FirstTool,
+    Json(Value),
+}
+
 #[derive(Clone)]
 pub struct AgentConfig {
     pub name: String,
     pub instructions: String,
+    pub instruction_provider: Option<Arc<dyn InstructionProvider>>,
+    pub tool_use: ToolUseBehavior,
+    pub stop_at_tools: std::collections::BTreeSet<String>,
+    pub tool_final_output: Option<ToolFinalOutput>,
+    pub mcp_servers: Vec<String>,
     pub model: ModelBinding,
     pub fallbacks: Vec<ModelBinding>,
     pub tools: Vec<Arc<dyn Tool>>,
+    /// Narrows host access and disables host mutation exceptions when set.
+    pub tool_access_ceiling: Option<AccessMode>,
     pub handoffs: Vec<Handoff>,
-    pub output_schema: Option<schemars::Schema>,
+    pub handoff_description: String,
+    pub output_schema: Option<adk_core::JsonDocument>,
     pub output_schema_name: String,
     pub output_schema_strict: bool,
     pub output_parser: Option<Arc<dyn OutputParser>>,
+    pub input_guardrails: Vec<Arc<dyn Guardrail>>,
+    pub output_guardrails: Vec<Arc<dyn Guardrail>>,
     pub settings: Map<String, Value>,
     pub hooks: Option<Arc<dyn RunHooks>>,
 }
@@ -110,14 +278,23 @@ impl AgentConfig {
         Self {
             name: name.into(),
             instructions: String::new(),
+            instruction_provider: None,
+            tool_use: ToolUseBehavior::Continue,
+            stop_at_tools: Default::default(),
+            tool_final_output: None,
+            mcp_servers: Vec::new(),
             model,
             fallbacks: vec![],
             tools: vec![],
+            tool_access_ceiling: None,
             handoffs: vec![],
+            handoff_description: String::new(),
             output_schema: None,
             output_schema_name: "final_output".into(),
             output_schema_strict: true,
             output_parser: None,
+            input_guardrails: vec![],
+            output_guardrails: vec![],
             settings: Map::new(),
             hooks: None,
         }
@@ -164,10 +341,31 @@ pub struct Limits {
 
 pub trait CostEstimator: Send + Sync {
     fn cost(&self, model: &str, usage: &Usage) -> f64;
+
+    /// Unknown prices contribute zero without claiming known trace or cumulative cost.
+    fn estimate_cost(&self, model: &str, usage: &Usage) -> Option<f64> {
+        Some(self.cost(model, usage))
+    }
+
+    /// Display-only projection; an uncertain price may still contribute an amount.
+    /// Actual accounting and budget charges continue to use `estimate_cost`.
+    fn estimate_display_cost(&self, model: &str, usage: &Usage) -> ResponseCostSummary {
+        let cost = self.estimate_cost(model, usage);
+        ResponseCostSummary {
+            cost_usd: cost.unwrap_or(0.0),
+            cost_known: cost.is_some(),
+        }
+    }
 }
 
 #[derive(Debug, Clone)]
 pub enum Observation {
+    FinalAnswerVerificationFailed {
+        error: ErrorInfo,
+    },
+    ImmediateInputPollFailed {
+        error: ErrorInfo,
+    },
     TextDelta {
         delta: String,
     },
@@ -195,6 +393,7 @@ pub enum Observation {
     },
     AgentStarted {
         agent: String,
+        instructions: String,
     },
     ModelAccepted {
         agent: String,
@@ -225,7 +424,15 @@ pub enum Observation {
         call: ToolCall,
         output: ToolOutput,
     },
+    HandoffStarted {
+        from: String,
+        to: String,
+    },
     Handoff {
+        from: String,
+        to: String,
+    },
+    HandoffCompleted {
         from: String,
         to: String,
     },
@@ -240,6 +447,9 @@ pub enum Observation {
         before_items: usize,
         after_items: usize,
         context_tokens: u64,
+    },
+    HandoffInputValidationFailed {
+        tool: String,
     },
     OutputValidationFailed {
         message: String,
@@ -266,6 +476,7 @@ pub trait RunHooks: Send + Sync {
 }
 
 pub struct CompactionRequest {
+    pub history_provenance: Vec<ItemProvenance>,
     pub agent: String,
     pub model: String,
     pub history: Vec<RunItem>,
@@ -274,12 +485,14 @@ pub struct CompactionRequest {
 }
 
 pub struct CompactedHistory {
+    pub history_provenance: Vec<ItemProvenance>,
     pub history: Vec<RunItem>,
     pub context_tokens: u64,
     /// Report provider compaction usage; local compaction uses zero counters.
     pub usage: Usage,
     /// In the same units as CostEstimator; local compaction costs zero.
     pub cost: f64,
+    pub cost_known: bool,
 }
 
 pub trait Compactor: Send + Sync {
@@ -299,6 +512,7 @@ pub struct CompactionConfig {
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Boundary {
+    ImmediateInputDispatched,
     Started,
     ModelPrepared,
     ModelCompleted,
@@ -324,6 +538,59 @@ pub trait DurableHook: Send + Sync {
     ) -> BoxFuture<'a, Result<(), Error>>;
 }
 
+/// Host-supplied items and exact authorship, in admission order.
+/// Nonempty batches require one provenance entry per item; no author is inferred.
+#[derive(Debug, Clone, Default)]
+pub struct ImmediateInputBatch {
+    pub items: Vec<RunItem>,
+    pub provenance: Vec<ItemProvenance>,
+}
+
+/// Boundary-only steering; this does not interrupt an in-flight model request.
+/// Futures must not detach work and must be safe to drop on cancellation.
+/// Errors are reported to hooks as ImmediateInputPollFailed and otherwise ignored.
+pub trait ImmediateInputPoller: Send + Sync {
+    /// Stable identity/version of the callback and its queue configuration.
+    /// Durable runs checkpoint before calling; an interrupted admission requires
+    /// host reconciliation, not automatic replay. This is not exactly-once delivery.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn poll<'a>(
+        &'a self,
+        context: &'a Context,
+    ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>>;
+}
+
+/// Host-owned notification that input may be available to the poller.
+/// Requires an ImmediateInputPoller. Wakes before visible output replace the
+/// pending attempt; later wakes leave queued input for the next boundary.
+/// Futures must be drop-safe, must not detach work, and must not drain input.
+/// Consume one notification per wait rather than returning a permanently ready future.
+/// Only the ordinary turn allowance is refunded; physical attempt metrics and
+/// child/security budgets remain charged. Child turn caps are never extended.
+/// No usage is invented for dropped calls.
+pub trait ImmediateInputSignal: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn wait<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, ()>;
+}
+
+/// Atomically close admission when empty, or drain accepted input and leave it
+/// open for another turn. Errors abort finalization. Without this callback a
+/// poller alone cannot guarantee admission of input racing with completion.
+/// Futures have the same cancellation and durable reconciliation contract as pollers.
+pub trait ImmediateInputFinalizer: Send + Sync {
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn finalize<'a>(
+        &'a self,
+        context: &'a Context,
+    ) -> BoxFuture<'a, Result<ImmediateInputBatch, Error>>;
+}
+
 pub trait TurnContext: Send + Sync {
     fn context<'a>(
         &'a self,
@@ -347,18 +614,68 @@ pub trait StopGate: Send + Sync {
         output: &'a Value,
     ) -> BoxFuture<'a, Result<Option<String>, Error>>;
 }
+/// One independent review per run, after the stop gate. Blank feedback accepts.
+/// Callback failures are diagnostic, not authorization or guardrail decisions.
+pub trait FinalAnswerVerifier: Send + Sync {
+    /// Opt in only for a deterministic, replay-safe verifier without external effects.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+    fn verify<'a>(
+        &'a self,
+        context: &'a Context,
+        output: &'a Value,
+    ) -> BoxFuture<'a, Result<String, Error>>;
+}
+
+/// Host-maintained state consulted only after compaction. A nonblank result
+/// supersedes the static working-state context; blank results fall back to it.
+pub trait CompactionCarryForward: Send + Sync {
+    fn context<'a>(&'a self, context: &'a Context) -> BoxFuture<'a, Result<String, Error>>;
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+}
+
+/// Host-owned model thresholds. A miss or zero trigger leaves configured thresholds unchanged.
+pub trait CompactionModelResolver: Send + Sync {
+    fn thresholds<'a>(
+        &'a self,
+        context: &'a Context,
+        model: &'a str,
+    ) -> BoxFuture<'a, Result<Option<(u64, u64)>, Error>>;
+    /// Opt in only for deterministic, replay-safe resolution; include all configuration in the key.
+    fn durable_key(&self) -> Option<&str> {
+        None
+    }
+}
+
 #[derive(Clone)]
 pub struct RunnerConfig {
+    pub action_authorizer: Option<Arc<dyn ActionAuthorizer>>,
+    pub immediate_input_poller: Option<Arc<dyn ImmediateInputPoller>>,
+    pub immediate_input_signal: Option<Arc<dyn ImmediateInputSignal>>,
+    pub immediate_input_finalizer: Option<Arc<dyn ImmediateInputFinalizer>>,
+    /// Reserve the last model attempt for a no-tool summary, unless children still need joining.
+    pub force_final_summary_turn: bool,
+    /// Require two consecutive final answers while tools remain available.
+    pub require_completion_confirmation: bool,
     pub work_dir: PathBuf,
     pub output: OutputPolicy,
     pub retry: RetryPolicy,
     pub error_handler: Option<Arc<dyn ModelErrorHandler>>,
+    pub generation_observer: Option<Arc<dyn GenerationObserver>>,
+    pub progress: Option<Arc<dyn RuntimeProgress>>,
+    /// Consume streaming bindings in blocking runs to surface observer reasoning deltas.
+    pub blocking_reasoning: bool,
     pub limits: Limits,
     pub cost_estimator: Option<Arc<dyn CostEstimator>>,
     /// None disables the model inactivity timeout. Host backpressure is excluded.
     pub model_idle_timeout: Option<Duration>,
     /// Stable instructions preceding the agent's instructions in every request.
     pub cache_prefix: String,
+    /// Run-wide text appended after each active agent's instructions, including handoffs.
+    pub additional_instructions: String,
     /// Hashed with the namespace (run ID by default) before reaching providers.
     pub prompt_cache_key: Option<String>,
     pub prompt_cache_namespace: Option<String>,
@@ -366,13 +683,21 @@ pub struct RunnerConfig {
     pub return_tool_output: bool,
     /// Optional native guardrail; Go leaves argument decoding/validation to each tool.
     pub validate_tool_arguments: bool,
+    pub tool_input_guardrails: Vec<Arc<dyn Guardrail>>,
+    pub tool_output_guardrails: Vec<Arc<dyn Guardrail>>,
     pub approve_mutating_tools: bool,
     pub consecutive_tool_error_limit: Option<usize>,
     pub stop_gate: Option<Arc<dyn StopGate>>,
+    pub final_answer_verifier: Option<Arc<dyn FinalAnswerVerifier>>,
     pub stop_gate_max_blocks: usize,
     pub turn_context: Option<Arc<dyn TurnContext>>,
     /// Session-owned children survive individual runs; the scheduler owner closes them.
     pub subagents: Option<Arc<crate::subagent_tools::SubagentSession>>,
+    /// Optional per-invocation ceiling inherited by submitted children.
+    pub subagent_max_turns: Option<std::num::NonZeroU32>,
+    /// Static host context injected after compaction, never into the initial prompt.
+    pub working_state_context: String,
+    pub compaction_carry_forward: Option<Arc<dyn CompactionCarryForward>>,
     /// Request-only context, never persisted in history or compaction input.
     pub transient_context: Vec<RunItem>,
     pub hooks: Option<Arc<dyn RunHooks>>,
@@ -380,34 +705,57 @@ pub struct RunnerConfig {
     pub compaction: Option<CompactionConfig>,
     /// Baseline local fallback; independent of the optional provider/custom compactor.
     pub local_compaction: LocalCompactionPolicy,
+    pub handoff_history: HandoffHistoryPolicy,
+    /// Resolve thresholds per active model without changing retention. None resolves only an unchanged default policy.
+    pub compaction_model_defaults: Option<bool>,
+    pub compaction_model_resolver: Option<Arc<dyn CompactionModelResolver>>,
 }
 
 impl Default for RunnerConfig {
     fn default() -> Self {
         Self {
+            action_authorizer: None,
+            immediate_input_poller: None,
+            immediate_input_signal: None,
+            immediate_input_finalizer: None,
+            force_final_summary_turn: false,
+            require_completion_confirmation: false,
             work_dir: PathBuf::from("."),
             output: OutputPolicy::default(),
             retry: RetryPolicy::default(),
             error_handler: None,
+            generation_observer: None,
+            progress: None,
+            blocking_reasoning: false,
             limits: Limits::default(),
             cost_estimator: None,
             model_idle_timeout: Some(Duration::from_secs(300)),
             cache_prefix: String::new(),
+            additional_instructions: String::new(),
             prompt_cache_key: None,
             prompt_cache_namespace: None,
             return_tool_output: false,
             validate_tool_arguments: false,
+            tool_input_guardrails: vec![],
+            tool_output_guardrails: vec![],
             approve_mutating_tools: false,
             consecutive_tool_error_limit: Some(3),
             stop_gate: None,
+            final_answer_verifier: None,
             stop_gate_max_blocks: 8,
             turn_context: None,
             subagents: None,
+            subagent_max_turns: None,
+            working_state_context: String::new(),
+            compaction_carry_forward: None,
             transient_context: vec![],
             hooks: None,
             durable: None,
             compaction: None,
             local_compaction: LocalCompactionPolicy::default(),
+            handoff_history: HandoffHistoryPolicy::default(),
+            compaction_model_defaults: None,
+            compaction_model_resolver: None,
         }
     }
 }
@@ -415,6 +763,7 @@ impl Default for RunnerConfig {
 #[derive(Clone)]
 pub struct Runner {
     initial: Arc<AgentConfig>,
+    child_base: Option<Arc<AgentConfig>>,
     config: Arc<RunnerConfig>,
 }
 
@@ -449,59 +798,104 @@ impl Continuation {
     /// Go ChatLoop boundary: resolve and execute each pending call before asking
     /// the next gate, then start a fresh invocation budget without replaying effects.
     pub async fn resume_go_gate(
+        self,
+        gate: &dyn crate::compat::GoApprovalGate,
+    ) -> Result<RunOutcome, RunError> {
+        self.resume_go_gate_inner(gate, None).await
+    }
+    /// Publish resolved approval records and await persistence before advancing.
+    /// Completed partial work is committed even when a later gate or tool fails;
+    /// persistence failures take precedence over publication or resolution failures.
+    /// Durable continuations are rejected until append reconciliation is supported.
+    pub async fn resume_go_gate_with_boundary(
+        self,
+        gate: &dyn crate::compat::GoApprovalGate,
+        boundary: &dyn crate::compat::GoApprovalBoundary,
+    ) -> Result<RunOutcome, RunError> {
+        if self.engine.durable_state.is_some() {
+            return Err(RunError::with_partial(
+                Error::new(
+                    ErrorCategory::Unsupported,
+                    "durable approval boundaries require append reconciliation",
+                ),
+                self.engine.result,
+            ));
+        }
+        self.resume_go_gate_inner(gate, Some(boundary)).await
+    }
+    async fn resume_go_gate_inner(
         mut self,
         gate: &dyn crate::compat::GoApprovalGate,
+        boundary: Option<&dyn crate::compat::GoApprovalBoundary>,
     ) -> Result<RunOutcome, RunError> {
         self.engine.result.status = RunStatus::Incomplete;
         self.engine.tools_prepared = true;
+        self.engine.action_authorizations.clear();
         self.engine.streaming = false;
         self.engine.sender.take();
-        while let Some(call) = self.engine.calls.front().cloned() {
-            let Some(request) = self
-                .engine
-                .result
-                .pending_approvals
-                .iter()
-                .find(|r| r.call.id == call.id)
-                .cloned()
-            else {
-                return Err(self
+        let initial_items = self.engine.result.new_items.len();
+        let initial_markers = self.engine.approval_journal.entries().len();
+        let resolution = async {
+            while let Some(call) = self.engine.calls.front().cloned() {
+                let Some(request) = self
                     .engine
-                    .fail(Error::new(
+                    .result
+                    .pending_approvals
+                    .iter()
+                    .find(|r| r.call.id == call.id)
+                    .cloned()
+                else {
+                    return Err(Error::new(
                         ErrorCategory::InvalidInput,
                         "Go gate resume requires pending approval calls",
-                    ))
-                    .await);
-            };
-            let decision = match bounded(
-                &self.engine.context,
-                None,
-                gate.approve(&self.engine.context, &request),
-            )
-            .await
-            {
-                Ok(decision) => decision,
-                Err(error) => return Err(self.engine.fail(error).await),
-            };
-            let approval = if decision.approved {
-                ApprovalDecision::Approve
-            } else {
-                ApprovalDecision::Deny
-            };
-            if !decision.approved && !decision.reason.trim().is_empty() {
-                self.engine
-                    .denial_reasons
-                    .insert(call.id.clone(), decision.reason.trim().into());
+                    ));
+                };
+                let decision = bounded(
+                    &self.engine.context,
+                    None,
+                    gate.approve(&self.engine.context, &request),
+                )
+                .await?;
+                let approval = if decision.approved {
+                    ApprovalDecision::Approve
+                } else {
+                    ApprovalDecision::Deny
+                };
+                if !decision.approved && !decision.reason.trim().is_empty() {
+                    self.engine
+                        .denial_reasons
+                        .insert(call.id.clone(), decision.reason.trim().into());
+                }
+                self.engine.approvals.insert(call.id.clone(), approval);
+                self.engine.tool(call).await?;
             }
-            self.engine.approvals.insert(call.id.clone(), approval);
-            if let Err(error) = self.engine.tool(call).await {
+            Ok::<_, Error>(())
+        }
+        .await;
+        if let Some(boundary) = boundary
+            && (self.engine.result.new_items.len() != initial_items
+                || self.engine.approval_journal.entries().len() != initial_markers)
+        {
+            let publication = self.engine.publish_committed().await;
+            if let Err(error) = boundary
+                .commit(&self.engine.context, &self.engine.result)
+                .await
+            {
                 return Err(self.engine.fail(error).await);
             }
+            if let Err(error) = publication {
+                return Err(self.engine.fail(error).await);
+            }
+        }
+        if let Err(error) = resolution {
+            return Err(self.engine.fail(error).await);
         }
         if self.engine.durable_state.is_none() {
             self.engine.turns = 0;
             self.engine.policy.max_turns = self.engine.base_turn_limit;
             self.engine.stop_gate_blocks = 0;
+            self.engine.pending_completion = false;
+            self.engine.verifier_ran = false;
             self.engine.consecutive_tool_errors = 0;
             self.engine.tool_error_escalated = false;
             self.engine.fallbacks.clear();
@@ -558,6 +952,7 @@ impl Continuation {
         }
         self.engine.streaming = false;
         self.engine.approvals = decisions.into_iter().collect();
+        self.engine.action_authorizations.clear();
         self.engine.tools_prepared = false;
         self.engine.result.status = RunStatus::Incomplete;
         Ok(self.engine)
@@ -604,10 +999,20 @@ impl RunStream {
 }
 
 impl Runner {
+    pub(crate) fn progress_model(&self) -> &str {
+        self.initial.model.name()
+    }
     pub fn new(agent: AgentConfig, mut config: RunnerConfig) -> Result<Self, Error> {
         validate_agent(&agent, &mut HashSet::new())?;
+        if config.immediate_input_signal.is_some() && config.immediate_input_poller.is_none() {
+            return Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "immediate input signal requires a poller",
+            ));
+        }
         config.output.work_dir = Some(config.work_dir.clone());
         config.local_compaction = config.local_compaction.normalized();
+        config.handoff_history = config.handoff_history.normalized();
         if config.stop_gate_max_blocks == 0 {
             config.stop_gate_max_blocks = 8;
         }
@@ -629,6 +1034,7 @@ impl Runner {
         }
         Ok(Self {
             initial: Arc::new(agent),
+            child_base: None,
             config: Arc::new(config),
         })
     }
@@ -640,14 +1046,40 @@ impl Runner {
     ) -> Result<RunOutcome, RunError> {
         self.engine(context, request, host).drive().await
     }
+    /// Seeds ordered approval sidecars for input history without replaying or republishing them.
+    pub async fn run_with_approval_history(
+        &self,
+        context: Context,
+        request: RunRequest,
+        host: Arc<dyn Host>,
+        markers: Vec<ApprovalMarkerBoundary>,
+    ) -> Result<RunOutcome, RunError> {
+        let journal = crate::compat::ApprovalJournal::from_history(markers, request.input.len())
+            .map_err(|error| Error::new(ErrorCategory::InvalidInput, error.to_string()))?;
+        let mut engine = self.engine(context, request, host);
+        engine.committed_markers = journal.entries().len();
+        engine.approval_journal = journal;
+        engine.drive().await
+    }
     pub fn stream(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> RunStream {
         RunStream::new(self.engine(context, request, host))
     }
-    fn engine(&self, context: Context, request: RunRequest, host: Arc<dyn Host>) -> Engine {
+    fn engine(&self, context: Context, mut request: RunRequest, host: Arc<dyn Host>) -> Engine {
+        if let Some(limit) = self.config.subagent_max_turns {
+            request.policy.tools.max_child_turns = Some(
+                request
+                    .policy
+                    .tools
+                    .max_child_turns
+                    .map_or(limit, |requested| requested.min(limit)),
+            );
+        }
         if let Some(session) = &self.config.subagents {
             session.begin_run();
         }
         Engine {
+            started: Instant::now(),
+            last_model: None,
             durable_state: None,
             child_control: None,
             applied_child_messages: HashSet::new(),
@@ -659,7 +1091,9 @@ impl Runner {
             policy: request.policy,
             phase: Phase::Start,
             calls: VecDeque::new(),
+            disabled_handoff_calls: HashMap::new(),
             approvals: HashMap::new(),
+            action_authorizations: HashMap::new(),
             denial_reasons: HashMap::new(),
             deferred_calls: VecDeque::new(),
             pending_marker_events: Vec::new(),
@@ -669,26 +1103,47 @@ impl Runner {
             consecutive_tool_errors: 0,
             tool_error_escalated: false,
             stop_gate_blocks: 0,
+            pending_completion: false,
+            verifier_ran: false,
             turns: 0,
             committed_cursor: 0,
             committed_markers: 0,
             calibration: EstimateCalibration::default(),
+            resolved_compaction: None,
             fallbacks: HashMap::new(),
             cost: 0.0,
+            cost_known: true,
+            response_cost: Some(ResponseCostSummary {
+                cost_usd: 0.0,
+                cost_known: true,
+            }),
+            last_response_cost: None,
             tool_pause: false,
+            summary_turn: false,
             tool_final: None,
+            matched_stop_tool: false,
             streaming: false,
             sender: None,
             spills: vec![],
             result: RunResult {
+                action_audit_records: vec![],
+                metrics: None,
+                history_provenance: if request.input_provenance.is_empty() {
+                    vec![ItemProvenance::Unknown; request.input.len()]
+                } else {
+                    request.input_provenance
+                },
+                new_items_provenance: Vec::new(),
                 status: RunStatus::Incomplete,
                 final_output: None,
+                final_output_is_raw_json: false,
                 new_items: vec![],
                 history: request.input,
                 responses: vec![],
                 usage: Usage::default(),
                 pending_approvals: vec![],
                 last_agent: Some(self.initial.name.clone()),
+                guardrails: vec![],
             },
         }
     }
@@ -704,11 +1159,20 @@ enum Phase {
 }
 
 struct ExecutedTool {
+    guardrails: Vec<GuardrailReport>,
     raw: ToolOutput,
     hook_error: Option<Error>,
 }
 
+struct ResolvedCompaction {
+    turn: u32,
+    model: String,
+    thresholds: Option<(u64, u64)>,
+}
+
 struct Engine {
+    started: Instant,
+    last_model: Option<String>,
     child_control: Option<crate::subagent::ChildControl>,
     applied_child_messages: HashSet<String>,
     durable_state: Option<durable::DurableState>,
@@ -720,7 +1184,9 @@ struct Engine {
     base_turn_limit: std::num::NonZeroU32,
     phase: Phase,
     calls: VecDeque<ToolCall>,
+    disabled_handoff_calls: HashMap<String, Option<String>>,
     approvals: HashMap<String, ApprovalDecision>,
+    action_authorizations: HashMap<String, ActionAuthorization>,
     denial_reasons: HashMap<String, String>,
     deferred_calls: VecDeque<ToolCall>,
     pending_marker_events: Vec<Observation>,
@@ -730,19 +1196,36 @@ struct Engine {
     consecutive_tool_errors: usize,
     tool_error_escalated: bool,
     stop_gate_blocks: usize,
+    pending_completion: bool,
+    verifier_ran: bool,
     turns: u32,
     committed_cursor: usize,
     committed_markers: usize,
     calibration: EstimateCalibration,
+    resolved_compaction: Option<ResolvedCompaction>,
     fallbacks: HashMap<usize, (usize, u32)>,
     cost: f64,
+    last_response_cost: Option<f64>,
+    cost_known: bool,
+    response_cost: Option<ResponseCostSummary>,
     tool_pause: bool,
+    summary_turn: bool,
     tool_final: Option<String>,
+    matched_stop_tool: bool,
     streaming: bool,
     sender: Option<mpsc::Sender<RunEvent>>,
     spills: Vec<Arc<SpillFile>>,
     result: RunResult,
 }
+
+const COMPLETION_CONFIRMATION_PROMPT: &str = r#"[SYSTEM] Before this answer is accepted as final: verify your work now.
+- Re-read the original task and confirm every requirement is satisfied.
+- If there are runnable checks (tests, builds, linters, the command the task asks about), run them and confirm they pass.
+- Confirm any files or artifacts the task requires actually exist with the expected content.
+If anything is unverified or incomplete, continue working instead of finalizing.
+If you are certain the task is complete, provide your final answer again."#;
+
+const FINAL_SUMMARY_DIRECTIVE: &str = "\n\n<final_turn>\nThis is your final available turn. No tools are available now.\nReturn the best concise summary you can from the evidence already gathered.\nInclude concrete findings, files checked, important gaps/unknowns, and recommended next steps.\nDo not ask for more tools or continue exploring.\n</final_turn>";
 
 fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), Error> {
     if !seen.insert(agent as *const AgentConfig as usize) {
@@ -763,10 +1246,14 @@ fn validate_agent(agent: &AgentConfig, seen: &mut HashSet<usize>) -> Result<(), 
         }
         compile_schema(&definition.input_schema)?;
     }
-    if let Some(schema) = &agent.output_schema {
-        compile_schema(schema)?;
-    }
     for handoff in &agent.handoffs {
+        if handoff.history_filter.is_some() && handoff.input_filter != HandoffInputFilter::Preserve
+        {
+            return Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "choose a custom or built-in handoff history filter, not both",
+            ));
+        }
         validate_agent(&handoff.target, seen)?;
     }
     Ok(())
@@ -804,6 +1291,51 @@ pub(crate) async fn bounded<T>(
         _ = async { match timeout { Some(d) => tokio::time::sleep(d).await, None => std::future::pending().await } } => Err(Error::new(ErrorCategory::DeadlineExceeded, "operation inactivity/timeout limit exceeded").with_source(OperationTimeout)),
         result = future => result,
     }
+}
+
+async fn bounded_model<T>(
+    context: &Context,
+    timeout: Option<Duration>,
+    activity: &mut tokio::sync::watch::Receiver<tokio::time::Instant>,
+    future: impl Future<Output = Result<T, Error>>,
+) -> Result<T, Error> {
+    let Some(timeout) = timeout else {
+        return bounded(context, None, future).await;
+    };
+    activity.borrow_and_update();
+    let inactivity = async {
+        let timer = tokio::time::sleep(timeout);
+        tokio::pin!(timer);
+        loop {
+            tokio::select! {
+                biased;
+                _ = &mut timer => {
+                    let latest = *activity.borrow_and_update();
+                    let expires = latest.checked_add(timeout).unwrap_or(timer.deadline());
+                    if expires > timer.deadline() {
+                        timer.as_mut().reset(expires);
+                    } else {
+                        return Error::new(ErrorCategory::DeadlineExceeded, "operation inactivity/timeout limit exceeded").with_source(OperationTimeout);
+                    }
+                }
+                Ok(()) = activity.changed() => {
+                    let latest = *activity.borrow_and_update();
+                    let expires = latest.checked_add(timeout).unwrap_or(timer.deadline());
+                    if expires > timer.deadline() {
+                        timer.as_mut().reset(expires);
+                    }
+                }
+            }
+        }
+    };
+    bounded(context, None, async {
+        tokio::select! {
+            biased;
+            error = inactivity => Err(error),
+            result = future => result,
+        }
+    })
+    .await
 }
 
 fn go_duration(duration: Duration) -> String {
@@ -888,7 +1420,50 @@ impl Engine {
         }
         Ok(())
     }
+    fn progress_frame(&self) -> ProgressFrame<'_> {
+        ProgressFrame {
+            agent_name: &self.agent.name,
+            agent_model: self.agent.model.name(),
+            turn: self.turns,
+            task_id: self.child_control.as_ref().map(|control| control.task_id()),
+        }
+    }
+    fn progress_usage(
+        &self,
+        origin: UsageOrigin,
+        binding: &ModelBinding,
+        usage: &Usage,
+        cost: Option<f64>,
+        cost_known: bool,
+    ) {
+        if let Some(progress) = &self.config.progress {
+            let info = match binding {
+                ModelBinding::Complete { model, .. } => model.info(binding.name()),
+                ModelBinding::Streaming { model, .. } => model.info(binding.name()),
+            };
+            progress.usage(
+                &self.context,
+                self.progress_frame(),
+                ProgressUsage {
+                    origin,
+                    request_model: binding.name(),
+                    provider: &info.provider,
+                    canonical_model: &info.model,
+                    usage,
+                    host_cost: cost,
+                    host_cost_known: cost_known,
+                },
+            );
+        }
+    }
     async fn observe(&self, observation: Observation) -> Result<(), Error> {
+        if let Some(progress) = &self.config.progress {
+            progress.observe(
+                &self.context,
+                self.progress_frame(),
+                ProgressObservation::Lifecycle(&observation),
+            );
+        }
         self.approval_journal
             .observe(&self.context, observation.clone())
             .await?;
@@ -940,8 +1515,21 @@ impl Engine {
         Ok(())
     }
     fn append(&mut self, item: RunItem) {
+        self.append_with_provenance(
+            item,
+            ItemProvenance::Agent {
+                name: self.agent.name.clone(),
+            },
+        );
+    }
+    fn append_unattributed(&mut self, item: RunItem) {
+        self.append_with_provenance(item, ItemProvenance::Unattributed);
+    }
+    fn append_with_provenance(&mut self, item: RunItem, provenance: ItemProvenance) {
         self.result.history.push(item.clone());
+        self.result.history_provenance.push(provenance.clone());
         self.result.new_items.push(item);
+        self.result.new_items_provenance.push(provenance);
     }
     async fn publish_committed(&mut self) -> Result<(), Error> {
         let entries = self.approval_journal.entries();
@@ -951,27 +1539,18 @@ impl Engine {
             return Ok(());
         }
         let items = self.result.new_items[self.committed_cursor..].to_vec();
-        let agents = items
+        let agents = self.result.new_items_provenance[self.committed_cursor..]
             .iter()
-            .map(|item| {
-                let no_agent = match item {
-                    RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
-                        message.role == Role::User
-                    }
-                    RunItem::ToolResult { call_id, .. } => entries.iter().any(|entry| {
-                        entry.marker.phase == adk_codec::approval::ApprovalPhase::Denied
-                            && entry.marker.agent.is_none()
-                            && entry.marker.data.call_id == *call_id
-                    }),
-                    _ => false,
-                };
-                (!no_agent).then(|| adk_codec::dto::AgentRef {
-                    name: self.agent.name.clone(),
-                })
+            .map(|provenance| match provenance {
+                ItemProvenance::Agent { name } => {
+                    Some(adk_codec::dto::AgentRef { name: name.clone() })
+                }
+                ItemProvenance::Unknown | ItemProvenance::Unattributed => None,
             })
             .collect();
         let mut markers = entries[self.committed_markers..]
             .iter()
+            .filter(|entry| !entry.historical_only)
             .map(|entry| {
                 let before_item = entry
                     .new_items_before
@@ -999,11 +1578,28 @@ impl Engine {
         self.committed_markers = entries.len();
         Ok(())
     }
+    fn record_metrics(&mut self) {
+        let elapsed = self
+            .durable_state
+            .as_ref()
+            .map_or_else(|| self.started.elapsed(), |state| state.elapsed());
+        self.result.metrics = Some(RunMetrics {
+            model: self.last_model.clone(),
+            turns: self.turns,
+            cost_usd: self.cost,
+            cost_known: self.cost_known && !self.result.responses.is_empty(),
+            response_cost: self.response_cost.clone(),
+            elapsed_ms: elapsed.as_millis().min(u64::MAX as u128) as u64,
+        });
+    }
     async fn drive(mut self) -> Result<RunOutcome, RunError> {
+        self.result.history_provenance =
+            normalize_provenance(self.result.history.len(), &self.result.history_provenance)?;
         let execution = async {
             let status = self.advance().await?;
             self.publish_committed().await?;
             self.result.status = status;
+            self.record_metrics();
             self.checkpoint(
                 if status == RunStatus::Paused {
                     Boundary::Paused
@@ -1038,6 +1634,7 @@ impl Engine {
         }
     }
     async fn fail(mut self, mut error: Error) -> RunError {
+        self.record_metrics();
         self.result.status = RunStatus::Incomplete;
         self.result.final_output = None;
         // Preserve the original failure even when the failed-event sink fails.
@@ -1061,6 +1658,17 @@ impl Engine {
             match self.phase {
                 Phase::Start => {
                     validate_history_pairs(&self.result.history)?;
+                    let checked = run_guardrails(
+                        &self.agent.input_guardrails,
+                        &self.context,
+                        &self.agent.name,
+                        GuardrailInput::Input(&self.result.history),
+                    )
+                    .await;
+                    self.result.guardrails.extend(checked.reports);
+                    if let Some(error) = checked.error {
+                        return Err(error);
+                    }
                     self.checkpoint(Boundary::Started, None).await?;
                     self.emit(RunEvent::Started {
                         agent: self.agent.name.clone(),
@@ -1091,10 +1699,34 @@ impl Engine {
                                 .await?;
                         }
                         return Ok(RunStatus::Paused);
-                    } else if self.policy.tool_use == ToolUseBehavior::StopAfterTool
+                    } else if (self.policy.tool_use == ToolUseBehavior::StopAfterTool
+                        || self.agent.tool_use == ToolUseBehavior::StopAfterTool
+                        || self.matched_stop_tool)
                         && self.tool_final.is_some()
                     {
                         self.settle_tool_turn();
+                        if let Some(selection) = self.agent.tool_final_output.clone() {
+                            if self.finalize_immediate_input().await? {
+                                continue;
+                            }
+                            let (output, raw_json) = match selection {
+                                ToolFinalOutput::FirstTool => {
+                                    (Value::String(self.tool_final.take().unwrap()), false)
+                                }
+                                ToolFinalOutput::Json(value) => (value, true),
+                            };
+                            self.check_output_guardrails(&output).await?;
+                            self.result.final_output = Some(output);
+                            self.result.final_output_is_raw_json = raw_json;
+                            self.phase = Phase::Finish;
+                            continue;
+                        }
+                        if (!self.config.return_tool_output
+                            || (self.config.subagents.is_none() && self.child_control.is_none()))
+                            && self.finalize_immediate_input().await?
+                        {
+                            continue;
+                        }
                         if self.config.return_tool_output {
                             let output = self.tool_final.take().unwrap();
                             let output = self.validate_output(output).await?;
@@ -1108,7 +1740,10 @@ impl Engine {
                                 }
                                 continue;
                             }
+                            self.check_output_guardrails(&output).await?;
                             self.result.final_output = Some(output);
+                        } else {
+                            self.check_output_guardrails(&Value::Null).await?;
                         }
                         self.phase = Phase::Finish;
                     } else {
@@ -1163,10 +1798,211 @@ impl Engine {
         }
         Ok(())
     }
+    async fn apply_compaction_carry_forward(
+        &mut self,
+        history: &mut Vec<RunItem>,
+        provenance: &mut Vec<ItemProvenance>,
+        markers: &mut [ApprovalMarkerBoundary],
+    ) -> Result<(), Error> {
+        let dynamic = if let Some(callback) = &self.config.compaction_carry_forward {
+            bounded(
+                &self.context,
+                self.config.model_idle_timeout,
+                callback.context(&self.context),
+            )
+            .await?
+        } else {
+            String::new()
+        };
+        let section = if dynamic.trim().is_empty() {
+            self.config.working_state_context.trim()
+        } else {
+            dynamic.trim()
+        };
+        let carry = if section.is_empty() {
+            None
+        } else {
+            Some(RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text {
+                        text: format!(
+                            "{}\nThis live runtime state was injected after context compaction. Treat it as current and higher priority than older compacted history.\n\n{section}",
+                            crate::compaction::CARRY_FORWARD_MARKER
+                        ),
+                    }],
+                },
+            })
+        };
+        if let Some(item) = &carry {
+            let checked = run_guardrails(
+                &self.agent.input_guardrails,
+                &self.context,
+                &self.agent.name,
+                GuardrailInput::Input(std::slice::from_ref(item)),
+            )
+            .await;
+            self.result.guardrails.extend(checked.reports);
+            if let Some(error) = checked.error {
+                return Err(error);
+            }
+        }
+        let mut boundaries = Vec::with_capacity(history.len() + 1);
+        let mut retained = 0;
+        let mut sources = Vec::with_capacity(provenance.len() + 1);
+        for (item, source) in history.iter().zip(provenance.iter()) {
+            boundaries.push(retained);
+            let stale = match item {
+                RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => {
+                    let text = message
+                        .content
+                        .iter()
+                        .filter_map(|part| match part {
+                            Content::Text { text } => Some(text.as_str()),
+                            _ => None,
+                        })
+                        .collect::<Vec<_>>()
+                        .join("\n");
+                    text.trim()
+                        .starts_with(crate::compaction::CARRY_FORWARD_MARKER)
+                }
+                _ => false,
+            };
+            if !stale {
+                retained += 1;
+                sources.push(source.clone());
+            }
+        }
+        boundaries.push(retained);
+        let mut index = 0;
+        history.retain(|_| {
+            let keep = boundaries[index + 1] > boundaries[index];
+            index += 1;
+            keep
+        });
+        for marker in markers {
+            marker.before_item = boundaries[marker.before_item];
+        }
+        *provenance = sources;
+        if let Some(item) = carry {
+            history.push(item);
+            provenance.push(ItemProvenance::Unattributed);
+        }
+        Ok(())
+    }
+    async fn compact_handoff(&mut self) -> Result<(), Error> {
+        let policy = self.config.handoff_history.local_policy();
+        if !policy.enabled {
+            return Ok(());
+        }
+        let markers = self
+            .approval_journal
+            .history_markers()
+            .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+        let before = estimate_history_tokens_with_approvals(&self.result.history, &markers);
+        if before <= policy.trigger_tokens {
+            return Ok(());
+        }
+        self.observe(Observation::CompactionStarted {
+            context_tokens: before,
+            target_tokens: policy.target_tokens,
+        })
+        .await?;
+        let plan = plan_with_provenance(
+            &self.result.history,
+            &markers,
+            &self.result.history_provenance,
+            policy,
+            0,
+        );
+        if !plan.outcome.changed {
+            self.observe(Observation::CompactionFailed {
+                error: ErrorInfo {
+                    category: ErrorCategory::ModelBehavior,
+                    message: format!("handoff: {}", plan.outcome.reason),
+                },
+            })
+            .await?;
+            return Ok(());
+        }
+        let (mut history, mut markers, mut provenance) = finalize_with_provenance(
+            &plan.outcome,
+            &self.result.history,
+            &markers,
+            &self.result.history_provenance,
+        );
+        self.apply_compaction_carry_forward(&mut history, &mut provenance, &mut markers)
+            .await?;
+        validate_history_pairs(&history)?;
+        let context_tokens = estimate_history_tokens_with_approvals(&history, &markers);
+        let before = std::mem::replace(&mut self.result.history, history);
+        let before_items = before.len();
+        self.result.history_provenance = provenance;
+        self.result.usage.context_tokens = Some(context_tokens);
+        self.observe(Observation::ApprovalHistoryReplaced {
+            before,
+            after: self.result.history.clone(),
+            markers,
+        })
+        .await?;
+        self.observe(Observation::Compacted {
+            before_items,
+            after_items: self.result.history.len(),
+            context_tokens,
+        })
+        .await
+    }
+    async fn resolve_compaction(
+        &mut self,
+        model: &str,
+        turn: u32,
+    ) -> Result<Option<(u64, u64)>, Error> {
+        let Some(resolver) = self.config.compaction_model_resolver.clone() else {
+            return Ok(None);
+        };
+        if let Some(resolved) = &self.resolved_compaction
+            && resolved.turn == turn
+            && resolved.model == model
+        {
+            return Ok(resolved.thresholds);
+        }
+        let thresholds = bounded(
+            &self.context,
+            None,
+            resolver.thresholds(&self.context, model),
+        )
+        .await?
+        .filter(|(trigger, _)| *trigger > 0);
+        self.resolved_compaction = Some(ResolvedCompaction {
+            turn,
+            model: model.into(),
+            thresholds,
+        });
+        Ok(thresholds)
+    }
     async fn compact(&mut self) -> Result<(), Error> {
-        let Some(config) = &self.config.compaction else {
+        let Some(mut config) = self.config.compaction.clone() else {
             return Ok(());
         };
+        let model = self
+            .fallbacks
+            .get(&(Arc::as_ptr(&self.agent) as usize))
+            .map_or_else(
+                || self.agent.model.name(),
+                |(index, _)| self.agent.fallbacks[index - 1].name(),
+            )
+            .to_owned();
+        if let Some((trigger, target)) = self
+            .resolve_compaction(&model, self.turns.saturating_add(1))
+            .await?
+        {
+            config.trigger_tokens = trigger;
+            config.target_tokens = if target == 0 || target >= trigger {
+                (trigger / 2).max(1)
+            } else {
+                target
+            };
+        }
         let Some(tokens) = self.result.usage.context_tokens else {
             return Ok(());
         };
@@ -1176,15 +2012,9 @@ impl Engine {
         let before_items = self.result.history.len();
         let request = CompactionRequest {
             agent: self.agent.name.clone(),
-            model: self
-                .fallbacks
-                .get(&(Arc::as_ptr(&self.agent) as usize))
-                .map_or_else(
-                    || self.agent.model.name(),
-                    |(index, _)| self.agent.fallbacks[index - 1].name(),
-                )
-                .into(),
+            model: model.clone(),
             history: self.result.history.clone(),
+            history_provenance: self.result.history_provenance.clone(),
             context_tokens: tokens,
             target_tokens: config.target_tokens,
         };
@@ -1193,7 +2023,7 @@ impl Engine {
             target_tokens: config.target_tokens,
         })
         .await?;
-        let compacted = match bounded(
+        let mut compacted = match bounded(
             &self.context,
             self.config.model_idle_timeout,
             config.compactor.compact(&self.context, request),
@@ -1221,7 +2051,19 @@ impl Engine {
                 return Err(error);
             }
         };
-        self.account_usage(&compacted.usage, compacted.cost)?;
+        let binding = std::iter::once(&self.agent.model)
+            .chain(&self.agent.fallbacks)
+            .find(|binding| binding.name() == model)
+            .expect("active compaction model");
+        self.progress_usage(
+            UsageOrigin::ProviderCompaction,
+            binding,
+            &compacted.usage,
+            Some(compacted.cost),
+            compacted.cost_known,
+        );
+        self.cost_known &= compacted.cost_known;
+        self.account_usage(&compacted.usage, Some(compacted.cost))?;
         self.charge_child_usage().await?;
         self.observe(Observation::Usage {
             usage: self.result.usage.clone(),
@@ -1229,11 +2071,20 @@ impl Engine {
         })
         .await?;
         validate_history_pairs(&compacted.history)?;
+        let mut history_provenance =
+            normalize_provenance(compacted.history.len(), &compacted.history_provenance)?;
+        self.apply_compaction_carry_forward(
+            &mut compacted.history,
+            &mut history_provenance,
+            &mut [],
+        )
+        .await?;
         self.observe(Observation::HistoryReplaced {
             before: self.result.history.clone(),
             after: compacted.history.clone(),
         })
         .await?;
+        self.result.history_provenance = history_provenance;
         self.result.history = compacted.history;
         self.result.usage.context_tokens = Some(compacted.context_tokens);
         self.observe(Observation::Compacted {
@@ -1247,10 +2098,29 @@ impl Engine {
         &mut self,
         request: &mut ModelRequest,
         forced: bool,
+        binding: &ModelBinding,
     ) -> Result<bool, Error> {
         let mut policy = self.config.local_compaction;
-        if policy == LocalCompactionPolicy::default() {
-            policy = LocalCompactionPolicy::for_model(&request.model);
+        if policy.enabled && self.config.compaction_model_resolver.is_some() {
+            let turn = if forced {
+                self.turns
+            } else {
+                self.turns.saturating_add(1)
+            };
+            if let Some((trigger, target)) = self.resolve_compaction(&request.model, turn).await? {
+                policy.trigger_tokens = trigger;
+                policy.target_tokens = target;
+                policy = policy.normalized();
+            }
+        } else if self.config.compaction_model_resolver.is_none()
+            && self
+                .config
+                .compaction_model_defaults
+                .unwrap_or(policy.uses_default_thresholds())
+        {
+            let defaults = LocalCompactionPolicy::for_model(&request.model);
+            policy.trigger_tokens = defaults.trigger_tokens;
+            policy.target_tokens = defaults.target_tokens;
         }
         let mut policy = self.calibration.apply(policy);
         let markers = self
@@ -1275,9 +2145,10 @@ impl Engine {
             target_tokens: policy.target_tokens,
         })
         .await?;
-        let outcome = compact_with_approvals(
+        let mut plan = plan_with_provenance(
             &self.result.history,
             &markers,
+            &self.result.history_provenance,
             policy,
             if forced {
                 0
@@ -1285,29 +2156,102 @@ impl Engine {
                 overhead.min(i64::MAX as u64) as i64
             },
         );
-        if !outcome.changed {
-            if !matches!(outcome.reason, "disabled" | "below-threshold") {
+        if !plan.outcome.changed {
+            if !matches!(plan.outcome.reason, "disabled" | "below-threshold") {
                 self.observe(Observation::CompactionFailed {
                     error: ErrorInfo {
                         category: ErrorCategory::ModelBehavior,
-                        message: outcome.reason.into(),
+                        message: plan.outcome.reason.into(),
                     },
                 })
                 .await?;
             }
             return Ok(false);
         }
-        let (history, markers) = finalize_local_history_with_approvals(
-            &outcome.history,
-            &outcome.markers,
+        if policy.use_llm_summary
+            && let Some(summary_request) = plan.summary_request(binding.name())
+        {
+            let timeout = self
+                .config
+                .model_idle_timeout
+                .filter(|d| !d.is_zero())
+                .unwrap_or(Duration::from_secs(120));
+            let mut summary_context = self.context.clone();
+            let deadline = std::time::Instant::now() + timeout;
+            summary_context.deadline = Some(
+                summary_context
+                    .deadline
+                    .map_or(deadline, |d| d.min(deadline)),
+            );
+            let response = match binding {
+                ModelBinding::Complete { model, .. } => {
+                    bounded(
+                        &self.context,
+                        Some(timeout),
+                        model.complete(&summary_context, summary_request),
+                    )
+                    .await
+                }
+                ModelBinding::Streaming { model, .. } => {
+                    bounded(
+                        &self.context,
+                        Some(timeout),
+                        model.complete(&summary_context, summary_request),
+                    )
+                    .await
+                }
+            };
+            let applied = if let Ok(response) = response {
+                let cost =
+                    self.config.cost_estimator.as_ref().and_then(|estimator| {
+                        estimator.estimate_cost(binding.name(), &response.usage)
+                    });
+                self.progress_usage(
+                    UsageOrigin::SummaryCompaction,
+                    binding,
+                    &response.usage,
+                    cost,
+                    cost.is_some(),
+                );
+                self.account_usage(&response.usage, cost)?;
+                self.charge_child_usage().await?;
+                self.observe(Observation::Usage {
+                    usage: self.result.usage.clone(),
+                    cost: self.cost,
+                })
+                .await?;
+                let applied = plan.apply_summary(&response);
+                self.check_budget()?;
+                applied
+            } else {
+                false
+            };
+            self.context.check_active()?;
+            if !applied {
+                self.observe(Observation::CompactionFailed {
+                    error: ErrorInfo {
+                        category: ErrorCategory::ModelBehavior,
+                        message: "LLM compaction summary unavailable or ineffective; keeping deterministic summary".into(),
+                    },
+                }).await?;
+            }
+        }
+        let (mut history, mut markers, mut history_provenance) = finalize_with_provenance(
+            &plan.outcome,
             &self.result.history,
             &markers,
+            &self.result.history_provenance,
         );
+        self.apply_compaction_carry_forward(&mut history, &mut history_provenance, &mut markers)
+            .await?;
         validate_history_pairs(&history)?;
         let before_items = self.result.history.len();
         let context_tokens = estimate_history_tokens_with_approvals(&history, &markers) + overhead;
         let mut input = history.clone();
         input.extend_from_slice(transient);
+        let mut input_provenance = history_provenance.clone();
+        input_provenance.extend_from_slice(&request.input_provenance[self.result.history.len()..]);
+        request.input_provenance = input_provenance;
         request.input = input;
         self.observe(Observation::ApprovalHistoryReplaced {
             before: self.result.history.clone(),
@@ -1316,6 +2260,7 @@ impl Engine {
         })
         .await?;
         self.result.history = history;
+        self.result.history_provenance = history_provenance;
         self.result.usage.context_tokens = Some(context_tokens);
         self.observe(Observation::Compacted {
             before_items,
@@ -1354,11 +2299,87 @@ impl Engine {
         }
         if self.consecutive_tool_errors >= limit && !self.tool_error_escalated {
             self.tool_error_escalated = true;
-            self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
+            self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Your last {} tool turns all failed. Stop repeating the same approach. Re-read the error messages above carefully, then either: (1) try a fundamentally different approach or tool, (2) inspect the environment to understand why the calls fail, or (3) if the task is genuinely blocked, report the blocker and what you tried instead of retrying.", self.consecutive_tool_errors) }] } });
         }
     }
+    async fn admit_immediate_input(&mut self, batch: ImmediateInputBatch) -> Result<bool, Error> {
+        if batch.items.len() != batch.provenance.len() {
+            return Err(Error::new(
+                ErrorCategory::InvalidInput,
+                "immediate input provenance length mismatch",
+            ));
+        }
+        let provenance = normalize_provenance(batch.items.len(), &batch.provenance)?;
+        let admitted = !batch.items.is_empty();
+        if admitted {
+            self.pending_completion = false;
+        }
+        let mut candidate = self.result.history.clone();
+        candidate.extend(batch.items.iter().cloned());
+        validate_history_pairs(&candidate)?;
+        for (item, provenance) in batch.items.into_iter().zip(provenance) {
+            self.append_with_provenance(item, provenance);
+        }
+        self.publish_committed().await?;
+        Ok(admitted)
+    }
+    async fn poll_immediate_input(&mut self) -> Result<(), Error> {
+        let Some(poller) = self.config.immediate_input_poller.clone() else {
+            return Ok(());
+        };
+        self.checkpoint(Boundary::ImmediateInputDispatched, None)
+            .await?;
+        match bounded(&self.context, None, poller.poll(&self.context)).await {
+            Ok(batch) => {
+                self.admit_immediate_input(batch).await?;
+            }
+            Err(error) => {
+                self.context.check_active()?;
+                let _ = self
+                    .observe(Observation::ImmediateInputPollFailed { error: error.info })
+                    .await;
+                self.context.check_active()?;
+            }
+        }
+        Ok(())
+    }
+    async fn finalize_immediate_input(&mut self) -> Result<bool, Error> {
+        let Some(finalizer) = self.config.immediate_input_finalizer.clone() else {
+            return Ok(false);
+        };
+        self.checkpoint(Boundary::ImmediateInputDispatched, None)
+            .await?;
+        let batch = bounded(&self.context, None, finalizer.finalize(&self.context)).await?;
+        if !self.admit_immediate_input(batch).await? {
+            return Ok(false);
+        }
+        if let Some(control) = &self.child_control {
+            control.reopen_message_admission().await?;
+        }
+        if self.turns >= self.policy.max_turns.get() {
+            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+        }
+        self.result.final_output = None;
+        self.phase = Phase::Model;
+        Ok(true)
+    }
     async fn model_turn(&mut self) -> Result<(), Error> {
+        self.summary_turn = false;
         self.settle_tool_turn();
+        if self.turns >= self.policy.max_turns.get()
+            && self.config.immediate_input_finalizer.is_some()
+        {
+            self.publish_committed().await?;
+            if !self.finalize_immediate_input().await? {
+                return Err(Error::new(
+                    ErrorCategory::MaxTurns,
+                    format!("max turns exceeded: {}", self.policy.max_turns),
+                ));
+            }
+        }
+        if self.turns < self.policy.max_turns.get() {
+            self.poll_immediate_input().await?;
+        }
         self.apply_child_messages(false).await?;
         if let Some(control) = &self.child_control {
             control
@@ -1367,15 +2388,15 @@ impl Engine {
         }
         if let Some(session) = self.config.subagents.clone() {
             for item in session.collect(&self.context).await? {
-                self.append(item);
+                self.append_unattributed(item);
             }
-            session.update_parent(&self.result.history);
+            session.update_parent(&self.result.history, &self.result.history_provenance);
         }
         self.publish_committed().await?;
         if self.turns >= self.policy.max_turns.get() {
             return Err(Error::new(
                 ErrorCategory::MaxTurns,
-                "maximum model turns exceeded",
+                format!("max turns exceeded: {}", self.policy.max_turns),
             ));
         }
         self.check_budget()?;
@@ -1394,52 +2415,53 @@ impl Engine {
             );
         }
         let accessible_tools = self.tools_for_access();
-        let tools = accessible_tools
+        let (mut tools, mut declared_tool_timeouts): (Vec<_>, Vec<_>) = accessible_tools
             .iter()
-            .map(|t| t.definition())
-            .chain(self.agent.handoffs.iter().map(|h| &h.definition))
-            .filter(|d| self.policy.tools.decision(d) != ToolDecision::Deny)
-            .cloned()
-            .collect();
-        let mut instructions = if self.config.cache_prefix.is_empty() {
-            self.agent.instructions.clone()
-        } else {
-            format!("{}\n{}", self.config.cache_prefix, self.agent.instructions)
-        };
-        if let Some(schema) = &self.agent.output_schema {
-            if !instructions.trim().is_empty() {
-                instructions.push_str("\n\n---\n\n");
-            }
-            let name = self.agent.output_schema_name.trim();
-            let name = if name.is_empty() {
-                "final_output"
-            } else {
-                name
-            };
-            let strict = if self.agent.output_schema_strict {
-                "\nStrict mode: do not include prose, markdown fences, or fields outside the schema."
-            } else {
-                ""
-            };
-            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_value()));
+            .map(|tool| (tool.definition().clone(), tool.timeout()))
+            .chain(
+                self.agent
+                    .handoffs
+                    .iter()
+                    .filter(|handoff| self.handoff_enabled(handoff))
+                    .map(|handoff| (handoff.tool_definition(), None)),
+            )
+            .filter(|(definition, _)| {
+                self.effective_tool_policy().decision(definition) != ToolDecision::Deny
+            })
+            .unzip();
+        self.summary_turn = self.final_summary_required();
+        let instructions = self.build_instructions().await?;
+        if self.summary_turn {
+            tools.clear();
+            declared_tool_timeouts.clear();
         }
         let mut settings = self.agent.settings.clone();
-        if let Some(key) = &self.config.prompt_cache_key {
-            let namespace = self
-                .config
-                .prompt_cache_namespace
-                .as_deref()
-                .unwrap_or(&self.context.run_id);
-            let mut hash = Sha256::new();
-            hash.update(namespace);
-            hash.update([0]);
-            hash.update(key);
-            settings.insert(
-                "prompt_cache_key".into(),
-                Value::String(format!("{:x}", hash.finalize())),
-            );
-        }
+        let key = self
+            .config
+            .prompt_cache_key
+            .as_deref()
+            .map(str::trim)
+            .filter(|key| !key.is_empty())
+            .unwrap_or("run");
+        let namespace = self
+            .config
+            .prompt_cache_namespace
+            .as_deref()
+            .map(str::trim)
+            .filter(|namespace| !namespace.is_empty())
+            .unwrap_or(&self.context.run_id);
+        let mut hash = Sha256::new();
+        hash.update(namespace);
+        hash.update([0]);
+        hash.update(key);
+        settings.insert(
+            "prompt_cache_key".into(),
+            Value::String(format!("{:x}", hash.finalize())),
+        );
+        let mut input_provenance = self.result.history_provenance.clone();
+        input_provenance.resize(input.len(), ItemProvenance::Unattributed);
         let mut request = ModelRequest {
+            input_provenance,
             model: self
                 .fallbacks
                 .get(&(Arc::as_ptr(&self.agent) as usize))
@@ -1456,19 +2478,33 @@ impl Engine {
             output_schema_strict: self.agent.output_schema_strict,
             settings,
         };
-        self.compact_local(&mut request, false).await?;
+        let binding = self
+            .fallbacks
+            .get(&(Arc::as_ptr(&self.agent) as usize))
+            .map_or_else(
+                || self.agent.model.clone(),
+                |(index, _)| self.agent.fallbacks[index - 1].clone(),
+            );
+        self.compact_local(&mut request, false, &binding).await?;
         self.checkpoint(Boundary::ModelPrepared, None).await?;
-        let Some((response, model, streamed)) = self.model_response(request).await? else {
+        let exposed_tools: HashSet<_> =
+            request.tools.iter().map(|tool| tool.name.clone()).collect();
+        let Some((response, streamed, cost, generation)) =
+            self.model_response(request, declared_tool_timeouts).await?
+        else {
             self.phase = Phase::Model;
             self.checkpoint(Boundary::ModelCompleted, None).await?;
             return Ok(());
         };
+        if let (Some(observer), Some(record)) = (&self.config.generation_observer, &generation) {
+            observer.accepted(&self.context, record);
+        }
         self.observe(Observation::ModelAccepted {
             agent: self.agent.name.clone(),
             response: response.clone(),
         })
         .await?;
-        self.record_response(response.clone(), &model)?;
+        self.record_response(response.clone(), cost)?;
         self.charge_child_usage().await?;
         self.publish_committed().await?;
         if !streamed {
@@ -1493,6 +2529,7 @@ impl Engine {
         for item in &response.items {
             match item {
                 RunItem::ToolCall { call } => {
+                    call.validate_argument_projection()?;
                     if call.id.is_empty() || !ids.insert(call.id.clone()) || self.result.history[..self.result.history.len() - response.items.len()].iter().any(|i| matches!(i, RunItem::ToolCall { call: prior } if prior.id == call.id)) {
                         return Err(Error::new(ErrorCategory::ModelBehavior, "duplicate tool call ID"));
                     }
@@ -1509,23 +2546,45 @@ impl Engine {
                 }
             }
         }
-        if let Some(index) = self.calls.iter().position(|call| {
-            self.agent
+        self.disabled_handoff_calls.clear();
+        let mut selected = None;
+        for (index, call) in self.calls.iter().enumerate() {
+            if let Some(handoff) = self
+                .agent
                 .handoffs
                 .iter()
-                .any(|h| h.definition.name == call.name)
-        }) {
+                .find(|h| h.definition.name == call.name)
+            {
+                if self.handoff_enabled(handoff) {
+                    selected = Some(index);
+                    break;
+                }
+                self.disabled_handoff_calls.insert(
+                    call.id.clone(),
+                    exposed_tools
+                        .contains(&call.name)
+                        .then(|| handoff.target.name.clone()),
+                );
+            }
+        }
+        if let Some(index) = selected {
             let handoff = self.calls.remove(index).unwrap();
             self.calls.push_front(handoff);
         }
         if !self.calls.is_empty() {
+            self.pending_completion = false;
             self.stop_gate_blocks = 0;
             self.tool_turn_start = Some(self.result.new_items.len());
             self.tool_pause = false;
             self.tool_final = None;
+            self.matched_stop_tool = self
+                .calls
+                .iter()
+                .any(|call| self.agent.stop_at_tools.contains(&call.name));
             self.tools_prepared = false;
             self.phase = Phase::Tools;
         } else if response.end_turn == Some(false) {
+            self.pending_completion = false;
             self.stop_gate_blocks = 0;
             self.phase = Phase::Model;
         } else {
@@ -1543,7 +2602,11 @@ impl Engine {
                 .unwrap_or_default();
             let output = self.validate_output(output).await?;
             if self.durable_state.is_some()
-                && (self.config.stop_gate.is_some() || self.config.subagents.is_some())
+                && (self.config.final_answer_verifier.is_some()
+                    || self.config.require_completion_confirmation
+                    || self.config.stop_gate.is_some()
+                    || self.config.subagents.is_some()
+                    || self.config.immediate_input_finalizer.is_some())
             {
                 self.result.final_output = Some(output);
                 self.phase = Phase::Finalize;
@@ -1571,7 +2634,7 @@ impl Engine {
             .collect();
         let ids: Vec<_> = messages.iter().map(|message| message.id.clone()).collect();
         for message in messages {
-            self.append(RunItem::Message {
+            self.append_unattributed(RunItem::Message {
                 message: Message {
                     role: Role::User,
                     content: vec![Content::Text { text: message.text }],
@@ -1595,7 +2658,7 @@ impl Engine {
             let items = session.join(&self.context).await?;
             if !items.is_empty() {
                 for item in items {
-                    self.append(item);
+                    self.append_unattributed(item);
                 }
                 if self.turns >= self.policy.max_turns.get() {
                     self.policy.max_turns = self.policy.max_turns.saturating_add(1);
@@ -1604,14 +2667,35 @@ impl Engine {
                 return Ok(());
             }
         }
+        let has_tools = (self.config.require_completion_confirmation
+            || self.config.stop_gate.is_some()
+            || self.config.final_answer_verifier.is_some())
+            && (self
+                .tools_for_access()
+                .iter()
+                .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
+                || self.agent.handoffs.iter().any(|handoff| {
+                    self.handoff_enabled(handoff)
+                        && self.tool_decision(&handoff.definition) != ToolDecision::Deny
+                }));
+        if self.config.require_completion_confirmation && !self.pending_completion && has_tools {
+            self.pending_completion = true;
+            self.append_unattributed(RunItem::Message {
+                message: Message {
+                    role: Role::User,
+                    content: vec![Content::Text {
+                        text: COMPLETION_CONFIRMATION_PROMPT.into(),
+                    }],
+                },
+            });
+            self.publish_committed().await?;
+            if self.turns >= self.policy.max_turns.get() {
+                self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+            }
+            self.phase = Phase::Model;
+            return Ok(());
+        }
         if let Some(gate) = &self.config.stop_gate {
-            let has_tools =
-                self.tools_for_access()
-                    .iter()
-                    .any(|tool| self.tool_decision(tool.definition()) != ToolDecision::Deny)
-                    || self.agent.handoffs.iter().any(|handoff| {
-                        self.tool_decision(&handoff.definition) != ToolDecision::Deny
-                    });
             if has_tools && self.stop_gate_blocks < self.config.stop_gate_max_blocks.max(1) {
                 if let Some(mut feedback) =
                     bounded(&self.context, None, gate.check(&self.context, &output)).await?
@@ -1622,7 +2706,7 @@ impl Engine {
                             "the finalization check failed; continue working until it passes"
                                 .into();
                     }
-                    self.append(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
+                    self.append_unattributed(RunItem::Message { message: Message { role: Role::User, content: vec![Content::Text { text: format!("[SYSTEM] Final answer blocked by the completion gate ({}/{}):\n{}", self.stop_gate_blocks, self.config.stop_gate_max_blocks.max(1), feedback) }] } });
                     if self.turns >= self.policy.max_turns.get() {
                         self.policy.max_turns = self.policy.max_turns.saturating_add(1);
                     }
@@ -1632,10 +2716,44 @@ impl Engine {
                 self.stop_gate_blocks = 0;
             }
         }
+        if let Some(verifier) = &self.config.final_answer_verifier {
+            if !self.verifier_ran && has_tools {
+                self.verifier_ran = true;
+                match bounded(&self.context, None, verifier.verify(&self.context, &output)).await {
+                    Ok(feedback) if !feedback.trim().is_empty() => {
+                        self.pending_completion = false;
+                        self.append_unattributed(RunItem::Message { message: Message {
+                            role: Role::User,
+                            content: vec![Content::Text { text: format!("[SYSTEM] An independent reviewer examined your answer before finalization and raised these points. Address the valid ones (with tools if needed), then provide your final answer again:\n{feedback}") }],
+                        }});
+                        self.publish_committed().await?;
+                        if self.turns >= self.policy.max_turns.get() {
+                            self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                        }
+                        self.phase = Phase::Model;
+                        return Ok(());
+                    }
+                    Ok(_) => {}
+                    Err(error) => {
+                        self.context.check_active()?;
+                        let _ = self
+                            .observe(Observation::FinalAnswerVerificationFailed {
+                                error: error.info,
+                            })
+                            .await;
+                        self.context.check_active()?;
+                    }
+                }
+            }
+        }
         if self.apply_child_messages(true).await? {
             self.phase = Phase::Model;
             return Ok(());
         }
+        if self.finalize_immediate_input().await? {
+            return Ok(());
+        }
+        self.check_output_guardrails(&output).await?;
         self.result.final_output = Some(output.clone());
         self.observe(Observation::AgentEnded {
             agent: self.agent.name.clone(),
@@ -1645,8 +2763,22 @@ impl Engine {
         self.phase = Phase::Finish;
         Ok(())
     }
+    async fn check_output_guardrails(&mut self, output: &Value) -> Result<(), Error> {
+        let checked = run_guardrails(
+            &self.agent.output_guardrails,
+            &self.context,
+            &self.agent.name,
+            GuardrailInput::Output(output),
+        )
+        .await;
+        self.result.guardrails.extend(checked.reports);
+        match checked.error {
+            Some(error) => Err(error),
+            None => Ok(()),
+        }
+    }
     async fn validate_output(&self, output: String) -> Result<Value, Error> {
-        if let Some(schema) = &self.agent.output_schema {
+        if self.agent.output_schema.is_some() && !output.is_empty() {
             if let Some(parser) = &self.agent.output_parser {
                 return match parser.parse(&output) {
                     Ok(value) => Ok(value),
@@ -1659,16 +2791,8 @@ impl Engine {
                     }
                 };
             }
-            match serde_json::from_str::<Value>(&output) {
-                Ok(value) => {
-                    if !compile_schema(schema)?.is_valid(&value) {
-                        self.observe(Observation::OutputValidationFailed {
-                            message: "output does not match its JSON schema".into(),
-                        })
-                        .await?;
-                    }
-                    Ok(value)
-                }
+            match adk_codec::value::decode(output.as_bytes()) {
+                Ok(value) => Ok(value),
                 Err(error) => {
                     self.observe(Observation::OutputValidationFailed {
                         message: format!("output is not JSON: {error}"),
@@ -1700,8 +2824,11 @@ impl Engine {
         }
         Ok(())
     }
-    fn account_usage(&mut self, used: &Usage, cost: f64) -> Result<(), Error> {
+    fn account_usage(&mut self, used: &Usage, estimate: Option<f64>) -> Result<(), Error> {
+        self.cost_known &= estimate.is_some_and(|cost| cost.is_finite() && cost >= 0.0);
+        let cost = estimate.unwrap_or(0.0);
         let usage = &mut self.result.usage;
+        usage.requests = usage.requests.saturating_add(used.requests);
         usage.input_tokens = usage.input_tokens.saturating_add(used.input_tokens);
         usage.output_tokens = usage.output_tokens.saturating_add(used.output_tokens);
         usage.cache_read_tokens = usage
@@ -1712,6 +2839,7 @@ impl Engine {
             .saturating_add(used.cache_creation_tokens);
         usage.context_tokens = used.context_tokens;
         if !cost.is_finite() || cost < 0.0 || !(self.cost + cost).is_finite() {
+            self.cost_known = false;
             return Err(Error::new(
                 ErrorCategory::InvalidInput,
                 "invalid provider cost",
@@ -1720,41 +2848,126 @@ impl Engine {
         self.cost += cost;
         Ok(())
     }
-    fn record_response(&mut self, response: ModelResponse, model: &str) -> Result<(), Error> {
+    fn record_response(
+        &mut self,
+        response: ModelResponse,
+        estimate: Option<f64>,
+    ) -> Result<(), Error> {
         for item in &response.items {
             self.append(item.clone());
         }
-        let cost = self
-            .config
-            .cost_estimator
-            .as_ref()
-            .map(|c| c.cost(model, &response.usage))
-            .unwrap_or(0.0);
-        let accounting = self.account_usage(&response.usage, cost);
+        self.last_response_cost = estimate.filter(|cost| cost.is_finite() && *cost >= 0.0);
+        if let Some(summary) = &mut self.response_cost {
+            match self.last_response_cost {
+                Some(cost) if (summary.cost_usd + cost).is_finite() => summary.cost_usd += cost,
+                _ => summary.cost_known = false,
+            }
+        }
+        let accounting = self.account_usage(&response.usage, estimate);
         self.result.responses.push(response);
         accounting
     }
+    async fn build_instructions(&self) -> Result<String, Error> {
+        let resolved = InstructionContext {
+            operation: &self.context,
+            agent: &self.agent,
+            snapshot: &self.result,
+            config: &self.config,
+            policy: &self.policy,
+        }
+        .resolve()
+        .await?;
+        let mut instructions = if self.config.cache_prefix.is_empty() {
+            resolved
+        } else {
+            format!("{}\n{resolved}", self.config.cache_prefix)
+        };
+        if instructions.trim().is_empty() {
+            instructions.clear();
+        }
+        let extra = self.config.additional_instructions.trim();
+        if !extra.is_empty() {
+            if !instructions.is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(extra);
+        }
+        if let Some(schema) = &self.agent.output_schema {
+            if !instructions.trim().is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            let name = self.agent.output_schema_name.trim();
+            let name = if name.is_empty() {
+                "final_output"
+            } else {
+                name
+            };
+            let strict = if self.agent.output_schema_strict {
+                "\nStrict mode: do not include prose, markdown fences, or fields outside the schema."
+            } else {
+                ""
+            };
+            instructions.push_str(&format!("<structured_output>\nWhen producing a final answer, return JSON only.\nOutput schema name: {name}{strict}\nJSON schema:\n{}\n</structured_output>", schema.as_str()));
+        }
+        let mcp_context = crate::mcp_prompt::context(&self.agent.mcp_servers);
+        if !mcp_context.is_empty() {
+            if !instructions.is_empty() {
+                instructions.push_str("\n\n---\n\n");
+            }
+            instructions.push_str(&mcp_context);
+        }
+        if self.summary_turn {
+            instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+        }
+        Ok(instructions)
+    }
+
     async fn model_response(
         &mut self,
         mut request: ModelRequest,
-    ) -> Result<Option<(ModelResponse, String, bool)>, Error> {
+        mut declared_tool_timeouts: Vec<Option<Duration>>,
+    ) -> Result<Option<(ModelResponse, bool, Option<f64>, Option<GenerationRecord>)>, Error> {
         let candidates: Vec<_> = std::iter::once(self.agent.model.clone())
             .chain(self.agent.fallbacks.clone())
             .collect();
         let agent_key = Arc::as_ptr(&self.agent) as usize;
         let start = self.fallbacks.get(&agent_key).map_or(0, |state| state.0);
         let mut attempt = 0;
+        let mut refresh_instructions = false;
         for (index, binding) in candidates.iter().enumerate().skip(start) {
             loop {
                 if self.turns >= self.policy.max_turns.get() {
                     return Err(Error::new(
                         ErrorCategory::MaxTurns,
-                        "maximum model turns exceeded",
+                        format!("max turns exceeded: {}", self.policy.max_turns),
                     ));
+                }
+                let force_summary = !self.summary_turn && self.final_summary_required();
+                let refresh = refresh_instructions && self.agent.instruction_provider.is_some();
+                if force_summary {
+                    self.summary_turn = true;
+                    if !refresh {
+                        request.instructions.push_str(FINAL_SUMMARY_DIRECTIVE);
+                    }
+                    request.tools.clear();
+                    declared_tool_timeouts.clear();
+                }
+                if refresh {
+                    request.instructions = self.build_instructions().await?;
+                    request.model = binding.name().into();
+                }
+                if force_summary || refresh {
+                    self.compact_local(&mut request, false, binding).await?;
+                }
+                refresh_instructions = true;
+                if self.config.compaction_model_resolver.is_some() {
+                    request.model = binding.name().into();
+                    self.compact_local(&mut request, false, binding).await?;
                 }
                 self.turns += 1;
                 self.observe(Observation::AgentStarted {
                     agent: self.agent.name.clone(),
+                    instructions: self.agent.instructions.clone(),
                 })
                 .await?;
                 self.observe(Observation::ModelAttempt {
@@ -1765,7 +2978,7 @@ impl Engine {
                 .await?;
                 if request.model != binding.name() {
                     request.model = binding.name().into();
-                    self.compact_local(&mut request, false).await?;
+                    self.compact_local(&mut request, false, binding).await?;
                 }
                 let markers = self
                     .approval_journal
@@ -1784,30 +2997,131 @@ impl Engine {
                         })
                         .await?;
                 }
+                self.last_model = Some(request.model.clone());
                 self.checkpoint(Boundary::ModelDispatched, None).await?;
+                let mut generation = self.config.generation_observer.as_ref().map(|observer| {
+                    let info = match binding {
+                        ModelBinding::Complete { model, .. } => model.info(&request.model),
+                        ModelBinding::Streaming { model, .. } => model.info(&request.model),
+                    };
+                    GenerationGuard::new(
+                        observer.clone(),
+                        &self.context,
+                        &self.agent.name,
+                        info,
+                        self.child_control.as_ref().map(|control| control.task_id()),
+                        self.turns,
+                        &request,
+                        declared_tool_timeouts.clone(),
+                        adk_codec::snapshots::RequestSnapshot::from_native_with_approvals(
+                            &self.agent.name,
+                            &request,
+                            &declared_tool_timeouts,
+                            &markers,
+                        ),
+                    )
+                });
+                let responses_before = self.result.responses.len();
                 let control = self.child_control.clone();
+                let signal = self.config.immediate_input_signal.clone();
+                let context = self.context.clone();
                 let visible = Arc::new(std::sync::atomic::AtomicBool::new(false));
+                let completed_usage = self
+                    .config
+                    .progress
+                    .as_ref()
+                    .map(|_| Arc::new(std::sync::Mutex::new(None)));
                 let attempt_result = {
-                    let attempt = self.model_attempt(binding, request.clone(), visible.clone());
+                    let attempt = self.model_attempt(
+                        binding,
+                        request.clone(),
+                        visible.clone(),
+                        generation.as_ref(),
+                        completed_usage.clone(),
+                    );
                     tokio::pin!(attempt);
-                    if let Some(control) = control {
+                    let wake = async {
+                        match &signal {
+                            Some(signal) => signal.wait(&context).await,
+                            None => std::future::pending().await,
+                        }
+                    };
+                    tokio::pin!(wake);
+                    let mut signal_enabled = signal.is_some();
+                    let mut child_enabled = control.is_some();
+                    loop {
                         tokio::select! {
                             biased;
-                            message = control.wait_for_messages() => {
+                            _ = &mut wake, if signal_enabled => {
+                                context.check_active()?;
+                                if !visible.load(std::sync::atomic::Ordering::Acquire) {
+                                    break None;
+                                }
+                                signal_enabled = false;
+                            }
+                            message = async {
+                                match &control {
+                                    Some(control) => control.wait_for_messages().await,
+                                    None => std::future::pending().await,
+                                }
+                            }, if child_enabled => {
                                 message?;
                                 if !visible.load(std::sync::atomic::Ordering::Acquire) {
-                                    return Ok(None);
+                                    break None;
                                 }
-                                attempt.await
+                                child_enabled = false;
                             }
-                            result = &mut attempt => result,
+                            result = &mut attempt => break Some(result),
                         }
-                    } else {
-                        attempt.await
                     }
                 };
+                let Some(attempt_result) = attempt_result else {
+                    if let Some(usage) =
+                        completed_usage.and_then(|slot| slot.lock().unwrap().take())
+                    {
+                        let cost =
+                            self.config.cost_estimator.as_ref().and_then(|estimator| {
+                                estimator.estimate_cost(binding.name(), &usage)
+                            });
+                        self.progress_usage(
+                            UsageOrigin::SteeringSuperseded,
+                            binding,
+                            &usage,
+                            cost,
+                            cost.is_some(),
+                        );
+                    }
+                    // A child turn limit may already be narrowed by host security policy.
+                    if self.child_control.is_none() {
+                        self.policy.max_turns = self.policy.max_turns.saturating_add(1);
+                    }
+                    return Ok(None);
+                };
+                if let Some(generation) = &mut generation {
+                    generation.returned();
+                    if self.result.responses.len() > responses_before {
+                        generation.record.response = self.result.responses.last().cloned();
+                        generation.record.cost_usd = self.last_response_cost;
+                    }
+                }
                 match attempt_result {
                     Ok(response) => {
+                        let cost = self.config.cost_estimator.as_ref().and_then(|estimator| {
+                            estimator.estimate_cost(binding.name(), &response.usage)
+                        });
+                        if let Some(generation) = &mut generation {
+                            generation.record.response = Some(response.clone());
+                            generation.record.cost_usd =
+                                cost.filter(|cost| cost.is_finite() && *cost >= 0.0);
+                            generation.finish(GenerationStatus::Completed);
+                        }
+                        self.progress_usage(
+                            UsageOrigin::Accepted,
+                            binding,
+                            &response.usage,
+                            cost,
+                            cost.is_some(),
+                        );
                         self.calibration.observe_estimate(
                             response
                                 .usage
@@ -1823,11 +3137,17 @@ impl Engine {
                         }
                         return Ok(Some((
                             response,
-                            binding.name().into(),
                             self.streaming && matches!(binding, ModelBinding::Streaming { .. }),
+                            cost,
+                            generation
+                                .as_ref()
+                                .map(|generation| generation.record.clone()),
                         )));
                     }
                     Err((error, committed)) => {
+                        if let Some(generation) = &mut generation {
+                            generation.record.error = Some(error.info.clone());
+                        }
                         if self.durable_state.is_some() && self.child_control.is_none() {
                             return Err(error);
                         }
@@ -1849,7 +3169,7 @@ impl Engine {
                         let message = error.info.message.to_lowercase();
                         if (message.contains("context_length_exceeded")
                             || message.contains("exceeds the context window"))
-                            && self.compact_local(&mut request, true).await?
+                            && self.compact_local(&mut request, true, binding).await?
                         {
                             continue;
                         }
@@ -1858,6 +3178,12 @@ impl Engine {
                             ModelBinding::Complete { model, .. } => model.retry_advice(&error),
                             ModelBinding::Streaming { model, .. } => model.retry_advice(&error),
                         };
+                        if let Some(generation) = &mut generation {
+                            generation.record.retry_reason = advice
+                                .as_ref()
+                                .map(|advice| advice.reason.trim().to_owned())
+                                .filter(|reason| !reason.is_empty());
+                        }
                         if let Some(next) = candidates.get(index + 1).filter(|_| {
                             error.info.category != ErrorCategory::ModelBehavior
                                 && (idle
@@ -1883,6 +3209,10 @@ impl Engine {
                                             .any(|part| reason.contains(part)))
                                     }))
                         }) {
+                            if let Some(generation) = &mut generation {
+                                generation.record.fallback_model = Some(next.name().into());
+                                generation.finish(GenerationStatus::Fallback);
+                            }
                             self.fallbacks.insert(agent_key, (index + 1, 0));
                             self.observe(Observation::Fallback {
                                 from: binding.name().into(),
@@ -1893,7 +3223,13 @@ impl Engine {
                         }
                         if let Some(handler) = &self.config.error_handler {
                             match handler.handle(&self.agent.name, self.turns - 1, &error) {
-                                ModelErrorAction::Retry | ModelErrorAction::Continue => continue,
+                                ModelErrorAction::Retry => {
+                                    if let Some(generation) = &mut generation {
+                                        generation.finish(GenerationStatus::Retrying);
+                                    }
+                                    continue;
+                                }
+                                ModelErrorAction::Continue => continue,
                                 ModelErrorAction::Abort => {
                                     return Err(self.child_model_failure(error));
                                 }
@@ -1938,6 +3274,22 @@ impl Engine {
                                 .min(Duration::from_secs(30))
                         }
                         .min(Duration::from_secs(300));
+                        if let Some(generation) = &mut generation {
+                            generation.record.retry_after = Some(delay);
+                            generation.finish(GenerationStatus::Retrying);
+                        }
+                        if let Some(progress) = &self.config.progress {
+                            progress.observe(
+                                &self.context,
+                                self.progress_frame(),
+                                ProgressObservation::Retry {
+                                    error: &error.info,
+                                    attempt,
+                                    max_retries: self.config.retry.max_retries,
+                                    delay,
+                                },
+                            );
+                        }
                         self.observe(Observation::Retry {
                             model: binding.name().into(),
                             delay,
@@ -1980,34 +3332,73 @@ impl Engine {
         binding: &ModelBinding,
         request: ModelRequest,
         visible: Arc<std::sync::atomic::AtomicBool>,
+        generation: Option<&GenerationGuard>,
+        completed_usage: Option<Arc<std::sync::Mutex<Option<Usage>>>>,
     ) -> Result<ModelResponse, (Error, bool)> {
         let timeout = self.config.model_idle_timeout;
+        let (activity_sender, mut activity_receiver) =
+            tokio::sync::watch::channel(tokio::time::Instant::now());
+        let activity: adk_core::ModelActivitySink = Arc::new(move || {
+            activity_sender.send_modify(|last| *last = tokio::time::Instant::now());
+        });
         match binding {
-            ModelBinding::Complete { model, .. } => bounded(
-                &self.context,
-                timeout,
-                model.complete(&self.context, request),
-            )
-            .await
-            .map_err(|e| (e, false)),
-            ModelBinding::Streaming { model, .. } if !self.streaming => bounded(
-                &self.context,
-                timeout,
-                model.complete(&self.context, request),
-            )
-            .await
-            .map_err(|e| (e, false)),
+            ModelBinding::Complete { model, .. } => {
+                let reasoning = generation
+                    .filter(|_| !self.streaming && self.config.blocking_reasoning)
+                    .map(|generation| {
+                        let visible = visible.clone();
+                        let sink: adk_core::ModelReasoningSink<'_> = Arc::new(move |delta| {
+                            if !delta.is_empty() {
+                                visible.store(true, std::sync::atomic::Ordering::Release);
+                                generation.reasoning_delta(delta);
+                            }
+                        });
+                        sink
+                    });
+                bounded_model(
+                    &self.context,
+                    timeout,
+                    &mut activity_receiver,
+                    model.complete_with_observers(
+                        &self.context,
+                        request,
+                        Some(activity.clone()),
+                        reasoning,
+                    ),
+                )
+                .await
+                .map_err(|error| (error, visible.load(std::sync::atomic::Ordering::Acquire)))
+            }
+            ModelBinding::Streaming { model, .. }
+                if !self.streaming && !self.config.blocking_reasoning =>
+            {
+                bounded_model(
+                    &self.context,
+                    timeout,
+                    &mut activity_receiver,
+                    model.complete_with_activity(&self.context, request, Some(activity.clone())),
+                )
+                .await
+                .map_err(|e| (e, false))
+            }
             ModelBinding::Streaming { model, .. } => {
                 let context = self.context.clone();
-                let mut stream = bounded(&context, timeout, model.stream(&context, request))
-                    .await
-                    .map_err(|e| (e, false))?;
+                let mut stream = bounded_model(
+                    &context,
+                    timeout,
+                    &mut activity_receiver,
+                    model.stream_with_activity(&context, request, Some(activity.clone())),
+                )
+                .await
+                .map_err(|e| (e, false))?;
                 let mut complete = None;
                 let mut items = vec![];
                 let mut delta_text = String::new();
                 let mut committed = false;
                 let result = loop {
-                    match bounded(&context, timeout, stream.next()).await {
+                    match bounded_model(&context, timeout, &mut activity_receiver, stream.next())
+                        .await
+                    {
                         Ok(Some(event)) => {
                             if complete.is_some() {
                                 break Err(Error::new(
@@ -2015,7 +3406,31 @@ impl Engine {
                                     "model event after Complete",
                                 ));
                             }
+                            if let (Some(slot), ModelEvent::Complete { response }) =
+                                (&completed_usage, &event)
+                            {
+                                *slot.lock().unwrap() = Some(response.usage.clone());
+                            }
+                            if !self.streaming {
+                                match &event {
+                                    ModelEvent::Complete { response } => {
+                                        complete = Some(response.clone())
+                                    }
+                                    ModelEvent::ReasoningDelta { delta } if !delta.is_empty() => {
+                                        if let Some(generation) = generation {
+                                            committed = true;
+                                            visible
+                                                .store(true, std::sync::atomic::Ordering::Release);
+                                            generation.reasoning_delta(delta);
+                                        }
+                                    }
+                                    _ => {}
+                                }
+                                continue;
+                            }
                             committed = true;
+                            // Every native model event is published to the host. Do not
+                            // replay even tool-argument/item events it may already have seen.
                             visible.store(true, std::sync::atomic::Ordering::Release);
                             match &event {
                                 ModelEvent::Complete { response } => {
@@ -2054,7 +3469,19 @@ impl Engine {
                     Ok(response) => Ok(response),
                     Err(error) => {
                         if let Some(response) = complete {
-                            let _ = self.record_response(response, binding.name());
+                            // Retaining an authoritative response must not replay its history or usage.
+                            committed = true;
+                            let cost = self.config.cost_estimator.as_ref().and_then(|estimator| {
+                                estimator.estimate_cost(binding.name(), &response.usage)
+                            });
+                            self.progress_usage(
+                                UsageOrigin::FailedStreamRetained,
+                                binding,
+                                &response.usage,
+                                cost,
+                                cost.is_some(),
+                            );
+                            let _ = self.record_response(response, cost);
                             let _ = self.charge_child_usage().await;
                         } else {
                             if !delta_text.is_empty() {
@@ -2075,18 +3502,54 @@ impl Engine {
             }
         }
     }
+    fn final_summary_required(&self) -> bool {
+        self.config.force_final_summary_turn
+            && self.turns.saturating_add(1) == self.policy.max_turns.get()
+            && !self
+                .config
+                .subagents
+                .as_ref()
+                .is_some_and(|session| session.has_pending_final_join())
+    }
+    fn effective_tool_policy(&self) -> ToolPolicy {
+        let mut policy = self.policy.tools.clone();
+        if self.summary_turn {
+            policy.allowed_tools = Some(Default::default());
+        }
+        if let Some(ceiling) = self.agent.tool_access_ceiling {
+            policy.access = match (policy.access, ceiling) {
+                (AccessMode::ReadOnly, _) | (_, AccessMode::ReadOnly) => AccessMode::ReadOnly,
+                (AccessMode::WorkspaceWrite, _) | (_, AccessMode::WorkspaceWrite) => {
+                    AccessMode::WorkspaceWrite
+                }
+                _ => AccessMode::FullAccess,
+            };
+            policy.allowed_mutating_tools.clear();
+        }
+        policy
+    }
+    fn handoff_enabled(&self, handoff: &Handoff) -> bool {
+        handoff.is_enabled.as_ref().is_none_or(|predicate| {
+            predicate.enabled(HandoffContext {
+                operation: &self.context,
+                agent: &self.agent,
+                target: &handoff.target,
+                snapshot: &self.result,
+                config: &self.config,
+                policy: &self.policy,
+            })
+        })
+    }
     fn tools_for_access(&self) -> Vec<Arc<dyn Tool>> {
+        let access = self.effective_tool_policy().access;
         self.agent
             .tools
             .iter()
-            .map(|tool| {
-                tool.for_access(self.policy.tools.access)
-                    .unwrap_or_else(|| tool.clone())
-            })
+            .map(|tool| tool.for_access(access).unwrap_or_else(|| tool.clone()))
             .collect()
     }
     fn tool_decision(&self, definition: &ToolDefinition) -> ToolDecision {
-        let decision = self.policy.tools.decision(definition);
+        let decision = self.effective_tool_policy().decision(definition);
         if decision == ToolDecision::Allow
             && self.config.approve_mutating_tools
             && !definition.read_only
@@ -2100,15 +3563,68 @@ impl Engine {
             decision
         }
     }
+    async fn authorize_action(
+        &mut self,
+        call: &ToolCall,
+        definition: &ToolDefinition,
+    ) -> Result<Option<ActionAuthorization>, Error> {
+        let Some(authorizer) = self.config.action_authorizer.clone() else {
+            return Ok(None);
+        };
+        if let Some(authorization) = self.action_authorizations.get(&call.id) {
+            return Ok(Some(authorization.clone()));
+        }
+        let request = ActionRequest {
+            tool_name: call.name.clone(),
+            input: call.argument_text().into_owned(),
+            work_dir: self.config.work_dir.clone(),
+            read_only: definition.read_only,
+            provenance: "model-tool-call".into(),
+        };
+        let outcome = bounded(&self.context, None, async {
+            Ok(std::panic::AssertUnwindSafe(async {
+                authorizer.authorize(&self.context, request.clone()).await
+            })
+            .catch_unwind()
+            .await
+            .unwrap_or_else(|_| {
+                Err(Error::new(ErrorCategory::Host, "action authorizer panicked").into())
+            }))
+        })
+        .await?;
+        self.context.check_active()?;
+        let (authorization, error) = match outcome {
+            Ok(authorization) => (authorization, None),
+            Err(failure) => (
+                ActionAuthorization {
+                    risk: failure.risk,
+                    ..Default::default()
+                },
+                Some(failure.error),
+            ),
+        };
+        let authorization = normalize_action_authorization(authorization, error.as_ref());
+        self.result.action_audit_records.push(ActionAuditRecord {
+            request,
+            authorization: authorization.clone(),
+            error: error.map(|error| error.to_string()).unwrap_or_default(),
+        });
+        self.action_authorizations
+            .insert(call.id.clone(), authorization.clone());
+        Ok(Some(authorization))
+    }
+
     async fn prepare_tools(&mut self) -> Result<(), Error> {
         if self.durable_state.is_some() {
             return Ok(());
         }
         if self.calls.front().is_some_and(|call| {
-            self.agent
-                .handoffs
-                .iter()
-                .any(|handoff| handoff.definition.name == call.name)
+            !self.disabled_handoff_calls.contains_key(&call.id)
+                && self
+                    .agent
+                    .handoffs
+                    .iter()
+                    .any(|handoff| handoff.definition.name == call.name)
         }) {
             return Ok(());
         }
@@ -2121,7 +3637,23 @@ impl Engine {
                 .find(|tool| tool.definition().name == call.name);
             if let Some(tool) = tool {
                 let definition = tool.definition();
-                if self.tool_decision(definition) == ToolDecision::RequireApproval {
+                let decision = self.tool_decision(definition);
+                let authorization = if decision == ToolDecision::Deny {
+                    None
+                } else {
+                    self.authorize_action(&call, definition).await?
+                };
+                if authorization
+                    .as_ref()
+                    .is_some_and(|auth| auth.decision == ACTION_DECISION_DENY)
+                {
+                    ready.push_back(call);
+                    continue;
+                }
+                let action_ask = authorization
+                    .as_ref()
+                    .is_some_and(|auth| auth.decision == ACTION_DECISION_ASK);
+                if decision == ToolDecision::RequireApproval || action_ask {
                     if self.config.validate_tool_arguments
                         && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
                     {
@@ -2132,7 +3664,12 @@ impl Engine {
                     }
                     let request = ApprovalRequest {
                         call: call.clone(),
-                        reason: "tool policy requires approval".into(),
+                        reason: if action_ask {
+                            "action authorizer requires approval"
+                        } else {
+                            "tool policy requires approval"
+                        }
+                        .into(),
                     };
                     let approval = if let Some(approval) = self.approvals.remove(&call.id) {
                         approval
@@ -2179,6 +3716,11 @@ impl Engine {
                     let definition = tool.definition();
                     definition.name == call.name
                         && self.tool_decision(definition) == ToolDecision::Allow
+                        && (self.config.action_authorizer.is_none()
+                            || self
+                                .action_authorizations
+                                .get(&call.id)
+                                .is_some_and(|auth| auth.decision == ACTION_DECISION_ALLOW))
                         && (!self.config.validate_tool_arguments
                             || compile_schema(&definition.input_schema)
                                 .is_ok_and(|schema| schema.is_valid(&call.arguments)))
@@ -2232,16 +3774,16 @@ impl Engine {
         let tool = accessible_tools
             .iter()
             .find(|t| t.definition().name == call.name);
-        let handoff = agent
-            .handoffs
-            .iter()
-            .find(|h| h.definition.name == call.name);
+        let handoff = agent.handoffs.iter().find(|h| {
+            h.definition.name == call.name
+                && !matches!(self.disabled_handoff_calls.get(&call.id), Some(None))
+        });
         let definition = tool
             .map(|t| t.definition())
             .or_else(|| handoff.map(|h| &h.definition));
-        if definition
-            .is_none_or(|definition| self.policy.tools.decision(definition) == ToolDecision::Deny)
-        {
+        if definition.is_none_or(|definition| {
+            self.effective_tool_policy().decision(definition) == ToolDecision::Deny
+        }) {
             let output = ToolOutput {
                 content: vec![Content::Text {
                     text: format!("unknown tool: {}", call.name),
@@ -2252,6 +3794,7 @@ impl Engine {
             self.finish_tool(
                 call,
                 ExecutedTool {
+                    guardrails: vec![],
                     raw: output,
                     hook_error: None,
                 },
@@ -2260,8 +3803,41 @@ impl Engine {
             return Ok(false);
         }
         let definition = definition.unwrap();
-        let decision = self.tool_decision(definition);
-        if self.config.validate_tool_arguments
+        let authorization = if tool.is_some() {
+            self.authorize_action(&call, definition).await?
+        } else {
+            None
+        };
+        if let Some(authorization) = &authorization
+            && authorization.decision == ACTION_DECISION_DENY
+        {
+            let reason = authorization.reason.trim();
+            let reason = if reason.is_empty() {
+                "the action is not permitted by policy"
+            } else {
+                reason
+            };
+            self.finish_tool(call, ExecutedTool {
+                guardrails: vec![],
+                raw: ToolOutput {
+                    content: vec![Content::Text { text: format!("Action denied: {reason}. Respect this boundary and find a safer approach; do not route around it.") }],
+                    is_error: true,
+                    should_pause: false,
+                },
+                hook_error: None,
+            }).await?;
+            return Ok(false);
+        }
+        let action_ask = authorization
+            .as_ref()
+            .is_some_and(|auth| auth.decision == ACTION_DECISION_ASK);
+        let decision = if action_ask {
+            ToolDecision::RequireApproval
+        } else {
+            self.tool_decision(definition)
+        };
+        if handoff.is_none()
+            && self.config.validate_tool_arguments
             && !compile_schema(&definition.input_schema)?.is_valid(&call.arguments)
         {
             return Err(Error::new(
@@ -2272,7 +3848,12 @@ impl Engine {
         if decision == ToolDecision::RequireApproval {
             let request = ApprovalRequest {
                 call: call.clone(),
-                reason: "tool policy requires approval".into(),
+                reason: if action_ask {
+                    "action authorizer requires approval"
+                } else {
+                    "tool policy requires approval"
+                }
+                .into(),
             };
             if self.durable_state.is_some() {
                 self.checkpoint(Boundary::ApprovalPending, Some(&call))
@@ -2322,7 +3903,7 @@ impl Engine {
                         is_error: true,
                         should_pause: false,
                     };
-                    self.append(RunItem::ToolResult {
+                    self.append_unattributed(RunItem::ToolResult {
                         call_id: call.id.clone(),
                         output: output.clone(),
                     });
@@ -2342,7 +3923,71 @@ impl Engine {
             }
         }
         self.checkpoint(Boundary::ToolPrepared, Some(&call)).await?;
+        if let Some(Some(target)) = self.disabled_handoff_calls.get(&call.id) {
+            let output = ToolOutput {
+                content: vec![Content::Text {
+                    text: format!("Handing off to {target}"),
+                }],
+                is_error: false,
+                should_pause: false,
+            };
+            self.finish_tool(
+                call,
+                ExecutedTool {
+                    guardrails: vec![],
+                    raw: output,
+                    hook_error: None,
+                },
+            )
+            .await?;
+            return Ok(false);
+        }
         if let Some(handoff) = handoff {
+            let from = self.agent.name.clone();
+            let to = handoff.target.name.clone();
+            self.observe(Observation::HandoffStarted {
+                from: from.clone(),
+                to: to.clone(),
+            })
+            .await?;
+            self.observe(Observation::Handoff {
+                from: self.agent.name.clone(),
+                to: handoff.target.name.clone(),
+            })
+            .await?;
+            if let Some(callback) = &handoff.on_handoff {
+                let input = call.argument_text();
+                if !input.is_empty()
+                    && handoff.input_type.as_ref().is_some_and(|input_type| {
+                        input_type.parser.as_ref().map_or_else(
+                            || adk_codec::value::decode(input.as_bytes()).is_err(),
+                            |parser| parser.parse(&input).is_err(),
+                        )
+                    })
+                {
+                    self.observe(Observation::HandoffInputValidationFailed {
+                        tool: call.name.clone(),
+                    })
+                    .await?;
+                }
+                bounded(&self.context, None, async {
+                    callback
+                        .on_handoff(
+                            HandoffContext {
+                                operation: &self.context,
+                                agent: &self.agent,
+                                target: &handoff.target,
+                                snapshot: &self.result,
+                                config: &self.config,
+                                policy: &self.policy,
+                            },
+                            &call,
+                        )
+                        .await;
+                    Ok(())
+                })
+                .await?;
+            }
             // Handoff outputs include deliberately skipped siblings; they are
             // not a failed tool turn and must neither advance nor reset its streak.
             self.tool_turn_start = None;
@@ -2374,16 +4019,93 @@ impl Engine {
                 }
             }
             self.publish_committed().await?;
-            let from = self.agent.name.clone();
+            if let Some(filter) = &handoff.history_filter {
+                let approvals = self
+                    .approval_journal
+                    .history_markers()
+                    .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+                let filtered = bounded(
+                    &self.context,
+                    None,
+                    filter.filter(
+                        HandoffContext {
+                            operation: &self.context,
+                            agent: &self.agent,
+                            target: &handoff.target,
+                            snapshot: &self.result,
+                            config: &self.config,
+                            policy: &self.policy,
+                        },
+                        HandoffHistory {
+                            items: self.result.history.clone(),
+                            provenance: self.result.history_provenance.clone(),
+                            approvals: approvals.clone(),
+                        },
+                    ),
+                )
+                .await?;
+                validate_history_pairs(&filtered.items)?;
+                let provenance = normalize_provenance(filtered.items.len(), &filtered.provenance)?;
+                crate::compat::ApprovalJournal::from_history(
+                    filtered.approvals.clone(),
+                    filtered.items.len(),
+                )
+                .map_err(|error| Error::new(ErrorCategory::InvalidInput, error.to_string()))?;
+                let observation = Observation::ApprovalHistoryReplaced {
+                    before: self.result.history.clone(),
+                    after: filtered.items.clone(),
+                    markers: filtered.approvals,
+                };
+                // A rejected replacement must not invalidate the live approval journal.
+                let journal = crate::compat::ApprovalJournal::from_history(
+                    approvals,
+                    self.result.history.len(),
+                )
+                .map_err(|error| Error::new(ErrorCategory::Internal, error.to_string()))?;
+                journal.observe(&self.context, observation.clone()).await?;
+                self.result.usage.context_tokens = Some(estimate_history_tokens(&filtered.items));
+                self.result.history = filtered.items;
+                self.result.history_provenance = provenance;
+                self.observe(observation).await?;
+            }
+            if handoff.input_filter == HandoffInputFilter::RemoveTools {
+                let (history, provenance): (Vec<_>, Vec<_>) = self
+                    .result
+                    .history
+                    .iter()
+                    .zip(&self.result.history_provenance)
+                    .filter(|(item, _)| {
+                        matches!(
+                            item,
+                            RunItem::Message { .. }
+                                | RunItem::PhasedMessage { .. }
+                                | RunItem::Compaction { .. }
+                        )
+                    })
+                    .map(|(item, source)| (item.clone(), source.clone()))
+                    .unzip();
+                // observe updates the approval journal before invoking fallible
+                // host hooks. Commit the matching history first so a hook error
+                // cannot return unfiltered history with already-cleared anchors.
+                self.result.usage.context_tokens = Some(estimate_history_tokens(&history));
+                let before = std::mem::replace(&mut self.result.history, history);
+                self.result.history_provenance = provenance;
+                self.observe(Observation::ApprovalHistoryReplaced {
+                    before,
+                    after: self.result.history.clone(),
+                    markers: vec![],
+                })
+                .await?;
+            }
+            self.compact_handoff().await?;
             self.agent = handoff.target.clone();
+            self.matched_stop_tool = false;
+            self.pending_completion = false;
             self.result.last_agent = Some(self.agent.name.clone());
-            self.observe(Observation::Handoff {
-                from,
-                to: self.agent.name.clone(),
-            })
-            .await?;
             self.phase = Phase::Model;
             self.checkpoint(Boundary::Handoff, None).await?;
+            self.observe(Observation::HandoffCompleted { from, to })
+                .await?;
             return Ok(false);
         }
         let tool = tool.expect("tool or handoff resolved");
@@ -2394,6 +4116,29 @@ impl Engine {
         Ok(false)
     }
     async fn execute_tool(&self, tool: &dyn Tool, call: &ToolCall) -> Result<ExecutedTool, Error> {
+        let checked = run_guardrails(
+            &self.config.tool_input_guardrails,
+            &self.context,
+            &self.agent.name,
+            GuardrailInput::ToolInput(call),
+        )
+        .await;
+        let tripped = checked.tripped();
+        let mut guardrails = checked.reports;
+        if let Some(error) = checked.error {
+            let raw = ToolOutput {
+                content: vec![Content::Text {
+                    text: error.to_string(),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            return Ok(ExecutedTool {
+                raw,
+                guardrails,
+                hook_error: if tripped { None } else { Some(error) },
+            });
+        }
         self.observe(Observation::ToolStarted {
             agent: self.agent.name.clone(),
             call: call.clone(),
@@ -2402,7 +4147,8 @@ impl Engine {
         self.emit(RunEvent::ToolStarted { call: call.clone() })
             .await?;
         let mut operation = self.context.clone();
-        let timeout = self.policy.tools.timeout.or_else(|| tool.timeout());
+        let policy = self.effective_tool_policy();
+        let timeout = policy.timeout.or_else(|| tool.timeout());
         if let Some(timeout) = timeout {
             if let Some(deadline) = Instant::now().checked_add(timeout) {
                 operation.deadline = Some(operation.deadline.map_or(deadline, |d| d.min(deadline)));
@@ -2411,7 +4157,7 @@ impl Engine {
         let context = ToolContext {
             operation,
             work_dir: self.config.work_dir.clone(),
-            policy: self.policy.tools.clone(),
+            policy,
             idempotency_key: Some(
                 self.durable_state
                     .as_ref()
@@ -2473,7 +4219,7 @@ impl Engine {
                 )
                 .await?;
         }
-        let raw = match result {
+        let mut raw = match result {
             Ok(output) => output,
             Err(error) => {
                 if self.durable_state.is_some() {
@@ -2502,6 +4248,28 @@ impl Engine {
                 }
             }
         };
+        let checked = run_tool_output_guardrails(
+            &self.config.tool_output_guardrails,
+            &self.context,
+            &self.agent.name,
+            call,
+            &mut raw,
+        )
+        .await;
+        let tripped = checked.tripped();
+        guardrails.extend(checked.reports);
+        let guardrail_error = if let Some(error) = checked.error {
+            raw = ToolOutput {
+                content: vec![Content::Text {
+                    text: error.to_string(),
+                }],
+                is_error: true,
+                should_pause: false,
+            };
+            if tripped { None } else { Some(error) }
+        } else {
+            None
+        };
         let hook_error = self
             .observe(Observation::RawToolOutput {
                 call: call.clone(),
@@ -2509,11 +4277,20 @@ impl Engine {
             })
             .await
             .err();
-        Ok(ExecutedTool { raw, hook_error })
+        Ok(ExecutedTool {
+            raw,
+            guardrails,
+            hook_error: guardrail_error.or(hook_error),
+        })
     }
     async fn finish_tool(&mut self, call: ToolCall, executed: ExecutedTool) -> Result<(), Error> {
         self.calls.pop_front();
         self.approvals.remove(&call.id);
+        self.action_authorizations.remove(&call.id);
+        self.result
+            .pending_approvals
+            .retain(|request| request.call.id != call.id);
+        self.result.guardrails.extend(executed.guardrails);
         let raw = executed.raw;
         self.tool_pause |= raw.should_pause;
         if let Some(error) = executed.hook_error {
@@ -2525,7 +4302,8 @@ impl Engine {
         }
         let processed = match self.config.output.process(
             raw,
-            self.durable_state.is_none() && self.policy.tools.access != AccessMode::ReadOnly,
+            self.durable_state.is_none()
+                && self.effective_tool_policy().access != AccessMode::ReadOnly,
         ) {
             Ok(processed) => processed,
             Err(error) => {
@@ -2542,6 +4320,11 @@ impl Engine {
         if self.tool_final.is_none() {
             self.tool_final = Some(text(&processed.item_output.content));
         }
+        let provenance = ItemProvenance::Agent {
+            name: self.agent.name.clone(),
+        };
+        self.result.history_provenance.push(provenance.clone());
+        self.result.new_items_provenance.push(provenance);
         self.result.history.push(RunItem::ToolResult {
             call_id: call.id.clone(),
             output: processed.output,
@@ -2576,6 +4359,7 @@ fn validate_history_pairs(history: &[RunItem]) -> Result<(), Error> {
     for item in history {
         match item {
             RunItem::ToolCall { call } => {
+                call.validate_argument_projection()?;
                 if !pending.insert(call.id.clone()) {
                     return Err(Error::new(
                         ErrorCategory::InvalidInput,
@@ -2626,6 +4410,7 @@ impl std::error::Error for FailedSpills {
 #[derive(Default)]
 pub struct Conversation {
     pub history: Vec<RunItem>,
+    pub history_provenance: Vec<ItemProvenance>,
     spills: Vec<Arc<SpillFile>>,
     paused: bool,
 }
@@ -2641,11 +4426,16 @@ impl Conversation {
         if self.paused {
             return Err(Error::new(ErrorCategory::InvalidInput, "resume the continuation and accept its outcome before running the conversation again").into());
         }
+        self.history_provenance =
+            normalize_provenance(self.history.len(), &self.history_provenance)?;
         self.history.extend(input);
+        self.history_provenance
+            .resize(self.history.len(), ItemProvenance::Unknown);
         let result = runner
             .run(
                 context,
                 RunRequest {
+                    input_provenance: self.history_provenance.clone(),
                     input: self.history.clone(),
                     policy,
                 },
@@ -2655,6 +4445,7 @@ impl Conversation {
         match result {
             Ok(outcome) => {
                 self.history = outcome.result.history.clone();
+                self.history_provenance = outcome.result.history_provenance.clone();
                 self.paused = outcome.result.status == RunStatus::Paused;
                 self.spills.extend(outcome.spills.iter().cloned());
                 Ok(outcome)
@@ -2670,6 +4461,7 @@ impl Conversation {
     pub fn accept_error(&mut self, error: &RunError) {
         if let Some(partial) = &error.partial {
             self.history = partial.history.clone();
+            self.history_provenance = partial.history_provenance.clone();
         }
         if let Some(spills) = error
             .error
@@ -2684,6 +4476,7 @@ impl Conversation {
     /// Use after resuming an owned continuation to update conversation history.
     pub fn accept(&mut self, outcome: &mut RunOutcome) {
         self.history = outcome.result.history.clone();
+        self.history_provenance = outcome.result.history_provenance.clone();
         self.paused = outcome.result.status == RunStatus::Paused;
         self.spills.extend(outcome.spills.iter().cloned());
     }
@@ -2707,12 +4500,38 @@ impl durable::CheckpointStore for ChildRunnerStore {
     }
 }
 
+fn child_partial_progress(items: &[RunItem]) -> Option<String> {
+    let progress = items.iter().rev().find_map(|item| {
+        let message = match item {
+            RunItem::Message { message } | RunItem::PhasedMessage { message, .. } => message,
+            _ => return None,
+        };
+        let text = text(&message.content);
+        let text = text.trim();
+        (!text.is_empty() && !text.starts_with("[SYSTEM]")).then(|| text.to_owned())
+    })?;
+    let chars: Vec<_> = progress.chars().collect();
+    if chars.len() <= 1600 {
+        return Some(progress);
+    }
+    // Match the SDK's byte-sized marker reserve while counting content as Unicode scalars.
+    let keep = 1600 - ("\n…[elided %d chars]…\n".len() + 12);
+    let head = keep * 2 / 3;
+    let tail = keep - head;
+    let mut progress: String = chars[..head].iter().collect();
+    progress.push_str(&format!("\n…[elided {} chars]…\n", chars.len() - keep));
+    progress.extend(&chars[chars.len() - tail..]);
+    Some(progress)
+}
+
 impl Runner {
     pub(crate) async fn run_child(
         &self,
         mut invocation: crate::subagent::ChildInvocation,
         control: crate::subagent::ChildControl,
         host: Arc<dyn Host>,
+        output_extractor: Option<&crate::subagent_tools::ChildOutputExtractor>,
+        progress: Option<Arc<dyn RuntimeProgress>>,
     ) -> Result<crate::subagent::ChildOutcome, Error> {
         use crate::subagent::{ChildOutcome, TaskStatus};
         let child_agent_name = invocation.agent_name.clone();
@@ -2746,8 +4565,61 @@ impl Runner {
         }
         let mut config = self.config.as_ref().clone();
         config.subagents = Some(session.clone());
+        config.progress = progress;
+        config.force_final_summary_turn = true;
+        config.prompt_cache_key = Some(invocation.task_id.clone());
+        if config
+            .prompt_cache_namespace
+            .as_deref()
+            .is_none_or(|namespace| namespace.trim().is_empty())
+        {
+            config.prompt_cache_namespace = Some(control.root_run_id().to_owned());
+        }
+        struct ChildInstructions {
+            provider: Arc<dyn InstructionProvider>,
+            suffix: String,
+        }
+        impl InstructionProvider for ChildInstructions {
+            fn durable_key(&self) -> Option<&str> {
+                self.provider.durable_key()
+            }
+            fn instructions<'a>(
+                &'a self,
+                context: InstructionContext<'a>,
+            ) -> BoxFuture<'a, Result<String, Error>> {
+                Box::pin(
+                    async move { Ok(self.provider.instructions(context).await? + &self.suffix) },
+                )
+            }
+        }
+        let child_base = bind_agent(&self.initial, &session, &mut HashMap::new())?;
+        let mut initial = child_base.as_ref().clone();
+        let mut suffix = String::new();
+        if !config.work_dir.as_os_str().is_empty() {
+            let access = if initial.tool_access_ceiling == Some(AccessMode::ReadOnly) {
+                AccessMode::ReadOnly
+            } else {
+                invocation.security.tools.access
+            };
+            suffix.push_str("\n\n");
+            suffix.push_str(&crate::workspace_context(
+                &config.work_dir.to_string_lossy(),
+                access,
+            ));
+        }
+        suffix.push_str(&format!(
+            "\n\n{}",
+            adk_codec::userinput::build_subagent_budget_context(i64::from(
+                invocation.request.policy.max_turns.get()
+            ))
+        ));
+        initial.instructions.push_str(&suffix);
+        if let Some(provider) = initial.instruction_provider.take() {
+            initial.instruction_provider = Some(Arc::new(ChildInstructions { provider, suffix }));
+        }
         let scoped = Runner {
-            initial: bind_agent(&self.initial, &session, &mut HashMap::new())?,
+            initial: Arc::new(initial),
+            child_base: Some(child_base),
             config: Arc::new(config),
         };
         let security = &invocation.security;
@@ -2773,6 +4645,7 @@ impl Runner {
             durable.resume = invocation.resume;
             if durable.resume.is_some() {
                 invocation.request.input.clear();
+                invocation.request.input_provenance.clear();
             }
             scoped
                 .drive_durable(
@@ -2810,7 +4683,7 @@ impl Runner {
                 let Some(snapshot) = error.partial else {
                     return Err(error.error);
                 };
-                let message = if status == TaskStatus::Failed {
+                let mut message = if status == TaskStatus::Failed {
                     format!(
                         "agent {child_agent_name:?} failed: {}",
                         error.error.info.message
@@ -2818,41 +4691,69 @@ impl Runner {
                 } else {
                     error.error.info.message
                 };
+                if let Some(progress) = child_partial_progress(&snapshot.new_items) {
+                    message.push_str("\nPartial progress before the run ended:\n");
+                    message.push_str(&progress);
+                }
                 (*snapshot, status, Some(message))
             }
         };
+        let extracted = output_extractor
+            .filter(|_| status == TaskStatus::Completed)
+            .map(|extract| extract(&snapshot))
+            .filter(|text| !text.is_empty());
+        let (cost_usd, cost_known) = if status == TaskStatus::Completed {
+            crate::cost::estimate_result_cost(
+                &snapshot,
+                self.initial.model.name(),
+                self.config.cost_estimator.as_deref(),
+            )
+        } else {
+            snapshot.metrics.as_ref().map_or((0.0, false), |metrics| {
+                (metrics.cost_usd, metrics.cost_known)
+            })
+        };
         Ok(ChildOutcome {
+            cost_usd,
+            cost_known,
             status,
-            result: snapshot
-                .final_output
-                .map(|value| match value {
-                    Value::String(text) => text,
-                    value => value.to_string(),
+            result: if status == TaskStatus::Completed {
+                extracted.unwrap_or_else(|| match snapshot.final_text() {
+                    "" => "(no output)".into(),
+                    text => text.to_owned(),
                 })
-                .unwrap_or_else(|| {
-                    let progress = snapshot
-                        .new_items
-                        .iter()
-                        .filter_map(|item| match item {
-                            RunItem::Message { message }
-                            | RunItem::PhasedMessage { message, .. }
-                                if message.role == Role::Assistant =>
-                            {
-                                Some(text(&message.content))
-                            }
-                            _ => None,
-                        })
-                        .collect::<Vec<_>>()
-                        .join("\n");
-                    progress
-                        .chars()
-                        .rev()
-                        .take(4096)
-                        .collect::<Vec<_>>()
-                        .into_iter()
-                        .rev()
-                        .collect()
-                }),
+            } else {
+                snapshot
+                    .final_output
+                    .map(|value| match value {
+                        Value::String(text) => text,
+                        value => value.to_string(),
+                    })
+                    .unwrap_or_else(|| {
+                        let progress = snapshot
+                            .new_items
+                            .iter()
+                            .filter_map(|item| match item {
+                                RunItem::Message { message }
+                                | RunItem::PhasedMessage { message, .. }
+                                    if message.role == Role::Assistant =>
+                                {
+                                    Some(text(&message.content))
+                                }
+                                _ => None,
+                            })
+                            .collect::<Vec<_>>()
+                            .join("\n");
+                        progress
+                            .chars()
+                            .rev()
+                            .take(4096)
+                            .collect::<Vec<_>>()
+                            .into_iter()
+                            .rev()
+                            .collect()
+                    })
+            },
             error,
             usage: control.usage(),
         })

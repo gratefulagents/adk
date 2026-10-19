@@ -38,6 +38,7 @@ async fn invoke(registry: &Registry, name: &str, input: Value) -> ToolOutput {
         .execute(
             &context(),
             ToolCall {
+                raw_arguments: None,
                 id: "call".into(),
                 name: name.into(),
                 arguments: input,
@@ -100,6 +101,7 @@ async fn type_errors_do_not_pause_and_cancelled_calls_do_not_execute() {
         .execute(
             &ctx,
             ToolCall {
+                raw_arguments: None,
                 id: "cancel".into(),
                 name: "think".into(),
                 arguments: json!({"thought":"No work"}),

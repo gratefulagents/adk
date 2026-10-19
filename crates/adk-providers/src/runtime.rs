@@ -4,14 +4,21 @@ use adk_core::{BoxFuture, Context, Error, ErrorCategory, ModelRequest, Streaming
 use adk_runtime::{CompactedHistory, CompactionRequest, Compactor, CostEstimator};
 use std::sync::Arc;
 
+mod metadata;
+pub use metadata::{MetadataCompactionResolver, MetadataCompactionWarning};
+
 /// Baseline USD accounting for the runner's actual selected binding, including
 /// named routes and fallbacks. The runner requires a number: unknown prices use
-/// zero, as in baseline CalculateCost. Use Routes::estimate_cost to retain the
-/// known/unknown distinction; this adapter cannot enforce budgets for unknowns.
+/// zero, as in baseline CalculateCost. `estimate_cost` retains the known/unknown
+/// distinction for traces and cumulative metrics; budgets cannot constrain unknown prices.
 pub struct BaselineCosts(pub Arc<crate::routing::Routes>);
 impl CostEstimator for BaselineCosts {
     fn cost(&self, model: &str, usage: &adk_core::Usage) -> f64 {
         self.0.estimate_cost(model, usage).unwrap_or(0.0)
+    }
+
+    fn estimate_cost(&self, model: &str, usage: &adk_core::Usage) -> Option<f64> {
+        self.0.estimate_cost(model, usage)
     }
 }
 
@@ -43,8 +50,10 @@ impl Compactor for NativeCompactor {
             let mut input = self.template.clone();
             input.model = model;
             input.input = request.history;
+            input.input_provenance = request.history_provenance;
             let response = self.provider.compact(context, input).await?;
-            let cost = self.costs.cost(&request.model, &response.usage);
+            let estimate = self.costs.estimate_cost(&request.model, &response.usage);
+            let cost = estimate.unwrap_or(0.0);
             if !cost.is_finite() || cost < 0.0 {
                 return Err(Error::new(
                     ErrorCategory::InvalidInput,
@@ -53,9 +62,13 @@ impl Compactor for NativeCompactor {
             }
             Ok(CompactedHistory {
                 context_tokens: adk_runtime::compaction::estimate_history_tokens(&response.items),
+                // The provider returns replacement history without an attribution
+                // correspondence. Let the runner normalize it to Unknown.
+                history_provenance: Vec::new(),
                 history: response.items,
                 usage: response.usage,
                 cost,
+                cost_known: estimate.is_some(),
             })
         })
     }

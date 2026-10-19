@@ -46,16 +46,35 @@ pub enum OutputMode {
     Pty { rows: u16, cols: u16 },
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone)]
 pub struct Config {
     pub workspace: PathBuf,
     pub backend: Backend,
     /// Explicit host-selected, read-only runtime directories (for example, an
     /// Apple developer toolchain). Never construct these from model input.
     pub runtime_roots: Vec<PathBuf>,
+    /// Explicit host-owned application grants, never inherited or model-supplied.
+    /// Values reach the child and may appear in backend argv; not credential delivery.
+    pub application_env: BTreeMap<String, String>,
     /// Combined retained stdout/stderr byte budget; excess bytes are drained.
     pub output_limit: usize,
     pub term_grace: Duration,
+}
+
+impl std::fmt::Debug for Config {
+    fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        f.debug_struct("Config")
+            .field("workspace", &self.workspace)
+            .field("backend", &self.backend)
+            .field("runtime_roots", &self.runtime_roots)
+            .field(
+                "application_env_keys",
+                &self.application_env.keys().collect::<Vec<_>>(),
+            )
+            .field("output_limit", &self.output_limit)
+            .field("term_grace", &self.term_grace)
+            .finish()
+    }
 }
 
 impl Config {
@@ -64,6 +83,7 @@ impl Config {
             workspace: workspace.into(),
             backend: Backend::Auto,
             runtime_roots: Vec::new(),
+            application_env: BTreeMap::new(),
             output_limit: 1024 * 1024,
             term_grace: Duration::from_millis(250),
         }
@@ -298,6 +318,7 @@ pub fn macos_developer_toolchain_root() -> Result<PathBuf, Error> {
 impl Executor {
     pub fn new(mut config: Config) -> Result<Self, Error> {
         config.workspace = policy::workspace(&config.workspace)?;
+        policy::environment(&BTreeMap::new(), &config.application_env, Path::new("/tmp"))?;
         config.runtime_roots = trusted_runtime_roots(&config.workspace, config.runtime_roots)?;
         if config.output_limit > 64 * 1024 * 1024 || config.term_grace > Duration::from_secs(30) {
             return Err(Error::Invalid(

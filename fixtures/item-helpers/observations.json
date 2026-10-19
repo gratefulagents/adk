@@ -1,0 +1,1059 @@
+{
+  "cases": [
+    {
+      "body": "null",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": ""
+    },
+    {
+      "body": "[]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": ""
+    },
+    {
+      "body": "[{}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": ""
+    },
+    {
+      "body": "[{\"Message\":{\"text\":\"kept\"}},{},{\"Message\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "kept",
+      "text": "kept"
+    },
+    {
+      "body": "[{\"Message\":{\"text\":\"hello\"}},{\"Type\":1,\"ToolCall\":{\"Name\":\"bash\"}},{\"Message\":{\"text\":\"world\"}}]",
+      "call_inputs": [
+        ""
+      ],
+      "calls": [
+        {
+          "id": "",
+          "input": null,
+          "name": "bash"
+        }
+      ],
+      "last": "world",
+      "text": "hello\nworld"
+    },
+    {
+      "body": "[{\"Message\":{\"text\":\"first\"}},{\"Type\":1,\"ToolCall\":{\"Name\":\"bash\"}},{\"Message\":{\"text\":\"last\"}}]",
+      "call_inputs": [
+        ""
+      ],
+      "calls": [
+        {
+          "id": "",
+          "input": null,
+          "name": "bash"
+        }
+      ],
+      "last": "last",
+      "text": "first\nlast"
+    },
+    {
+      "body": "[{\"Type\":1,\"ToolCall\":{\"Name\":\"bash\",\"ID\":\"1\"}},{\"Message\":{\"text\":\"text\"}},{\"Type\":1,\"ToolCall\":{\"Name\":\"read\",\"ID\":\"2\"}}]",
+      "call_inputs": [
+        "",
+        ""
+      ],
+      "calls": [
+        {
+          "id": "1",
+          "input": null,
+          "name": "bash"
+        },
+        {
+          "id": "2",
+          "input": null,
+          "name": "read"
+        }
+      ],
+      "last": "text",
+      "text": "text"
+    },
+    {
+      "body": "[{\"Type\":1},{\"Type\":0,\"ToolCall\":{\"name\":\"ignored\"}},{\"Type\":2,\"Message\":{\"text\":\"ignored\"}},{\"Type\":99,\"Message\":{\"text\":\"ignored\"}},{\"Message\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": ""
+    },
+    {
+      "body": "[{\"Message\":{\"text\":\"visible\"}},{\"Message\":{\"images\":[{\"media_type\":\"image/png\",\"data\":\"aGk=\"}]}}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "visible\n"
+    },
+    {
+      "body": "[{\"Message\":{\"text\":\"kept\"},\"ToolCall\":{\"name\":\"ignored\"}},{\"Type\":1,\"Message\":{\"text\":\"ignored\"},\"ToolCall\":{\"name\":\"kept\"}}]",
+      "call_inputs": [
+        ""
+      ],
+      "calls": [
+        {
+          "id": "",
+          "input": null,
+          "name": "kept"
+        }
+      ],
+      "last": "kept",
+      "text": "kept"
+    },
+    {
+      "body": "[{\"Type\":1,\"ToolCall\":{\"id\":\"raw\",\"name\":\"echo\",\"input\": { \"z\": 1e0, \"a\":2,\"a\":3 } }},{\"Type\":1,\"ToolCall\":{\"id\":\"null\",\"input\":null}}]",
+      "call_inputs": [
+        "7b20227a223a203165302c202261223a322c2261223a33207d",
+        "6e756c6c"
+      ],
+      "calls": [
+        {
+          "id": "raw",
+          "input": {
+            "a": 3,
+            "z": 1.0
+          },
+          "name": "echo"
+        },
+        {
+          "id": "null",
+          "input": null,
+          "name": ""
+        }
+      ],
+      "last": "",
+      "text": ""
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": ""
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "a\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "a\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "a\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "a\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": " \n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": " \na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " \n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": " \n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": " \n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\u754c\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\u754c\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\u754c\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\u754c\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "a\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "a\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "a\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "a\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "a\na\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a\na\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "a\na\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "a\na\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "a\na\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "a\n \n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a\n \na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "a\n \n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "a\n \n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "a\n \n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "a\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a\n\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "a\n\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "a\n\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "a\n\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "a\n\u754c\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "a\n\u754c\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "a\n\u754c\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "a\n\u754c\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "a\n\u754c\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": " \n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": " \n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " \n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": " \n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": " \n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": " \na\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": " \na\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " \na\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": " \na\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": " \na\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": " \n \n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": " \n \na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " \n \n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": " \n \n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": " \n \n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": " \n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": " \n\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " \n\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": " \n\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": " \n\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": " \n\u754c\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": " \n\u754c\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": " \n\u754c\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": " \n\u754c\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": " \n\u754c\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\n\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\n\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\n\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\n\na\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\n\na\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\n\na\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n\na\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\n\na\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\n\n \n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\n\n \na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\n\n \n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n\n \n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\n\n \n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\n\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\n\n\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\n\n\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n\n\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\n\n\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\n\n\u754c\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\n\n\u754c\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\n\n\u754c\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\n\n\u754c\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\n\n\u754c\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\u754c\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\u754c\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\u754c\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\u754c\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\u754c\na\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\u754c\na\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\u754c\na\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\u754c\na\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c\na\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\u754c\n \n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\u754c\n \na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\u754c\n \n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\u754c\n \n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c\n \n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\u754c\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\u754c\n\n\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\u754c\n\n\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\u754c\n\n\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c\n\n\n\u754c"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "",
+      "text": "\u754c\n\u754c\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"a\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "a",
+      "text": "\u754c\n\u754c\na"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\" \"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": " ",
+      "text": "\u754c\n\u754c\n "
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\\n\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\n",
+      "text": "\u754c\n\u754c\n\n"
+    },
+    {
+      "body": "[{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null},{\"Type\":0,\"Agent\":null,\"Message\":{\"text\":\"\u754c\"},\"ToolCall\":null,\"ToolOutput\":null,\"HandoffCall\":null,\"HandoffOutput\":null,\"Reasoning\":null,\"Compaction\":null,\"ToolApproval\":null}]",
+      "call_inputs": [],
+      "calls": null,
+      "last": "\u754c",
+      "text": "\u754c\n\u754c\n\u754c"
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/item-helpers-reference/reference_test.go": "09f921224c469c0cff24707491196151089551e24cdfe8f0e5c526b536639eb5",
+      "scripts/item-helpers-reference/run.py": "8738a38fcee3553414cc91856aebd35074f3e1793286dbd6382c094b4146664c"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/items.go": "fc3506f8767831ea124df1c0d1c9a72c4fdc6c248860a1660eaa3bb569ae287b",
+      "internal/agent/types_test.go": "9d71a1e6609d79cc77abd6713e043cb72d8ca9e22729b30cb71c268fecaeef10"
+    }
+  },
+  "raw_cases": [
+    {
+      "input": "",
+      "nil": true,
+      "output": "",
+      "output_nil": true
+    },
+    {
+      "input": "",
+      "nil": false,
+      "output": "",
+      "output_nil": false
+    },
+    {
+      "input": "ff00",
+      "nil": false,
+      "output": "ff00",
+      "output_nil": false
+    },
+    {
+      "input": "7b22696e636f6d706c657465223a",
+      "nil": false,
+      "output": "7b22696e636f6d706c657465223a",
+      "output_nil": false
+    },
+    {
+      "input": "207b227a223a3165302c2261223a322c2261223a337d20",
+      "nil": false,
+      "output": "207b227a223a3165302c2261223a322c2261223a337d20",
+      "output_nil": false
+    }
+  ]
+}

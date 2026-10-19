@@ -1,0 +1,3274 @@
+{
+  "normalizations": [
+    {
+      "failed": false,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "allow",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "deny",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ask",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "low",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "medium",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "high",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "unknown",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "classify",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "low",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "medium",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "high",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "unknown",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "low",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "medium",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "high",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "unknown",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "unknown",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "low",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "medium",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "high",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "unknown",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": "ALLOW",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "low",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "low",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "low",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "medium",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "medium",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "medium",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "high",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "high",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "high",
+        "rule": "authorizer-error"
+      }
+    },
+    {
+      "failed": false,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer returned an invalid decision",
+        "risk": "unknown",
+        "rule": "invalid-decision"
+      }
+    },
+    {
+      "failed": true,
+      "input": {
+        "decision": " allow ",
+        "reason": "detail <&>",
+        "risk": "unknown",
+        "rule": "custom-rule"
+      },
+      "output": {
+        "decision": "deny",
+        "reason": "action authorizer failed",
+        "risk": "unknown",
+        "rule": "authorizer-error"
+      }
+    }
+  ],
+  "provenance": {
+    "commit": "1dc92b73900fac74dc357a938e4b5eee6392b418",
+    "goVersion": "go version go1.26.8 linux/amd64",
+    "harnessSHA256": {
+      "scripts/action-authorization-reference/reference_test.go": "9dc5fb8e815c9a3704e57432c3d581d1495a9c86e3ad277435092837631d9f46",
+      "scripts/action-authorization-reference/run.py": "b170f7bd0b5e7482c5dba3268ae1454ac4d97639e9a255021f860eb423d6bedf"
+    },
+    "license": "GPL-3.0-only",
+    "repository": "https://github.com/gratefulagents/sdk",
+    "sourceSHA256": {
+      "go.mod": "e18874595643118f49c67f9293b99ab600da977982176bbb483f29a806ec4f9a",
+      "go.sum": "9fdfbfc58032bf40b8851149d34b69269e8bd03ba395a74b356d8c87b31d4069",
+      "internal/agent/authorization.go": "d3f1f1e57835d975f43137a00dbdbc09882a4c61c28f756e1ec1c52e4895dd36",
+      "internal/agent/authorization_test.go": "5729ee4a0704073d43b20a127d1abf127ed597d6d727106ff1775fd3c34d7d55",
+      "internal/agent/run_config.go": "8bf6e20a356b493908bb9789b4b82b1430646558d1936cf8fa41439922d4163e",
+      "internal/agent/run_result.go": "d7e374e858afd34ef0b922d1df046adc28e5d21252f8e76babde8f1112c990bd",
+      "internal/agent/runner.go": "d70780fc683b240b77b27ac888175d5f260ef2d73e2a32fb21c293fd5ea70c00",
+      "internal/agent/runner_authorization_test.go": "f43cf0109740ec9a22c70fb20a9bc0e50de65b4cd54455b2e185662a0b4b2735"
+    }
+  },
+  "runs": [
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": true,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "deny",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: boundary. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "null",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "ask",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ask",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "null",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": true,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "allow",
+            "reason": " boundary ",
+            "risk": "retained-risk",
+            "rule": "custom-rule"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": true,
+      "output": null
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer failed",
+            "risk": "retained-risk",
+            "rule": "authorizer-error"
+          },
+          "error": "private classifier failure",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "allow",
+      "disabled": false,
+      "executed": false,
+      "failed": true,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer failed. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "classify",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"target\":\"fixture\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "null",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":1,\"x\":2}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "{\"x\":\"\\ud800\"}",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "not-json",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [
+        {
+          "authorization": {
+            "decision": "deny",
+            "reason": "action authorizer returned an invalid decision",
+            "risk": "retained-risk",
+            "rule": "invalid-decision"
+          },
+          "error": "",
+          "request": {
+            "input": "\"\u732b\ud83d\udca5\"",
+            "provenance": "model-tool-call",
+            "read_only": false,
+            "tool_name": "write_file",
+            "work_dir": "/workspace/repo"
+          }
+        }
+      ],
+      "decision": "ALLOW",
+      "disabled": false,
+      "executed": false,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": true,
+        "text": "Action denied: action authorizer returned an invalid decision. Respect this boundary and find a safer approach; do not route around it."
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "{\"target\":\"fixture\"}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "null",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "{}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "{\"x\":1,\"x\":2}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "{\"x\":\"\\ud800\"}",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "not-json",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    },
+    {
+      "approval": false,
+      "audits": [],
+      "decision": "allow",
+      "disabled": true,
+      "executed": true,
+      "failed": false,
+      "input": "\"\u732b\ud83d\udca5\"",
+      "interrupted": false,
+      "output": {
+        "error": false,
+        "text": "executed"
+      }
+    }
+  ]
+}

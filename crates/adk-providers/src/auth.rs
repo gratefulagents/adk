@@ -56,6 +56,7 @@ impl Scope {
         account: Option<String>,
         mode: AuthMode,
     ) -> Result<Self, Error> {
+        let endpoint = endpoint.trim();
         let mut url =
             Url::parse(endpoint).map_err(|_| crate::invalid("invalid provider endpoint"))?;
         if !url.username().is_empty()
@@ -77,13 +78,37 @@ impl Scope {
             return Err(crate::invalid("invalid credential route"));
         }
         url.set_path(url.path().trim_end_matches('/').to_owned().as_str());
+        // Url erases default ports, but their presence changes SDK backend classification.
+        let endpoint = match explicit_endpoint_port(endpoint) {
+            Some(port) if url.port().is_none() => {
+                format!(
+                    "{}:{port}{}",
+                    url.origin().ascii_serialization(),
+                    url.path()
+                )
+            }
+            _ => url.to_string(),
+        };
         Ok(Self {
             route: route.to_owned(),
-            endpoint: url.to_string().trim_end_matches('/').to_owned(),
+            endpoint: endpoint.trim_end_matches('/').to_owned(),
             account,
             mode,
         })
     }
+}
+
+pub(crate) fn explicit_endpoint_port(endpoint: &str) -> Option<&str> {
+    let authority = endpoint
+        .trim()
+        .split_once("://")?
+        .1
+        .split(['/', '\\', '?', '#'])
+        .next()?;
+    let (_, port) = authority.rsplit_once(':')?;
+    port.bytes()
+        .all(|byte| byte.is_ascii_digit())
+        .then_some(port)
 }
 
 #[derive(Debug, Clone)]
@@ -178,6 +203,7 @@ struct SessionState {
 /// reloads. Independent routes must have independent sessions.
 pub struct Session {
     scope: Scope,
+    codex_client_version: Option<String>,
     store: Arc<dyn CredentialStore>,
     refresh: Arc<dyn Refresh>,
     gate: Mutex<SessionState>,
@@ -193,6 +219,7 @@ impl Session {
         let scope = Scope::new(&scope.route, &scope.endpoint, scope.account, scope.mode)?;
         Ok(Self {
             scope,
+            codex_client_version: None,
             store,
             refresh,
             gate: Mutex::new(SessionState::default()),
@@ -204,6 +231,19 @@ impl Session {
     pub fn with_clock(mut self, now: Arc<dyn Fn() -> SystemTime + Send + Sync>) -> Self {
         self.now = now;
         self
+    }
+    /// Override the Codex URL client version before sharing this session.
+    /// Whitespace-only values restore the pinned default.
+    pub fn with_codex_client_version(mut self, version: impl Into<String>) -> Self {
+        let version = version.into();
+        let version = version.trim();
+        self.codex_client_version = (!version.is_empty()).then(|| version.to_owned());
+        self
+    }
+    pub fn codex_client_version(&self) -> &str {
+        self.codex_client_version
+            .as_deref()
+            .unwrap_or(crate::metadata::DEFAULT_CODEX_CLIENT_VERSION)
     }
     /// Disable local exchanges when the host owns refresh or requires reauthentication.
     pub fn disable_refresh(&self) {
@@ -412,6 +452,35 @@ impl Session {
         Ok(())
     }
 }
+pub(crate) fn decorate_codex_url(url: &mut Url, session: &Session) {
+    if session.scope().mode != AuthMode::OpenAiOAuth
+        || explicit_endpoint_port(&session.scope().endpoint).is_some()
+        || url.port().is_some()
+        || !url
+            .host_str()
+            .is_some_and(|host| host == "chatgpt.com" || host.ends_with(".chatgpt.com"))
+    {
+        return;
+    }
+    // Go's q.Get inspects the first value; q.Set replaces every duplicate if empty.
+    if url
+        .query_pairs()
+        .find(|(key, _)| key == "client_version")
+        .is_some_and(|(_, value)| !value.is_empty())
+    {
+        return;
+    }
+    let pairs: Vec<_> = url
+        .query_pairs()
+        .filter(|(key, _)| key != "client_version")
+        .map(|(key, value)| (key.into_owned(), value.into_owned()))
+        .collect();
+    url.query_pairs_mut()
+        .clear()
+        .extend_pairs(pairs)
+        .append_pair("client_version", session.codex_client_version());
+}
+
 /// Headers are marked sensitive; do not serialize or log the returned map.
 pub fn headers(scope: &Scope, material: &Material, anthropic: bool) -> Result<HeaderMap, Error> {
     if scope.account.is_some() && scope.account != material.account {

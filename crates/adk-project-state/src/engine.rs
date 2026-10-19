@@ -2,7 +2,7 @@ use crate::{
     storage::{Backend, Transaction, normalize_options},
     *,
 };
-use chrono::{DateTime, Utc};
+use chrono::{DateTime, FixedOffset, Utc};
 use serde_json::{Value, json};
 use std::{
     collections::{BTreeMap, BTreeSet},
@@ -52,7 +52,8 @@ impl State {
     fn apply(&mut self, ev: &Event) -> Result<()> {
         let p = &ev.payload;
         let id = p["id"].as_str().unwrap_or_default();
-        let at = || -> Result<DateTime<Utc>> { Ok(serde_json::from_value(p["at"].clone())?) };
+        let at =
+            || -> Result<DateTime<FixedOffset>> { Ok(serde_json::from_value(p["at"].clone())?) };
         match ev.event_type.as_str() {
             "project.initialized" => {
                 self.project = serde_json::from_value(p.clone())?;
@@ -289,7 +290,7 @@ impl ProjectStore {
             project_id: self.options.project_id.clone(),
             run_id: self.options.run_id.clone(),
             actor: self.options.actor.clone(),
-            time,
+            time: time.fixed_offset(),
             event_type: kind.into(),
             payload,
         }
@@ -327,14 +328,14 @@ impl ProjectStore {
                 description: input.description.trim().into(),
                 task_type: normalize_type(&input.task_type),
                 status: "open".into(),
-                priority: input.priority.clamp(0, 4),
+                priority: i64::from(input.priority.clamp(0, 4)),
                 assignee: input.assignee.trim().into(),
                 depends_on: unique(&input.depends_on),
                 labels: unique(&input.labels),
-                created_at: now,
-                updated_at: now,
+                created_at: now.fixed_offset(),
+                updated_at: now.fixed_offset(),
                 source_run: first(&input.source_run, &self.options.run_id),
-                metadata: input.metadata,
+                metadata: (!input.metadata.is_null()).then_some(input.metadata),
                 ..Default::default()
             };
             Ok((serde_json::to_value(&task)?, task))
@@ -354,10 +355,10 @@ impl ProjectStore {
             }
             if let Some(v) = &patch.status {
                 task.status = normalize_status(v);
-                task.closed_at = (task.status == "closed").then_some(now);
+                task.closed_at = (task.status == "closed").then_some(now.fixed_offset());
             }
             if let Some(v) = patch.priority {
-                task.priority = v.clamp(0, 4);
+                task.priority = i64::from(v.clamp(0, 4));
             }
             if let Some(v) = &patch.assignee {
                 task.assignee = v.trim().into();
@@ -366,9 +367,9 @@ impl ProjectStore {
                 task.labels = unique(&patch.labels);
             }
             if let Some(v) = &patch.metadata {
-                task.metadata = v.clone();
+                task.metadata = Some(v.clone());
             }
-            task.updated_at = now;
+            task.updated_at = now.fixed_offset();
             Ok((json!({"id":task.id,"patch":patch,"task":task}), task))
         })
     }
@@ -378,7 +379,7 @@ impl ProjectStore {
             let actor = first(&first(actor, &self.options.actor), "agent");
             task.assignee = actor.clone();
             task.status = "in_progress".into();
-            task.updated_at = now;
+            task.updated_at = now.fixed_offset();
             task.closed_at = None;
             Ok((json!({"id":task.id,"actor":actor,"at":now}), task))
         })
@@ -387,14 +388,14 @@ impl ProjectStore {
         self.mutate("task.closed", |state, now| {
             let mut task = state.task_mut(id.trim())?.clone();
             task.status = "closed".into();
-            task.updated_at = now;
-            task.closed_at = Some(now);
+            task.updated_at = now.fixed_offset();
+            task.closed_at = Some(now.fixed_offset());
             if !reason.trim().is_empty() {
                 task.comments.push(TaskComment {
                     id: crate::id("comment"),
                     actor: self.options.actor.clone(),
                     body: format!("Closed: {}", reason.trim()),
-                    created_at: now,
+                    created_at: now.fixed_offset(),
                 });
             }
             Ok((
@@ -451,7 +452,7 @@ impl ProjectStore {
                 id: id("comment"),
                 actor: first(actor, &self.options.actor),
                 body: required(body, "comment body")?,
-                created_at: now,
+                created_at: now.fixed_offset(),
             };
             Ok((json!({"id":task.id,"comment":comment}), comment))
         })
@@ -465,7 +466,11 @@ impl ProjectStore {
                 input.id.trim().into()
             };
             let memory = Memory {
-                created_at: state.memories.get(&id).map(|m| m.created_at).unwrap_or(now),
+                created_at: state
+                    .memories
+                    .get(&id)
+                    .map(|m| m.created_at)
+                    .unwrap_or(now.fixed_offset()),
                 id,
                 kind: normalize(
                     &input.kind,
@@ -482,8 +487,8 @@ impl ProjectStore {
                 task_ids: unique(&input.task_ids),
                 file_paths: unique(&input.file_paths),
                 source_run: first(&input.source_run, &self.options.run_id),
-                updated_at: now,
-                metadata: input.metadata,
+                updated_at: now.fixed_offset(),
+                metadata: (!input.metadata.is_null()).then_some(input.metadata),
                 last_read_at: None,
             };
             Ok((serde_json::to_value(&memory)?, memory))
@@ -510,14 +515,14 @@ impl ProjectStore {
             required(&summary.summary, "session summary")?;
             if summary.id.trim().is_empty() {
                 summary.id = id("session");
-                summary.created_at = now;
+                summary.created_at = now.fixed_offset();
             }
             if let Some(old) = state.sessions.get(&summary.id) {
                 summary.created_at = old.created_at;
             }
             summary.run_id = first(&summary.run_id, &self.options.run_id);
             summary.task_ids = unique(&summary.task_ids);
-            summary.updated_at = now;
+            summary.updated_at = now.fixed_offset();
             Ok((serde_json::to_value(&summary)?, summary))
         })
     }

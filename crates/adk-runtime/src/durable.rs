@@ -1126,7 +1126,11 @@ impl Engine {
                     _ => item,
                 };
                 adk_codec::approval::encode_item(item, agent.as_ref())
-                    .map(|wire| adk_codec::snapshot_items(&[wire]).remove(0))
+                    .map(|wire| {
+                        adk_codec::snapshot_items(&[wire])
+                            .expect("one snapshot")
+                            .remove(0)
+                    })
                     .map_err(invalid)
             })
             .collect::<Result<Vec<_>, _>>()?;
@@ -1144,7 +1148,9 @@ impl Engine {
                 .ok_or_else(|| invalid("approval marker outside history"))?;
             history.insert(
                 index,
-                adk_codec::snapshot_items(&[marker.marker.to_wire().map_err(invalid)?]).remove(0),
+                adk_codec::snapshot_items(&[marker.marker.to_wire().map_err(invalid)?])
+                    .expect("one snapshot")
+                    .remove(0),
             );
         }
         let count = |n: u64| i64::try_from(n).map_err(invalid);

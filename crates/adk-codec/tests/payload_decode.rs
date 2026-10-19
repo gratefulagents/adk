@@ -4,6 +4,88 @@ use serde::{Deserialize, Serialize};
 use serde_json::{Value, json};
 
 #[test]
+fn snapshot_helper_empty_results_match_pinned_go() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let nil: Option<Vec<RunItem>> = None;
+    assert_eq!(
+        adk_codec::snapshot_items(nil.as_deref().unwrap_or_default()).is_none(),
+        fixture["snapshot_empty_results"]["nil_input_nil"]
+    );
+    assert_eq!(
+        adk_codec::snapshot_items(&[]).is_none(),
+        fixture["snapshot_empty_results"]["empty_input_nil"]
+    );
+    assert_eq!(
+        serde_json::to_value(adk_codec::snapshot_items(&[])).unwrap(),
+        Value::Null
+    );
+}
+
+#[test]
+fn snapshot_helper_raw_fallback_matches_pinned_go_without_mutating_input() {
+    let fixture: Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let cases = fixture["snapshot_raw_helper_cases"].as_array().unwrap();
+    assert_eq!(cases.len(), 38);
+    for case in cases {
+        let bytes = unhex(case["input_hex"].as_str().unwrap());
+        let raw = if case["raw_nil"] == true {
+            RawJson::Missing
+        } else {
+            RawJson::EncodedBytes(bytes.clone())
+        };
+        let kind = RunItemType(case["kind"].as_i64().unwrap());
+        let mut item = RunItem {
+            kind,
+            ..Default::default()
+        };
+        if kind == RunItemType(1) {
+            item.tool_call = Some(ToolCallData {
+                id: "call".into(),
+                name: "tool".into(),
+                input: raw,
+            });
+        } else {
+            assert_eq!(kind, RunItemType(6));
+            item.tool_approval = Some(ToolApprovalData {
+                call_id: "call".into(),
+                tool_name: "tool".into(),
+                input: raw,
+                approved: true,
+            });
+        }
+        let snapshots = adk_codec::snapshot_items(std::slice::from_ref(&item)).unwrap();
+        assert_eq!(snapshots.len(), 1);
+        let snapshot = &snapshots[0];
+        let (output, original) = if kind == RunItemType(1) {
+            (
+                &snapshot.tool_call.as_ref().unwrap().input,
+                &item.tool_call.as_ref().unwrap().input,
+            )
+        } else {
+            (
+                &snapshot.tool_approval.as_ref().unwrap().input,
+                &item.tool_approval.as_ref().unwrap().input,
+            )
+        };
+        assert_eq!(output.is_missing(), case["output_nil"], "{case}");
+        assert_eq!(
+            output.bytes(),
+            unhex(case["output_hex"].as_str().unwrap()),
+            "{case}"
+        );
+        assert_eq!(
+            to_go_json_bytes(snapshot).unwrap(),
+            unhex(case["encoded_hex"].as_str().unwrap()),
+            "{case}"
+        );
+        assert_eq!(original.bytes(), bytes);
+        assert_eq!(original.is_missing(), case["raw_nil"]);
+    }
+}
+
+#[test]
 fn nullable_image_payloads_and_snapshot_projection_match_pinned_go() {
     let fixture: Value =
         serde_json::from_str(include_str!("../../../fixtures/tracestore/sdk-writer.json")).unwrap();
@@ -42,7 +124,8 @@ fn nullable_image_payloads_and_snapshot_projection_match_pinned_go() {
                 tool_output: Some(output),
                 ..Default::default()
             },
-        ]);
+        ])
+        .unwrap();
         assert_eq!(
             snapshots[0].message_images.is_none(),
             case["message_snapshot_images_nil"]

@@ -53,12 +53,7 @@ pub fn replay(operation: &str, input: &Value) -> Result<Value, CodecError> {
     Ok(match operation {
         "snapshot_items" => {
             let items: Option<Vec<RunItem>> = serde_json::from_value(input.clone())?;
-            let output = snapshot_items(items.as_deref().unwrap_or_default());
-            if output.is_empty() {
-                Value::Null
-            } else {
-                serde_json::to_value(output)?
-            }
+            serde_json::to_value(snapshot_items(items.as_deref().unwrap_or_default()))?
         }
         "response_snapshot" => {
             let response: Option<ModelResponse> = serde_json::from_value(input.clone())?;
@@ -73,76 +68,98 @@ pub fn replay(operation: &str, input: &Value) -> Result<Value, CodecError> {
     })
 }
 
-pub fn snapshot_items(items: &[RunItem]) -> Vec<RunItemSnapshot> {
-    items
-        .iter()
-        .map(|item| {
-            let mut out = RunItemSnapshot {
-                kind: item.kind.into(),
-                agent_name: item
-                    .agent
-                    .as_ref()
-                    .map(|a| a.name.clone())
-                    .unwrap_or_default(),
-                ..Default::default()
-            };
-            match out.kind {
-                SnapshotType::Message => {
-                    if let Some(v) = &item.message {
-                        out.message_text = v.text.clone();
-                        out.message_phase = v.phase.clone();
-                        out.message_images = v
-                            .images
-                            .as_ref()
-                            .filter(|images| !images.is_empty())
-                            .cloned();
+fn snapshot_raw_message(raw: &RawJson) -> RawJson {
+    let bytes = raw.bytes();
+    if bytes.is_empty() {
+        RawJson::Missing
+    } else if value::validate(&bytes).is_ok() {
+        raw.clone()
+    } else {
+        RawJson::EncodedBytes(value::quote_original_bytes(&bytes))
+    }
+}
+
+/// Build owned analysis records, returning nil (`None`) for empty input.
+///
+/// Raw call/approval input is copied when valid JSON, omitted when empty, and
+/// otherwise quoted as a Go byte string. Use the sealed byte encoder for raw
+/// fragments that contain invalid UTF-8.
+pub fn snapshot_items(items: &[RunItem]) -> Option<Vec<RunItemSnapshot>> {
+    if items.is_empty() {
+        return None;
+    }
+    Some(
+        items
+            .iter()
+            .map(|item| {
+                let mut out = RunItemSnapshot {
+                    kind: item.kind.into(),
+                    agent_name: item
+                        .agent
+                        .as_ref()
+                        .map(|a| a.name.clone())
+                        .unwrap_or_default(),
+                    ..Default::default()
+                };
+                match out.kind {
+                    SnapshotType::Message => {
+                        if let Some(v) = &item.message {
+                            out.message_text = v.text.clone();
+                            out.message_phase = v.phase.clone();
+                            out.message_images = v
+                                .images
+                                .as_ref()
+                                .filter(|images| !images.is_empty())
+                                .cloned();
+                        }
                     }
-                }
-                SnapshotType::ToolCall => {
-                    out.tool_call = item.tool_call.as_ref().map(|v| ToolCallSnapshot {
-                        id: v.id.clone(),
-                        name: v.name.clone(),
-                        input: v.input.clone(),
-                    })
-                }
-                SnapshotType::ToolOutput => out.tool_output = item.tool_output.clone(),
-                SnapshotType::HandoffCall => out.handoff_call = item.handoff_call.clone(),
-                SnapshotType::HandoffOutput => out.handoff_output = item.handoff_output.clone(),
-                SnapshotType::Reasoning => {
-                    if let Some(v) = &item.reasoning {
-                        out.reasoning_text = v.text.clone();
-                        out.thinking_text = v.text.clone();
-                        out.reasoning = Some(ReasoningSnapshot {
+                    SnapshotType::ToolCall => {
+                        out.tool_call = item.tool_call.as_ref().map(|v| ToolCallSnapshot {
                             id: v.id.clone(),
-                            text: v.text.clone(),
-                            thinking: v.text.clone(),
-                            signature: v.signature.clone(),
-                            redacted_data: v.redacted_data.clone(),
-                            encrypted_content: v.encrypted_content.clone(),
-                        });
+                            name: v.name.clone(),
+                            input: snapshot_raw_message(&v.input),
+                        })
                     }
+                    SnapshotType::ToolOutput => out.tool_output = item.tool_output.clone(),
+                    SnapshotType::HandoffCall => out.handoff_call = item.handoff_call.clone(),
+                    SnapshotType::HandoffOutput => out.handoff_output = item.handoff_output.clone(),
+                    SnapshotType::Reasoning => {
+                        if let Some(v) = &item.reasoning {
+                            out.reasoning_text = v.text.clone();
+                            out.thinking_text = v.text.clone();
+                            out.reasoning = Some(ReasoningSnapshot {
+                                id: v.id.clone(),
+                                text: v.text.clone(),
+                                thinking: v.text.clone(),
+                                signature: v.signature.clone(),
+                                redacted_data: v.redacted_data.clone(),
+                                encrypted_content: v.encrypted_content.clone(),
+                            });
+                        }
+                    }
+                    SnapshotType::Compaction => {
+                        out.compaction = item.compaction.as_ref().map(|v| CompactionSnapshot {
+                            id: v.id.clone(),
+                            content: v.content.clone(),
+                            encrypted_content: v.encrypted_content.clone(),
+                            created_by: v.created_by.clone(),
+                        })
+                    }
+                    SnapshotType::ToolApproval => {
+                        out.tool_approval =
+                            item.tool_approval.as_ref().map(|v| ToolApprovalSnapshot {
+                                tool_name: v.tool_name.clone(),
+                                input: snapshot_raw_message(&v.input),
+                                call_id: v.call_id.clone(),
+                                approved: v.approved,
+                            })
+                    }
+                    SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_) => {}
                 }
-                SnapshotType::Compaction => {
-                    out.compaction = item.compaction.as_ref().map(|v| CompactionSnapshot {
-                        id: v.id.clone(),
-                        content: v.content.clone(),
-                        encrypted_content: v.encrypted_content.clone(),
-                        created_by: v.created_by.clone(),
-                    })
-                }
-                SnapshotType::ToolApproval => {
-                    out.tool_approval = item.tool_approval.as_ref().map(|v| ToolApprovalSnapshot {
-                        tool_name: v.tool_name.clone(),
-                        input: v.input.clone(),
-                        call_id: v.call_id.clone(),
-                        approved: v.approved,
-                    })
-                }
-                SnapshotType::Unknown | SnapshotType::Unspecified | SnapshotType::Other(_) => {}
-            }
-            out
-        })
-        .collect()
+                out
+            })
+            .collect(),
+    )
 }
 
 pub fn response_snapshot(response: &ModelResponse) -> ResponseSnapshot {
@@ -158,7 +175,7 @@ pub fn response_snapshot(response: &ModelResponse) -> ResponseSnapshot {
         },
         ..Default::default()
     };
-    for item in &items {
+    for item in items.iter().flatten() {
         if !item.message_text.is_empty() {
             out.texts
                 .get_or_insert_with(Vec::new)
@@ -179,7 +196,7 @@ pub fn response_snapshot(response: &ModelResponse) -> ResponseSnapshot {
             out.tool_calls.get_or_insert_with(Vec::new).push(v.clone());
         }
     }
-    out.items = (!items.is_empty()).then_some(items);
+    out.items = items;
     out
 }
 

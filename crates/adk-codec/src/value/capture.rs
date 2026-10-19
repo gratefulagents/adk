@@ -130,7 +130,7 @@ fn encode(nodes: &[Node], redact: &impl Fn(&str) -> String) -> Vec<u8> {
     out
 }
 
-fn quote_original_bytes(mut input: &[u8]) -> Vec<u8> {
+pub(crate) fn quote_original_bytes(mut input: &[u8]) -> Vec<u8> {
     let mut out = vec![b'"'];
     while !input.is_empty() {
         let (valid, invalid) = match std::str::from_utf8(input) {

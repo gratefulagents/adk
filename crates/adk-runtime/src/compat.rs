@@ -599,7 +599,7 @@ impl RunHooks for GoEventAdapter {
                         approval::encode_history(&items, &agents, &markers).map_err(|error| {
                             Error::new(ErrorCategory::Unsupported, error.to_string())
                         })?;
-                    for item in adk_codec::snapshot_items(&wire) {
+                    for item in adk_codec::snapshot_items(&wire).into_iter().flatten() {
                         self.0
                             .emit(context, GoStreamEvent::Item(Box::new(item)))
                             .await?;

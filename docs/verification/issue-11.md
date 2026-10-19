@@ -2,6 +2,22 @@
 
 ## Current continuation evidence
 
+### Snapshot helper raw fallback and empty results
+
+The public `snapshot_items` helper now returns `Option<Vec<RunItemSnapshot>>`,
+with `None` for empty input as the pinned helper returns nil. Native execution
+and durable adapters explicitly project this optional result where they require
+a sequence. Tool-call and approval raw payloads are copied unchanged when valid,
+omitted when zero-length, and quoted as Go byte strings when invalid (including
+over-depth JSON). This reuses the existing original-byte quoting implementation,
+preserving the distinction between malformed UTF8 and genuine replacement runes.
+
+Thirty-eight independent Go helper observations assert raw output bytes, nil
+state and final encoding; Rust also checks that input bytes remain unchanged.
+Both nil and allocated-empty input arrays are independently observed to return
+nil. The targeted codec and actual runner replay suites pass (40 tests). This
+fixes concrete helper behavior but does not alone close all snapshot helpers.
+
 ### Complete request/response analysis data byte contracts
 
 An additional 522 independently generated Go observations enumerate every field

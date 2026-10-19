@@ -11,6 +11,34 @@ use adk::codec::{
 };
 
 #[test]
+fn public_snapshot_helper_preserves_nil_and_quotes_invalid_raw() {
+    use adk::codec::dto::{RawJson, RunItem, RunItemType, ToolCallData};
+    assert!(adk::codec::snapshot_items(&[]).is_none());
+    let item = RunItem {
+        kind: RunItemType(1),
+        tool_call: Some(ToolCallData {
+            id: "call".into(),
+            name: "tool".into(),
+            input: RawJson::EncodedBytes(b"[1,]".to_vec()),
+        }),
+        ..Default::default()
+    };
+    let snapshots = adk::codec::snapshot_items(&[item]).unwrap();
+    let fixture: serde_json::Value =
+        serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();
+    let case = fixture["snapshot_raw_helper_cases"]
+        .as_array()
+        .unwrap()
+        .iter()
+        .find(|case| case["kind"] == 1 && case["input_hex"] == "5b312c5d")
+        .unwrap();
+    assert_eq!(
+        to_go_json_bytes(&snapshots[0]).unwrap(),
+        unhex(case["encoded_hex"].as_str().unwrap())
+    );
+}
+
+#[test]
 fn public_field_complete_envelopes_match_pinned_go() {
     let fixture: serde_json::Value =
         serde_json::from_str(include_str!("../../../fixtures/payloads/observations.json")).unwrap();

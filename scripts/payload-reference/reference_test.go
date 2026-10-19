@@ -272,6 +272,47 @@ func runItemEncodeCases() []map[string]any {
 	return cases
 }
 
+func snapshotRawHelperCases() []map[string]any {
+	values := []json.RawMessage{
+		nil, {}, json.RawMessage(`null`), json.RawMessage(`"text"`),
+		json.RawMessage(`"\ud800"`), json.RawMessage("\"\xff\""),
+		json.RawMessage("\xff"), json.RawMessage("\xe2\x82"), json.RawMessage("\xed\xa0\x80"),
+		json.RawMessage("�"), json.RawMessage("�\xff"),
+		json.RawMessage(" { \"n\": 1e+02, \"n\": -0 } \n"),
+		json.RawMessage(`1e9999`), json.RawMessage(` `), json.RawMessage(`[1,]`), json.RawMessage(`01`),
+	}
+	for _, depth := range []int{9999, 10000, 10001} {
+		values = append(values, json.RawMessage(strings.Repeat("[", depth)+"0"+strings.Repeat("]", depth)))
+	}
+	var cases []map[string]any
+	for _, raw := range values {
+		for _, kind := range []RunItemType{RunItemToolCall, RunItemToolApproval} {
+			item := RunItem{Type: kind}
+			if kind == RunItemToolCall {
+				item.ToolCall = &ToolCallData{ID: "call", Name: "tool", Input: raw}
+			} else {
+				item.ToolApproval = &ToolApprovalData{CallID: "call", ToolName: "tool", Input: raw, Approved: true}
+			}
+			snapshot := SnapshotRunItems([]RunItem{item})[0]
+			var output json.RawMessage
+			if kind == RunItemToolCall {
+				output = snapshot.ToolCall.Input
+			} else {
+				output = snapshot.ToolApproval.Input
+			}
+			encoded, err := json.Marshal(snapshot)
+			if err != nil {
+				panic(err)
+			}
+			cases = append(cases, map[string]any{
+				"kind": kind, "raw_nil": raw == nil, "input_hex": hex.EncodeToString(raw),
+				"output_nil": output == nil, "output_hex": hex.EncodeToString(output), "encoded_hex": hex.EncodeToString(encoded),
+			})
+		}
+	}
+	return cases
+}
+
 func TestNativePayloadReference(t *testing.T) {
 	if strconv.IntSize != 64 {
 		t.Fatalf("oracle requires IntSize 64, got %d", strconv.IntSize)
@@ -486,8 +527,13 @@ func TestNativePayloadReference(t *testing.T) {
 	result := map[string]any{
 		"schema_version": 1, "int_size": strconv.IntSize, "cases": cases, "snapshot_encode_cases": encoding,
 		"run_item_byte_cases": runItemByteCases(), "run_item_encode_cases": runItemEncodeCases(),
-		"envelope_field_cases": envelopeFieldCases(),
-		"envelope_byte_cases":  snapshotEnvelopeCases(), "envelope_encode_cases": snapshotEnvelopeEncodeCases(),
+		"envelope_field_cases":      envelopeFieldCases(),
+		"snapshot_raw_helper_cases": snapshotRawHelperCases(),
+		"snapshot_empty_results": map[string]bool{
+			"nil_input_nil":   SnapshotRunItems(nil) == nil,
+			"empty_input_nil": SnapshotRunItems([]RunItem{}) == nil,
+		},
+		"envelope_byte_cases": snapshotEnvelopeCases(), "envelope_encode_cases": snapshotEnvelopeEncodeCases(),
 		"enum_values": map[string]RunItemType{
 			"RunItemMessage": RunItemMessage, "RunItemToolCall": RunItemToolCall,
 			"RunItemToolOutput": RunItemToolOutput, "RunItemHandoffCall": RunItemHandoffCall,

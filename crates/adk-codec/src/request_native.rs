@@ -59,7 +59,7 @@ pub fn snapshot_native_items(
         .zip(provenance)
         .map(|(item, agent)| analysis_item(item, agent))
         .collect::<Result<Vec<_>, _>>()?;
-    Ok(crate::snapshot_items(&items))
+    Ok(crate::snapshot_items(&items).unwrap_or_default())
 }
 
 impl RequestSnapshot {
@@ -236,7 +236,7 @@ fn merge_markers(
         {
             return Err(BridgeError("approval marker agent name is empty"));
         }
-        merged.extend(crate::snapshot_items(&[wire]));
+        merged.extend(crate::snapshot_items(&[wire]).into_iter().flatten());
     }
     merged.extend(native);
     Ok(merged)

@@ -1,6 +1,7 @@
 //! Decoding and byte-oriented capture of untyped SDK JSON values.
 
 mod capture;
+pub(crate) use capture::quote_original_bytes;
 pub use capture::redact_json;
 
 use serde::{Deserialize, Deserializer};
